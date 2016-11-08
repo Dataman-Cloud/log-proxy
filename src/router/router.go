@@ -21,13 +21,14 @@ func Router(middlewares ...gin.HandlerFunc) *gin.Engine {
 	s := api.GetSearch()
 	logv1 := r.Group("/v1/search")
 	{
-		logv3.GET("/ping", s.Ping)
+		logv1.GET("/ping", s.Ping)
+		logv1.GET("/applications", s.Applications)
 	}
 
 	monitor := api.GetMonitor()
 	monitorv1 := r.Group("/v1/monitor")
 	{
-		monitorv3.GET("/ping", monitor.Ping)
+		monitorv1.GET("/ping", monitor.Ping)
 	}
 
 	return r
