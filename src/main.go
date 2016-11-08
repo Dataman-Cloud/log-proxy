@@ -9,7 +9,6 @@ import (
 	"github.com/Dataman-Cloud/log-proxy/src/router/middleware"
 
 	log "github.com/Sirupsen/logrus"
-	_ "gopkg.in/olivere/elastic.v3"
 )
 
 func main() {
