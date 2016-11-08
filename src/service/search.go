@@ -12,7 +12,7 @@ type SearchService struct {
 func GetSearchService() *SearchService {
 	client, err := elastic.NewClient(elastic.SetURL("http://127.0.0.1:9200"))
 	if err != nil {
-		log.Fatalf("new elastic client error: %v", err)
+		log.Errorf("new elastic client error: %v", err)
 		return nil
 	}
 
