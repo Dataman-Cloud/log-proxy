@@ -1,6 +1,7 @@
 package service
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -164,7 +165,6 @@ func (s *SearchService) Search(appid, taskid, source, keyword string) ([]map[str
 	result, err := s.ESClient.Search().
 		Index("dataman-"+strings.Split(appid, "-")[0]+"-*").
 		Type("dataman-"+appid).
-		Fields("message", "host", "appid", "id", "offset", "path", "taskid").
 		Query(bquery).
 		Sort("offset", true).From(s.PageFrom).Size(s.PageSize).Pretty(true).IgnoreUnavailable(true).Do()
 
@@ -173,7 +173,9 @@ func (s *SearchService) Search(appid, taskid, source, keyword string) ([]map[str
 	}
 
 	for _, hit := range result.Hits.Hits {
-		results = append(results, hit.Fields)
+		data := make(map[string]interface{})
+		json.Unmarshal(*hit.Source, &data)
+		results = append(results, data)
 	}
 
 	return results, nil
