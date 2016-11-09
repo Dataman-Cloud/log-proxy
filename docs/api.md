@@ -1,7 +1,6 @@
 # Logging/Monitoring Proxy API Guide
 
-`GET /v1/search/applications`(#itm1 "itm1")
-
+<a href="#itm1">GET /v1/search/applications</a>
 
 ## Monitoring
 
@@ -116,7 +115,7 @@ curl -XGET http://localhost:5098/v1/search/tasks/test
  ```
 
  ### 根据应用实例获取所有日志来源
-`GET /v1/search/paths/:appid/:taskid`
+<span id="itm1">`GET /v1/search/paths/:appid/:taskid`</span>
 
 For example:
 ```
