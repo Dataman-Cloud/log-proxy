@@ -58,7 +58,8 @@ func init() {
 func LoadConfig() {
 	robj := reflect.ValueOf(c).Elem()
 	for i := 0; i < robj.NumField(); i++ {
-		if rb, err := strconv.ParseBool(robj.Type().Field(i).Tag.Get("require")); err == nil {
+		rb, err := strconv.ParseBool(robj.Type().Field(i).Tag.Get("require"))
+		if err == nil {
 			if rb && os.Getenv(robj.Type().Field(i).Name) == "" {
 				log.Fatalf("config field %s not setting", robj.Type().Field(i).Name)
 			}

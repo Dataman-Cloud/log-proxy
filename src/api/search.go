@@ -7,7 +7,6 @@ import (
 	"github.com/Dataman-Cloud/log-proxy/src/service"
 	"github.com/Dataman-Cloud/log-proxy/src/utils"
 
-	//log "github.com/Sirupsen/logrus"
 	"github.com/gin-gonic/gin"
 )
 

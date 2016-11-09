@@ -3,7 +3,6 @@ package service
 import (
 	"fmt"
 	"strings"
-	"time"
 
 	"github.com/Dataman-Cloud/log-proxy/src/config"
 
@@ -26,9 +25,9 @@ type SearchResult struct {
 func NewSearchService() *SearchService {
 	var ofs []elastic.ClientOptionFunc
 	ofs = append(ofs, elastic.SetURL(strings.Split(config.GetConfig().ES_URL, ",")...))
-	/*if config.GetConfig().SEARCH_DEBUG {
+	if config.GetConfig().SEARCH_DEBUG {
 		ofs = append(ofs, elastic.SetTraceLog(log.StandardLogger()))
-	}*/
+	}
 	client, err := elastic.NewClient(ofs...)
 	if err != nil {
 		log.Errorf("new elastic client error: %v", err)
@@ -45,10 +44,13 @@ func NewSearchService() *SearchService {
 }
 
 func (s *SearchService) Applications() (map[string]int64, error) {
+	bquery := elastic.NewBoolQuery().
+		Filter(elastic.NewRangeQuery("time").Gte(s.RangeFrom).Lte(s.RangeTo).Format("epoch_millis"))
+
 	apps := make(map[string]int64)
 	result, err := s.ESClient.Search().
 		Index("dataman-*").
-		Query(elastic.NewMatchAllQuery()).
+		Query(bquery).
 		SearchType("count").
 		Aggregation("apps", elastic.
 			NewTermsAggregation().
@@ -73,11 +75,15 @@ func (s *SearchService) Applications() (map[string]int64, error) {
 }
 
 func (s *SearchService) Tasks(appName string) (map[string]int64, error) {
+	bquery := elastic.NewBoolQuery().
+		Filter(elastic.NewRangeQuery("time").Gte(s.RangeFrom).Lte(s.RangeTo).Format("epoch_millis")).
+		Must(elastic.NewTermQuery("appid", appName))
+
 	tasks := make(map[string]int64)
 	result, err := s.ESClient.Search().
 		Index("dataman-*").
 		Type("dataman-"+appName).
-		Query(elastic.NewTermQuery("appid", appName)).
+		Query(bquery).
 		SearchType("count").
 		Aggregation("tasks", elastic.
 			NewTermsAggregation().
@@ -105,15 +111,14 @@ func (s *SearchService) Tasks(appName string) (map[string]int64, error) {
 func (s *SearchService) Paths(appName, taskId string) (map[string]int64, error) {
 	paths := make(map[string]int64)
 
-	r := elastic.NewRangeQuery("@timestamp").
-		Gte(time.Now().UnixNano() / 1000000)
+	bquery := elastic.NewBoolQuery().
+		Filter(elastic.NewRangeQuery("time").Gte(s.RangeFrom).Lte(s.RangeTo).Format("epoch_millis")).
+		Must(elastic.NewTermQuery("appid", appName), elastic.NewTermQuery("taskid", taskId))
 
 	result, err := s.ESClient.Search().
 		Index("dataman-*").
 		Type("dataman-"+appName).
-		Query(elastic.NewTermQuery("appid", appName)).
-		Query(elastic.NewTermQuery("taskid", taskId)).
-		Query(r).
+		Query(bquery).
 		SearchType("count").
 		Aggregation("paths", elastic.
 			NewTermsAggregation().
@@ -152,14 +157,16 @@ func (s *SearchService) Search(appid, taskid, source, keyword string) ([]map[str
 	if keyword != "" {
 		querys = append(querys, elastic.NewQueryStringQuery("message:"+keyword).AnalyzeWildcard(true))
 	}
-	bquery := elastic.NewBoolQuery().Must(querys...)
+	bquery := elastic.NewBoolQuery().
+		Filter(elastic.NewRangeQuery("time").Gte(s.RangeFrom).Lte(s.RangeTo).Format("epoch_millis")).
+		Must(querys...)
 
 	result, err := s.ESClient.Search().
 		Index("dataman-"+strings.Split(appid, "-")[0]+"-*").
 		Type("dataman-"+appid).
 		Fields("message", "host", "appid", "id", "offset", "path", "taskid").
 		Query(bquery).
-		Sort("offset", true).From(0).Size(10).Pretty(true).Do()
+		Sort("offset", true).From(s.PageFrom).Size(s.PageSize).Pretty(true).IgnoreUnavailable(true).Do()
 
 	if err != nil {
 		return nil, err
