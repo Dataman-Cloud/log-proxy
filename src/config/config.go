@@ -10,9 +10,11 @@ import (
 	"strings"
 )
 
+// Config defines the conf info
 type Config struct {
-	ADDR   string
-	ES_URL string
+	ADDR           string
+	ES_URL         string
+	PROMETHEUS_URL string
 }
 
 var c *Config

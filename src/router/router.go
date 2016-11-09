@@ -25,10 +25,11 @@ func Router(middlewares ...gin.HandlerFunc) *gin.Engine {
 		logv1.GET("/applications", s.Applications)
 	}
 
-	monitor := api.GetMonitor()
+	monitor := api.NewMonitor()
 	monitorv1 := r.Group("/v1/monitor")
 	{
 		monitorv1.GET("/ping", monitor.Ping)
+		monitorv1.GET("/query", monitor.QueryRange)
 	}
 
 	return r
