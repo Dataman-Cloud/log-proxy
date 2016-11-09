@@ -115,7 +115,7 @@ curl -XGET http://localhost:5098/v1/search/tasks/test
  ```
 
  ### 根据应用实例获取所有日志来源
-<span id="itm1">`GET /v1/search/paths/:appid/:taskid`</span>
+`GET /v1/search/paths/:appid/:taskid{#itm1}
 
 For example:
 ```
