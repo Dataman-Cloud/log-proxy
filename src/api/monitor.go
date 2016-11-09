@@ -12,7 +12,10 @@ import (
 )
 
 const (
-	STATUSBADTEST  = "400-10002"
+	STATUSBADTEST = "400-10002"
+)
+
+const (
 	QUERYRANGEPATH = "/api/v1/query_range"
 )
 

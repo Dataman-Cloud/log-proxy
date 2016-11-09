@@ -127,9 +127,13 @@ func (query *QueryRange) QueryRangeFromProm() (*models.QueryRangeResult, error) 
 func (query *QueryRange) setQueryExpr(metrics, appID string) (expr string) {
 	switch metrics {
 	case "cpu":
-		expr = "avg(irate(container_cpu_usage_seconds_total{container_label_APP_ID='" + appID + "',id=~'/docker/.*', name=~'mesos.*'}[5m])) by (container_label_APP_ID, group, id, image, instance, job, name)"
+		expr = "avg(irate(container_cpu_usage_seconds_total{container_label_APP_ID='" + appID +
+			"',id=~'/docker/.*', name=~'mesos.*'}[5m])) by (container_label_APP_ID, group, " +
+			"id, image, instance, job, name)"
 	case "memory":
-		expr = "container_memory_usage_bytes{container_label_APP_ID='" + appID + "',id=~'/docker/.*', name=~'mesos.*'} / container_spec_memory_limit_bytes{container_label_APP_ID='nginx-stress', id=~'/docker/.*', name=~'mesos.*'}"
+		expr = "container_memory_usage_bytes{container_label_APP_ID='" + appID +
+			"',id=~'/docker/.*', name=~'mesos.*'} / container_spec_memory_limit_bytes" +
+			"{container_label_APP_ID='nginx-stress', id=~'/docker/.*', name=~'mesos.*'}"
 	default:
 		expr = ""
 	}

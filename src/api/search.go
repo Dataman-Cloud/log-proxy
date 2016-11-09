@@ -2,6 +2,7 @@ package api
 
 import (
 	"errors"
+	"strconv"
 
 	"github.com/Dataman-Cloud/log-proxy/src/service"
 	"github.com/Dataman-Cloud/log-proxy/src/utils"
@@ -14,6 +15,7 @@ const (
 	GETAPPS_ERROR = "503-11000"
 	PARAM_ERROR   = "400-11001"
 	GETTASK_ERROR = "503-11002"
+	INDEX_ERROR   = "503-11003"
 )
 
 type search struct {
@@ -22,7 +24,7 @@ type search struct {
 
 func GetSearch() *search {
 	return &search{
-		Service: service.GetSearchService(),
+		Service: service.NewSearchService(),
 	}
 }
 
@@ -72,4 +74,41 @@ func (s *search) Paths(ctx *gin.Context) {
 		return
 	}
 	utils.Ok(ctx, paths)
+}
+
+func (s *search) Index(ctx *gin.Context) {
+	results, err := s.Service.Search(ctx.Param("appname"),
+		ctx.Query("taskid"),
+		ctx.Query("path"),
+		ctx.Query("keyword"))
+	if err != nil {
+		utils.ErrorResponse(ctx, utils.NewError(INDEX_ERROR, err))
+		return
+	}
+
+	utils.Ok(ctx, results)
+}
+
+func (s *search) Middleware(ctx *gin.Context) {
+	if ctx.Query("from") != "" {
+		s.Service.RangeFrom = ctx.Query("from")
+	}
+
+	if ctx.Query("to") != "" {
+		s.Service.RangeTo = ctx.Query("to")
+	}
+
+	if size, err := strconv.Atoi(ctx.Param("size")); err == nil && size > 0 {
+		s.Service.PageSize = size
+	} else {
+		s.Service.PageSize = 100
+	}
+
+	if page, err := strconv.Atoi(ctx.Param("page")); err == nil && page > 0 {
+		s.Service.PageFrom = (page - 1) * s.Service.PageSize
+	} else {
+		s.Service.PageFrom = 0
+	}
+
+	ctx.Next()
 }
