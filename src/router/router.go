@@ -19,10 +19,13 @@ func Router(middlewares ...gin.HandlerFunc) *gin.Engine {
 	r.Use(middlewares...)
 
 	s := api.GetSearch()
-	logv1 := r.Group("/v1/search")
+	logv1 := r.Group("/v1/search", s.Middleware)
 	{
 		logv1.GET("/ping", s.Ping)
 		logv1.GET("/applications", s.Applications)
+		logv1.GET("/tasks/:appname", s.Tasks)
+		logv1.GET("/paths/:appname/:taskid", s.Paths)
+		logv1.GET("/index/:appname", s.Index)
 	}
 
 	monitor := api.NewMonitor()

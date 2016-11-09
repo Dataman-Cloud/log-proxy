@@ -7,14 +7,16 @@ import (
 	"log"
 	"os"
 	"reflect"
+	"strconv"
 	"strings"
 )
 
 // Config defines the conf info
 type Config struct {
-	ADDR           string
-	ES_URL         string
-	PROMETHEUS_URL string
+	ADDR           string `require:"true"`
+	ES_URL         string `require:"true"`
+	SEARCH_DEBUG   bool
+	PROMETHEUS_URL string `require:"true"`
 }
 
 var c *Config
@@ -56,6 +58,38 @@ func init() {
 func LoadConfig() {
 	robj := reflect.ValueOf(c).Elem()
 	for i := 0; i < robj.NumField(); i++ {
-		robj.Field(i).Set(reflect.ValueOf(os.Getenv(robj.Type().Field(i).Name)))
+		if rb, err := strconv.ParseBool(robj.Type().Field(i).Tag.Get("require")); err == nil {
+			if rb && os.Getenv(robj.Type().Field(i).Name) == "" {
+				log.Fatalf("config field %s not setting", robj.Type().Field(i).Name)
+			}
+		}
+		switch robj.Type().Field(i).Type.String() {
+		case "string":
+			robj.Field(i).Set(reflect.ValueOf(os.Getenv(robj.Type().Field(i).Name)))
+		case "bool":
+			if b, err := strconv.ParseBool(os.Getenv(robj.Type().Field(i).Name)); err == nil {
+				robj.Field(i).Set(reflect.ValueOf(b))
+			} else if rb {
+				log.Fatalf("config %s value invalid", robj.Type().Field(i).Name)
+			}
+		case "int":
+			if b, err := strconv.Atoi(os.Getenv(robj.Type().Field(i).Name)); err == nil {
+				robj.Field(i).Set(reflect.ValueOf(b))
+			} else if rb {
+				log.Fatalf("config %s value invalid", robj.Type().Field(i).Name)
+			}
+		case "uint64":
+			if b, err := strconv.ParseUint(os.Getenv(robj.Type().Field(i).Name), 10, 64); err == nil {
+				robj.Field(i).Set(reflect.ValueOf(b))
+			} else if rb {
+				log.Fatalf("config %s value invalid", robj.Type().Field(i).Name)
+			}
+		case "int64":
+			if b, err := strconv.ParseInt(os.Getenv(robj.Type().Field(i).Name), 10, 64); err == nil {
+				robj.Field(i).Set(reflect.ValueOf(b))
+			} else if rb {
+				log.Fatalf("config %s value invalid", robj.Type().Field(i).Name)
+			}
+		}
 	}
 }
