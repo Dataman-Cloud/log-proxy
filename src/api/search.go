@@ -41,7 +41,7 @@ func (s *search) Applications(ctx *gin.Context) {
 }
 
 func (s *search) Tasks(ctx *gin.Context) {
-	appName := ctx.Param("appname")
+	appName := ctx.Param("appid")
 	if appName == "" {
 		utils.ErrorResponse(ctx, utils.NewError(PARAM_ERROR, errors.New("param error")))
 		return
@@ -55,7 +55,7 @@ func (s *search) Tasks(ctx *gin.Context) {
 }
 
 func (s *search) Paths(ctx *gin.Context) {
-	appName := ctx.Param("appname")
+	appName := ctx.Param("appid")
 	if appName == "" {
 		utils.ErrorResponse(ctx, utils.NewError(PARAM_ERROR, errors.New("param error")))
 		return
@@ -76,7 +76,7 @@ func (s *search) Paths(ctx *gin.Context) {
 }
 
 func (s *search) Index(ctx *gin.Context) {
-	results, err := s.Service.Search(ctx.Param("appname"),
+	results, err := s.Service.Search(ctx.Param("appid"),
 		ctx.Query("taskid"),
 		ctx.Query("path"),
 		ctx.Query("keyword"))
