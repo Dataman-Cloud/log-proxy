@@ -1,5 +1,8 @@
 # Logging/Monitoring Proxy API Guide
 
+`GET /v1/search/applications`(#itm1 "itm1")
+
+
 ## Monitoring
 
 ### Get the metric values (CPU/Memory)
@@ -80,8 +83,8 @@ return
     "code": 0,
     "data": {
         "cluster1-maliao": 79273,
-	"cluster1-proxytest": 78595,
-	"cluster1-test": 88599
+        "cluster1-proxytest": 78595,
+        "cluster1-test": 88599
     }
 }
 ```
@@ -134,7 +137,7 @@ curl -XGET http://localhost:5098/v1/search/paths/appid/taskid
     "code": 0,
     "data": {
         "stderr": 5,
-	"stdout": 79268
+        "stdout": 79268
     }
 }
  ```
