@@ -20,6 +20,7 @@ type QueryRange struct {
 	PromServer string
 	Path       string
 	AppID      string
+	InstanceID string
 	Metric     string
 	From       string
 	To         string
@@ -34,7 +35,7 @@ func (query *QueryRange) QueryRangeFromProm() (*models.QueryRangeResult, error) 
 	const (
 		unixTime = "unix"
 	)
-	expr := query.setQueryExpr(query.Metric, query.AppID)
+	expr := query.setQueryExpr(query.Metric, query.AppID, query.InstanceID)
 
 	u, err := url.Parse(query.PromServer)
 	if err != nil {
@@ -82,28 +83,28 @@ func (query *QueryRange) QueryRangeFromProm() (*models.QueryRangeResult, error) 
 }
 
 // setQueryExpr will return the expr of prometheus query
-func (query *QueryRange) setQueryExpr(metrics, appID string) (expr string) {
+func (query *QueryRange) setQueryExpr(metrics, appID, instanceID string) (expr string) {
 	switch metrics {
 	case "cpu":
 		expr = "avg(irate(container_cpu_usage_seconds_total{container_label_APP_ID='" + appID +
-			"',id=~'/docker/.*', name=~'mesos.*'}[5m])) by (container_label_APP_ID, group, " +
+			"',id=~'/docker/" + instanceID + ".*', name=~'mesos.*'}[5m])) by (container_label_APP_ID, group, " +
 			"id, image, instance, job, name)"
 	case "memory":
 		expr = "container_memory_usage_bytes{container_label_APP_ID='" + appID +
-			"',id=~'/docker/.*', name=~'mesos.*'} / container_spec_memory_limit_bytes" +
+			"',id=~'/docker/" + instanceID + ".*', name=~'mesos.*'} / container_spec_memory_limit_bytes" +
 			"{container_label_APP_ID='nginx-stress', id=~'/docker/.*', name=~'mesos.*'}"
 	case "network_rx":
 		expr = "container_network_receive_bytes_total{container_label_APP_ID='" + appID +
-			"',id=~'/docker/.*', name=~'mesos.*'}"
+			"',id=~'/docker/" + instanceID + ".*', name=~'mesos.*'}"
 	case "network_tx":
 		expr = "container_network_transmit_bytes_total{container_label_APP_ID='" + appID +
-			"',id=~'/docker/.*', name=~'mesos.*'}"
+			"',id=~'/docker/" + instanceID + ".*', name=~'mesos.*'}"
 	case "fs_read":
 		expr = "container_fs_reads_total{container_label_APP_ID='" + appID +
-			"',id=~'/docker/.*', name=~'mesos.*'}"
+			"',id=~'/docker/" + instanceID + ".*', name=~'mesos.*'}"
 	case "fs_write":
 		expr = "container_fs_writes_total{container_label_APP_ID='" + appID +
-			"',id=~'/docker/.*', name=~'mesos.*'}"
+			"',id=~'/docker/" + instanceID + ".*', name=~'mesos.*'}"
 	default:
 		expr = ""
 	}
@@ -111,9 +112,13 @@ func (query *QueryRange) setQueryExpr(metrics, appID string) (expr string) {
 }
 
 func timeRange(f, t, unixTime string) (string, string, error) {
+	const (
+		OFFSET = "0m"
+	)
+
 	if f == "" && t == "" {
 		to := time.Now()
-		from := timeOffset(to, "-30m")
+		from := timeOffset(to, OFFSET)
 		return timeConvertString(from, unixTime), timeConvertString(to, unixTime), nil
 	}
 
@@ -122,7 +127,7 @@ func timeRange(f, t, unixTime string) (string, string, error) {
 		if err != nil {
 			return "", "", err
 		}
-		from := timeOffset(to, "-30m")
+		from := timeOffset(to, OFFSET)
 		return timeConvertString(from, unixTime), timeConvertString(to, unixTime), nil
 	}
 
@@ -131,7 +136,7 @@ func timeRange(f, t, unixTime string) (string, string, error) {
 		if err != nil {
 			return "", "", err
 		}
-		to := timeOffset(from, "30m")
+		to := timeOffset(from, OFFSET)
 		return timeConvertString(from, unixTime), timeConvertString(to, unixTime), nil
 	}
 

@@ -36,6 +36,7 @@ func (m *monitor) QueryRange(ctx *gin.Context) {
 		PromServer: config.GetConfig().PROMETHEUS_URL,
 		Path:       QUERYRANGEPATH,
 		AppID:      ctx.Query("appid"),
+		InstanceID: ctx.Query("instanceid"),
 		Metric:     ctx.Query("metric"),
 		From:       ctx.Query("from"),
 		To:         ctx.Query("to"),
