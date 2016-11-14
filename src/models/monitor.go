@@ -24,8 +24,3 @@ type Metric struct {
 	Job                 string `json:"job"`
 	Name                string `json:"name"`
 }
-
-type MetricList struct {
-	CPU    []*Result `json:"cpu"`
-	Memory []*Result `json:"memory"`
-}

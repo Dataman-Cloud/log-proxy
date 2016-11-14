@@ -20,7 +20,6 @@ const (
 )
 
 type monitor struct {
-	httpClient *http.Client
 }
 
 func NewMonitor() *monitor {
@@ -42,7 +41,8 @@ func (m *monitor) QueryRange(ctx *gin.Context) {
 		To:         ctx.Query("to"),
 		Step:       ctx.Query("step"),
 	}
-	data, err := query.GetMetricList()
+	data := service.NewMetricList()
+	err := data.GetMetricList(query)
 	if err != nil {
 		utils.ErrorResponse(ctx, err)
 		return

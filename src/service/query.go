@@ -30,48 +30,6 @@ const (
 	TIMEFORMAT = "2006-01-02 15:04:05"
 )
 
-// GetMetricList will return the list of metric of query result.
-// metric=cpu, will only query CPU usage
-// metric=memory, will only query memory usage
-// metric=all, will query each metic.
-func (query *QueryRange) GetMetricList() (*models.MetricList, error) {
-	list := new(models.MetricList)
-	if query.Metric != "all" {
-		data, err := query.QueryRangeFromProm()
-		if err != nil {
-			return nil, err
-		}
-		switch query.Metric {
-		case "cpu":
-			list.CPU = data.Data.Result
-		case "memory":
-			list.Memory = data.Data.Result
-		default:
-			return nil, errors.New("No this kind of metric.")
-		}
-		return list, nil
-	}
-
-	metrics := [...]string{"cpu", "memory"}
-	for _, metric := range metrics {
-		query.Metric = metric
-		data, err := query.QueryRangeFromProm()
-		if err != nil {
-			return nil, err
-		}
-		switch metric {
-		case "cpu":
-			list.CPU = data.Data.Result
-		case "memory":
-			list.Memory = data.Data.Result
-		default:
-			return nil, errors.New("No this kind of metric.")
-		}
-	}
-
-	return list, nil
-}
-
 func (query *QueryRange) QueryRangeFromProm() (*models.QueryRangeResult, error) {
 	const (
 		unixTime = "unix"
@@ -134,6 +92,18 @@ func (query *QueryRange) setQueryExpr(metrics, appID string) (expr string) {
 		expr = "container_memory_usage_bytes{container_label_APP_ID='" + appID +
 			"',id=~'/docker/.*', name=~'mesos.*'} / container_spec_memory_limit_bytes" +
 			"{container_label_APP_ID='nginx-stress', id=~'/docker/.*', name=~'mesos.*'}"
+	case "network_rx":
+		expr = "container_network_receive_bytes_total{container_label_APP_ID='" + appID +
+			"',id=~'/docker/.*', name=~'mesos.*'}"
+	case "network_tx":
+		expr = "container_network_transmit_bytes_total{container_label_APP_ID='" + appID +
+			"',id=~'/docker/.*', name=~'mesos.*'}"
+	case "fs_read":
+		expr = "container_fs_reads_total{container_label_APP_ID='" + appID +
+			"',id=~'/docker/.*', name=~'mesos.*'}"
+	case "fs_write":
+		expr = "container_fs_writes_total{container_label_APP_ID='" + appID +
+			"',id=~'/docker/.*', name=~'mesos.*'}"
 	default:
 		expr = ""
 	}
