@@ -4,6 +4,7 @@ import (
 	"errors"
 	"strconv"
 
+	"github.com/Dataman-Cloud/log-proxy/src/models"
 	"github.com/Dataman-Cloud/log-proxy/src/service"
 	"github.com/Dataman-Cloud/log-proxy/src/utils"
 
@@ -11,10 +12,14 @@ import (
 )
 
 const (
-	GETAPPS_ERROR = "503-11000"
-	PARAM_ERROR   = "400-11001"
-	GETTASK_ERROR = "503-11002"
-	INDEX_ERROR   = "503-11003"
+	GETAPPS_ERROR      = "503-11000"
+	PARAM_ERROR        = "400-11001"
+	GETTASK_ERROR      = "503-11002"
+	INDEX_ERROR        = "503-11003"
+	CREATE_ALERT_ERROR = "503-11004"
+	DELETE_ALERT_ERROR = "503-11005"
+	GET_ALERT_ERROR    = "503-11006"
+	UPDATE_ALERT_ERROR = "503-11007"
 )
 
 type search struct {
@@ -90,6 +95,98 @@ func (s *search) Index(ctx *gin.Context) {
 	}
 
 	utils.Ok(ctx, results)
+}
+
+func (s *search) CreateAlert(ctx *gin.Context) {
+	alert := new(models.Alert)
+	if err := ctx.BindJSON(alert); err != nil {
+		utils.ErrorResponse(ctx, utils.NewError(PARAM_ERROR, errors.New("request body param error")))
+		return
+	}
+
+	if alert.Period == "" {
+		utils.ErrorResponse(ctx, utils.NewError(PARAM_ERROR, errors.New("period can't be empty")))
+		return
+	}
+
+	if alert.AppId == "" {
+		utils.ErrorResponse(ctx, utils.NewError(PARAM_ERROR, errors.New("appid can't be empty")))
+		return
+	}
+
+	if alert.Keyword == "" {
+		utils.ErrorResponse(ctx, utils.NewError(PARAM_ERROR, errors.New("keyword can't be empty")))
+		return
+	}
+
+	err := s.Service.CreateAlert(alert)
+	if err != nil {
+		utils.ErrorResponse(ctx, utils.NewError(CREATE_ALERT_ERROR, err))
+		return
+	}
+
+	utils.Ok(ctx, "create success")
+}
+
+func (s *search) DeleteAlert(ctx *gin.Context) {
+	if ctx.Param("id") == "" {
+		utils.ErrorResponse(ctx, utils.NewError(PARAM_ERROR, errors.New("alert id can't be empty")))
+		return
+	}
+
+	err := s.Service.DeleteAlert(ctx.Param("id"))
+	if err != nil {
+		utils.ErrorResponse(ctx, utils.NewError(DELETE_ALERT_ERROR, err))
+		return
+	}
+
+	utils.Ok(ctx, "delete success")
+}
+
+func (s *search) GetAlerts(ctx *gin.Context) {
+	results, err := s.Service.GetAlerts()
+	if err != nil {
+		utils.ErrorResponse(ctx, utils.NewError(GET_ALERT_ERROR, err))
+		return
+	}
+
+	utils.Ok(ctx, results)
+}
+
+func (s *search) UpdateAlert(ctx *gin.Context) {
+	alert := new(models.Alert)
+	if err := ctx.BindJSON(alert); err != nil {
+		utils.ErrorResponse(ctx, utils.NewError(PARAM_ERROR, errors.New("request body param error")))
+		return
+	}
+
+	if alert.Id == "" {
+		utils.ErrorResponse(ctx, utils.NewError(PARAM_ERROR, errors.New("id can't be empty")))
+		return
+	}
+
+	if alert.Period == "" {
+		utils.ErrorResponse(ctx, utils.NewError(PARAM_ERROR, errors.New("period can't be empty")))
+		return
+	}
+
+	if alert.AppId == "" {
+		utils.ErrorResponse(ctx, utils.NewError(PARAM_ERROR, errors.New("appid can't be empty")))
+		return
+	}
+
+	if alert.Keyword == "" {
+		utils.ErrorResponse(ctx, utils.NewError(PARAM_ERROR, errors.New("keyword can't be empty")))
+		return
+	}
+
+	err := s.Service.UpdateAlert(alert)
+	if err != nil {
+		utils.ErrorResponse(ctx, utils.NewError(UPDATE_ALERT_ERROR, err))
+		return
+	}
+
+	utils.Ok(ctx, "update success")
 }
 
 func (s *search) Middleware(ctx *gin.Context) {
