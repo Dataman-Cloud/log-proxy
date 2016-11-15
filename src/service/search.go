@@ -166,7 +166,7 @@ func (s *SearchService) Search(appid, taskid, source, keyword string) ([]map[str
 		Index("dataman-"+strings.Split(appid, "-")[0]+"-*").
 		Type("dataman-"+appid).
 		Query(bquery).
-		Highlight(elastic.NewHighlight().Field("message").PreTags(`<em stype="color: red;">`).PostTags(`</em>`)).
+		Highlight(elastic.NewHighlight().Field("message").PreTags(`@dataman-highlighted-field@`).PostTags(`@/dataman-highlighted-field@`)).
 		Sort("offset", true).From(s.PageFrom).Size(s.PageSize).Pretty(true).IgnoreUnavailable(true).Do()
 
 	if err != nil {
