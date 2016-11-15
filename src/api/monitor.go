@@ -17,6 +17,7 @@ const (
 
 const (
 	QUERYRANGEPATH = "/api/v1/query_range"
+	QUERYPATH      = "/api/v1/query"
 )
 
 type monitor struct {
@@ -36,7 +37,7 @@ func (m *monitor) QueryRange(ctx *gin.Context) {
 		PromServer: config.GetConfig().PROMETHEUS_URL,
 		Path:       QUERYRANGEPATH,
 		AppID:      ctx.Query("appid"),
-		InstanceID: ctx.Query("instanceid"),
+		TaskID:     ctx.Query("taskid"),
 		Metric:     ctx.Query("metric"),
 		From:       ctx.Query("from"),
 		To:         ctx.Query("to"),
@@ -49,4 +50,20 @@ func (m *monitor) QueryRange(ctx *gin.Context) {
 		return
 	}
 	utils.Ok(ctx, data)
+}
+
+func (m *monitor) QueryApps(ctx *gin.Context) {
+	query := &service.QueryRange{
+		HttpClient: http.DefaultClient,
+		PromServer: config.GetConfig().PROMETHEUS_URL,
+		Path:       QUERYPATH,
+	}
+
+	apps := service.NewAppsList()
+	err := apps.GetAppsList(query)
+	if err != nil {
+		utils.ErrorResponse(ctx, err)
+		return
+	}
+	utils.Ok(ctx, apps)
 }

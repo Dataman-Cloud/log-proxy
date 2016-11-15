@@ -87,3 +87,56 @@ func (ml *MetricList) SetMetricList(query *QueryRange) error {
 	}
 	return nil
 }
+
+type AppsList struct {
+	Apps map[string][]string `json:"apps"`
+}
+
+func NewAppsList() *AppsList {
+	return &AppsList{
+		Apps: make(map[string][]string),
+	}
+}
+
+func (a *AppsList) GetAppsList(query *QueryRange) error {
+	err := a.SetAppsList(query)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (a *AppsList) SetAppsList(query *QueryRange) error {
+	data, err := query.QueryAppsFromProm()
+	if err != nil {
+		return err
+	}
+
+	// appIDs save the APPID in list;
+	// Get the appID and taskID, make the appID as Key, the array of taskID as
+	// value, and then append them into the list of apps
+	appIDs := []string{}
+	for _, originData := range data.Data.Result {
+		appID := originData.Metric.ContainerLabelAPPID
+		taskID := originData.Metric.ID
+
+		if len(a.Apps) == 0 {
+			appIDs = append(appIDs, appID)
+		}
+
+		isExist := false
+		for _, value := range appIDs {
+			if appID == value {
+				a.Apps[appID] = append(a.Apps[appID], taskID)
+				isExist = true
+				break
+			}
+		}
+		if !isExist {
+			tasks := []string{taskID}
+			a.Apps[appID] = tasks
+			appIDs = append(appIDs, appID)
+		}
+	}
+	return nil
+}

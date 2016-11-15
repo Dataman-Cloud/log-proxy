@@ -20,7 +20,7 @@ type QueryRange struct {
 	PromServer string
 	Path       string
 	AppID      string
-	InstanceID string
+	TaskID     string
 	Metric     string
 	From       string
 	To         string
@@ -35,7 +35,7 @@ func (query *QueryRange) QueryRangeFromProm() (*models.QueryRangeResult, error) 
 	const (
 		unixTime = "unix"
 	)
-	expr := query.setQueryExpr(query.Metric, query.AppID, query.InstanceID)
+	expr := query.setQueryExpr(query.Metric, query.AppID, query.TaskID)
 
 	u, err := url.Parse(query.PromServer)
 	if err != nil {
@@ -83,28 +83,28 @@ func (query *QueryRange) QueryRangeFromProm() (*models.QueryRangeResult, error) 
 }
 
 // setQueryExpr will return the expr of prometheus query
-func (query *QueryRange) setQueryExpr(metrics, appID, instanceID string) (expr string) {
+func (query *QueryRange) setQueryExpr(metrics, appID, taskID string) (expr string) {
 	switch metrics {
 	case "cpu":
 		expr = "avg(irate(container_cpu_usage_seconds_total{container_label_APP_ID='" + appID +
-			"',id=~'/docker/" + instanceID + ".*', name=~'mesos.*'}[5m])) by (container_label_APP_ID, group, " +
+			"',id=~'/docker/" + taskID + ".*', name=~'mesos.*'}[5m])) by (container_label_APP_ID, group, " +
 			"id, image, instance, job, name)"
 	case "memory":
 		expr = "container_memory_usage_bytes{container_label_APP_ID='" + appID +
-			"',id=~'/docker/" + instanceID + ".*', name=~'mesos.*'} / container_spec_memory_limit_bytes" +
+			"',id=~'/docker/" + taskID + ".*', name=~'mesos.*'} / container_spec_memory_limit_bytes" +
 			"{container_label_APP_ID='nginx-stress', id=~'/docker/.*', name=~'mesos.*'}"
 	case "network_rx":
 		expr = "container_network_receive_bytes_total{container_label_APP_ID='" + appID +
-			"',id=~'/docker/" + instanceID + ".*', name=~'mesos.*'}"
+			"',id=~'/docker/" + taskID + ".*', name=~'mesos.*'}"
 	case "network_tx":
 		expr = "container_network_transmit_bytes_total{container_label_APP_ID='" + appID +
-			"',id=~'/docker/" + instanceID + ".*', name=~'mesos.*'}"
+			"',id=~'/docker/" + taskID + ".*', name=~'mesos.*'}"
 	case "fs_read":
 		expr = "container_fs_reads_total{container_label_APP_ID='" + appID +
-			"',id=~'/docker/" + instanceID + ".*', name=~'mesos.*'}"
+			"',id=~'/docker/" + taskID + ".*', name=~'mesos.*'}"
 	case "fs_write":
 		expr = "container_fs_writes_total{container_label_APP_ID='" + appID +
-			"',id=~'/docker/" + instanceID + ".*', name=~'mesos.*'}"
+			"',id=~'/docker/" + taskID + ".*', name=~'mesos.*'}"
 	default:
 		expr = ""
 	}
@@ -173,4 +173,39 @@ func timeConvertString(t time.Time, unixTime string) string {
 func timeOffset(t time.Time, offset string) time.Time {
 	duration, _ := time.ParseDuration(offset)
 	return t.Add(duration)
+}
+
+func (query *QueryRange) QueryAppsFromProm() (*models.QueryRangeResult, error) {
+	expr := "container_tasks_state{container_label_APP_ID=~'.*', id=~'/docker/.*', name=~'mesos.*', state='running'}"
+	u, err := url.Parse(query.PromServer)
+	if err != nil {
+		return nil, err
+	}
+
+	u.Path = strings.TrimRight(u.Path, "/") + query.Path
+	q := u.Query()
+	q.Set("query", expr)
+
+	u.RawQuery = q.Encode()
+
+	resp, err := query.HttpClient.Get(u.String())
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	var result *models.QueryRangeResult
+	err = json.Unmarshal(body, &result)
+	if err != nil {
+		return nil, err
+	}
+	log.Printf("Get the prometheus qurey result by url: %s", u.String())
+
+	return result, nil
+
 }
