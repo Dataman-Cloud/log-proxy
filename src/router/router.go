@@ -25,7 +25,7 @@ func Router(middlewares ...gin.HandlerFunc) *gin.Engine {
 		logv1.GET("/applications", s.Applications)
 		logv1.GET("/tasks/:appid", s.Tasks)
 		logv1.GET("/paths/:appid/:taskid", s.Paths)
-		logv1.GET("/index/:appid", s.Index)
+		logv1.GET("/index", s.Index)
 	}
 
 	monitor := api.NewMonitor()

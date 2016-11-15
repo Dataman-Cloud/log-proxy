@@ -76,7 +76,11 @@ func (s *search) Paths(ctx *gin.Context) {
 }
 
 func (s *search) Index(ctx *gin.Context) {
-	results, err := s.Service.Search(ctx.Param("appid"),
+	if ctx.Query("appid") == "" {
+		utils.ErrorResponse(ctx, utils.NewError(PARAM_ERROR, errors.New("appid can't be empty")))
+		return
+	}
+	results, err := s.Service.Search(ctx.Query("appid"),
 		ctx.Query("taskid"),
 		ctx.Query("path"),
 		ctx.Query("keyword"))
@@ -97,13 +101,13 @@ func (s *search) Middleware(ctx *gin.Context) {
 		s.Service.RangeTo = ctx.Query("to")
 	}
 
-	if size, err := strconv.Atoi(ctx.Param("size")); err == nil && size > 0 {
+	if size, err := strconv.Atoi(ctx.Query("size")); err == nil && size > 0 {
 		s.Service.PageSize = size
 	} else {
 		s.Service.PageSize = 100
 	}
 
-	if page, err := strconv.Atoi(ctx.Param("page")); err == nil && page > 0 {
+	if page, err := strconv.Atoi(ctx.Query("page")); err == nil && page > 0 {
 		s.Service.PageFrom = (page - 1) * s.Service.PageSize
 	} else {
 		s.Service.PageFrom = 0

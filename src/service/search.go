@@ -150,10 +150,10 @@ func (s *SearchService) Search(appid, taskid, source, keyword string) ([]map[str
 
 	var querys []elastic.Query
 	if taskid != "" {
-		querys = append(querys, elastic.NewTermQuery("taskid", taskid))
+		querys = append(querys, elastic.NewTermsQuery("taskid", strings.Split(taskid, ",")))
 	}
 	if source != "" {
-		querys = append(querys, elastic.NewTermQuery("path", source))
+		querys = append(querys, elastic.NewTermsQuery("path", strings.Split(source, ",")))
 	}
 	if keyword != "" {
 		querys = append(querys, elastic.NewQueryStringQuery("message:"+keyword).AnalyzeWildcard(true))
@@ -166,6 +166,7 @@ func (s *SearchService) Search(appid, taskid, source, keyword string) ([]map[str
 		Index("dataman-"+strings.Split(appid, "-")[0]+"-*").
 		Type("dataman-"+appid).
 		Query(bquery).
+		Highlight(elastic.NewHighlight().Field("message").PreTags(`<em stype="color: red;">`).PostTags(`</em>`)).
 		Sort("offset", true).From(s.PageFrom).Size(s.PageSize).Pretty(true).IgnoreUnavailable(true).Do()
 
 	if err != nil {
@@ -175,6 +176,9 @@ func (s *SearchService) Search(appid, taskid, source, keyword string) ([]map[str
 	for _, hit := range result.Hits.Hits {
 		data := make(map[string]interface{})
 		json.Unmarshal(*hit.Source, &data)
+		if len(hit.Highlight["message"]) > 0 {
+			data["message"] = hit.Highlight["message"][0]
+		}
 		results = append(results, data)
 	}
 
