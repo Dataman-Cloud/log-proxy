@@ -6,9 +6,9 @@
 
 ### Get the metric values (CPU/Memory/Network/Filesystem)
 
-```GET /v1/monitor/query```
+```GET /v1/monitor/```
 
-- path: /v1/monitor/query
+- path: /v1/monitor/
 - HTTP Method: GET
 - URL Params: Null
 - Query Params: metric, appid, instanceid, from, to, step
@@ -23,7 +23,7 @@ For example:
 
 Get the metrics of the instances in one application.
 ```
-curl http://127.0.0.1:5098/v1/monitor/query?metric=memory&appid=nginx-stress&from=2016-11-09%2000:01:00&to=2016-11-09%2000:01:30&step=10s
+curl http://127.0.0.1:5098/v1/monitor/?metric=memory&appid=nginx-stress&from=2016-11-09%2000:01:00&to=2016-11-09%2000:01:30&step=10s
 
 {
   "code": 0,
@@ -155,7 +155,7 @@ curl http://127.0.0.1:5098/v1/monitor/query?metric=memory&appid=nginx-stress&fro
 ```
 Get the metrics of one instance in one application.
 ```
-http://127.0.0.1:5098/v1/monitor/app?metric=cpu&appid=nginx-stress&instanceid=063d8a98a5df330c
+http://127.0.0.1:5098/v1/monitor/?metric=cpu&appid=nginx-stress&taskid=063d8a98a5df330c
 
 {
   "code": 0,
@@ -195,7 +195,35 @@ http://127.0.0.1:5098/v1/monitor/app?metric=cpu&appid=nginx-stress&instanceid=06
   }
 }
 ```
+### Get the list of applications
 
+```GET /v1/monitor/applications```
+
+- path: /v1/monitor/applications
+- HTTP Method: GET
+- URL Params: Null
+- Query Params: Null
+
+For example:
+```
+curl http://127.0.0.1:5098/v1/monitor/applications
+{
+  "code": 0,
+  "data": {
+    "apps": {
+      "work-nginx": [
+        "/docker/d2f1c5324cced328d766fb858055bc0a5f9fa04402343379077e89ce6c9c0b6f",
+        "/docker/e58177e632ca1a6ef5404a76ae129f047e295cd4aab1c262eaec4811d24f9b6f"
+      ],
+      "work-nginx2": [
+        "/docker/130c1a4d5ec79315e98deafb1445bb79a94125297f27d20847efb9ba961ebd7f",
+        "/docker/5b8d5c0c1dea877c21e225ab9dfc6b7b0b5255f4e593b80a335613a5439ab425"
+      ]
+    }
+  }
+}```
+
+## 日志
 ### 获取所有应用
 `GET /v1/search/applications`
 

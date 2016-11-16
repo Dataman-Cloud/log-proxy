@@ -37,7 +37,8 @@ func Router(middlewares ...gin.HandlerFunc) *gin.Engine {
 	monitorv1 := r.Group("/v1/monitor")
 	{
 		monitorv1.GET("/ping", monitor.Ping)
-		monitorv1.GET("/app", monitor.QueryRange)
+		monitorv1.GET("/", monitor.QueryRange)
+		monitorv1.GET("/applications", monitor.QueryApps)
 	}
 
 	return r
