@@ -1,7 +1,5 @@
 # Logging/Monitoring Proxy API Guide
 
-<a href="#itm1">GET /v1/search/applications</a>
-
 ## Monitoring
 
 ### Get the metric values (CPU/Memory/Network/Filesystem)
@@ -292,7 +290,7 @@ curl -XGET http://localhost:5098/v1/search/paths/appid/taskid
 
  return
 
- ```
+```
 {
     "code": 0,
     "data": {
@@ -300,4 +298,47 @@ curl -XGET http://localhost:5098/v1/search/paths/appid/taskid
         "stdout": 79268
     }
 }
- ```
+```
+
+### 日志搜索
+
+`GET /v1/search/index`
+
+```
+http://192.168.1.46:5098/v1/search/index?appid=cluster1-maliao&from=now-7d&taskid=cluster1-maliao.e43f85e6-9f7f-11e6-8313-02421fb0085c,cluster1-maliao.e43f85e6-9f7f-11e6-8313-02421fb0085c&path=stdout,stderr&keyword=container
+```
+
+- Query Params: appid,taskid,path,keyword,from,to
+ - appid=test
+ - taskid=tasktest
+ - path=stdout
+ - keyword=test
+ - from=now-7d
+ - to=now
+
+return 
+
+```
+{
+"code": 0,
+"data": [
+{
+"@timestamp": "2016-11-08T10:27:56.759Z",
+"@version": "1",
+"appid": "cluster1-maliao",
+"clusterid": "cluster1",
+"groupid": "9",
+"host": "192.168.1.71",
+"id": "75145e5517b7f2038e39012bc471db59bd8c7dab1b5779075603fdb452fbac27",
+"message": "--container=\"mesos-c62c27ef-c144-4a38-b9fb-684794919bc7-S5.6b08bb27-409c-49fa-9606-7ed56e9d8366\" --docker=\"docker\" --docker_socket=\"/var/run/docker.sock\" --help=\"false\" --initialize_driver_logging=\"true\" --launcher_dir=\"/usr/libexec/mesos\" --logbufsecs=\"0\" --logging_level=\"INFO\" --mapped_directory=\"/mnt/mesos/sandbox\" --quiet=\"false\" --sandbox_directory=\"/data/mesos/slaves/c62c27ef-c144-4a38-b9fb-684794919bc7-S5/frameworks/c62c27ef-c144-4a38-b9fb-684794919bc7-0000/executors/cluster1-maliao.e43f85e6-9f7f-11e6-8313-02421fb0085c/runs/6b08bb27-409c-49fa-9606-7ed56e9d8366\" --stop_timeout=\"0ns\"\n",
+"offset": 1,
+"path": "stdout",
+"port": 39426,
+"taskid": "cluster1-maliao.e43f85e6-9f7f-11e6-8313-02421fb0085c",
+"time": "2016-11-09T02:16:09.405026732+08:00",
+"userid": "23"
+}
+]
+}
+```
+
