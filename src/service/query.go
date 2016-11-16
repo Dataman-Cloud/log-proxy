@@ -176,7 +176,13 @@ func timeOffset(t time.Time, offset string) time.Time {
 }
 
 func (query *QueryRange) QueryAppsFromProm() (*models.QueryRangeResult, error) {
-	expr := "container_tasks_state{container_label_APP_ID=~'.*', id=~'/docker/.*', name=~'mesos.*', state='running'}"
+	var expr string
+	if query.AppID == "" {
+		expr = "container_tasks_state{container_label_APP_ID=~'.*', id=~'/docker/.*', name=~'mesos.*', state='running'}"
+	} else {
+		expr = "container_tasks_state{container_label_APP_ID='" + query.AppID + "', id=~'/docker/.*', name=~'mesos.*', state='running'}"
+	}
+
 	u, err := url.Parse(query.PromServer)
 	if err != nil {
 		return nil, err
