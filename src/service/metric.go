@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"strings"
 
 	"github.com/Dataman-Cloud/log-proxy/src/models"
 )
@@ -50,7 +51,12 @@ type MetricFilesystem struct {
 // metric=all, will query each metic.
 func (ml *MetricList) GetMetricList(query *QueryRange) error {
 	if query.Metric == "all" {
-		metrics := [...]string{"cpu", "memory", "network_rx", "network_tx", "fs_read", "fs_write"}
+		metrics := []string{}
+		if query.Type == "node" {
+			metrics = []string{"cpu", "memory", "network_rx", "network_tx"}
+		} else {
+			metrics = []string{"cpu", "memory", "network_rx", "network_tx", "fs_read", "fs_write"}
+		}
 		for _, metric := range metrics {
 			query.Metric = metric
 			err := ml.SetMetricList(query)
@@ -58,6 +64,7 @@ func (ml *MetricList) GetMetricList(query *QueryRange) error {
 				return err
 			}
 		}
+		return nil
 	}
 
 	err := ml.SetMetricList(query)
@@ -149,4 +156,90 @@ func (a *AppsList) SetAppsList(query *QueryRange) error {
 		}
 	}
 	return nil
+}
+
+type NodesMetric struct {
+	Nodes map[string]*NodeMetric `json:"nodes"`
+}
+
+type NodeMetric struct {
+	CPU     *NodeCPUMetric     `json:"cpu"`
+	Memory  *NodeMemoryMetric  `json:"memory"`
+	Network *NodeNetworkMetric `json:"network"`
+}
+
+type NodeCPUMetric struct {
+	Usage []interface{} `json:"usage"`
+}
+
+type NodeMemoryMetric struct {
+	Usage []interface{} `json:"usage"`
+}
+
+type NodeNetworkMetric struct {
+	Receive  []interface{} `json:"receive"`
+	Transmit []interface{} `json:"transmit"`
+}
+
+func NewNodesMetric() *NodesMetric {
+	return &NodesMetric{
+		Nodes: make(map[string]*NodeMetric),
+	}
+}
+
+func NewNodeMetric() *NodeMetric {
+	return &NodeMetric{
+		CPU:     &NodeCPUMetric{},
+		Memory:  &NodeMemoryMetric{},
+		Network: &NodeNetworkMetric{},
+	}
+}
+
+func (nm *NodesMetric) GetNodesMetric(query *QueryRange) error {
+	err := nm.SetNodesMetric(query)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (nm *NodesMetric) SetNodesMetric(query *QueryRange) error {
+	metrics := []string{"cpu", "memory", "network_rx", "network_tx"}
+	for _, metric := range metrics {
+		query.Metric = metric
+		data, err := query.QueryNodesFromProm()
+		if err != nil {
+			return err
+		}
+
+		if len(nm.Nodes) == 0 {
+			for _, originData := range data.Data.Result {
+				node := NewNodeMetric()
+				name := strings.Split(originData.Metric.Instance, ":")[0]
+				nm.Nodes[name] = node
+			}
+		}
+
+		for _, originData := range data.Data.Result {
+			name := strings.Split(originData.Metric.Instance, ":")[0]
+			value := originData.Values[0]
+			for k, v := range nm.Nodes {
+				if name == k {
+					switch query.Metric {
+					case "cpu":
+						v.CPU.Usage = value
+					case "memory":
+						v.Memory.Usage = value
+					case "network_rx":
+						v.Network.Receive = value
+					case "network_tx":
+						v.Network.Transmit = value
+					}
+				}
+			}
+		}
+
+	}
+	return nil
+
 }

@@ -395,6 +395,129 @@ http://127.0.0.1:5098/v1/monitor/applications?appid=work-nginx
 }
 ```
 
+### Get the metric data of nodes
+
+```GET /v1/monitor/nodes```
+
+- path: /v1/monitor/nodes
+- HTTP Method: GET
+- URL Params: Null
+- Query Params: node
+  - node=<string>: the IP address of node.
+
+For example:
+Get the metric data of all nodes
+```
+http://127.0.0.1:5098/v1/monitor/nodes
+{
+  "code": 0,
+  "data": {
+    "nodes": {
+      "192.168.1.101": {
+        "cpu": {
+          "usage": [
+            1479444371,
+            "0.030511715233357488"
+          ]
+        },
+        "memory": {
+          "usage": [
+            1479444371,
+            "0.5278851770465356"
+          ]
+        },
+        "network": {
+          "receive": [
+            1479444371,
+            "1853086509"
+          ],
+          "transmit": [
+            1479444371,
+            "1241003139"
+          ]
+        }
+      },
+      "192.168.1.102": {
+        "cpu": {
+          "usage": [
+            1479444371,
+            "0.018358025783337933"
+          ]
+        },
+        "memory": {
+          "usage": [
+            1479444371,
+            "0.12986786032589293"
+          ]
+        },
+        "network": {
+          "receive": [
+            1479444371,
+            "483338529"
+          ],
+          "transmit": [
+            1479444371,
+            "860170615"
+          ]
+        }
+      },
+      "192.168.1.91": {
+        "cpu": {
+          "usage": [
+            1479444371,
+            "0.05481752030003312"
+          ]
+        },
+        "memory": {
+          "usage": [
+            1479444371,
+            "0.7841073807249992"
+          ]
+        },
+        "network": {
+          "receive": [
+            1479444371,
+            "1880722606"
+          ],
+          "transmit": [
+            1479444371,
+            "2680864446"
+          ]
+        }
+      },
+      "192.168.1.92": {
+        "cpu": {
+          "usage": [
+            1479444371,
+            "0.04335599093331742"
+          ]
+        },
+        "memory": {
+          "usage": [
+            1479444371,
+            "0.7260611826624831"
+          ]
+        },
+        "network": {
+          "receive": [
+            1479444371,
+            "1502950018"
+          ],
+          "transmit": [
+            1479444371,
+            "1279601302"
+          ]
+        }
+      }
+    }
+  }
+}
+```
+Get the metric data of one node
+```
+http://127.0.0.1:5098/v1/monitor/nodes?node=192.168.1.101
+```
+
 ## 日志
 
 ### 获取所有应用
@@ -491,7 +614,7 @@ http://192.168.1.46:5098/v1/search/index?appid=cluster1-maliao&from=now-7d&taski
  - from=now-7d
  - to=now
 
-return 
+return
 
 ```
 {
@@ -516,4 +639,3 @@ return
 ]
 }
 ```
-
