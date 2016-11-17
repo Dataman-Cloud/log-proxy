@@ -6,13 +6,14 @@
 
 ```GET /v1/monitor/```
 
-- path: /v1/monitor/
+- path: /v1/monitor
 - HTTP Method: GET
 - URL Params: Null
-- Query Params: metric, appid, instanceid, from, to, step
+- Query Params: type, metric, appid, instanceid, from, to, step
+  - type=[app]: the type string
   - metric=[all/cpu/memory/network_rx/network_tx/fs_read/fs_write]: the metric string.
   - appid=<string>: the name of application.
-  - instanceid=<string>: the id string of the docker instance.
+  - taskid=<string>: the id string of the docker instance.
   - from=<2006-01-02 15:04:05>: the start time of the query range.
   - to=<2006-01-02 15:04:05>: the end time of the query range.
   - step=<duration>: Query resolution step width.
@@ -21,7 +22,7 @@ For example:
 
 Get the metrics of the instances in one application.
 ```
-curl http://127.0.0.1:5098/v1/monitor/?metric=memory&appid=nginx-stress&from=2016-11-09%2000:01:00&to=2016-11-09%2000:01:30&step=10s
+curl http://127.0.0.1:5098/v1/monitor?metric=memory&appid=nginx-stress&from=2016-11-09%2000:01:00&to=2016-11-09%2000:01:30&step=10s
 
 {
   "code": 0,
@@ -153,7 +154,7 @@ curl http://127.0.0.1:5098/v1/monitor/?metric=memory&appid=nginx-stress&from=201
 ```
 Get the metrics of one instance in one application.
 ```
-http://127.0.0.1:5098/v1/monitor/?metric=cpu&appid=nginx-stress&taskid=063d8a98a5df330c
+http://127.0.0.1:5098/v1/monitor?metric=cpu&appid=nginx-stress&taskid=063d8a98a5df330c
 
 {
   "code": 0,
@@ -200,9 +201,11 @@ http://127.0.0.1:5098/v1/monitor/?metric=cpu&appid=nginx-stress&taskid=063d8a98a
 - path: /v1/monitor/applications
 - HTTP Method: GET
 - URL Params: Null
-- Query Params: Null
+- Query Params: appid
+  - appid=<string>: the name of application.
 
 For example:
+Get the instances of all applications
 ```
 curl http://127.0.0.1:5098/v1/monitor/applications
 {
@@ -219,9 +222,27 @@ curl http://127.0.0.1:5098/v1/monitor/applications
       ]
     }
   }
-}```
+}
+```
+
+Get the instances of one Applications
+```
+http://127.0.0.1:5098/v1/monitor/applications?appid=work-nginx
+{
+  "code": 0,
+  "data": {
+    "apps": {
+      "work-nginx": [
+        "/docker/e58177e632ca1a6ef5404a76ae129f047e295cd4aab1c262eaec4811d24f9b6f",
+        "/docker/d2f1c5324cced328d766fb858055bc0a5f9fa04402343379077e89ce6c9c0b6f"
+      ]
+    }
+  }
+}
+```
 
 ## 日志
+
 ### 获取所有应用
 `GET /v1/search/applications`
 
@@ -264,14 +285,14 @@ curl -XGET http://localhost:5098/v1/search/tasks/test
 
  return
 
- ```
+```
 {
     "code": 0,
     "data": {
         "cluster1-maliao.e43f85e6-9f7f-11e6-8313-02421fb0085c": 79273
     }
 }
- ```
+```
 
 ### 根据应用实例获取所有日志来源
 `GET /v1/search/paths/:appid/:taskid

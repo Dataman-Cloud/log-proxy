@@ -36,6 +36,7 @@ func (m *monitor) QueryRange(ctx *gin.Context) {
 		HttpClient: http.DefaultClient,
 		PromServer: config.GetConfig().PROMETHEUS_URL,
 		Path:       QUERYRANGEPATH,
+		Type:       ctx.Query("type"),
 		AppID:      ctx.Query("appid"),
 		TaskID:     ctx.Query("taskid"),
 		Metric:     ctx.Query("metric"),
@@ -57,6 +58,7 @@ func (m *monitor) QueryApps(ctx *gin.Context) {
 		HttpClient: http.DefaultClient,
 		PromServer: config.GetConfig().PROMETHEUS_URL,
 		Path:       QUERYPATH,
+		AppID:      ctx.Query("appid"),
 	}
 
 	apps := service.NewAppsList()
