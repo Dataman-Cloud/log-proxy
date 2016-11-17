@@ -8,13 +8,14 @@
 
 ```GET /v1/monitor/```
 
-- path: /v1/monitor/
+- path: /v1/monitor
 - HTTP Method: GET
 - URL Params: Null
-- Query Params: metric, appid, instanceid, from, to, step
+- Query Params: type, metric, appid, instanceid, from, to, step
+  - type=[app]: the type string
   - metric=[all/cpu/memory/network_rx/network_tx/fs_read/fs_write]: the metric string.
   - appid=<string>: the name of application.
-  - instanceid=<string>: the id string of the docker instance.
+  - taskid=<string>: the id string of the docker instance.
   - from=<2006-01-02 15:04:05>: the start time of the query range.
   - to=<2006-01-02 15:04:05>: the end time of the query range.
   - step=<duration>: Query resolution step width.
@@ -23,7 +24,7 @@ For example:
 
 Get the metrics of the instances in one application.
 ```
-curl http://127.0.0.1:5098/v1/monitor/?metric=memory&appid=nginx-stress&from=2016-11-09%2000:01:00&to=2016-11-09%2000:01:30&step=10s
+curl http://127.0.0.1:5098/v1/monitor?metric=memory&appid=nginx-stress&from=2016-11-09%2000:01:00&to=2016-11-09%2000:01:30&step=10s
 
 {
   "code": 0,
@@ -155,7 +156,7 @@ curl http://127.0.0.1:5098/v1/monitor/?metric=memory&appid=nginx-stress&from=201
 ```
 Get the metrics of one instance in one application.
 ```
-http://127.0.0.1:5098/v1/monitor/?metric=cpu&appid=nginx-stress&taskid=063d8a98a5df330c
+http://127.0.0.1:5098/v1/monitor?metric=cpu&appid=nginx-stress&taskid=063d8a98a5df330c
 
 {
   "code": 0,

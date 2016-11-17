@@ -45,20 +45,20 @@ type MetricFilesystem struct {
 // metric=memory, will only query memory usage
 // metric=all, will query each metic.
 func (ml *MetricList) GetMetricList(query *QueryRange) error {
-	if query.Metric != "all" {
-		err := ml.SetMetricList(query)
-		if err != nil {
-			return err
+	if query.Metric == "all" {
+		metrics := [...]string{"cpu", "memory", "network_rx", "network_tx", "fs_read", "fs_write"}
+		for _, metric := range metrics {
+			query.Metric = metric
+			err := ml.SetMetricList(query)
+			if err != nil {
+				return err
+			}
 		}
-		return nil
 	}
-	metrics := [...]string{"cpu", "memory", "network_rx", "network_tx", "fs_read", "fs_write"}
-	for _, metric := range metrics {
-		query.Metric = metric
-		err := ml.SetMetricList(query)
-		if err != nil {
-			return err
-		}
+
+	err := ml.SetMetricList(query)
+	if err != nil {
+		return err
 	}
 	return nil
 }

@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/Dataman-Cloud/log-proxy/src/api"
+	"github.com/Dataman-Cloud/log-proxy/src/router/middleware"
 	"github.com/Dataman-Cloud/log-proxy/src/utils"
 
 	log "github.com/Sirupsen/logrus"
@@ -16,7 +17,7 @@ func Router(middlewares ...gin.HandlerFunc) *gin.Engine {
 
 	r.Use(gin.Recovery())
 	r.Use(utils.Ginrus(log.StandardLogger(), time.RFC3339Nano, false))
-	r.Use(middlewares...)
+	r.Use(middleware.CORSMiddleware())
 
 	s := api.GetSearch()
 	logv1 := r.Group("/v1/search", s.Middleware)
@@ -32,7 +33,7 @@ func Router(middlewares ...gin.HandlerFunc) *gin.Engine {
 	monitorv1 := r.Group("/v1/monitor")
 	{
 		monitorv1.GET("/ping", monitor.Ping)
-		monitorv1.GET("/", monitor.QueryRange)
+		monitorv1.GET("", monitor.QueryRange)
 		monitorv1.GET("/applications", monitor.QueryApps)
 	}
 
