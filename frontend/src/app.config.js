@@ -4,8 +4,7 @@
         .config(configure);
 
     /* @ngInject */
-    function configure($locationProvider, $urlRouterProvider, $interpolateProvider, NotificationProvider, $stateProvider) {
-
+    function configure($locationProvider, $urlRouterProvider, $interpolateProvider, $stateProvider) {
         $stateProvider
             .state('home', {
                 url: '',
@@ -15,13 +14,40 @@
             })
             .state('home.appmonitor', {
                 url: '/appmonitor',
-                templateUrl: '/src/monitor/app/list/list.html',
-                controller: 'ListAppCtrl as vm'
+                templateUrl: '/src/monitor/app/list.html',
+                controller: 'MonitorListAppCtrl as vm',
+                resolve: {
+                    apps: listApp
+                }
+            })
+            .state('home.appmonitor.detail', {
+                url: '/:appId',
+                controller: 'MonitorAppDetailCtrl as vm',
+                templateUrl: '/src/monitor/app/detail.html'
             })
             .state('home.instancemonitor', {
-                url: '/instancemonitor',
-                templateUrl: '/src/monitor/instance/list/list.html'
+                url: '/appmonitor/:appId/instances',
+                templateUrl: '/src/monitor/instance/list.html',
+                controller: 'MonitorListInstanceCtrl as vm',
+                resolve: {
+                    instances: listInstance
+                }
+            })
+            .state('home.instancemonitor.detail', {
+                url: '/:instanceId',
+                templateUrl: '/src/monitor/instance/detail.html'
             });
+
+
+        /* @ngInject */
+        function listApp(monitorBackend) {
+            return monitorBackend.listApp().get().$promise
+        }
+
+        /* @ngInject */
+        function listInstance(monitorBackend) {
+            return monitorBackend.listApp().get().$promise
+        }
 
         $locationProvider.html5Mode(true);
         //warning: otherwise(url) will be redirect loop on state with errored resolve
@@ -31,14 +57,5 @@
         });
         $interpolateProvider.startSymbol('{/');
         $interpolateProvider.endSymbol('/}');
-
-        NotificationProvider.setOptions({
-            delay: 3000 * 3,
-            positionX: 'right',
-            positionY: 'top',
-            replaceMessage: true,
-            startTop: 20,
-            startRight: 260
-        });
     }
 })();

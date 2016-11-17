@@ -13,10 +13,11 @@
           href="bower_components/angular-ui-notification/dist/angular-ui-notification.css">
     <link rel="stylesheet" type="text/css" href="bower_components/angular-material-data-table/dist/md-data-table.css">
     <link rel="stylesheet" type="text/css" href="bower_components/nvd3/build/nv.d3.css">
+    <link rel="stylesheet" type="text/css" href="assets/css/style.css">
     <!--endbuild-->
 </head>
 <body>
-<div ui-view layout="row" layout-fill></div>
+<div ui-view></div>
 
 <!--build:js js/script.js-->
 <script src="bower_components/jquery/dist/jquery.js" type="text/javascript"></script>
@@ -52,6 +53,9 @@
 <script src="src/app.run.js"></script>
 <script src="src/app.ctrl.js"></script>
 
+<script src="src/filter/net-rate.filter.js"></script>
+<script src="src/filter/size.filter.js"></script>
+
 <script src="src/utils/modals/alert.service.js"></script>
 <script src="src/utils/modals/form.service.js"></script>
 <script src="src/utils/modals/confirm.service.js"></script>
@@ -59,8 +63,10 @@
 <script src="src/utils/services/stats-chart.service.js"></script>
 <script src="src/utils/services/timing.service.js"></script>
 
-<script src="src/monitor/app/list/list.ctrl.js"></script>
-<script src="src/monitor/app/service/app-monitor-backend.service.js"></script>
+<script src="src/monitor/app/list.ctrl.js"></script>
+<script src="src/monitor/app/detail.ctrl.js"></script>
+<script src="src/monitor/instance/list.ctrl.js"></script>
+<script src="src/monitor/service/monitor-backend.service.js"></script>
 <!--build:js js/template.js-->
 <!-- inject:template.js -->
 <!-- angular templates will be automatically converted in js and inserted here -->

@@ -1,0 +1,17 @@
+<div class="panel monitor-tab" layout="row" layout-align="space-between start">
+    <div class="tab">
+        <ul>
+            <li ng-repeat="(key, value) in vm.apps">
+                <a ui-sref=".detail({appId: key})">
+                    <h3>{/key/}</h3>
+                    <div class="statistic">
+                        <div flex="none"><i class="fa fa-cube"></i>{/value.length/}</div>
+                    </div>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div flex="auto" flex-offset="5" class="content">
+        <div ui-view></div>
+    </div>
+</div>

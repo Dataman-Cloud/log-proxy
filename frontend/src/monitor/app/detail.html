@@ -1,0 +1,65 @@
+<div class="statistic" layout="row" layout-align="start space-between">
+    <div class="statistic-panel" flex="20">
+        <h3>实个数</h3>
+        <em>XXX</em>
+    </div>
+    <div class="statistic-panel" flex="20">
+        <h3>CPU</h3>
+        <em>{/vm.realTimeData.cpuPercent/} %</em>
+    </div>
+    <div class="statistic-panel" flex="20">
+        <h3>内存</h3>
+        <em>{/vm.realTimeData.memUsage | size/}</em>
+    </div>
+    <div class="statistic-panel" flex="20">
+        <h3>网络 IO</h3>
+        <em>读: {/vm.realTimeData.networkReceive | netRate/}</em>
+        <em>写: {/vm.realTimeData.networkTransmit | netRate/}</em>
+    </div>
+    <div class="statistic-panel" flex="20">
+        <h3>磁盘 IO</h3>
+        <em>读: {/vm.realTimeData.fileSysRead | netRate/}</em>
+        <em>写: {/vm.realTimeData.fileSysWrite | netRate/}</em>
+    </div>
+</div>
+<div class="chart" layout="row">
+    <div class="chart-panel">chart
+        <div>
+        </div>
+    </div>
+</div>
+
+<md-content class="main-tab-content">
+    <md-table-container>
+        <table md-table id="node-list">
+            <thead md-head>
+            <tr md-row>
+                <th md-column>实例</th>
+                <th md-column>CPU</th>
+                <th md-column>内存</th>
+                <th md-column>网络I/O</th>
+                <th md-column>磁盘I/O</th>
+            </tr>
+            </thead>
+            <tbody md-body>
+            <tr md-row ng-repeat="instance in [a,b,c,d] track by $index">
+                <td md-cell>
+                    实例名
+                </td>
+                <td md-cell>
+                    10%
+                </td>
+                <td md-cell>
+                    10%
+                </td>
+                <td md-cell>
+                    25.5 KiB/s
+                </td>
+                <td md-cell>
+                    25.5 KiB/s
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </md-table-container>
+</md-content>
