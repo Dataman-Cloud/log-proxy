@@ -163,22 +163,27 @@ type NodesMetric struct {
 }
 
 type NodeMetric struct {
-	CPU     *NodeCPUMetric     `json:"cpu"`
-	Memory  *NodeMemoryMetric  `json:"memory"`
-	Network *NodeNetworkMetric `json:"network"`
+	CPU     *CPUMetric     `json:"cpu"`
+	Memory  *MemoryMetric  `json:"memory"`
+	Network *NetworkMetric `json:"network"`
 }
 
-type NodeCPUMetric struct {
+type CPUMetric struct {
 	Usage []interface{} `json:"usage"`
 }
 
-type NodeMemoryMetric struct {
+type MemoryMetric struct {
 	Usage []interface{} `json:"usage"`
 }
 
-type NodeNetworkMetric struct {
+type NetworkMetric struct {
 	Receive  []interface{} `json:"receive"`
 	Transmit []interface{} `json:"transmit"`
+}
+
+type FilesystemMetric struct {
+	Read  []interface{} `json:"read"`
+	Write []interface{} `json:"write"`
 }
 
 func NewNodesMetric() *NodesMetric {
@@ -189,9 +194,9 @@ func NewNodesMetric() *NodesMetric {
 
 func NewNodeMetric() *NodeMetric {
 	return &NodeMetric{
-		CPU:     &NodeCPUMetric{},
-		Memory:  &NodeMemoryMetric{},
-		Network: &NodeNetworkMetric{},
+		CPU:     &CPUMetric{},
+		Memory:  &MemoryMetric{},
+		Network: &NetworkMetric{},
 	}
 }
 
@@ -238,8 +243,83 @@ func (nm *NodesMetric) SetNodesMetric(query *QueryRange) error {
 				}
 			}
 		}
-
 	}
 	return nil
+}
 
+type AppMetric struct {
+	App map[string]*TaskMetric `json:"app"`
+}
+
+type TaskMetric struct {
+	CPU        *CPUMetric        `json:"cpu"`
+	Memory     *MemoryMetric     `json:"memory"`
+	Network    *NetworkMetric    `json:"network"`
+	Filesystem *FilesystemMetric `json:"filesystem"`
+}
+
+func NewAppMetric() *AppMetric {
+	return &AppMetric{
+		App: make(map[string]*TaskMetric),
+	}
+}
+
+func NewTaskMetric() *TaskMetric {
+	return &TaskMetric{
+		CPU:        &CPUMetric{},
+		Memory:     &MemoryMetric{},
+		Network:    &NetworkMetric{},
+		Filesystem: &FilesystemMetric{},
+	}
+}
+
+func (am *AppMetric) GetAppMetric(query *QueryRange) error {
+	err := am.SetAppMetric(query)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (am *AppMetric) SetAppMetric(query *QueryRange) error {
+	metrics := []string{"cpu", "memory", "network_rx", "network_tx", "fs_read", "fs_write"}
+	for _, metric := range metrics {
+		query.Metric = metric
+		data, err := query.QueryRangeFromProm()
+		if err != nil {
+			return err
+		}
+
+		if len(am.App) == 0 {
+			for _, originData := range data.Data.Result {
+				task := NewTaskMetric()
+				name := strings.Split(originData.Metric.ID, "/")[2]
+				am.App[name] = task
+			}
+		}
+
+		for _, originData := range data.Data.Result {
+			name := strings.Split(originData.Metric.ID, "/")[2]
+			value := originData.Values[0]
+			for k, v := range am.App {
+				if name == k {
+					switch query.Metric {
+					case "cpu":
+						v.CPU.Usage = value
+					case "memory":
+						v.Memory.Usage = value
+					case "network_rx":
+						v.Network.Receive = value
+					case "network_tx":
+						v.Network.Transmit = value
+					case "fs_read":
+						v.Filesystem.Read = value
+					case "fs_write":
+						v.Filesystem.Write = value
+					}
+				}
+			}
+		}
+	}
+	return nil
 }

@@ -518,6 +518,100 @@ Get the metric data of one node
 http://127.0.0.1:5098/v1/monitor/nodes?node=192.168.1.101
 ```
 
+
+### Get the metric data of nodes
+
+```GET /v1/monitor/application```
+
+- path: /v1/monitor/application
+- HTTP Method: GET
+- URL Params: Null
+- Query Params: appid
+  - appid=<string>: the name of application.
+
+For example:
+```
+Get the metric data of the tasks in one application
+```
+http://127.0.0.1:5098/v1/monitor/application?appid=work-nginx
+{
+  "code": 0,
+  "data": {
+    "app": {
+      "d2f1c5324cced328d766fb858055bc0a5f9fa04402343379077e89ce6c9c0b6f": {
+        "cpu": {
+          "usage": [
+            1479452528,
+            "0"
+          ]
+        },
+        "memory": {
+          "usage": [
+            1479452528,
+            "0.0213623046875"
+          ]
+        },
+        "network": {
+          "receive": [
+            1479452528,
+            "1854"
+          ],
+          "transmit": [
+            1479452528,
+            "648"
+          ]
+        },
+        "filesystem": {
+          "read": [
+            1479452528,
+            "0"
+          ],
+          "write": [
+            1479452528,
+            "0"
+          ]
+        }
+      },
+      "e58177e632ca1a6ef5404a76ae129f047e295cd4aab1c262eaec4811d24f9b6f": {
+        "cpu": {
+          "usage": [
+            1479452528,
+            "0"
+          ]
+        },
+        "memory": {
+          "usage": [
+            1479452528,
+            "0.02130126953125"
+          ]
+        },
+        "network": {
+          "receive": [
+            1479452528,
+            "1944"
+          ],
+          "transmit": [
+            1479452528,
+            "648"
+          ]
+        },
+        "filesystem": {
+          "read": [
+            1479452528,
+            "0"
+          ],
+          "write": [
+            1479452528,
+            "0"
+          ]
+        }
+      }
+    }
+  }
+}
+```
+
+
 ## 日志
 
 ### 获取所有应用
