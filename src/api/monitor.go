@@ -69,3 +69,20 @@ func (m *monitor) QueryApps(ctx *gin.Context) {
 	}
 	utils.Ok(ctx, apps)
 }
+
+func (m *monitor) QueryNodes(ctx *gin.Context) {
+	query := &service.QueryRange{
+		HttpClient: http.DefaultClient,
+		PromServer: config.GetConfig().PROMETHEUS_URL,
+		Path:       QUERYRANGEPATH,
+		Node:       ctx.Query("node"),
+	}
+
+	data := service.NewNodesMetric()
+	err := data.GetNodesMetric(query)
+	if err != nil {
+		utils.ErrorResponse(ctx, err)
+		return
+	}
+	utils.Ok(ctx, data)
+}
