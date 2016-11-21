@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/Dataman-Cloud/log-proxy/src/config"
+	"github.com/Dataman-Cloud/log-proxy/src/utils"
 
 	log "github.com/Sirupsen/logrus"
 	"gopkg.in/olivere/elastic.v3"
@@ -45,13 +46,10 @@ func NewSearchService() *SearchService {
 }
 
 func (s *SearchService) Applications() (map[string]int64, error) {
-	bquery := elastic.NewBoolQuery().
-		Filter(elastic.NewRangeQuery("logtime").Gte(s.RangeFrom).Lte(s.RangeTo).Format("epoch_millis"))
 
 	apps := make(map[string]int64)
 	result, err := s.ESClient.Search().
 		Index("dataman-*").
-		Query(bquery).
 		SearchType("count").
 		Aggregation("apps", elastic.
 			NewTermsAggregation().
@@ -77,7 +75,6 @@ func (s *SearchService) Applications() (map[string]int64, error) {
 
 func (s *SearchService) Tasks(appName string) (map[string]int64, error) {
 	bquery := elastic.NewBoolQuery().
-		Filter(elastic.NewRangeQuery("logtime").Gte(s.RangeFrom).Lte(s.RangeTo).Format("epoch_millis")).
 		Must(elastic.NewTermQuery("appid", appName))
 
 	tasks := make(map[string]int64)
@@ -113,7 +110,6 @@ func (s *SearchService) Paths(appName, taskId string) (map[string]int64, error) 
 	paths := make(map[string]int64)
 
 	bquery := elastic.NewBoolQuery().
-		Filter(elastic.NewRangeQuery("logtime").Gte(s.RangeFrom).Lte(s.RangeTo).Format("epoch_millis")).
 		Must(elastic.NewTermQuery("appid", appName), elastic.NewTermQuery("taskid", taskId))
 
 	result, err := s.ESClient.Search().
@@ -163,7 +159,7 @@ func (s *SearchService) Search(appid, taskid, source, keyword string) (map[strin
 		Must(querys...)
 
 	result, err := s.ESClient.Search().
-		Index("dataman-"+strings.Split(appid, "-")[0]+"-*").
+		Index("dataman-"+strings.Split(appid, "-")[0]+"-"+utils.ParseDate(s.RangeFrom, s.RangeTo)).
 		Type("dataman-"+appid).
 		Query(bquery).
 		Highlight(elastic.NewHighlight().Field("message").PreTags(`@dataman-highlighted-field@`).PostTags(`@/dataman-highlighted-field@`)).
