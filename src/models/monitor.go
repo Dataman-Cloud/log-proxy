@@ -1,8 +1,10 @@
 package models
 
 type QueryRangeResult struct {
-	Status string `json:"status"`
-	Data   *Data  `json:"data"`
+	Status    string `json:"status"`
+	Data      *Data  `json:"data"`
+	ErrorType string `json:"errorType"`
+	Error     string `json:"error"`
 }
 
 type Data struct {

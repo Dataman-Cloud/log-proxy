@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -55,9 +56,11 @@ func (query *QueryRange) QueryRangeFromProm() (*models.QueryRangeResult, error) 
 	q := u.Query()
 	q.Set("query", expr)
 
-	start, end, err := timeRange(query.From, query.To, unixTime)
+	var start, end string
+	start, end, err = timeRange(query.From, query.To, unixTime)
 	if err != nil {
-		return nil, err
+		start = query.From
+		end = query.To
 	}
 	q.Set("start", start)
 	q.Set("end", end)
@@ -86,6 +89,12 @@ func (query *QueryRange) QueryRangeFromProm() (*models.QueryRangeResult, error) 
 	if err != nil {
 		return nil, err
 	}
+
+	if result.Status != "success" {
+		err := fmt.Errorf("%s", result.Error)
+		return nil, err
+	}
+
 	log.Printf("Get the prometheus qurey result by url: %s", u.String())
 
 	return result, nil
@@ -102,6 +111,12 @@ func (query *QueryRange) setQueryExpr(metrics, appID, taskID string) (expr strin
 		expr = "container_memory_usage_bytes{container_label_APP_ID='" + appID +
 			"',id=~'/docker/" + taskID + ".*', name=~'mesos.*'} / container_spec_memory_limit_bytes" +
 			"{container_label_APP_ID='" + appID + "', id=~'/docker/" + taskID + ".*', name=~'mesos.*'}"
+	case "memory_usage":
+		expr = "container_memory_usage_bytes{container_label_APP_ID='" + appID +
+			"',id=~'/docker/" + taskID + ".*', name=~'mesos.*'}"
+	case "memory_total":
+		expr = "container_spec_memory_limit_bytes{container_label_APP_ID='" + appID +
+			"',id=~'/docker/" + taskID + ".*', name=~'mesos.*'}"
 	case "network_rx":
 		expr = "container_network_receive_bytes_total{container_label_APP_ID='" + appID +
 			"',id=~'/docker/" + taskID + ".*', name=~'mesos.*'}"
@@ -127,7 +142,8 @@ func (query *QueryRange) setQueryAppExpr(metrics, appID string) (expr string) {
 		expr = "avg(irate(container_cpu_usage_seconds_total{container_label_APP_ID='" + appID +
 			"',id=~'/docker/.*', name=~'mesos.*'}[5m])) by (container_label_APP_ID)"
 	case "memory":
-		expr = "sum(container_memory_usage_bytes{container_label_APP_ID='" + appID +
+		expr = "avg(container_memory_usage_bytes{container_label_APP_ID='" + appID +
+			"',id=~'/docker/.*'} / container_spec_memory_limit_bytes{container_label_APP_ID='" + appID +
 			"',id=~'/docker/.*'}) by (container_label_APP_ID)"
 	case "network_rx":
 		expr = "sum(container_network_receive_bytes_total{container_label_APP_ID='" + appID +
@@ -246,6 +262,12 @@ func (query *QueryRange) QueryAppsFromProm() (*models.QueryRangeResult, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	if result.Status != "success" {
+		err := fmt.Errorf("%s", result.Error)
+		return nil, err
+	}
+
 	log.Printf("Get the prometheus qurey result by url: %s", u.String())
 
 	return result, nil
@@ -260,6 +282,10 @@ func (query *QueryRange) setQueryNodesExpr(metric, node string) (expr string) {
 		case "memory":
 			expr = "sum(container_memory_usage_bytes{id='/',instance='" + node +
 				":5014'} / container_spec_memory_limit_bytes{id='/',instance='" + node + ":5014'}) by (instance)"
+		case "memory_usage":
+			expr = "sum(container_memory_usage_bytes{id='/',instance='" + node + ":5014'}) by (instance)"
+		case "memory_total":
+			expr = "sum(container_spec_memory_limit_bytes{id='/',instance='" + node + ":5014'}) by (instance)"
 		case "network_rx":
 			expr = "sum(container_network_receive_bytes_total{id=~'/',instance='" + node + ":5014'}) by (instance)"
 		case "network_tx":
@@ -275,6 +301,10 @@ func (query *QueryRange) setQueryNodesExpr(metric, node string) (expr string) {
 		expr = "avg(irate(container_cpu_usage_seconds_total{id='/'}[5m])) by (instance)"
 	case "memory":
 		expr = "sum(container_memory_usage_bytes{id='/'} / container_spec_memory_limit_bytes{id='/'}) by (instance)"
+	case "memory_usage":
+		expr = "sum(container_memory_usage_bytes{id='/'}) by (instance)"
+	case "memory_total":
+		expr = "sum(container_spec_memory_limit_bytes{id='/'}) by (instance)"
 	case "network_rx":
 		expr = "sum(container_network_receive_bytes_total{id=~'/'}) by (instance)"
 	case "network_tx":
@@ -329,6 +359,11 @@ func (query *QueryRange) QueryNodesFromProm() (*models.QueryRangeResult, error) 
 	var result *models.QueryRangeResult
 	err = json.Unmarshal(body, &result)
 	if err != nil {
+		return nil, err
+	}
+
+	if result.Status != "success" {
+		err := fmt.Errorf("%s", result.Error)
 		return nil, err
 	}
 	log.Printf("Get the prometheus qurey result by url: %s", u.String())
