@@ -115,6 +115,7 @@ func NewAppsList() *AppsList {
 	}
 }
 
+// GetAppsList return the list of apps. router: /applications
 func (a *AppsList) GetAppsList(query *QueryRange) error {
 	err := a.SetAppsList(query)
 	if err != nil {
@@ -173,7 +174,8 @@ type CPUMetric struct {
 }
 
 type MemoryMetric struct {
-	Usage []interface{} `json:"usage"`
+	Usage []interface{} `json:"usage_bytes"`
+	Total []interface{} `json:"total_bytes"`
 }
 
 type NetworkMetric struct {
@@ -209,7 +211,7 @@ func (nm *NodesMetric) GetNodesMetric(query *QueryRange) error {
 }
 
 func (nm *NodesMetric) SetNodesMetric(query *QueryRange) error {
-	metrics := []string{"cpu", "memory", "network_rx", "network_tx"}
+	metrics := []string{"cpu", "memory_usage", "memory_total", "network_rx", "network_tx"}
 	for _, metric := range metrics {
 		query.Metric = metric
 		data, err := query.QueryNodesFromProm()
@@ -233,8 +235,10 @@ func (nm *NodesMetric) SetNodesMetric(query *QueryRange) error {
 					switch query.Metric {
 					case "cpu":
 						v.CPU.Usage = value
-					case "memory":
+					case "memory_usage":
 						v.Memory.Usage = value
+					case "memory_total":
+						v.Memory.Total = value
 					case "network_rx":
 						v.Network.Receive = value
 					case "network_tx":
@@ -252,6 +256,7 @@ type AppMetric struct {
 }
 
 type TaskMetric struct {
+	Node       string            `json:"node"`
 	CPU        *CPUMetric        `json:"cpu"`
 	Memory     *MemoryMetric     `json:"memory"`
 	Network    *NetworkMetric    `json:"network"`
@@ -273,6 +278,7 @@ func NewTaskMetric() *TaskMetric {
 	}
 }
 
+// GetAppMetric will return the metric of one app. router: /application
 func (am *AppMetric) GetAppMetric(query *QueryRange) error {
 	err := am.SetAppMetric(query)
 	if err != nil {
@@ -282,7 +288,7 @@ func (am *AppMetric) GetAppMetric(query *QueryRange) error {
 }
 
 func (am *AppMetric) SetAppMetric(query *QueryRange) error {
-	metrics := []string{"cpu", "memory", "network_rx", "network_tx", "fs_read", "fs_write"}
+	metrics := []string{"cpu", "memory_usage", "memory_total", "network_rx", "network_tx", "fs_read", "fs_write"}
 	for _, metric := range metrics {
 		query.Metric = metric
 		data, err := query.QueryRangeFromProm()
@@ -293,21 +299,25 @@ func (am *AppMetric) SetAppMetric(query *QueryRange) error {
 		if len(am.App) == 0 {
 			for _, originData := range data.Data.Result {
 				task := NewTaskMetric()
-				name := strings.Split(originData.Metric.ID, "/")[2]
+				name := originData.Metric.ID
 				am.App[name] = task
 			}
 		}
 
 		for _, originData := range data.Data.Result {
-			name := strings.Split(originData.Metric.ID, "/")[2]
+			name := originData.Metric.ID
+			node := strings.Split(originData.Metric.Instance, ":")[0]
 			value := originData.Values[0]
 			for k, v := range am.App {
 				if name == k {
+					v.Node = node
 					switch query.Metric {
 					case "cpu":
 						v.CPU.Usage = value
-					case "memory":
+					case "memory_usage":
 						v.Memory.Usage = value
+					case "memory_total":
+						v.Memory.Total = value
 					case "network_rx":
 						v.Network.Receive = value
 					case "network_tx":
