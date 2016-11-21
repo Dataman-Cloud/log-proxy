@@ -57,7 +57,7 @@
                         tickFormat: function (d) {
                             return d3.format('.02f')(d) + '%';
                         },
-                        axisLabelDistance: -10
+                        axisLabelDistance: 10
                     },
                     pointSize: 0.1,
                     forceY: [0],

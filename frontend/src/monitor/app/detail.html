@@ -1,7 +1,7 @@
 <div class="statistic" layout="row" layout-align="start space-between">
     <div class="statistic-panel" flex="20">
-        <h3>实个数</h3>
-        <em>XXX</em>
+        <h3>实例个数</h3>
+        <em>{/keys(vm.instances).length/}</em>
     </div>
     <div class="statistic-panel" flex="20">
         <h3>CPU</h3>
@@ -23,24 +23,45 @@
     </div>
 </div>
 <div class="chart" layout="row">
-    <div class="chart-panel">
+    <div class="chart-panel" flex="100">
         <div>
             <nvd3 options="vm.chartOptions.networkOptions"
                   data="vm.chartOptions.networkData" api="vm.networkApi"
                   config="{deepWatchData: false, deepWatchOptions:false}"></nvd3>
+        </div>
+    </div>
+</div>
+
+<div class="chart" layout="row">
+    <div class="chart-panel" flex="100">
+        <div>
             <nvd3 options="vm.chartOptions.cpuOptions"
                   data="vm.chartOptions.cpuData" api="vm.cpuApi"
                   config="{deepWatchData: false, deepWatchOptions:false}"></nvd3>
+        </div>
+    </div>
+</div>
+
+
+<div class="chart" layout="row">
+    <div class="chart-panel" flex="100">
+        <div>
             <nvd3 options="vm.chartOptions.memOptions"
                   data="vm.chartOptions.memData" api="vm.memApi"
                   config="{deepWatchData: false, deepWatchOptions:false}"></nvd3>
+        </div>
+    </div>
+</div>
+
+<div class="chart" layout="row">
+    <div class="chart-panel" flex="100">
+        <div>
             <nvd3 options="vm.chartOptions.fileSysOptions"
                   data="vm.chartOptions.fileSysData" api="vm.fileSysApi"
                   config="{deepWatchData: false, deepWatchOptions:false}"></nvd3>
         </div>
     </div>
 </div>
-
 <md-content class="main-tab-content">
     <md-table-container>
         <table md-table id="node-list">
@@ -54,21 +75,21 @@
             </tr>
             </thead>
             <tbody md-body>
-            <tr md-row ng-repeat="instance in [a,b,c,d] track by $index">
+            <tr md-row ng-repeat="(key, value) in vm.instances track by $index">
                 <td md-cell>
-                    实例名
+                    {/key/}
                 </td>
                 <td md-cell>
-                    10%
+                    {/value.cpu.usage[1]/}
                 </td>
                 <td md-cell>
-                    10%
+                    {/value.memory.usage[1]/}
                 </td>
                 <td md-cell>
-                    25.5 KiB/s
+                    发送:{/value.network.transmit[1]/} 接收:{/value.network.receive[1]/}
                 </td>
                 <td md-cell>
-                    25.5 KiB/s
+                    读:{/value.filesystem.read[1]/} 写:{/value.filesystem.write[1]/}
                 </td>
             </tr>
             </tbody>

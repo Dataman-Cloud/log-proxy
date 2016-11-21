@@ -38,7 +38,7 @@
                 options.chart.yAxis.tickFormat = function (d) {
                     return $filter('netRate')(d);
                 };
-                options.chart.margin.left = 80;
+                options.chart.margin.left = 100;
                 return options
             };
 
@@ -49,7 +49,7 @@
                 options.chart.yAxis.tickFormat = function (d) {
                     return $filter('netRate')(d);
                 };
-                options.chart.margin.left = 80;
+                options.chart.margin.left = 100;
                 return options
             };
 
@@ -58,6 +58,7 @@
                 options.chart.yAxis.axisLabel = 'CPU使用率';
                 options.title.text = 'CPU 使用率';
                 options.chart.forceY = [0, 100];
+                options.chart.margin.left = 100;
                 return options
             };
 
@@ -66,6 +67,7 @@
                 options.chart.yAxis.axisLabel = '内存使用率';
                 options.title.text = '内存使用率';
                 options.chart.forceY = [0, 100];
+                options.chart.margin.left = 100;
                 return options;
             };
 
@@ -86,20 +88,20 @@
             };
 
             Options.prototype._pushNetworkData = function (data, networkApi) {
-                this._pushData(data.network.receive, networkApi, this.networkData, function(insId){
+                this._pushData(data.network.receive, networkApi, this.networkData, function (insId) {
                     return insId + '接收';
                 });
-                this._pushData(data.network.transmit, networkApi, this.networkData, function(insId){
+                this._pushData(data.network.transmit, networkApi, this.networkData, function (insId) {
                     return insId + '发送';
                 });
 
             };
 
             Options.prototype._pushFileSysData = function (data, fileSysApi) {
-                this._pushData(data.filesystem.read, fileSysApi, this.fileSysData, function(insId){
+                this._pushData(data.filesystem.read, fileSysApi, this.fileSysData, function (insId) {
                     return insId + '读取';
                 });
-                this._pushData(data.network.write, fileSysApi, this.fileSysData, function(insId){
+                this._pushData(data.network.write, fileSysApi, this.fileSysData, function (insId) {
                     return insId + '写入';
                 });
             };
@@ -114,7 +116,7 @@
                     }
                     angular.forEach(item.values, function (value) {
                         chartUtil.pushData(target, serialKey, {
-                            x: value[0],
+                            x: value[0] * 1000,
                             y: parseFloat(value[1])
                         }, POINT_NUM);
                     })
@@ -123,7 +125,7 @@
             };
 
             Options.prototype.flushCharts = function (cpuApi, memApi, networkApi, diskApi) {
-                if(this.dataChanged) {
+                if (this.dataChanged) {
                     cpuApi.update();
                     memApi.update();
                     networkApi.update();
