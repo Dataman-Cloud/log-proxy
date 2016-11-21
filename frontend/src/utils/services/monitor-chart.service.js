@@ -107,7 +107,7 @@
                 this._pushData(data.filesystem.read, fileSysApi, this.fileSysData, function (insId) {
                     return insId + '读取';
                 });
-                this._pushData(data.network.write, fileSysApi, this.fileSysData, function (insId) {
+                this._pushData(data.filesystem.write, fileSysApi, this.fileSysData, function (insId) {
                     return insId + '写入';
                 });
             };
