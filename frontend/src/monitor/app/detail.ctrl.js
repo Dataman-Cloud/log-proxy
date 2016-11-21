@@ -19,7 +19,7 @@
         };
         self.chartOptions = monitorChart.Options();
         self.curTimestamp = moment().unix();
-        self.fromTimestamp = moment().subtract(1, 'hours').unix();
+        self.fromTimestamp = moment().subtract(2, 'hours').unix();
 
         activate();
 
@@ -51,8 +51,8 @@
                     self.chartOptions.pushData(result[0].data, self.cpuApi, self.memApi, self.networkApi, self.fileSysApi);
                     self.chartOptions.flushCharts(self.cpuApi, self.memApi, self.networkApi, self.fileSysApi);
 
-                    self.realTimeData.cpuPercent = parseInt(result[1].data.cpu.usage[0].values[0][1]);
-                    self.realTimeData.memUsage = parseInt(result[1].data.memory.usage[0].values[0][1]);
+                    self.realTimeData.cpuPercent = parseFloat(result[1].data.cpu.usage[0].values[0][1]) * 100;
+                    self.realTimeData.memUsage = parseFloat(result[1].data.memory.usage[0].values[0][1]) * 100;
                     self.realTimeData.networkReceive = parseInt(result[1].data.network.receive[0].values[0][1]);
                     self.realTimeData.networkTransmit = parseInt(result[1].data.network.transmit[0].values[0][1]);
                     self.realTimeData.fileSysRead = parseInt(result[1].data.filesystem.read[0].values[0][1]);

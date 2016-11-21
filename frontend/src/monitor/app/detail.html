@@ -9,7 +9,7 @@
     </div>
     <div class="statistic-panel" flex="20">
         <h3>内存</h3>
-        <em>{/vm.realTimeData.memUsage | size/}</em>
+        <em>{/vm.realTimeData.memUsage.toFixed(2)/} %</em>
     </div>
     <div class="statistic-panel" flex="20">
         <h3>网络 IO</h3>
@@ -68,6 +68,7 @@
             <thead md-head>
             <tr md-row>
                 <th md-column>实例</th>
+                <th md-column>主机</th>
                 <th md-column>CPU</th>
                 <th md-column>内存</th>
                 <th md-column>网络I/O</th>
@@ -80,16 +81,19 @@
                     {/key/}
                 </td>
                 <td md-cell>
-                    {/value.cpu.usage[1]/}
+                    {/value.node/}
                 </td>
                 <td md-cell>
-                    {/value.memory.usage[1]/}
+                    {/value.cpu.usage[1]/} %
                 </td>
                 <td md-cell>
-                    发送:{/value.network.transmit[1]/} 接收:{/value.network.receive[1]/}
+                    {/value.memory.usage_bytes[1] | size/} / {/value.memory.total_bytes[1] | size/}
                 </td>
                 <td md-cell>
-                    读:{/value.filesystem.read[1]/} 写:{/value.filesystem.write[1]/}
+                    发送:{/value.network.transmit[1] | netRate/} 接收:{/value.network.receive[1] | netRate/}
+                </td>
+                <td md-cell>
+                    读:{/value.filesystem.read[1] | netRate/} 写:{/value.filesystem.write[1] | netRate/}
                 </td>
             </tr>
             </tbody>

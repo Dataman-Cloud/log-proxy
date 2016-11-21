@@ -79,7 +79,7 @@
                             }
                         }
                         return colors[i];
-                    },
+                    }
                 },
                 title: {
                     enable: true
@@ -89,7 +89,7 @@
 
         function pushData(data, serialKey, value, pointNum, interval, area) {
             if (!interval) {
-                interval = 1000;
+                interval = 30000;
             }
             if (area === undefined) {
                 area = true;
@@ -112,7 +112,7 @@
                 if (data[i].values.length > pointNum) {
                     data[i].values.shift();
                 } else {
-                    data[i].values.unshift({x: data[i].values[0].x - interval, y: 0});
+                    data[i].values.unshift({x: data[i].values[0].x - interval, y: null});
                 }
             }
         }

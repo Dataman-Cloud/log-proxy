@@ -7,6 +7,7 @@
     function size() {
         //////
         return function (rawSize, minUnite) {
+            rawSize = parseFloat(rawSize);
             var units;
             units = minUnite === "MB" ? ['MB', 'GB', 'TB'] : ['B', 'KB', 'MB', 'GB', 'TB'];
             var unitIndex = 0;

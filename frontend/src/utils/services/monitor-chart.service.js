@@ -57,6 +57,9 @@
                 var options = chartUtil.createDefaultOptions();
                 options.chart.yAxis.axisLabel = 'CPU使用率';
                 options.title.text = 'CPU 使用率';
+                options.chart.yAxis.tickFormat = function (d) {
+                    return d + '%';
+                };
                 options.chart.forceY = [0, 100];
                 options.chart.margin.left = 100;
                 return options
@@ -66,6 +69,9 @@
                 var options = chartUtil.createDefaultOptions();
                 options.chart.yAxis.axisLabel = '内存使用率';
                 options.title.text = '内存使用率';
+                options.chart.yAxis.tickFormat = function (d) {
+                    return d + '%';
+                };
                 options.chart.forceY = [0, 100];
                 options.chart.margin.left = 100;
                 return options;
