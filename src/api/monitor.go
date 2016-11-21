@@ -36,6 +36,7 @@ func (m *monitor) QueryRange(ctx *gin.Context) {
 		HttpClient: http.DefaultClient,
 		PromServer: config.GetConfig().PROMETHEUS_URL,
 		Path:       QUERYRANGEPATH,
+		Type:       ctx.Query("type"),
 		AppID:      ctx.Query("appid"),
 		TaskID:     ctx.Query("taskid"),
 		Metric:     ctx.Query("metric"),
@@ -57,6 +58,7 @@ func (m *monitor) QueryApps(ctx *gin.Context) {
 		HttpClient: http.DefaultClient,
 		PromServer: config.GetConfig().PROMETHEUS_URL,
 		Path:       QUERYPATH,
+		AppID:      ctx.Query("appid"),
 	}
 
 	apps := service.NewAppsList()
@@ -66,4 +68,38 @@ func (m *monitor) QueryApps(ctx *gin.Context) {
 		return
 	}
 	utils.Ok(ctx, apps)
+}
+
+func (m *monitor) QueryNodes(ctx *gin.Context) {
+	query := &service.QueryRange{
+		HttpClient: http.DefaultClient,
+		PromServer: config.GetConfig().PROMETHEUS_URL,
+		Path:       QUERYRANGEPATH,
+		Node:       ctx.Query("node"),
+	}
+
+	data := service.NewNodesMetric()
+	err := data.GetNodesMetric(query)
+	if err != nil {
+		utils.ErrorResponse(ctx, err)
+		return
+	}
+	utils.Ok(ctx, data)
+}
+
+func (m *monitor) QueryApp(ctx *gin.Context) {
+	query := &service.QueryRange{
+		HttpClient: http.DefaultClient,
+		PromServer: config.GetConfig().PROMETHEUS_URL,
+		Path:       QUERYRANGEPATH,
+		AppID:      ctx.Query("appid"),
+	}
+
+	data := service.NewAppMetric()
+	err := data.GetAppMetric(query)
+	if err != nil {
+		utils.ErrorResponse(ctx, err)
+		return
+	}
+	utils.Ok(ctx, data)
 }
