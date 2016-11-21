@@ -6,9 +6,9 @@
             'ngAnimate',
             'ui-notification',
             'md.data.table',
-            'ngCookies',
             'ngMaterial',
             'nvd3',
-            'ngResource'
+            'ngResource',
+            'angularMoment'
         ]);
 })();

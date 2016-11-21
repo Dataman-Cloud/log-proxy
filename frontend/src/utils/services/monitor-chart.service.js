@@ -5,7 +5,7 @@
 
 
     /* @ngInject */
-    function monitorChart($filter, $rootScope, chartUtil) {
+    function monitorChart($filter, chartUtil) {
 
         var optionsCls = createOptionsCls();
         var POINT_NUM = 180;

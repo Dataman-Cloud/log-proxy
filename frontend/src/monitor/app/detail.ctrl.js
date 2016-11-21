@@ -3,8 +3,9 @@
     angular.module('app')
         .controller('MonitorAppDetailCtrl', MonitorAppDetailCtrl);
     /* @ngInject */
-    function MonitorAppDetailCtrl(monitorBackend, $stateParams, $q, $timeout, $scope, monitorChart) {
+    function MonitorAppDetailCtrl(monitorBackend, $stateParams, $q, $timeout, $scope, monitorChart, moment) {
         var timeoutResult;
+        var reloadInterval = 5000;
 
         var self = this;
         self.instances = {};
@@ -17,6 +18,8 @@
             fileSysWrite: 0
         };
         self.chartOptions = monitorChart.Options();
+        self.curTimestamp = moment().unix();
+        self.fromTimestamp = moment().subtract(1, 'hours').unix();
 
         activate();
 
@@ -25,18 +28,23 @@
             monitorBackend.monitor({
                 metric: 'all',
                 appid: $stateParams.appId,
-                from: '2016-11-09%2000:01:00',
-                to: '2016-11-09%2000:01:30'
+                from: self.fromTimestamp,
+                to: self.curTimestamp
             }).get(function (data) {
                 self.chartOptions.pushData(data.data, self.cpuApi, self.memApi, self.networkApi, self.fileSysApi);
                 self.chartOptions.flushCharts(self.cpuApi, self.memApi, self.networkApi, self.fileSysApi);
+            }).$promise.then(function () {
+                tick();
             });
-
-            tick();
         }
 
         function tick() {
-            $q.all([monitorBackend.monitor({metric: 'all', appid: $stateParams.appId}).get().$promise,
+            $q.all([monitorBackend.monitor({
+                metric: 'all',
+                appid: $stateParams.appId,
+                to: moment().unix(),
+                from: moment().subtract(5, 'seconds').unix()
+            }).get().$promise,
                 monitorBackend.monitor({metric: 'all', appid: $stateParams.appId, type: 'app'}).get().$promise,
                 monitorBackend.listInstance({appid: $stateParams.appId}).get().$promise])
                 .then(function (result) {
@@ -52,10 +60,10 @@
 
                     self.instances = result[2].data.app;
 
-                    timeoutResult = $timeout(tick, 5000);
+                    timeoutResult = $timeout(tick, reloadInterval);
                 })
 
-        };
+        }
 
         $scope.$on('$destroy', function () {
             $timeout.cancel(timeoutResult);
