@@ -17,6 +17,7 @@ type Config struct {
 	ES_URL         string `require:"true"`
 	SEARCH_DEBUG   bool
 	PROMETHEUS_URL string `require:"true"`
+	FRONTEND_PATH  string
 }
 
 var c *Config

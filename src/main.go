@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"path"
 	"time"
 
 	"github.com/Dataman-Cloud/log-proxy/src/config"
@@ -9,14 +10,17 @@ import (
 	"github.com/Dataman-Cloud/log-proxy/src/router/middleware"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/gin-gonic/contrib/static"
 )
 
 func main() {
 	log.Infof("http server: %s start...", config.GetConfig().ADDR)
 
 	server := &http.Server{
-		Addr:           config.GetConfig().ADDR,
-		Handler:        router.Router(middleware.Authenticate),
+		Addr: config.GetConfig().ADDR,
+		Handler: router.Router(middleware.Authenticate,
+			static.Serve("/",
+				static.LocalFile(path.Join(config.GetConfig().FRONTEND_PATH, "frontend"), true))),
 		WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}

@@ -18,6 +18,7 @@ func Router(middlewares ...gin.HandlerFunc) *gin.Engine {
 	r.Use(gin.Recovery())
 	r.Use(utils.Ginrus(log.StandardLogger(), time.RFC3339Nano, false))
 	r.Use(middleware.CORSMiddleware())
+	r.Use(middlewares...)
 
 	s := api.GetSearch()
 	logv1 := r.Group("/v1/search", s.Middleware)
