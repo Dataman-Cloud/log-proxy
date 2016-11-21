@@ -27,16 +27,9 @@
                 templateUrl: '/src/monitor/app/detail.html'
             })
             .state('home.instancemonitor', {
-                url: '/appmonitor/:appId/instances',
-                templateUrl: '/src/monitor/instance/list.html',
-                controller: 'MonitorListInstanceCtrl as vm',
-                resolve: {
-                    instances: listInstance
-                }
-            })
-            .state('home.instancemonitor.detail', {
-                url: '/:instanceId',
-                templateUrl: '/src/monitor/instance/detail.html'
+                url: '/appmonitor/:appId/instances/:taskId',
+                templateUrl: '/src/monitor/instance/detail.html',
+                controller: 'MonitorInstanceCtrl as vm'
             });
 
 

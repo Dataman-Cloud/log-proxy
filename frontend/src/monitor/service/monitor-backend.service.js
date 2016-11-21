@@ -30,7 +30,8 @@
                 type: paramObj.type,
                 from: paramObj.from,
                 to: paramObj.to,
-                step: paramObj.step
+                step: paramObj.step,
+                taskid: paramObj.taskid
             });
         }
 
