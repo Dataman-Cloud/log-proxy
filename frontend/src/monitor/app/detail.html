@@ -23,8 +23,20 @@
     </div>
 </div>
 <div class="chart" layout="row">
-    <div class="chart-panel">chart
+    <div class="chart-panel">
         <div>
+            <nvd3 options="vm.chartOptions.networkOptions"
+                  data="vm.chartOptions.networkData" api="vm.networkApi"
+                  config="{deepWatchData: false, deepWatchOptions:false}"></nvd3>
+            <nvd3 options="vm.chartOptions.cpuOptions"
+                  data="vm.chartOptions.cpuData" api="vm.cpuApi"
+                  config="{deepWatchData: false, deepWatchOptions:false}"></nvd3>
+            <nvd3 options="vm.chartOptions.memOptions"
+                  data="vm.chartOptions.memData" api="vm.memApi"
+                  config="{deepWatchData: false, deepWatchOptions:false}"></nvd3>
+            <nvd3 options="vm.chartOptions.fileSysOptions"
+                  data="vm.chartOptions.fileSysData" api="vm.fileSysApi"
+                  config="{deepWatchData: false, deepWatchOptions:false}"></nvd3>
         </div>
     </div>
 </div>

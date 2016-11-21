@@ -5,6 +5,7 @@
 
     /* @ngInject */
     function configure($locationProvider, $urlRouterProvider, $interpolateProvider, $stateProvider) {
+
         $stateProvider
             .state('home', {
                 url: '',
