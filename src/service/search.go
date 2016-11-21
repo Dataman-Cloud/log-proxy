@@ -145,8 +145,8 @@ func (s *SearchService) Paths(appName, taskId string) (map[string]int64, error) 
 	return paths, nil
 }
 
-func (s *SearchService) Search(appid, taskid, source, keyword string) ([]map[string]interface{}, error) {
-	var results []map[string]interface{}
+func (s *SearchService) Search(appid, taskid, source, keyword string) (map[string]interface{}, error) {
+	var data map[string]interface{}
 
 	var querys []elastic.Query
 	if taskid != "" {
@@ -173,6 +173,7 @@ func (s *SearchService) Search(appid, taskid, source, keyword string) ([]map[str
 		return nil, err
 	}
 
+	var results []map[string]interface{}
 	for _, hit := range result.Hits.Hits {
 		data := make(map[string]interface{})
 		json.Unmarshal(*hit.Source, &data)
@@ -181,6 +182,8 @@ func (s *SearchService) Search(appid, taskid, source, keyword string) ([]map[str
 		}
 		results = append(results, data)
 	}
+	data["results"] = results
+	data["count"] = result.Hits.TotalHits
 
-	return results, nil
+	return data, nil
 }
