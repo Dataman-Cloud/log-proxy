@@ -1,0 +1,98 @@
+body, html {
+  font-family: 'Helvetica Neue', 'Helvetica', 'PingHei', 'PingFang SC', 'STHeitiSC-Light', 'Arial', sans-serif;
+  font-size: 14px;
+  font-weight: 300;
+  height: 100%;
+  color: #000;
+  background-color: rgba(241,241,241,1);
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizelegibility; }
+
+* {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box; }
+
+*:before,
+*:after {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box; }
+
+  ul, ol, li, h1, h2, h3, h4, h5, h6, p {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+.panel {
+  background-color: #FFF;
+  border-radius: 4px;
+  padding: 20px;
+}
+
+
+#container {
+  padding: 20px;
+}
+
+#header {
+  background-color: #354052;
+  height: 50px;
+}
+
+#header .logo img {
+  height: 25px;
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+#header .md-button {
+  color: #FFF;
+  margin: 0;
+  height: 50px;
+  line-height: 50px;
+  border-radius: 0;
+}
+
+.monitor-tab {
+  text-align: right;
+}
+
+.monitor-tab .tab {
+  width: 200px;
+  border-right: 4px solid rgba(0,0,0,0.05);
+  padding: 0 12px 0 0;
+}
+
+.monitor-tab .tab li {
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.monitor-tab .tab li a h3 {
+  text-align: left;
+  margin-bottom: 8px;
+}
+
+.monitor-tab .tab li a {
+  text-decoration: none;
+  color: rgba(0,0,0,0.7);
+  display: block;
+  padding: 12px 8px;
+}
+
+.monitor-tab .tab li a:hover {
+  background-color: rgba(63,81,181,0.1);
+}
+.monitor-tab .tab li .statistic {
+  font-size: 12px;
+}
+.monitor-tab .tab li .statistic i {
+  margin-right: 4px;
+}
+.monitor-tab .content {
+
+}
+
+

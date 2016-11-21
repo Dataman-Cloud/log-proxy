@@ -1,0 +1,32 @@
+<header id="header" layout="row" layout-align="start center">
+    <div class="logo"><a href="#"><img src="../assets/images/logo-white-full.svg"></a></div>
+    <nav>
+        <ul layout="row" layout-align="start center">
+            <li>
+                <md-button ng-href="#">首页</md-button>
+            </li>
+            <li>
+                <md-menu>
+                    <md-button aria-label="More" ng-click="$mdOpenMenu($event)" id="open-user-menu">
+                        监控
+                    </md-button>
+                    <md-menu-content>
+                        <md-menu-item>
+                            <md-button ui-sref=".appmonitor">应用</md-button>
+                        </md-menu-item>
+                    </md-menu-content>
+                </md-menu>
+            </li>
+            <li>
+                <md-button ng-href="#">日志</md-button>
+            </li>
+            <li>
+                <md-button ng-href="#">事件</md-button>
+            </li>
+            <li>
+                <md-button ng-href="#">告警</md-button>
+            </li>
+        </ul>
+    </nav>
+</header>
+<div id="container" ui-view></div>
