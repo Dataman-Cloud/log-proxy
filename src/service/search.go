@@ -28,6 +28,7 @@ type SearchResult struct {
 func NewSearchService() *SearchService {
 	var ofs []elastic.ClientOptionFunc
 	ofs = append(ofs, elastic.SetURL(strings.Split(config.GetConfig().ES_URL, ",")...))
+	ofs = append(ofs, elastic.SetMaxRetries(10))
 	if config.GetConfig().SEARCH_DEBUG {
 		ofs = append(ofs, elastic.SetTraceLog(log.StandardLogger()))
 	}
@@ -200,8 +201,16 @@ func (s *SearchService) Search(appid, taskid, source, keyword string) (map[strin
 	data["results"] = results
 	data["count"] = result.Hits.TotalHits
 
+	var history []map[string]interface{}
 	agg, _ := result.Aggregations.DateHistogram("history")
-	data["history"] = agg.Buckets
+	for _, bucket := range agg.Buckets {
+		history = append(history, map[string]interface{}{
+			"key":         bucket.Key,
+			"KeyAsString": bucket.KeyAsString,
+			"DocCount":    bucket.DocCount,
+		})
+	}
+	data["history"] = history
 
 	return data, nil
 }
