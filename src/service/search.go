@@ -200,8 +200,8 @@ func (s *SearchService) Search(appid, taskid, source, keyword string) (map[strin
 	data["results"] = results
 	data["count"] = result.Hits.TotalHits
 
-	agg, _ := result.Aggregations.Terms("history")
-	data["history"] = agg
+	agg, _ := result.Aggregations.DateHistogram("history")
+	data["history"] = agg.Buckets
 
 	return data, nil
 }
