@@ -5,10 +5,10 @@
                 <md-tab label="最近">
                     <md-content>
                         <div flex class="form-item">
-                            <md-select placeholder="最近时间" ng-model="user">
-                                <md-option value="a">最近一分钟</md-option>
-                                <md-option value="b">最近十分钟</md-option>
-                                <md-option value="c">最近三十分钟</md-option>
+                            <md-select placeholder="最近时间" ng-model="vm.timePeriod" ng-change="vm.periodChange(vm.timePeriod)">
+                                <md-option ng-value="30">最近三十分钟</md-option>
+                                <md-option ng-value="120">最近两小时</md-option>
+                                <md-option ng-value="360">最近六小时</md-option>
                             </md-select>
                         </div>
                     </md-content>
@@ -24,26 +24,22 @@
             </md-tabs>
             <div flex class="form-item">
                 <label class="requirement">应用名</label>
-                <md-select placeholder="选择XXX" ng-model="user">
-                    <md-option value="a">a</md-option>
-                    <md-option value="b">b</md-option>
-                    <md-option value="c">c</md-option>
+                <md-select placeholder="选择应用" ng-model="vm.selectApp" md-on-open="vm.loadApps()" ng-change="vm.selectAppChange(vm.selectApp)">
+                    <md-option ng-value="key" ng-repeat="(key, value) in vm.apps">{/key/} : {/value/}</md-option>
                 </md-select>
             </div>
             <div flex class="form-item">
                 <label>实例 ID</label>
-                <md-select placeholder="选择XXX" ng-model="user">
-                    <md-option value="a">a</md-option>
-                    <md-option value="b">b</md-option>
-                    <md-option value="c">c</md-option>
+                <md-select placeholder="选择实例" ng-model="vm.selectTasks" md-on-open="vm.loadTasks()" multiple ng-change="vm.selectTasksChange(vm.selectTasks)"
+                        ng-disabled="!vm.selectApp">
+                    <md-option ng-value="key" ng-repeat="(key, value) in vm.tasks">{/key/} : {/value/}</md-option>
                 </md-select>
             </div>
             <div flex class="form-item">
                 <label>来源</label>
-                <md-select placeholder="选择XXX" ng-model="user">
-                    <md-option value="a">a</md-option>
-                    <md-option value="b">b</md-option>
-                    <md-option value="c">c</md-option>
+                <md-select placeholder="选择来源" ng-model="vm.selectPaths" md-on-open="vm.loadPaths()" multiple
+                           ng-disabled="!vm.selectTasks.length">
+                    <md-option ng-value="key" ng-repeat="(key, value) in vm.paths">{/key/} : {/value/}</md-option>
                 </md-select>
             </div>
             <div flex class="form-item">
@@ -51,7 +47,7 @@
                 <input type="text">
             </div>
             <div class="form-buttons-footer" layout="column">
-                <md-button class="md-raised md-primary">更新</md-button>
+                <md-button class="md-raised md-primary" ng-click="vm.searchLog()">更新</md-button>
             </div>
         </form>
     </div>
