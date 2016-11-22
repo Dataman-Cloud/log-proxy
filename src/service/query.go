@@ -118,11 +118,11 @@ func (query *QueryRange) setQueryExpr(metrics, appID, taskID string) (expr strin
 		expr = "container_spec_memory_limit_bytes{container_label_APP_ID='" + appID +
 			"',id=~'/docker/" + taskID + ".*', name=~'mesos.*'}"
 	case "network_rx":
-		expr = "container_network_receive_bytes_total{container_label_APP_ID='" + appID +
-			"',id=~'/docker/" + taskID + ".*', name=~'mesos.*'}"
+		expr = "irate(container_network_receive_bytes_total{container_label_APP_ID='" + appID +
+			"',id=~'/docker/" + taskID + ".*', name=~'mesos.*'}[5m])"
 	case "network_tx":
-		expr = "container_network_transmit_bytes_total{container_label_APP_ID='" + appID +
-			"',id=~'/docker/" + taskID + ".*', name=~'mesos.*'}"
+		expr = "irate(container_network_transmit_bytes_total{container_label_APP_ID='" + appID +
+			"',id=~'/docker/" + taskID + ".*', name=~'mesos.*'}[5m])"
 	case "fs_read":
 		expr = "container_fs_reads_total{container_label_APP_ID='" + appID +
 			"',id=~'/docker/" + taskID + ".*', name=~'mesos.*'}"
@@ -146,11 +146,11 @@ func (query *QueryRange) setQueryAppExpr(metrics, appID string) (expr string) {
 			"',id=~'/docker/.*'} / container_spec_memory_limit_bytes{container_label_APP_ID='" + appID +
 			"',id=~'/docker/.*'}) by (container_label_APP_ID)"
 	case "network_rx":
-		expr = "sum(container_network_receive_bytes_total{container_label_APP_ID='" + appID +
-			"',id=~'/docker/.*'}) by (container_label_APP_ID)"
+		expr = "sum(irate(container_network_receive_bytes_total{container_label_APP_ID='" + appID +
+			"',id=~'/docker/.*'}[5m])) by (container_label_APP_ID)"
 	case "network_tx":
-		expr = "sum(container_network_transmit_bytes_total{container_label_APP_ID='" + appID +
-			"',id=~'/docker/.*'}) by (container_label_APP_ID)"
+		expr = "sum(irate(container_network_transmit_bytes_total{container_label_APP_ID='" + appID +
+			"',id=~'/docker/.*'}[5m])) by (container_label_APP_ID)"
 	case "fs_read":
 		expr = "sum(container_fs_reads_total{container_label_APP_ID='" + appID +
 			"',id=~'/docker/.*'}) by (container_label_APP_ID)"
@@ -287,9 +287,9 @@ func (query *QueryRange) setQueryNodesExpr(metric, node string) (expr string) {
 		case "memory_total":
 			expr = "sum(container_spec_memory_limit_bytes{id='/',instance='" + node + ":5014'}) by (instance)"
 		case "network_rx":
-			expr = "container_network_receive_bytes_total{id=~'/',instance='" + node + ":5014'}"
+			expr = "irate(container_network_receive_bytes_total{id=~'/',instance='" + node + ":5014'}[5m])"
 		case "network_tx":
-			expr = "container_network_transmit_bytes_total{id=~'/',instance='" + node + ":5014'}"
+			expr = "irate(container_network_transmit_bytes_total{id=~'/',instance='" + node + ":5014'}[5m])"
 		default:
 			expr = ""
 		}
@@ -306,9 +306,9 @@ func (query *QueryRange) setQueryNodesExpr(metric, node string) (expr string) {
 	case "memory_total":
 		expr = "sum(container_spec_memory_limit_bytes{id='/'}) by (instance)"
 	case "network_rx":
-		expr = "container_network_receive_bytes_total{id=~'/'}"
+		expr = "irate(container_network_receive_bytes_total{id=~'/'}[5m])"
 	case "network_tx":
-		expr = "container_network_transmit_bytes_total{id=~'/'}"
+		expr = "irate(container_network_transmit_bytes_total{id=~'/'}[5m])"
 	default:
 		expr = ""
 	}
