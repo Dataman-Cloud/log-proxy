@@ -135,7 +135,7 @@ func (query *QueryRange) setQueryExpr(metrics, appID, taskID string) (expr strin
 	return expr
 }
 
-// setQueryExpr will return the expr of prometheus query
+// setQueryAppExpr will return the expr of query the Applicaton aggregation data
 func (query *QueryRange) setQueryAppExpr(metrics, appID string) (expr string) {
 	switch metrics {
 	case "cpu":
@@ -287,9 +287,9 @@ func (query *QueryRange) setQueryNodesExpr(metric, node string) (expr string) {
 		case "memory_total":
 			expr = "sum(container_spec_memory_limit_bytes{id='/',instance='" + node + ":5014'}) by (instance)"
 		case "network_rx":
-			expr = "sum(container_network_receive_bytes_total{id=~'/',instance='" + node + ":5014'}) by (instance)"
+			expr = "container_network_receive_bytes_total{id=~'/',instance='" + node + ":5014'}"
 		case "network_tx":
-			expr = "sum(container_network_transmit_bytes_total{id=~'/',instance='" + node + ":5014'}) by (instance)"
+			expr = "container_network_transmit_bytes_total{id=~'/',instance='" + node + ":5014'}"
 		default:
 			expr = ""
 		}
@@ -306,9 +306,9 @@ func (query *QueryRange) setQueryNodesExpr(metric, node string) (expr string) {
 	case "memory_total":
 		expr = "sum(container_spec_memory_limit_bytes{id='/'}) by (instance)"
 	case "network_rx":
-		expr = "sum(container_network_receive_bytes_total{id=~'/'}) by (instance)"
+		expr = "container_network_receive_bytes_total{id=~'/'}"
 	case "network_tx":
-		expr = "sum(container_network_transmit_bytes_total{id=~'/'}) by (instance)"
+		expr = "container_network_transmit_bytes_total{id=~'/'}"
 	default:
 		expr = ""
 	}

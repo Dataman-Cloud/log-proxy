@@ -164,9 +164,9 @@ type NodesMetric struct {
 }
 
 type NodeMetric struct {
-	CPU     *CPUMetric     `json:"cpu"`
-	Memory  *MemoryMetric  `json:"memory"`
-	Network *NetworkMetric `json:"network"`
+	CPU     *CPUMetric                `json:"cpu"`
+	Memory  *MemoryMetric             `json:"memory"`
+	Network map[string]*NetworkMetric `json:"network"`
 }
 
 type CPUMetric struct {
@@ -194,11 +194,15 @@ func NewNodesMetric() *NodesMetric {
 	}
 }
 
+func NewNetworkMetric() *NetworkMetric {
+	return &NetworkMetric{}
+}
+
 func NewNodeMetric() *NodeMetric {
 	return &NodeMetric{
 		CPU:     &CPUMetric{},
 		Memory:  &MemoryMetric{},
-		Network: &NetworkMetric{},
+		Network: make(map[string]*NetworkMetric),
 	}
 }
 
@@ -227,8 +231,20 @@ func (nm *NodesMetric) SetNodesMetric(query *QueryRange) error {
 			}
 		}
 
+		if metric == "network_rx" || metric == "network_tx" {
+			for _, node := range nm.Nodes {
+				if len(node.Network) == 0 {
+					for _, originData := range data.Data.Result {
+						nic := originData.Metric.Interface
+						node.Network[nic] = NewNetworkMetric()
+					}
+				}
+			}
+		}
+
 		for _, originData := range data.Data.Result {
 			name := strings.Split(originData.Metric.Instance, ":")[0]
+			nic := originData.Metric.Interface
 			value := originData.Values[0]
 			for k, v := range nm.Nodes {
 				if name == k {
@@ -240,9 +256,17 @@ func (nm *NodesMetric) SetNodesMetric(query *QueryRange) error {
 					case "memory_total":
 						v.Memory.Total = value
 					case "network_rx":
-						v.Network.Receive = value
+						for nicK, nicV := range v.Network {
+							if nic == nicK {
+								nicV.Receive = value
+							}
+						}
 					case "network_tx":
-						v.Network.Transmit = value
+						for nicK, nicV := range v.Network {
+							if nic == nicK {
+								nicV.Transmit = value
+							}
+						}
 					}
 				}
 			}
@@ -256,11 +280,11 @@ type AppMetric struct {
 }
 
 type TaskMetric struct {
-	Node       string            `json:"node"`
-	CPU        *CPUMetric        `json:"cpu"`
-	Memory     *MemoryMetric     `json:"memory"`
-	Network    *NetworkMetric    `json:"network"`
-	Filesystem *FilesystemMetric `json:"filesystem"`
+	Node       string                    `json:"node"`
+	CPU        *CPUMetric                `json:"cpu"`
+	Memory     *MemoryMetric             `json:"memory"`
+	Network    map[string]*NetworkMetric `json:"network"`
+	Filesystem *FilesystemMetric         `json:"filesystem"`
 }
 
 func NewAppMetric() *AppMetric {
@@ -273,7 +297,7 @@ func NewTaskMetric() *TaskMetric {
 	return &TaskMetric{
 		CPU:        &CPUMetric{},
 		Memory:     &MemoryMetric{},
-		Network:    &NetworkMetric{},
+		Network:    make(map[string]*NetworkMetric),
 		Filesystem: &FilesystemMetric{},
 	}
 }
@@ -304,8 +328,20 @@ func (am *AppMetric) SetAppMetric(query *QueryRange) error {
 			}
 		}
 
+		if metric == "network_rx" || metric == "network_tx" {
+			for _, task := range am.App {
+				if len(task.Network) == 0 {
+					for _, originData := range data.Data.Result {
+						nic := originData.Metric.Interface
+						task.Network[nic] = NewNetworkMetric()
+					}
+				}
+			}
+		}
+
 		for _, originData := range data.Data.Result {
 			name := originData.Metric.ID
+			nic := originData.Metric.Interface
 			node := strings.Split(originData.Metric.Instance, ":")[0]
 			value := originData.Values[0]
 			for k, v := range am.App {
@@ -319,9 +355,17 @@ func (am *AppMetric) SetAppMetric(query *QueryRange) error {
 					case "memory_total":
 						v.Memory.Total = value
 					case "network_rx":
-						v.Network.Receive = value
+						for nicK, nicV := range v.Network {
+							if nic == nicK {
+								nicV.Receive = value
+							}
+						}
 					case "network_tx":
-						v.Network.Transmit = value
+						for nicK, nicV := range v.Network {
+							if nic == nicK {
+								nicV.Transmit = value
+							}
+						}
 					case "fs_read":
 						v.Filesystem.Read = value
 					case "fs_write":
