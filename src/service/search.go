@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"fmt"
+	"html"
 	"strconv"
 	"strings"
 
@@ -194,7 +195,10 @@ func (s *SearchService) Search(appid, taskid, source, keyword string) (map[strin
 		data := make(map[string]interface{})
 		json.Unmarshal(*hit.Source, &data)
 		if len(hit.Highlight["message"]) > 0 {
-			data["message"] = hit.Highlight["message"][0]
+			str := html.EscapeString(hit.Highlight["message"][0])
+			str = strings.Replace(str, "@dataman-highlighted-field@", "<mark>", -1)
+			str = strings.Replace(str, "@/dataman-highlighted-field@", "</mark>", -1)
+			data["message"] = str
 		}
 		results = append(results, data)
 	}
