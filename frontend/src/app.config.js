@@ -30,6 +30,11 @@
                 url: '/appmonitor/:appId/instances/:taskId',
                 templateUrl: '/src/monitor/instance/detail.html',
                 controller: 'MonitorInstanceCtrl as vm'
+            })
+            .state('home.log', {
+                url: '/log',
+                templateUrl: '/src/log/log.html',
+                controller: 'LogCtrl as vm'
             });
 
 
