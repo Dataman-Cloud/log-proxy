@@ -18,6 +18,14 @@
             return new optionsCls();
         }
 
+        function formatCpuOrMem(usage) {
+            angular.forEach(usage, function (item, index, usage) {
+                angular.forEach(item.values, function (value, valueIndex, values) {
+                    value[1] = (parseFloat(value[1]) * 100).toFixed(2)
+                })
+            });
+        }
+
         function createOptionsCls() {
             function Options() {
                 this.memOptions = this._createMemOptions();
@@ -86,10 +94,12 @@
             };
 
             Options.prototype._pushCpuData = function (data, cpuApi) {
+                formatCpuOrMem(data.cpu.usage);
                 this._pushData(data.cpu.usage, cpuApi, this.cpuData);
             };
 
             Options.prototype._pushMemData = function (data, memApi) {
+                formatCpuOrMem(data.memory.usage);
                 this._pushData(data.memory.usage, memApi, this.memData);
             };
 

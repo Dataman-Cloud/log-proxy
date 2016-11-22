@@ -5,7 +5,7 @@
     </div>
     <div class="statistic-panel" flex="20">
         <h3>CPU</h3>
-        <em>{/vm.realTimeData.cpuPercent/} %</em>
+        <em>{/vm.realTimeData.cpuPercent.toFixed(2)/} %</em>
     </div>
     <div class="statistic-panel" flex="20">
         <h3>内存</h3>
@@ -84,7 +84,7 @@
                     {/value.node/}
                 </td>
                 <td md-cell>
-                    {/value.cpu.usage[1]/} %
+                    {/ ((value.cpu.usage[1] | num) * 100).toFixed(2)/} %
                 </td>
                 <td md-cell>
                     {/value.memory.usage_bytes[1] | size/} / {/value.memory.total_bytes[1] | size/}

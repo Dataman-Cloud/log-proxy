@@ -1,0 +1,30 @@
+<md-content class="main-tab-content">
+    <md-table-container>
+        <table md-table id="node-list">
+            <thead md-head>
+            <tr md-row>
+                <th md-column>主机</th>
+                <th md-column>CPU</th>
+                <th md-column>内存</th>
+                <th md-column>网络I/O</th>
+            </tr>
+            </thead>
+            <tbody md-body>
+            <tr md-row ng-repeat="(key, value) in vm.nodes track by $index">
+                <td md-cell>
+                    {/key/}
+                </td>
+                <td md-cell>
+                    {/ ((value.cpu.usage[1] | num) * 100).toFixed(2) /}  %
+                </td>
+                <td md-cell>
+                    {/value.memory.usage_bytes[1] | size/} / {/value.memory.total_bytes[1] | size/}
+                </td>
+                <td md-cell>
+                    发送:{/value.network.transmit[1] | netRate/} 接收:{/value.network.receive[1] | netRate/}
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </md-table-container>
+</md-content>

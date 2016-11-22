@@ -31,6 +31,14 @@
                 templateUrl: '/src/monitor/instance/detail.html',
                 controller: 'MonitorInstanceCtrl as vm'
             })
+            .state('home.nodemonitor', {
+                url: '/nodemonitor',
+                templateUrl: '/src/monitor/node/node.html',
+                controller: 'MonitorNodeCtrl as vm',
+                resolve: {
+                    nodes: listNode
+                }
+            })
             .state('home.log', {
                 url: '/log',
                 templateUrl: '/src/log/log.html',
@@ -44,8 +52,13 @@
         }
 
         /* @ngInject */
-        function listInstance(monitorBackend) {
+        function listApp(monitorBackend) {
             return monitorBackend.listApp().get().$promise
+        }
+
+        /* @ngInject */
+        function listNode(monitorBackend) {
+            return monitorBackend.listNode().get().$promise
         }
 
         $locationProvider.html5Mode(true);
