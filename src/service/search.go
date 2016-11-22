@@ -147,7 +147,7 @@ func (s *SearchService) Paths(appName, taskId string) (map[string]int64, error) 
 }
 
 func (s *SearchService) Search(appid, taskid, source, keyword string) (map[string]interface{}, error) {
-	var data map[string]interface{}
+	data := make(map[string]interface{})
 
 	var querys []elastic.Query
 	if taskid != "" {
