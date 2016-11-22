@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/Dataman-Cloud/log-proxy/src/config"
@@ -159,6 +160,14 @@ func (s *SearchService) Search(appid, taskid, source, keyword string) (map[strin
 	if keyword != "" {
 		querys = append(querys, elastic.NewQueryStringQuery("message:"+keyword).AnalyzeWildcard(true))
 	}
+
+	interval := "1m"
+	f, ferr := strconv.ParseUint(s.RangeFrom, 10, 64)
+	t, terr := strconv.ParseUint(s.RangeTo, 10, 64)
+	if ferr == nil && terr == nil {
+		interval = fmt.Sprintf("%dms", (t-f)/12)
+	}
+
 	bquery := elastic.NewBoolQuery().
 		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte(s.RangeFrom).Lte(s.RangeTo).Format("epoch_millis")).
 		Must(querys...)
@@ -169,7 +178,7 @@ func (s *SearchService) Search(appid, taskid, source, keyword string) (map[strin
 		Query(bquery).
 		Aggregation("history", elastic.NewDateHistogramAggregation().
 			Field("logtime.timestamp").
-			Interval("30s").
+			Interval(interval).
 			MinDocCount(0).
 			ExtendedBounds(s.RangeFrom, s.RangeTo)).
 		Highlight(elastic.NewHighlight().Field("message").PreTags(`@dataman-highlighted-field@`).PostTags(`@/dataman-highlighted-field@`)).
@@ -190,6 +199,9 @@ func (s *SearchService) Search(appid, taskid, source, keyword string) (map[strin
 	}
 	data["results"] = results
 	data["count"] = result.Hits.TotalHits
+
+	agg, _ := result.Aggregations.Terms("history")
+	data["history"] = agg
 
 	return data, nil
 }
