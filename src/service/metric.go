@@ -36,13 +36,11 @@ type MetricMemory struct {
 type MetricNewtork struct {
 	Receive  []*models.Result `json:"receive"`
 	Transmit []*models.Result `json:"transmit"`
-	Count    int              `json:"count"`
 }
 
 type MetricFilesystem struct {
 	Read  []*models.Result `json:"read"`
 	Write []*models.Result `json:"write"`
-	Count int              `json:"count"`
 }
 
 // GetMetricList will return the list of metric of query result.
@@ -89,16 +87,12 @@ func (ml *MetricList) SetMetricList(query *QueryRange) error {
 		ml.Memory.Count = len(data.Data.Result)
 	case "network_rx":
 		ml.Network.Receive = data.Data.Result
-		ml.Network.Count = len(data.Data.Result)
 	case "network_tx":
 		ml.Network.Transmit = data.Data.Result
-		ml.Network.Count = len(data.Data.Result)
 	case "fs_read":
 		ml.Filesystem.Read = data.Data.Result
-		ml.Filesystem.Count = len(data.Data.Result)
 	case "fs_write":
 		ml.Filesystem.Write = data.Data.Result
-		ml.Filesystem.Count = len(data.Data.Result)
 	default:
 		return errors.New("No this kind of metric.")
 	}
