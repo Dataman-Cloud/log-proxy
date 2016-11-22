@@ -1,16 +1,16 @@
 (function () {
     'use strict';
     angular.module('app')
-        .controller('ListInstanceCtrl', ListInstanceCtrl);
+        .controller('MonitorNodeCtrl', MonitorNodeCtrl);
     /* @ngInject */
-    function ListInstanceCtrl() {
+    function MonitorNodeCtrl(nodes) {
         var self = this;
+        self.nodes = nodes.data.nodes;
 
         activate();
 
         function activate() {
 
         }
-
     }
 })();

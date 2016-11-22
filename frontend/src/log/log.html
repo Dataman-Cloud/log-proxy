@@ -1,0 +1,77 @@
+<div class="log" layout="row" layout-align="space-between start">
+    <div class="panel log-condition">
+        <form layout="column">
+            <md-tabs md-dynamic-height md-border-bottom>
+                <md-tab label="最近">
+                    <md-content>
+                        <div flex class="form-item">
+                            <md-select placeholder="最近时间" ng-model="user">
+                                <md-option value="a">最近一分钟</md-option>
+                                <md-option value="b">最近十分钟</md-option>
+                                <md-option value="c">最近三十分钟</md-option>
+                            </md-select>
+                        </div>
+                    </md-content>
+                </md-tab>
+                <md-tab label="高级">
+                    <md-content>
+                        <div flex class="form-item">
+                            <input type="text" placeholder="开始时间">
+                            <input type="text" placeholder="结束时间">
+                        </div>
+                    </md-content>
+                </md-tab>
+            </md-tabs>
+            <div flex class="form-item">
+                <label class="requirement">应用名</label>
+                <md-select placeholder="选择XXX" ng-model="user">
+                    <md-option value="a">a</md-option>
+                    <md-option value="b">b</md-option>
+                    <md-option value="c">c</md-option>
+                </md-select>
+            </div>
+            <div flex class="form-item">
+                <label>实例 ID</label>
+                <md-select placeholder="选择XXX" ng-model="user">
+                    <md-option value="a">a</md-option>
+                    <md-option value="b">b</md-option>
+                    <md-option value="c">c</md-option>
+                </md-select>
+            </div>
+            <div flex class="form-item">
+                <label>来源</label>
+                <md-select placeholder="选择XXX" ng-model="user">
+                    <md-option value="a">a</md-option>
+                    <md-option value="b">b</md-option>
+                    <md-option value="c">c</md-option>
+                </md-select>
+            </div>
+            <div flex class="form-item">
+                <label>关键字</label>
+                <input type="text">
+            </div>
+            <div class="form-buttons-footer" layout="column">
+                <md-button class="md-raised md-primary">更新</md-button>
+            </div>
+        </form>
+    </div>
+    <div flex="auto" class="panel log-result">
+        <div class="result-sum">总计<em>xxx</em>条记录</div>
+        <table>
+            <thead>
+            <tr>
+                <th></th>
+                <th>时间</th>
+                <th>信息</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td><a href="#">详情</a></td>
+                <td>YYYY-MM-DD HH-MM-SS</td>
+                <td>日志内容</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

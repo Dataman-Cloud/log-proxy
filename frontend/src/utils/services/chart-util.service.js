@@ -92,7 +92,7 @@
                 interval = 30000;
             }
             if (area === undefined) {
-                area = true;
+                area = false;
             }
             var i;
             for (i = 0; i < data.length; i++) {

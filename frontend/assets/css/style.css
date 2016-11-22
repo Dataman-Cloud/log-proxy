@@ -20,11 +20,11 @@ body, html {
   -moz-box-sizing: border-box;
   box-sizing: border-box; }
 
-  ul, ol, li, h1, h2, h3, h4, h5, h6, p {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
+ul, ol, li, h1, h2, h3, h4, h5, h6, p {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
 
 .panel {
   background-color: #FFF;
@@ -34,12 +34,16 @@ body, html {
 
 
 #container {
-  padding: 20px;
+  padding: 70px 20px 20px 20px;
 }
 
 #header {
   background-color: #354052;
   height: 50px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
 }
 
 #header .logo img {
@@ -56,14 +60,79 @@ body, html {
   border-radius: 0;
 }
 
+form {
+  padding: 0; }
+
+input[type="text"], input[type="number"], input[type="email"], input[type="password"], input[type="date"], input[type="time"] {
+  height: 32px;
+  line-height: 32px;
+  border-radius: 2px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 2px 4px;
+  width: 100%; }
+
+label {
+  margin-bottom: 8px;
+  display: inline-block;
+  position: relative;
+  font-size: 14px;
+  font-weight: 600; }
+
+label.requirement:after {
+  content: "*";
+  color: red;
+  position: absolute;
+  right: -8px;
+  top: 0px;
+  font-size: 12px; }
+
+label small {
+  color: rgba(0, 0, 0, 0.5);
+  margin-left: 4px; }
+
+md-select {
+  margin: 0; }
+
+.md-select-value {
+  height: 32px;
+  line-height: 32px;
+  border-radius: 2px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background-color: #FFF;
+  box-sizing: border-box;
+  padding: 2px 4px; }
+
+.md-select-value .md-text {
+  display: inline-block; }
+
+.md-select-value .md-select-icon:after {
+  top: 0; }
+
+textarea {
+  border-radius: 2px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 2px 4px;
+  min-height: 60px;
+  width: 100%;
+}
+
+.form-buttons-footer {
+  margin-top: 28px;
+  margin-bottom: 28px;
+}
+
+.form-item {
+  margin-bottom: 16px;
+}
+
 .monitor-tab {
   text-align: right;
 }
 
 .monitor-tab .tab {
-  width: 200px;
-  border-right: 4px solid rgba(0,0,0,0.05);
-  padding: 0 12px 0 0;
+  width: 240px;
+  padding: 12px;
+  margin-right: 20px;
 }
 
 .monitor-tab .tab li {
@@ -95,4 +164,28 @@ body, html {
 
 }
 
+.statistic-panel {
+  border: 1px solid rgba(0,0,0,0.05);
+  border-radius: 4px;
+  background-color: rgba(0,0,0,0.05);
+  padding: 12px;
+  text-align: center;
+}
+.statistic-panel h3 {
+  font-size: 12px;
+  font-weight: 400;
+  color: #666;
+}
+.statistic-panel em {
+  font-size: 30px;
+  font-weight: 700;
+}
 
+.log-condition {
+  width: 220px;
+  margin-right: 20px;
+}
+.log-condition md-content {
+  background-color: transparent;
+  padding-top: 12px;
+}

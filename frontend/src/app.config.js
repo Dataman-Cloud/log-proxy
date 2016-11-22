@@ -27,16 +27,22 @@
                 templateUrl: '/src/monitor/app/detail.html'
             })
             .state('home.instancemonitor', {
-                url: '/appmonitor/:appId/instances',
-                templateUrl: '/src/monitor/instance/list.html',
-                controller: 'MonitorListInstanceCtrl as vm',
+                url: '/appmonitor/:appId/instances/:taskId',
+                templateUrl: '/src/monitor/instance/detail.html',
+                controller: 'MonitorInstanceCtrl as vm'
+            })
+            .state('home.nodemonitor', {
+                url: '/nodemonitor',
+                templateUrl: '/src/monitor/node/node.html',
+                controller: 'MonitorNodeCtrl as vm',
                 resolve: {
-                    instances: listInstance
+                    nodes: listNode
                 }
             })
-            .state('home.instancemonitor.detail', {
-                url: '/:instanceId',
-                templateUrl: '/src/monitor/instance/detail.html'
+            .state('home.log', {
+                url: '/log',
+                templateUrl: '/src/log/log.html',
+                controller: 'LogCtrl as vm'
             });
 
 
@@ -46,8 +52,13 @@
         }
 
         /* @ngInject */
-        function listInstance(monitorBackend) {
+        function listApp(monitorBackend) {
             return monitorBackend.listApp().get().$promise
+        }
+
+        /* @ngInject */
+        function listNode(monitorBackend) {
+            return monitorBackend.listNode().get().$promise
         }
 
         $locationProvider.html5Mode(true);
