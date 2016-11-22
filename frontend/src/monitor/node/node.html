@@ -15,13 +15,15 @@
                     {/key/}
                 </td>
                 <td md-cell>
-                    {/ ((value.cpu.usage[1] | num) * 100).toFixed(2) /}  %
+                    {/ ((value.cpu.usage[1] | num) * 100).toFixed(2) /} %
                 </td>
                 <td md-cell>
                     {/value.memory.usage_bytes[1] | size/} / {/value.memory.total_bytes[1] | size/}
                 </td>
                 <td md-cell>
-                    发送:{/value.network.transmit[1] | netRate/} 接收:{/value.network.receive[1] | netRate/}
+                    <p ng-repeat="(networkKey, networkValue) in value.network">
+                        网卡: {/networkKey/} 发送:{/networkValue.transmit[1] | netRate/} 接收:{/networkValue.receive[1] | netRate/}
+                    </p>
                 </td>
             </tr>
             </tbody>
