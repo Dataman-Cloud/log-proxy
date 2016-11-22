@@ -19,10 +19,11 @@ type Result struct {
 
 type Metric struct {
 	ContainerLabelAPPID string `json:"container_label_APP_ID"`
-	Group               string `json:"group"`
 	ID                  string `json:"id"`
 	Image               string `json:"image"`
 	Instance            string `json:"instance"`
 	Job                 string `json:"job"`
 	Name                string `json:"name"`
+	Group               string `json:"group,omitempty"`
+	Interface           string `json:"interface,omitempty"`
 }
