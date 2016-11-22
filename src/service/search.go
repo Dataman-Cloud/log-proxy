@@ -47,7 +47,7 @@ func NewSearchService() *SearchService {
 
 func (s *SearchService) Applications() (map[string]int64, error) {
 	bquery := elastic.NewBoolQuery().
-		Filter(elastic.NewRangeQuery("logtime").Gte(s.RangeFrom).Lte(s.RangeTo).Format("epoch_millis"))
+		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte(s.RangeFrom).Lte(s.RangeTo).Format("epoch_millis"))
 
 	apps := make(map[string]int64)
 	result, err := s.ESClient.Search().
@@ -78,7 +78,7 @@ func (s *SearchService) Applications() (map[string]int64, error) {
 
 func (s *SearchService) Tasks(appName string) (map[string]int64, error) {
 	bquery := elastic.NewBoolQuery().
-		Filter(elastic.NewRangeQuery("logtime").Gte(s.RangeFrom).Lte(s.RangeTo).Format("epoch_millis")).
+		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte(s.RangeFrom).Lte(s.RangeTo).Format("epoch_millis")).
 		Must(elastic.NewTermQuery("appid", appName))
 
 	tasks := make(map[string]int64)
@@ -114,7 +114,7 @@ func (s *SearchService) Paths(appName, taskId string) (map[string]int64, error) 
 	paths := make(map[string]int64)
 
 	bquery := elastic.NewBoolQuery().
-		Filter(elastic.NewRangeQuery("logtime").Gte(s.RangeFrom).Lte(s.RangeTo).Format("epoch_millis")).
+		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte(s.RangeFrom).Lte(s.RangeTo).Format("epoch_millis")).
 		Must(elastic.NewTermQuery("appid", appName), elastic.NewTermQuery("taskid", taskId))
 
 	result, err := s.ESClient.Search().
@@ -160,7 +160,7 @@ func (s *SearchService) Search(appid, taskid, source, keyword string) (map[strin
 		querys = append(querys, elastic.NewQueryStringQuery("message:"+keyword).AnalyzeWildcard(true))
 	}
 	bquery := elastic.NewBoolQuery().
-		Filter(elastic.NewRangeQuery("logtime").Gte(s.RangeFrom).Lte(s.RangeTo).Format("epoch_millis")).
+		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte(s.RangeFrom).Lte(s.RangeTo).Format("epoch_millis")).
 		Must(querys...)
 
 	result, err := s.ESClient.Search().
