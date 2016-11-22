@@ -167,6 +167,11 @@ func (s *SearchService) Search(appid, taskid, source, keyword string) (map[strin
 		Index("dataman-"+strings.Split(appid, "-")[0]+"-"+utils.ParseDate(s.RangeFrom, s.RangeTo)).
 		Type("dataman-"+appid).
 		Query(bquery).
+		Aggregation("history", elastic.NewDateHistogramAggregation().
+			Field("logtime.timestamp").
+			Interval("30s").
+			MinDocCount(0).
+			ExtendedBounds(s.RangeFrom, s.RangeTo)).
 		Highlight(elastic.NewHighlight().Field("message").PreTags(`@dataman-highlighted-field@`).PostTags(`@/dataman-highlighted-field@`)).
 		Sort("offset", true).From(s.PageFrom).Size(s.PageSize).Pretty(true).IgnoreUnavailable(true).Do()
 
