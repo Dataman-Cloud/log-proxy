@@ -1,14 +1,17 @@
 <div class="log" layout="row" layout-align="space-between start">
     <div class="panel log-condition">
-        <form layout="column">
-            <md-tabs md-dynamic-height md-border-bottom>
+        <form layout="column" name="staticForm">
+            <md-tabs md-dynamic-height md-border-bottom md-selected="vm.selectedTabIndex">
                 <md-tab label="最近">
                     <md-content>
                         <div flex class="form-item">
-                            <md-select placeholder="最近时间" ng-model="vm.timePeriod" ng-change="vm.periodChange(vm.timePeriod)">
+                            <md-select placeholder="最近时间" ng-model="vm.timePeriod"
+                                       ng-change="vm.periodChange(vm.timePeriod)">
                                 <md-option ng-value="30">最近三十分钟</md-option>
                                 <md-option ng-value="120">最近两小时</md-option>
                                 <md-option ng-value="360">最近六小时</md-option>
+                                <md-option ng-value="720">最近12小时</md-option>
+                                <md-option ng-value="1440">最近一天</md-option>
                             </md-select>
                         </div>
                     </md-content>
@@ -16,58 +19,96 @@
                 <md-tab label="高级">
                     <md-content>
                         <div flex class="form-item">
-                            <input type="text" placeholder="开始时间">
-                            <input type="text" placeholder="结束时间">
+                            <input type="datetime-local" placeholder="开始时间" ng-model="vm.startTime" ng-max="vm.endTime"
+                                   name="startTime" ng-required="vm.selectedTabIndex === 1">
+                            <input type="datetime-local" placeholder="结束时间" ng-model="vm.endTime" ng-min="vm.startTime"
+                                   name="endTime" ng-required="vm.selectedTabIndex === 1">
                         </div>
+                        <p data-ng-show="staticForm.startTime.$error.max && !staticForm.startTime.$pristine">
+                            起始时间大于结束时间</p>
+                        <p data-ng-show="staticForm.endTime.$error.min && !staticForm.endTime.$pristine">结束时间小于起始时间</p>
+                        <span ng-show="staticForm.startTime.$error.datetimelocal">请填写正确时间格式</span>
+                        <span ng-show="staticForm.endTime.$error.datetimelocal">请填写正确时间格式</span>
                     </md-content>
                 </md-tab>
             </md-tabs>
             <div flex class="form-item">
                 <label class="requirement">应用名</label>
-                <md-select placeholder="选择应用" ng-model="vm.selectApp" md-on-open="vm.loadApps()" ng-change="vm.selectAppChange(vm.selectApp)">
-                    <md-option ng-value="key" ng-repeat="(key, value) in vm.apps">{/key/} : {/value/}</md-option>
+                <md-select placeholder="选择应用" ng-model="vm.selectApp" md-on-open="vm.loadApps()"
+                           ng-change="vm.selectAppChange(vm.selectApp)" data-required="required"
+                           ng-disabled="staticForm.startTime.$error.max || staticForm.endTime.$error.min">
+                    <md-option ng-value="key" ng-repeat="(key, value) in vm.apps">{/key/}</md-option>
                 </md-select>
             </div>
             <div flex class="form-item">
                 <label>实例 ID</label>
-                <md-select placeholder="选择实例" ng-model="vm.selectTasks" md-on-open="vm.loadTasks()" multiple ng-change="vm.selectTasksChange(vm.selectTasks)"
-                        ng-disabled="!vm.selectApp">
-                    <md-option ng-value="key" ng-repeat="(key, value) in vm.tasks">{/key/} : {/value/}</md-option>
+                <md-select placeholder="选择实例" ng-model="vm.selectTasks" md-on-open="vm.loadTasks()"
+                           ng-change="vm.selectTasksChange(vm.selectTasks)"
+                           ng-disabled="!vm.selectApp">
+                    <md-option value="">空</md-option>
+                    <md-option ng-value="key" ng-repeat="(key, value) in vm.tasks">{/key/}</md-option>
                 </md-select>
             </div>
             <div flex class="form-item">
                 <label>来源</label>
                 <md-select placeholder="选择来源" ng-model="vm.selectPaths" md-on-open="vm.loadPaths()" multiple
-                           ng-disabled="!vm.selectTasks.length">
-                    <md-option ng-value="key" ng-repeat="(key, value) in vm.paths">{/key/} : {/value/}</md-option>
+                           ng-disabled="!vm.selectTasks">
+                    <md-option ng-value="key" ng-repeat="(key, value) in vm.paths">{/key/}</md-option>
                 </md-select>
             </div>
             <div flex class="form-item">
                 <label>关键字</label>
-                <input type="text">
+                <input type="text" ng-model="vm.keyword">
             </div>
             <div class="form-buttons-footer" layout="column">
-                <md-button class="md-raised md-primary" ng-click="vm.searchLog()">更新</md-button>
+                <md-button class="md-raised md-primary" ng-click="vm.searchLog()" ng-disabled="staticForm.$invalid">更新
+                </md-button>
             </div>
         </form>
     </div>
     <div flex="auto" class="panel log-result">
-        <div class="result-sum">总计<em>xxx</em>条记录</div>
-        <table>
-            <thead>
-            <tr>
-                <th></th>
-                <th>时间</th>
-                <th>信息</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-                <td><a href="#">详情</a></td>
-                <td>YYYY-MM-DD HH-MM-SS</td>
-                <td>日志内容</td>
-            </tr>
-            </tbody>
-        </table>
+        <div class="result-sum">总计<em>{/vm.count/}</em>条记录</div>
+        <md-table-container ng-hide="!vm.logs.length">
+            <table md-table id="user-list-table">
+                <thead md-head>
+                <tr md-row>
+                    <th md-column><a>展开</a></th>
+                    <th md-column>时间</th>
+                    <th md-column>信息</th>
+                </tr>
+                </thead>
+                <tbody md-body>
+                <tr md-row
+                    ng-repeat-start="log in vm.logs track by $index">
+                    <td md-cell><a ng-click="vm.logDisplaySet[$index] = !vm.logDisplaySet[$index]">展开</a></td>
+                    <td md-cell>
+                        {/log.logtime | date: 'yyyy-MM-dd HH:mm:ss'/}
+                    </td>
+                    <td md-cell>
+                        <p>{/log.message/}</p>
+                    </td>
+                </tr>
+                <tr ng-repeat-end ng-hide="!vm.logDisplaySet[$index]">
+                    <td colspan="3">
+                        <div class="json-detail">
+                            <dl layout="row" ng-repeat="(key, value) in log track by $index">
+                                <dt>{/key/}</dt>
+                                <dd>{/value/}</dd>
+                            </dl>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <md-table-pagination md-limit="vm.query.limit"
+                                 md-label="{page: '页:', rowsPerPage: '每页:', of: 'of'}"
+                                 md-limit-options="vm.limitOptions"
+                                 md-boundary-links="vm.limitOptions.boundaryLinks"
+                                 md-page="vm.query.page"
+                                 md-total="{/vm.count/}"
+                                 md-on-paginate="vm.onPaginate"
+                                 md-page-select="vm.options.pageSelect">
+            </md-table-pagination>
+        </md-table-container>
     </div>
 </div>
