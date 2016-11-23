@@ -6,6 +6,7 @@ import (
 	"html"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/Dataman-Cloud/log-proxy/src/config"
 	"github.com/Dataman-Cloud/log-proxy/src/utils"
@@ -222,8 +223,12 @@ func (s *SearchService) Search(appid, taskid, source, keyword string) (map[strin
 }
 
 func (s *SearchService) Context(appid, taskid, source, timestamp string) ([]map[string]interface{}, error) {
+	date, err := time.Parse(time.RFC3339Nano, timestamp)
+	if err != nil {
+		return nil, err
+	}
 	bquery := elastic.NewBoolQuery().
-		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte(timestamp).TimeZone("+08:00")).
+		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte(date.UnixNano()/1e6).Format("epoch_millis")).
 		Must(elastic.NewTermQuery("appid", appid), elastic.NewTermQuery("taskid", taskid), elastic.NewTermQuery("path", source))
 
 	result, err := s.ESClient.Search().
