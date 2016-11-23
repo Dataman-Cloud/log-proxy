@@ -84,9 +84,10 @@ func (s *SearchService) Tasks(appName string) (map[string]int64, error) {
 		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte(s.RangeFrom).Lte(s.RangeTo).Format("epoch_millis")).
 		Must(elastic.NewTermQuery("appid", appName))
 
+	//Index("dataman-*").
 	tasks := make(map[string]int64)
 	result, err := s.ESClient.Search().
-		Index("dataman-*").
+		Index("dataman-"+strings.Split(appName, "-")[0]+"-"+utils.ParseDate(s.RangeFrom, s.RangeTo)).
 		Type("dataman-"+appName).
 		Query(bquery).
 		SearchType("count").
@@ -120,8 +121,9 @@ func (s *SearchService) Paths(appName, taskId string) (map[string]int64, error) 
 		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte(s.RangeFrom).Lte(s.RangeTo).Format("epoch_millis")).
 		Must(elastic.NewTermQuery("appid", appName), elastic.NewTermQuery("taskid", taskId))
 
+	//Index("dataman-*").
 	result, err := s.ESClient.Search().
-		Index("dataman-*").
+		Index("dataman-"+strings.Split(appName, "-")[0]+"-"+utils.ParseDate(s.RangeFrom, s.RangeTo)).
 		Type("dataman-"+appName).
 		Query(bquery).
 		SearchType("count").
@@ -184,7 +186,7 @@ func (s *SearchService) Search(appid, taskid, source, keyword string) (map[strin
 			MinDocCount(0).
 			ExtendedBounds(s.RangeFrom, s.RangeTo)).
 		Highlight(elastic.NewHighlight().Field("message").PreTags(`@dataman-highlighted-field@`).PostTags(`@/dataman-highlighted-field@`)).
-		Sort("offset", true).From(s.PageFrom).Size(s.PageSize).Pretty(true).IgnoreUnavailable(true).Do()
+		Sort("logtime.timestamp", true).From(s.PageFrom).Size(s.PageSize).Pretty(true).IgnoreUnavailable(true).Do()
 
 	if err != nil {
 		return nil, err
@@ -217,4 +219,39 @@ func (s *SearchService) Search(appid, taskid, source, keyword string) (map[strin
 	data["history"] = history
 
 	return data, nil
+}
+
+func (s *SearchService) Context(appid, taskid, source, timestamp string) ([]map[string]interface{}, error) {
+	bquery := elastic.NewBoolQuery().
+		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte(timestamp).Format("epoch_millis").TimeZone("+08:00")).
+		Must(elastic.NewTermQuery("appid", appid), elastic.NewTermQuery("taskid", taskid), elastic.NewTermQuery("path", source))
+
+	result, err := s.ESClient.Search().
+		Index("dataman-"+strings.Split(appid, "-")[0]+"-"+utils.ParseDate(s.RangeFrom, s.RangeTo)).
+		Type("dataman-"+appid).
+		Query(bquery).
+		Sort("logtime.timestamp", true).
+		From(0).
+		Size(100).
+		Pretty(true).
+		Do()
+
+	if err != nil {
+		return nil, err
+	}
+
+	var results []map[string]interface{}
+	for _, hit := range result.Hits.Hits {
+		data := make(map[string]interface{})
+		json.Unmarshal(*hit.Source, &data)
+		if len(hit.Highlight["message"]) > 0 {
+			str := html.EscapeString(hit.Highlight["message"][0])
+			str = strings.Replace(str, "@dataman-highlighted-field@", "<mark>", -1)
+			str = strings.Replace(str, "@/dataman-highlighted-field@", "</mark>", -1)
+			data["message"] = str
+		}
+		results = append(results, data)
+	}
+
+	return results, nil
 }

@@ -97,6 +97,23 @@ func (s *search) Index(ctx *gin.Context) {
 	utils.Ok(ctx, results)
 }
 
+func (s *search) Context(ctx *gin.Context) {
+	if ctx.Query("appid") == "" {
+		utils.ErrorResponse(ctx, utils.NewError(PARAM_ERROR, errors.New("appid can't be empty")))
+		return
+	}
+	results, err := s.Service.Context(ctx.Query("appid"),
+		ctx.Query("taskid"),
+		ctx.Query("path"),
+		ctx.Query("timestamp"))
+	if err != nil {
+		utils.ErrorResponse(ctx, utils.NewError(INDEX_ERROR, err))
+		return
+	}
+
+	utils.Ok(ctx, results)
+}
+
 func (s *search) CreateAlert(ctx *gin.Context) {
 	alert := new(models.Alert)
 	if err := ctx.BindJSON(alert); err != nil {
