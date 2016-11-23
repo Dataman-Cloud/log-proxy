@@ -53,5 +53,12 @@ func Router(middlewares ...gin.HandlerFunc) *gin.Engine {
 		monitorv1.GET("/alerts/status", monitor.GetAlertsStatus)
 	}
 
+	staticRouter := r.Group("/ui")
+	{
+		staticRouter.GET("/*filepath", func(ctx *gin.Context) {
+			ctx.File("frontend/index.html")
+		})
+	}
+
 	return r
 }
