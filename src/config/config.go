@@ -13,11 +13,12 @@ import (
 
 // Config defines the conf info
 type Config struct {
-	ADDR           string `require:"true"`
-	ES_URL         string `require:"true"`
-	SEARCH_DEBUG   bool
-	PROMETHEUS_URL string `require:"true"`
-	FRONTEND_PATH  string
+	ADDR             string `require:"true"`
+	ES_URL           string `require:"true"`
+	SEARCH_DEBUG     bool
+	PROMETHEUS_URL   string `require:"true"`
+	ALERTMANAGER_URL string `require:"true"`
+	FRONTEND_PATH    string
 }
 
 var c *Config

@@ -43,6 +43,10 @@ func Router(middlewares ...gin.HandlerFunc) *gin.Engine {
 		monitorv1.GET("/applications", monitor.QueryApps)
 		monitorv1.GET("/nodes", monitor.QueryNodes)
 		monitorv1.GET("/application", monitor.QueryApp)
+
+		monitorv1.GET("/alerts", monitor.GetAlerts)
+		monitorv1.GET("/alerts/groups", monitor.GetAlertsGroups)
+		monitorv1.GET("/alerts/status", monitor.GetAlertsStatus)
 	}
 
 	return r

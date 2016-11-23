@@ -2,10 +2,11 @@
 
 ## Monitoring
 
-### Get the metric values (CPU/Memory/Network/Filesystem)
+### Metric(监控数据)
+
+#### Get the metric values (CPU/Memory/Network/Filesystem)
 
 ```GET /v1/monitor/```
-
 - path: /v1/monitor
 - HTTP Method: GET
 - URL Params: Null
@@ -348,7 +349,7 @@ http://127.0.0.1:5098/v1/monitor?type=app&metric=cpu&appid=work-nginx&taskid=d2f
 }
 ```
 
-### Get the list of applications
+#### Get the list of applications
 
 ```GET /v1/monitor/applications```
 
@@ -395,7 +396,7 @@ http://127.0.0.1:5098/v1/monitor/applications?appid=work-nginx
 }
 ```
 
-### Get the metric data of nodes
+#### Get the metric data of nodes
 
 ```GET /v1/monitor/nodes```
 
@@ -519,7 +520,7 @@ http://127.0.0.1:5098/v1/monitor/nodes?node=192.168.1.101
 ```
 
 
-### Get the metric data of nodes
+#### Get the metric data of nodes
 
 ```GET /v1/monitor/application```
 
@@ -530,7 +531,7 @@ http://127.0.0.1:5098/v1/monitor/nodes?node=192.168.1.101
   - appid=<string>: the name of application.
 
 For example:
-```
+
 Get the metric data of the tasks in one application
 ```
 http://127.0.0.1:5098/v1/monitor/application?appid=work-nginx
@@ -611,6 +612,16 @@ http://127.0.0.1:5098/v1/monitor/application?appid=work-nginx
 }
 ```
 
+### AlertManager API
+
+#### 获取当前活动的报警
+`GET /v1/monitor/alerts`
+
+#### 获取当前活动的报警，分组
+`GET /v1/monitor/alerts/groups`
+
+#### 获取AlertManager的状态信息
+`GET /v1/monitor/alerts/status`
 
 ## 日志
 
