@@ -103,3 +103,54 @@ func (m *monitor) QueryApp(ctx *gin.Context) {
 	}
 	utils.Ok(ctx, data)
 }
+
+const (
+	ALERTSPATH       = "api/v1/alerts"
+	ALERTSGROUSPPATH = "api/v1/alerts/groups"
+	ALERTSSTATUSPATH = "api/v1/status"
+)
+
+func (m *monitor) GetAlerts(ctx *gin.Context) {
+	query := &service.AlertManager{
+		HttpClient: http.DefaultClient,
+		Server:     config.GetConfig().ALERTMANAGER_URL,
+		Path:       ALERTSPATH,
+	}
+
+	data, err := query.GetAlertManagerResponse()
+	if err != nil {
+		utils.ErrorResponse(ctx, err)
+		return
+	}
+	ctx.JSON(http.StatusOK, data)
+}
+
+func (m *monitor) GetAlertsGroups(ctx *gin.Context) {
+	query := &service.AlertManager{
+		HttpClient: http.DefaultClient,
+		Server:     config.GetConfig().ALERTMANAGER_URL,
+		Path:       ALERTSGROUSPPATH,
+	}
+
+	data, err := query.GetAlertManagerResponse()
+	if err != nil {
+		utils.ErrorResponse(ctx, err)
+		return
+	}
+	ctx.JSON(http.StatusOK, data)
+}
+
+func (m *monitor) GetAlertsStatus(ctx *gin.Context) {
+	query := &service.AlertManager{
+		HttpClient: http.DefaultClient,
+		Server:     config.GetConfig().ALERTMANAGER_URL,
+		Path:       ALERTSSTATUSPATH,
+	}
+
+	data, err := query.GetAlertManagerResponse()
+	if err != nil {
+		utils.ErrorResponse(ctx, err)
+		return
+	}
+	ctx.JSON(http.StatusOK, data)
+}
