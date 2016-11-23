@@ -520,7 +520,7 @@ http://127.0.0.1:5098/v1/monitor/nodes?node=192.168.1.101
 ```
 
 
-#### Get the metric data of nodes
+#### Get the metric data of application
 
 ```GET /v1/monitor/application```
 
@@ -611,6 +611,20 @@ http://127.0.0.1:5098/v1/monitor/application?appid=work-nginx
   }
 }
 ```
+
+### PromQL API
+
+Refer to "https://prometheus.io/docs/querying/api/"
+
+#### 单时间点查询
+`GET /v1/monitor/promql/query`
+
+https://prometheus.io/docs/querying/api/#instant-queries
+
+#### 时间范围查询
+`GET /v1/monitor/promql/query_range`
+
+https://prometheus.io/docs/querying/api/#range-queries
 
 ### AlertManager API
 

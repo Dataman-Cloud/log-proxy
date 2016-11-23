@@ -44,6 +44,10 @@ func Router(middlewares ...gin.HandlerFunc) *gin.Engine {
 		monitorv1.GET("/nodes", monitor.QueryNodes)
 		monitorv1.GET("/application", monitor.QueryApp)
 
+		// Promethues HTTP API
+		monitorv1.GET("/promql/query", monitor.PromqlQuery)
+		monitorv1.GET("/promql/query_range", monitor.PromqlQueryRange)
+		// AlertManager API
 		monitorv1.GET("/alerts", monitor.GetAlerts)
 		monitorv1.GET("/alerts/groups", monitor.GetAlertsGroups)
 		monitorv1.GET("/alerts/status", monitor.GetAlertsStatus)

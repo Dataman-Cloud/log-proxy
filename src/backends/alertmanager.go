@@ -1,4 +1,4 @@
-package service
+package backends
 
 import (
 	"encoding/json"
@@ -23,7 +23,7 @@ func (am AlertManager) GetAlertManagerResponse() (map[string]interface{}, error)
 	var result map[string]interface{}
 	err = json.Unmarshal(response, &result)
 	if err != nil {
-		err = fmt.Errorf("Failed to parse the response from %s/%s", am.Server, am.Path)
+		err = fmt.Errorf("Failed to parse the response from %s%s", am.Server, am.Path)
 		return nil, err
 	}
 	return result, nil
@@ -37,7 +37,7 @@ func (am AlertManager) getResponse() ([]byte, error) {
 	u.Path = strings.TrimRight(u.Path, "/") + am.Path
 	resp, err := am.HttpClient.Get(u.String())
 	if err != nil {
-		err = fmt.Errorf("Failed to get response from %s/%s", am.Server, am.Path)
+		err = fmt.Errorf("Failed to get response from %s", u.String())
 		return nil, err
 	}
 	defer resp.Body.Close()
