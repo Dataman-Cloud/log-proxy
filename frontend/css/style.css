@@ -331,3 +331,20 @@ textarea {
     background-color: transparent;
     padding-top: 12px;
 }
+.log-result tbody .md-row td {
+    border-bottom: 1px solid white;
+}
+.log-result tbody .md-row td a {
+    cursor: pointer;
+}
+.log-result table dl {
+    margin-bottom: 12px;
+    font-size: 12px;
+}
+.log-result table dt {
+    min-width: 120px;
+    font-weight: 500;
+}
+.log-result .json-detail {
+    padding: 20px 8px;
+}
