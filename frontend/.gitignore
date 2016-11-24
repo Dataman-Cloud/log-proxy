@@ -2,4 +2,5 @@
 .DS_Store
 build/
 node_modules/
+dist/
 bower_components/
