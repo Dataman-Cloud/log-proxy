@@ -85,7 +85,7 @@
                         {/log.logtime | date: 'yyyy-MM-dd HH:mm:ss'/}
                     </td>
                     <td md-cell>
-                        <p>{/log.message/}</p>
+                        <div ng-bind-html="log.message"></div>
                     </td>
                 </tr>
                 <tr ng-repeat-end ng-hide="!vm.logDisplaySet[$index]">
@@ -93,7 +93,7 @@
                         <div class="json-detail">
                             <dl layout="row" ng-repeat="(key, value) in log track by $index">
                                 <dt>{/key/}</dt>
-                                <dd>{/value/}</dd>
+                                <dd ng-bind-html="value"></dd>
                             </dl>
                         </div>
                     </td>
