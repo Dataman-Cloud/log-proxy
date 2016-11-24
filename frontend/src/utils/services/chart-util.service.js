@@ -48,7 +48,7 @@
                     showLegend: false,
                     xAxis: {
                         tickFormat: function (d) {
-                            return $filter('date')(d, 'HH:mm:ss');
+                            return $filter('date')(d, 'yy/M/d HH:mm');
                         },
                         showMaxMin: false
                     },
