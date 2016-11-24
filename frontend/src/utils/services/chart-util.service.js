@@ -31,7 +31,7 @@
                 chart: {
                     type: 'lineChart',
                     noData: '暂无数据',
-                    height: 450,
+                    height: 200,
                     margin: {
                         top: 20,
                         right: 20,
@@ -47,7 +47,6 @@
                     useInteractiveGuideline: true,
                     showLegend: false,
                     xAxis: {
-                        axisLabel: '时间',
                         tickFormat: function (d) {
                             return $filter('date')(d, 'HH:mm:ss');
                         },
