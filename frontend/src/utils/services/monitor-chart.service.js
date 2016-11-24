@@ -41,7 +41,6 @@
 
             Options.prototype._createFileSysOptions = function () {
                 var options = chartUtil.createDefaultOptions();
-                options.chart.yAxis.axisLabel = '速率';
                 options.title.text = '磁盘读/写速率';
                 options.chart.yAxis.tickFormat = function (d) {
                     return $filter('netRate')(d);
@@ -52,7 +51,6 @@
 
             Options.prototype._createNetworkOptions = function () {
                 var options = chartUtil.createDefaultOptions();
-                options.chart.yAxis.axisLabel = '速率';
                 options.title.text = '网络接收/发送速率';
                 options.chart.yAxis.tickFormat = function (d) {
                     return $filter('netRate')(d);
@@ -63,7 +61,6 @@
 
             Options.prototype._createCpuOptions = function () {
                 var options = chartUtil.createDefaultOptions();
-                options.chart.yAxis.axisLabel = 'CPU使用率';
                 options.title.text = 'CPU 使用率';
                 options.chart.yAxis.tickFormat = function (d) {
                     return d + '%';
@@ -75,7 +72,6 @@
 
             Options.prototype._createMemOptions = function () {
                 var options = chartUtil.createDefaultOptions();
-                options.chart.yAxis.axisLabel = '内存使用率';
                 options.title.text = '内存使用率';
                 options.chart.yAxis.tickFormat = function (d) {
                     return d + '%';

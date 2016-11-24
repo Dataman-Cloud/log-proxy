@@ -1,191 +1,333 @@
-body, html {
-  font-family: 'Helvetica Neue', 'Helvetica', 'PingHei', 'PingFang SC', 'STHeitiSC-Light', 'Arial', sans-serif;
-  font-size: 14px;
-  font-weight: 300;
-  height: 100%;
-  color: #000;
-  background-color: rgba(241,241,241,1);
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizelegibility; }
+body,
+html {
+    font-family: 'Helvetica Neue', 'Helvetica', 'PingHei', 'PingFang SC', 'STHeitiSC-Light', 'Arial', sans-serif;
+    font-size: 14px;
+    font-weight: 300;
+    height: 100%;
+    color: #000;
+    background-color: rgba(241, 241, 241, 1);
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizelegibility;
+}
 
 * {
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box; }
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
 
 *:before,
 *:after {
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box; }
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
 
-ul, ol, li, h1, h2, h3, h4, h5, h6, p {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+ul,
+ol,
+li,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+dl,
+dt,
+dd {
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
 .panel {
-  background-color: #FFF;
-  border-radius: 4px;
-  padding: 20px;
+    background-color: #FFF;
+    border-radius: 4px;
+    padding: 20px;
 }
 
-
 #container {
-  padding: 70px 20px 20px 20px;
+    padding: 70px 20px 20px 20px;
 }
 
 #header {
-  background-color: #354052;
-  height: 50px;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
+    background-color: #354052;
+    height: 50px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
 }
 
 #header .logo img {
-  height: 25px;
-  margin-left: 20px;
-  margin-right: 20px;
+    height: 25px;
+    margin-left: 20px;
+    margin-right: 20px;
 }
 
 #header .md-button {
-  color: #FFF;
-  margin: 0;
-  height: 50px;
-  line-height: 50px;
-  border-radius: 0;
+    color: #FFF;
+    margin: 0;
+    height: 50px;
+    line-height: 50px;
+    border-radius: 0;
+}
+
+md-table-container {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+
+
+/* ******* table style ******* */
+table.md-table {
+  table-layout: fixed;
+  word-wrap: break-word;
+}
+table.md-table tbody.md-body > tr.md-row,
+table.md-table tfoot.md-foot > tr.md-row {
+    height: 40px;
+}
+
+table.md-table thead.md-head > tr.md-row {
+    height: 32px;
+}
+
+table.md-table tbody.md-body tr:nth-child(2n+1) td.md-cell {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+table.md-table td.md-cell:last-child,
+table.md-table th.md-column:last-child {
+    padding: 0 24px 0 0;
+}
+
+table.md-table td.md-cell md-checkbox,
+table.md-table th.md-column md-checkbox {
+    margin: 0;
+    width: 20px;
+}
+
+table.md-table th.md-column {
+    border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+    color: rgba(0, 0, 0, 0.9);
+    font-size: 12px;
+    font-weight: bold;
+    padding: 8px!important;
+    white-space: nowrap;
+}
+
+table.md-table td.md-cell {
+    color: rgba(0, 0, 0, 0.85);
+    font-size: 12px;
+    border-top: none;
+    min-height: 40px;
+    padding: 8px!important;
+}
+
+table.md-table td.md-cell .md-button {
+    font-size: 11px;
+    font-weight: 400;
+    line-height: 20px;
+    min-width: 30px;
+    min-height: 20px;
+    margin: 0 4px;
+    padding: 0 2px;
+}
+
+table.md-table td.md-cell md-menu-content {
+    padding: 0;
+}
+
+table.md-table td.md-cell p {
+    margin-top: 4px;
+    margin-bottom: 0;
+}
+
+table.md-table td.md-cell ul li {
+    margin-bottom: 5px;
+}
+
+table.md-table td.md-cell ul li:last-child {
+    margin-bottom: 0;
 }
 
 form {
-  padding: 0; }
+    padding: 0;
+}
 
-input[type="text"], input[type="number"], input[type="email"], input[type="password"], input[type="date"], input[type="time"] {
-  height: 32px;
-  line-height: 32px;
-  border-radius: 2px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  padding: 2px 4px;
-  width: 100%; }
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="password"],
+input[type="datetime-local"],
+input[type="date"],
+input[type="time"] {
+    height: 32px;
+    line-height: 32px;
+    border-radius: 2px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 2px 4px;
+    width: 100%;
+}
 
 label {
-  margin-bottom: 8px;
-  display: inline-block;
-  position: relative;
-  font-size: 14px;
-  font-weight: 600; }
+    margin-bottom: 8px;
+    display: inline-block;
+    position: relative;
+    font-size: 14px;
+    font-weight: 600;
+}
 
 label.requirement:after {
-  content: "*";
-  color: red;
-  position: absolute;
-  right: -8px;
-  top: 0px;
-  font-size: 12px; }
+    content: "*";
+    color: red;
+    position: absolute;
+    right: -8px;
+    top: 0px;
+    font-size: 12px;
+}
 
 label small {
-  color: rgba(0, 0, 0, 0.5);
-  margin-left: 4px; }
+    color: rgba(0, 0, 0, 0.5);
+    margin-left: 4px;
+}
 
 md-select {
-  margin: 0; }
+    margin: 0;
+}
 
 .md-select-value {
-  height: 32px;
-  line-height: 32px;
-  border-radius: 2px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  background-color: #FFF;
-  box-sizing: border-box;
-  padding: 2px 4px; }
+    height: 32px;
+    line-height: 32px;
+    border-radius: 2px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    background-color: #FFF;
+    box-sizing: border-box;
+    padding: 2px 4px;
+}
 
 .md-select-value .md-text {
-  display: inline-block; }
+    display: inline-block;
+}
 
 .md-select-value .md-select-icon:after {
-  top: 0; }
+    top: 0;
+}
 
 textarea {
-  border-radius: 2px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  padding: 2px 4px;
-  min-height: 60px;
-  width: 100%;
+    border-radius: 2px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 2px 4px;
+    min-height: 60px;
+    width: 100%;
 }
 
 .form-buttons-footer {
-  margin-top: 28px;
-  margin-bottom: 28px;
+    margin-top: 28px;
+    margin-bottom: 28px;
 }
 
 .form-item {
-  margin-bottom: 16px;
+    margin-bottom: 16px;
 }
 
 .monitor-tab {
-  text-align: right;
+    text-align: right;
 }
 
 .monitor-tab .tab {
-  width: 240px;
-  padding: 12px;
-  margin-right: 20px;
+    width: 240px;
+    padding: 12px;
+    margin-right: 20px;
 }
 
 .monitor-tab .tab li {
-  border-bottom: 1px solid rgba(0,0,0,0.05);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .monitor-tab .tab li a h3 {
-  text-align: left;
-  margin-bottom: 8px;
+    text-align: left;
+    margin-bottom: 8px;
 }
 
 .monitor-tab .tab li a {
-  text-decoration: none;
-  color: rgba(0,0,0,0.7);
-  display: block;
-  padding: 12px 8px;
+    text-decoration: none;
+    color: rgba(0, 0, 0, 0.7);
+    display: block;
+    padding: 12px 8px;
 }
 
 .monitor-tab .tab li a:hover {
-  background-color: rgba(63,81,181,0.1);
+    background-color: rgba(63, 81, 181, 0.1);
 }
-.monitor-tab .tab li .statistic {
-  font-size: 12px;
-}
-.monitor-tab .tab li .statistic i {
-  margin-right: 4px;
-}
-.monitor-tab .content {
 
+.monitor-tab .tab li .statistic {
+    font-size: 12px;
+}
+
+.monitor-tab .tab li .statistic i {
+    margin-right: 4px;
+}
+
+.monitor-tab .content {}
+
+.statistic {
+    
 }
 
 .statistic-panel {
-  border: 1px solid rgba(0,0,0,0.05);
-  border-radius: 4px;
-  background-color: rgba(0,0,0,0.05);
-  padding: 12px;
-  text-align: center;
+    border: 1px solid rgba(0, 0, 0, 0.025);
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, 0.025);
+    padding: 12px;
+    text-align: center;
+    width: 18%;
+    margin-bottom: 40px;
 }
+
 .statistic-panel h3 {
-  font-size: 12px;
-  font-weight: 400;
-  color: #666;
+    font-size: 14px;
+    font-weight: 400;
+    color: #888;
+    height: 20px;
+    display: block;
 }
+
 .statistic-panel em {
-  font-size: 30px;
-  font-weight: 700;
+    font-size: 36px;
+    font-weight: 600;
+    font-style: normal;
+    display: block;
+}
+
+.statistic-panel em i {
+    font-size: 16px;
+}
+
+.statistic-panel.statictic-io em {
+    font-size: 24px;
+}
+
+.chart-panel {
+  margin-bottom: 20px;
+}
+
+.chart-panel nvd3 .title {
+  font-weight: bold;
 }
 
 .log-condition {
-  width: 220px;
-  margin-right: 20px;
+    width: 260px;
+    margin-right: 20px;
 }
+
 .log-condition md-content {
-  background-color: transparent;
-  padding-top: 12px;
+    background-color: transparent;
+    padding-top: 12px;
 }

@@ -1,60 +1,44 @@
-<div class="statistic" layout="row" layout-align="start space-between">
-    <div class="statistic-panel" flex="20">
-        <h3>CPU</h3>
-        <em>{/vm.realTimeData.cpuPercent/} %</em>
-    </div>
-    <div class="statistic-panel" flex="20">
-        <h3>内存</h3>
-        <em>{/vm.realTimeData.memUsage.toFixed(2)/} %</em>
-    </div>
-    <div class="statistic-panel" flex="20">
-        <h3>网络 IO</h3>
-        <em>读: {/vm.realTimeData.networkReceive | netRate/}</em>
-        <em>写: {/vm.realTimeData.networkTransmit | netRate/}</em>
-    </div>
-    <div class="statistic-panel" flex="20">
-        <h3>磁盘 IO</h3>
-        <em>读: {/vm.realTimeData.fileSysRead | netRate/}</em>
-        <em>写: {/vm.realTimeData.fileSysWrite | netRate/}</em>
-    </div>
-</div>
-<div class="chart" layout="row">
-    <div class="chart-panel" flex="100">
-        <div>
-            <nvd3 options="vm.chartOptions.networkOptions"
-                  data="vm.chartOptions.networkData" api="vm.networkApi"
-                  config="{deepWatchData: false, deepWatchOptions:false}"></nvd3>
+<div class="panel">
+    <div class="statistic" layout="row" layout-align="space-between stretch">
+        <div class="statistic-panel" layout="column" layout-align="space-around center">
+            <h3>CPU</h3>
+            <em>{/vm.realTimeData.cpuPercent/} %</em>
+        </div>
+        <div class="statistic-panel" layout="column" layout-align="space-around center">
+            <h3>内存</h3>
+            <em>{/vm.realTimeData.memUsage.toFixed(2)/} %</em>
+        </div>
+        <div class="statistic-panel statictic-io" layout="column" layout-align="space-around center">
+            <h3>网络 IO</h3>
+            <em><i class="fa fa-upload" aria-hidden="true"><md-tooltip md-direction="left">读</md-tooltip></i> {/vm.realTimeData.networkReceive | netRate/}</em>
+            <em><i class="fa fa-download" aria-hidden="true"><md-tooltip md-direction="left">写</md-tooltip></i> {/vm.realTimeData.networkTransmit | netRate/}</em>
+        </div>
+        <div class="statistic-panel statictic-io" layout="column" layout-align="space-around center">
+            <h3>磁盘 IO</h3>
+            <em><i class="fa fa-upload" aria-hidden="true"><md-tooltip md-direction="left">读</md-tooltip></i> {/vm.realTimeData.fileSysRead | netRate/}</em>
+            <em><i class="fa fa-download" aria-hidden="true"><md-tooltip md-direction="left">写</md-tooltip></i> {/vm.realTimeData.fileSysWrite | netRate/}</em>
         </div>
     </div>
-</div>
-
-<div class="chart" layout="row">
-    <div class="chart-panel" flex="100">
-        <div>
-            <nvd3 options="vm.chartOptions.cpuOptions"
-                  data="vm.chartOptions.cpuData" api="vm.cpuApi"
-                  config="{deepWatchData: false, deepWatchOptions:false}"></nvd3>
+    <div class="chart" layout="row" layout-align="space-around start" layout-wrap>
+        <div class="chart-panel" flex="45">
+            <div>
+                <nvd3 options="vm.chartOptions.networkOptions" data="vm.chartOptions.networkData" api="vm.networkApi" config="{deepWatchData: false, deepWatchOptions:false}"></nvd3>
+            </div>
         </div>
-    </div>
-</div>
-
-
-<div class="chart" layout="row">
-    <div class="chart-panel" flex="100">
-        <div>
-            <nvd3 options="vm.chartOptions.memOptions"
-                  data="vm.chartOptions.memData" api="vm.memApi"
-                  config="{deepWatchData: false, deepWatchOptions:false}"></nvd3>
+        <div class="chart-panel" flex="45">
+            <div>
+                <nvd3 options="vm.chartOptions.cpuOptions" data="vm.chartOptions.cpuData" api="vm.cpuApi" config="{deepWatchData: false, deepWatchOptions:false}"></nvd3>
+            </div>
         </div>
-    </div>
-</div>
-
-<div class="chart" layout="row">
-    <div class="chart-panel" flex="100">
-        <div>
-            <nvd3 options="vm.chartOptions.fileSysOptions"
-                  data="vm.chartOptions.fileSysData" api="vm.fileSysApi"
-                  config="{deepWatchData: false, deepWatchOptions:false}"></nvd3>
+        <div class="chart-panel" flex="45">
+            <div>
+                <nvd3 options="vm.chartOptions.memOptions" data="vm.chartOptions.memData" api="vm.memApi" config="{deepWatchData: false, deepWatchOptions:false}"></nvd3>
+            </div>
+        </div>
+        <div class="chart-panel" flex="45">
+            <div>
+                <nvd3 options="vm.chartOptions.fileSysOptions" data="vm.chartOptions.fileSysData" api="vm.fileSysApi" config="{deepWatchData: false, deepWatchOptions:false}"></nvd3>
+            </div>
         </div>
     </div>
 </div>
