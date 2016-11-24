@@ -102,6 +102,22 @@ func (s *search) Context(ctx *gin.Context) {
 		utils.ErrorResponse(ctx, utils.NewError(PARAM_ERROR, errors.New("appid can't be empty")))
 		return
 	}
+
+	if ctx.Query("taskid") == "" {
+		utils.ErrorResponse(ctx, utils.NewError(PARAM_ERROR, errors.New("taskid can't be empty")))
+		return
+	}
+
+	if ctx.Query("path") == "" {
+		utils.ErrorResponse(ctx, utils.NewError(PARAM_ERROR, errors.New("path can't be empty")))
+		return
+	}
+
+	if ctx.Query("offset") == "" {
+		utils.ErrorResponse(ctx, utils.NewError(PARAM_ERROR, errors.New("offset can't be empty")))
+		return
+	}
+
 	results, err := s.Service.Context(ctx.Query("appid"),
 		ctx.Query("taskid"),
 		ctx.Query("path"),
