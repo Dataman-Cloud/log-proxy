@@ -86,8 +86,8 @@ md-table-container {
 
 /* ******* table style ******* */
 table.md-table {
-  table-layout: fixed;
-  word-wrap: break-word;
+    table-layout: fixed;
+    word-wrap: break-word;
 }
 table.md-table tbody.md-body > tr.md-row,
 table.md-table tfoot.md-foot > tr.md-row {
@@ -278,7 +278,7 @@ textarea {
 .monitor-tab .content {}
 
 .statistic {
-    
+
 }
 
 .statistic-panel {
@@ -315,11 +315,11 @@ textarea {
 }
 
 .chart-panel {
-  margin-bottom: 20px;
+    margin-bottom: 20px;
 }
 
 .chart-panel nvd3 .title {
-  font-weight: bold;
+    font-weight: bold;
 }
 
 .log-condition {
