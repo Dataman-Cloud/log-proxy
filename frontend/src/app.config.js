@@ -8,7 +8,7 @@
 
         $stateProvider
             .state('home', {
-                url: '',
+                url: '/ui',
                 templateUrl: '/src/app.html',
                 controller: 'RootCtrl as vm',
                 abstract: true
@@ -45,11 +45,6 @@
                 controller: 'LogCtrl as vm'
             });
 
-
-        /* @ngInject */
-        function listApp(monitorBackend) {
-            return monitorBackend.listApp().get().$promise
-        }
 
         /* @ngInject */
         function listApp(monitorBackend) {
