@@ -4,6 +4,7 @@
         [
             'ui.router',
             'ngAnimate',
+            'ngSanitize',
             'ui-notification',
             'md.data.table',
             'ngMaterial',
