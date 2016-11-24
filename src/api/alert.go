@@ -2,7 +2,6 @@ package api
 
 import (
 	"errors"
-	"strconv"
 
 	"github.com/Dataman-Cloud/log-proxy/src/models"
 	"github.com/Dataman-Cloud/log-proxy/src/utils"
