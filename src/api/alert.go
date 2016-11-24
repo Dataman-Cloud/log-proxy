@@ -101,27 +101,3 @@ func (s *search) UpdateAlert(ctx *gin.Context) {
 
 	utils.Ok(ctx, "update success")
 }
-
-func (s *search) Middleware(ctx *gin.Context) {
-	if ctx.Query("from") != "" {
-		s.Service.RangeFrom = ctx.Query("from")
-	}
-
-	if ctx.Query("to") != "" {
-		s.Service.RangeTo = ctx.Query("to")
-	}
-
-	if size, err := strconv.Atoi(ctx.Query("size")); err == nil && size > 0 {
-		s.Service.PageSize = size
-	} else {
-		s.Service.PageSize = 100
-	}
-
-	if page, err := strconv.Atoi(ctx.Query("page")); err == nil && page > 0 {
-		s.Service.PageFrom = (page - 1) * s.Service.PageSize
-	} else {
-		s.Service.PageFrom = 0
-	}
-
-	ctx.Next()
-}
