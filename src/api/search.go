@@ -105,7 +105,7 @@ func (s *search) Context(ctx *gin.Context) {
 	results, err := s.Service.Context(ctx.Query("appid"),
 		ctx.Query("taskid"),
 		ctx.Query("path"),
-		ctx.Query("timestamp"))
+		ctx.Query("offset"))
 	if err != nil {
 		utils.ErrorResponse(ctx, utils.NewError(INDEX_ERROR, err))
 		return
