@@ -2,9 +2,12 @@ package service
 
 import (
 	"encoding/json"
+	"strings"
 	"time"
 
 	"github.com/Dataman-Cloud/log-proxy/src/models"
+
+	"gopkg.in/olivere/elastic.v3"
 )
 
 const (
@@ -65,4 +68,47 @@ func (s *SearchService) UpdateAlert(alert *models.Alert) error {
 		Doc(alert).
 		Do()
 	return err
+}
+
+func (s *SearchService) GetAlertCondition() []models.Alert {
+	var alerts []models.Alert
+	result, err := s.ESClient.Search().
+		Index(".dataman-alerts").
+		Type("dataman-alerts").
+		Pretty(true).
+		Do()
+	if err != nil {
+		return alerts
+	}
+
+	for _, hit := range result.Hits.Hits {
+		alert := models.Alert{
+			Id: hit.Id,
+		}
+		json.Unmarshal(*hit.Source, &alert)
+		alerts = append(alerts, alert)
+	}
+
+	return alerts
+}
+
+func (s *SearchService) ExecuteAlert(alert models.Alert) int64 {
+	query := elastic.NewBoolQuery().
+		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte("now-" + alert.Period).Lte("now")).
+		Must(elastic.NewQueryStringQuery("message:" + alert.Keyword).AnalyzeWildcard(true))
+
+	clusterName := strings.Split(alert.AppId, "-")[0]
+	result, err := s.ESClient.Search().
+		Index("dataman-" + clusterName + "-*").
+		Type("dataman-" + alert.AppId).
+		Query(query).
+		Pretty(true).
+		SearchType("count").
+		Do()
+
+	if err != nil {
+		return 0
+	}
+
+	return result.Hits.TotalHits
 }

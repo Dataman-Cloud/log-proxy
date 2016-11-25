@@ -21,6 +21,7 @@ func Router(middlewares ...gin.HandlerFunc) *gin.Engine {
 	r.Use(middlewares...)
 
 	s := api.GetSearch()
+	go s.PollAlert()
 	logv1 := r.Group("/v1/search", s.Middleware)
 	{
 		logv1.GET("/ping", s.Ping)

@@ -2,6 +2,7 @@ package api
 
 import (
 	"errors"
+	"time"
 
 	"github.com/Dataman-Cloud/log-proxy/src/models"
 	"github.com/Dataman-Cloud/log-proxy/src/utils"
@@ -92,6 +93,7 @@ func (s *search) UpdateAlert(ctx *gin.Context) {
 		return
 	}
 
+	alert.CreateTime = time.Now()
 	err := s.Service.UpdateAlert(alert)
 	if err != nil {
 		utils.ErrorResponse(ctx, utils.NewError(UPDATE_ALERT_ERROR, err))
@@ -99,4 +101,17 @@ func (s *search) UpdateAlert(ctx *gin.Context) {
 	}
 
 	utils.Ok(ctx, "update success")
+}
+
+func (s *search) PollAlert() {
+	for {
+		select {
+		case <-time.After(time.Second * 1):
+			alerts := s.Service.GetAlertCondition()
+			for _, alert := range alerts {
+				if s.Service.ExecuteAlert(alert) >= alert.Condition {
+				}
+			}
+		}
+	}
 }
