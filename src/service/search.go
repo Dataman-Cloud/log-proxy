@@ -185,7 +185,7 @@ func (s *SearchService) Search(appid, taskid, source, keyword string, page model
 			MinDocCount(0).
 			ExtendedBounds(page.RangeFrom, page.RangeTo)).
 		Highlight(elastic.NewHighlight().Field("message").PreTags(`@dataman-highlighted-field@`).PostTags(`@/dataman-highlighted-field@`)).
-		Sort("logtime.sort", true).From(page.PageFrom).Size(page.PageSize).Pretty(true).IgnoreUnavailable(true).Do()
+		From(page.PageFrom).Size(page.PageSize).Pretty(true).IgnoreUnavailable(true).Do()
 
 	if err != nil {
 		return nil, err

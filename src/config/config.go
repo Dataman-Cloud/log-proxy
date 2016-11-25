@@ -19,6 +19,7 @@ type Config struct {
 	PROMETHEUS_URL   string `require:"true"`
 	ALERTMANAGER_URL string `require:"true"`
 	FRONTEND_PATH    string
+	MARATHON_URL     string
 }
 
 var c *Config

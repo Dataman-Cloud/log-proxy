@@ -22,6 +22,7 @@ func Router(middlewares ...gin.HandlerFunc) *gin.Engine {
 
 	s := api.GetSearch()
 	go s.PollAlert()
+	go s.ReceiverMarathonEvent()
 	logv1 := r.Group("/v1/search")
 	{
 		logv1.GET("/ping", s.Ping)
@@ -35,7 +36,6 @@ func Router(middlewares ...gin.HandlerFunc) *gin.Engine {
 		logv1.POST("/alert", s.CreateAlert)
 		logv1.PUT("/alert", s.UpdateAlert)
 		logv1.DELETE("/alert/:id", s.DeleteAlert)
-		logv1.POST("/alert/prometheus", s.Receiver)
 		logv1.GET("/alert/keyword/hostory", s.GetKeywordAlertHistory)
 	}
 
