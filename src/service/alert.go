@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/json"
+	"fmt"
 	"strings"
 	"time"
 
@@ -13,6 +14,9 @@ import (
 const (
 	ALERT_INDEX = ".dataman-alerts"
 	ALERT_TYPE  = "dataman-alerts"
+
+	ALERT_HISTORY_INDEX = ".dataman-keyword-history"
+	ALERT_HISTORY_TYPE  = "dataman-keyword-history"
 )
 
 func (s *SearchService) CreateAlert(alert *models.Alert) error {
@@ -34,14 +38,14 @@ func (s *SearchService) DeleteAlert(id string) error {
 	return err
 }
 
-func (s *SearchService) GetAlerts() ([]models.Alert, error) {
+func (s *SearchService) GetAlerts(page models.Page) ([]models.Alert, error) {
 	var results []models.Alert
 
 	result, err := s.ESClient.Search().
 		Index(ALERT_INDEX).
 		Type(ALERT_TYPE).
-		From(s.PageFrom).
-		Size(s.PageSize).
+		From(page.PageFrom).
+		Size(page.PageSize).
 		Pretty(true).
 		Do()
 	if err != nil {
@@ -92,23 +96,69 @@ func (s *SearchService) GetAlertCondition() []models.Alert {
 	return alerts
 }
 
-func (s *SearchService) ExecuteAlert(alert models.Alert) int64 {
+func (s *SearchService) ExecuteAlert(alert models.Alert) {
+	s.Maf.Lock()
+	defer s.Maf.Unlock()
+
+	t, ok := s.AlertFlag[alert.Id]
+	if ok && !time.Now().After(t.Add(+time.Duration(alert.Period)*time.Minute)) {
+		return
+	}
+
 	query := elastic.NewBoolQuery().
-		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte("now-" + alert.Period).Lte("now")).
+		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte(fmt.Sprintf("now-%dm", alert.Period)).Lte("now")).
 		Must(elastic.NewQueryStringQuery("message:" + alert.Keyword).AnalyzeWildcard(true))
 
 	clusterName := strings.Split(alert.AppId, "-")[0]
 	result, err := s.ESClient.Search().
-		Index("dataman-" + clusterName + "-*").
-		Type("dataman-" + alert.AppId).
+		Index(fmt.Sprintf("dataman-%s-*", clusterName)).
+		Type("dataman-"+alert.AppId).
 		Query(query).
+		Aggregation("tasks", elastic.NewTermsAggregation().Field("taskid").OrderByCountDesc()).
 		Pretty(true).
 		SearchType("count").
 		Do()
 
 	if err != nil {
-		return 0
+		return
+	}
+	s.AlertFlag[alert.Id] = time.Now()
+
+	s.CreateKeywordAlertInfo(models.KeywordAlertHistory{
+		AppId:      alert.AppId,
+		Keyword:    alert.Keyword,
+		Count:      result.Hits.TotalHits,
+		CreateTime: time.Now(),
+	})
+}
+
+func (s *SearchService) CreateKeywordAlertInfo(info models.KeywordAlertHistory) {
+	info.CreateTime = time.Now()
+	s.ESClient.Index().
+		Index(ALERT_HISTORY_INDEX).
+		Type(ALERT_HISTORY_TYPE).
+		BodyJson(info).
+		Do()
+}
+
+func (s *SearchService) GetKeywordAlertHistory() (map[string]interface{}, error) {
+	result, err := s.ESClient.Search().
+		Index(ALERT_HISTORY_INDEX).
+		Type(ALERT_HISTORY_TYPE).
+		Pretty(true).
+		Do()
+	if err != nil {
+		return nil, err
 	}
 
-	return result.Hits.TotalHits
+	var results []models.KeywordAlertHistory
+	for _, hit := range result.Hits.Hits {
+		var kh models.KeywordAlertHistory
+		json.Unmarshal(*hit.Source, &kh)
+		results = append(results, kh)
+	}
+	return map[string]interface{}{
+		"results": results,
+		"count":   result.Hits.TotalHits,
+	}, nil
 }

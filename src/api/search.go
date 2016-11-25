@@ -2,8 +2,8 @@ package api
 
 import (
 	"errors"
-	"strconv"
 
+	"github.com/Dataman-Cloud/log-proxy/src/models"
 	"github.com/Dataman-Cloud/log-proxy/src/service"
 	"github.com/Dataman-Cloud/log-proxy/src/utils"
 
@@ -36,7 +36,7 @@ func (s *search) Ping(ctx *gin.Context) {
 }
 
 func (s *search) Applications(ctx *gin.Context) {
-	apps, err := s.Service.Applications()
+	apps, err := s.Service.Applications(ctx.MustGet("page").(models.Page))
 	if err != nil {
 		utils.ErrorResponse(ctx, utils.NewError(GETAPPS_ERROR, err))
 		return
@@ -50,7 +50,8 @@ func (s *search) Tasks(ctx *gin.Context) {
 		utils.ErrorResponse(ctx, utils.NewError(PARAM_ERROR, errors.New("param error")))
 		return
 	}
-	tasks, err := s.Service.Tasks(appName)
+
+	tasks, err := s.Service.Tasks(appName, ctx.MustGet("page").(models.Page))
 	if err != nil {
 		utils.ErrorResponse(ctx, utils.NewError(GETTASK_ERROR, err))
 		return
@@ -71,7 +72,7 @@ func (s *search) Paths(ctx *gin.Context) {
 		return
 	}
 
-	paths, err := s.Service.Paths(appName, taskId)
+	paths, err := s.Service.Paths(appName, taskId, ctx.MustGet("page").(models.Page))
 	if err != nil {
 		utils.ErrorResponse(ctx, utils.NewError(GETTASK_ERROR, err))
 		return
@@ -84,10 +85,12 @@ func (s *search) Index(ctx *gin.Context) {
 		utils.ErrorResponse(ctx, utils.NewError(PARAM_ERROR, errors.New("appid can't be empty")))
 		return
 	}
+
 	results, err := s.Service.Search(ctx.Query("appid"),
 		ctx.Query("taskid"),
 		ctx.Query("path"),
-		ctx.Query("keyword"))
+		ctx.Query("keyword"),
+		ctx.MustGet("page").(models.Page))
 	if err != nil {
 		utils.ErrorResponse(ctx, utils.NewError(INDEX_ERROR, err))
 		return
@@ -127,41 +130,4 @@ func (s *search) Context(ctx *gin.Context) {
 	}
 
 	utils.Ok(ctx, results)
-}
-
-func (s *search) Middleware(ctx *gin.Context) {
-
-	if ctx.Query("from") != "" {
-		if from, err := strconv.ParseInt(ctx.Query("from"), 10, 64); err == nil {
-			s.Service.RangeFrom = from
-		} else {
-			s.Service.RangeFrom = ctx.Query("from")
-		}
-	} else {
-		s.Service.RangeFrom = nil
-	}
-
-	if ctx.Query("to") != "" {
-		if to, err := strconv.ParseInt(ctx.Query("to"), 10, 64); err == nil {
-			s.Service.RangeTo = to
-		} else {
-			s.Service.RangeTo = ctx.Query("to")
-		}
-	} else {
-		s.Service.RangeTo = nil
-	}
-
-	if size, err := strconv.Atoi(ctx.Query("size")); err == nil && size > 0 {
-		s.Service.PageSize = size
-	} else {
-		s.Service.PageSize = 100
-	}
-
-	if page, err := strconv.Atoi(ctx.Query("page")); err == nil && page > 0 {
-		s.Service.PageFrom = (page - 1) * s.Service.PageSize
-	} else {
-		s.Service.PageFrom = 0
-	}
-
-	ctx.Next()
 }

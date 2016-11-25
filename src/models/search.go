@@ -19,9 +19,17 @@ type Log struct {
 
 type Alert struct {
 	Id         string    `json:"id,omitempty"`
-	Period     string    `json:"period"`
+	Period     int64     `json:"period"`
 	AppId      string    `json:"appid"`
 	Keyword    string    `json:"keyword"`
 	Condition  int64     `json:"condition"`
+	CreateTime time.Time `json:"createtime"`
+}
+
+type KeywordAlertHistory struct {
+	Id         string    `json:"id,omitempty"`
+	AppId      string    `json:"appid"`
+	Keyword    string    `json:"keyword"`
+	Count      int64     `json:"count"`
 	CreateTime time.Time `json:"createtime"`
 }

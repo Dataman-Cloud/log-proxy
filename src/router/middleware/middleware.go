@@ -1,6 +1,10 @@
 package middleware
 
 import (
+	"strconv"
+
+	"github.com/Dataman-Cloud/log-proxy/src/models"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -20,6 +24,44 @@ func CORSMiddleware() gin.HandlerFunc {
 			return
 		}
 
+		packPage(c)
+
 		c.Next()
 	}
+}
+
+func packPage(ctx *gin.Context) {
+	page := models.Page{}
+	if ctx.Query("from") != "" {
+		if from, err := strconv.ParseInt(ctx.Query("from"), 10, 64); err == nil {
+			page.RangeFrom = from
+		} else {
+			page.RangeFrom = ctx.Query("from")
+		}
+	} else {
+		page.RangeFrom = nil
+	}
+
+	if ctx.Query("to") != "" {
+		if to, err := strconv.ParseInt(ctx.Query("to"), 10, 64); err == nil {
+			page.RangeTo = to
+		} else {
+			page.RangeTo = ctx.Query("to")
+		}
+	} else {
+		page.RangeTo = nil
+	}
+
+	if size, err := strconv.Atoi(ctx.Query("size")); err == nil && size > 0 {
+		page.PageSize = size
+	} else {
+		page.PageSize = 100
+	}
+
+	if p, err := strconv.Atoi(ctx.Query("page")); err == nil && p > 0 {
+		page.PageFrom = (p - 1) * page.PageSize
+	} else {
+		page.PageFrom = 0
+	}
+	ctx.Set("page", page)
 }
