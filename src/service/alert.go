@@ -141,10 +141,12 @@ func (s *SearchService) CreateKeywordAlertInfo(info models.KeywordAlertHistory) 
 		Do()
 }
 
-func (s *SearchService) GetKeywordAlertHistory() (map[string]interface{}, error) {
+func (s *SearchService) GetKeywordAlertHistory(page models.Page) (map[string]interface{}, error) {
 	result, err := s.ESClient.Search().
 		Index(ALERT_HISTORY_INDEX).
 		Type(ALERT_HISTORY_TYPE).
+		From(page.PageFrom).
+		Size(page.PageSize).
 		Pretty(true).
 		Do()
 	if err != nil {
