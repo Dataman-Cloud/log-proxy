@@ -130,12 +130,25 @@ func (s *search) Context(ctx *gin.Context) {
 }
 
 func (s *search) Middleware(ctx *gin.Context) {
+
 	if ctx.Query("from") != "" {
-		s.Service.RangeFrom = ctx.Query("from")
+		if from, err := strconv.ParseInt(ctx.Query("from"), 10, 64); err == nil {
+			s.Service.RangeFrom = from
+		} else {
+			s.Service.RangeFrom = ctx.Query("from")
+		}
+	} else {
+		s.Service.RangeFrom = nil
 	}
 
 	if ctx.Query("to") != "" {
-		s.Service.RangeTo = ctx.Query("to")
+		if to, err := strconv.ParseInt(ctx.Query("to"), 10, 64); err == nil {
+			s.Service.RangeTo = to
+		} else {
+			s.Service.RangeTo = ctx.Query("to")
+		}
+	} else {
+		s.Service.RangeTo = nil
 	}
 
 	if size, err := strconv.Atoi(ctx.Query("size")); err == nil && size > 0 {

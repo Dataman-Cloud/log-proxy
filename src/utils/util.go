@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"strconv"
 	"time"
 	"unsafe"
 )
@@ -10,18 +9,18 @@ func Byte2str(b []byte) string {
 	return *(*string)(unsafe.Pointer(&b))
 }
 
-func ParseDate(from, to string) string {
-	f, err := strconv.ParseInt(from, 10, 64)
-	if err != nil {
+func ParseDate(from, to interface{}) string {
+	f, ok := from.(int64)
+	if !ok {
 		return time.Now().Format("2006-01-02")
 	}
 
-	t, err := strconv.ParseInt(to, 10, 64)
-	if err != nil {
+	t, ok := to.(int64)
+	if !ok {
 		return time.Now().Format("2006-01-02")
 	}
 
-	if time.Unix(f, 0).Format("2006-01-02") != time.Unix(t, 0).Format("2006-01-02") {
+	if time.Unix(f/1000, 0).Format("2006-01-02") != time.Unix(t/1000, 0).Format("2006-01-02") {
 		return "*"
 	}
 

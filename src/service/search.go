@@ -16,8 +16,8 @@ import (
 )
 
 type SearchService struct {
-	RangeFrom string
-	RangeTo   string
+	RangeFrom interface{}
+	RangeTo   interface{}
 	PageSize  int
 	PageFrom  int
 	ESClient  *elastic.Client
@@ -41,11 +41,9 @@ func NewSearchService() *SearchService {
 	}
 
 	return &SearchService{
-		RangeFrom: "now-15m",
-		RangeTo:   "now",
-		PageFrom:  0,
-		PageSize:  100,
-		ESClient:  client,
+		PageFrom: 0,
+		PageSize: 100,
+		ESClient: client,
 	}
 }
 
@@ -167,9 +165,9 @@ func (s *SearchService) Search(appid, taskid, source, keyword string) (map[strin
 	}
 
 	interval := "1m"
-	f, ferr := strconv.ParseUint(s.RangeFrom, 10, 64)
-	t, terr := strconv.ParseUint(s.RangeTo, 10, 64)
-	if ferr == nil && terr == nil {
+	f, fok := s.RangeFrom.(int64)
+	t, tok := s.RangeTo.(int64)
+	if fok && tok {
 		interval = fmt.Sprintf("%dms", (t-f)/12)
 	}
 
