@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"io/ioutil"
+	"net/http"
 	"time"
 	"unsafe"
 )
@@ -25,4 +27,9 @@ func ParseDate(from, to interface{}) string {
 	}
 
 	return time.Now().Format("2006-01-02")
+}
+
+func ReadRequestBody(request *http.Request) ([]byte, error) {
+	defer request.Body.Close()
+	return ioutil.ReadAll(request.Body)
 }

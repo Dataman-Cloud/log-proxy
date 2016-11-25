@@ -9,6 +9,8 @@ import (
 const (
 	EVENT_INDEX = ".dataman-event"
 	EVENT_TYPE  = "dataman-event"
+
+	TASK_FAILED = "TASK_FAILED"
 )
 
 func (s *SearchService) SaveFaildEvent(data []byte) error {
@@ -16,6 +18,10 @@ func (s *SearchService) SaveFaildEvent(data []byte) error {
 	err := json.Unmarshal(data, &event)
 	if err != nil {
 		return err
+	}
+
+	if event.TaskStatus != TASK_FAILED {
+		return nil
 	}
 
 	_, err = s.ESClient.Index().

@@ -113,9 +113,6 @@ func (s *search) GetKeywordAlertHistory(ctx *gin.Context) {
 	utils.Ok(ctx, result)
 }
 
-func (s *search) Receiver(ctx *gin.Context) {
-}
-
 func (s *search) PollAlert() {
 	for {
 		select {
