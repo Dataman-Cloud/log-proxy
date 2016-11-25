@@ -12,4 +12,5 @@ type CommonLabels struct {
 	Instance    string `json:"instance"`
 	Job         string `json:"job"`
 	Name        string `json:"name"`
+	CreateTime  string `json:"createtime"`
 }

@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/json"
+	"time"
 
 	"github.com/Dataman-Cloud/log-proxy/src/models"
 )
@@ -23,6 +24,7 @@ func (s *SearchService) SaveFaildEvent(data []byte) error {
 	if event.TaskStatus != TASK_FAILED {
 		return nil
 	}
+	event.CreateTime = time.Now().Format(time.RFC3339Nano)
 
 	_, err = s.ESClient.Index().
 		Index(EVENT_INDEX).

@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/json"
+	"time"
 
 	"github.com/Dataman-Cloud/log-proxy/src/models"
 )
@@ -12,6 +13,7 @@ const (
 )
 
 func (s *SearchService) SavePrometheus(pro models.CommonLabels) error {
+	pro.CreateTime = time.Now().Format(time.RFC3339Nano)
 	_, err := s.ESClient.Index().
 		Index(PROMETHEUS_INDEX).
 		Type(PROMETHEUS_TYPE).
