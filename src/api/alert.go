@@ -93,7 +93,7 @@ func (s *search) UpdateAlert(ctx *gin.Context) {
 		return
 	}
 
-	alert.CreateTime = time.Now()
+	alert.CreateTime = time.Now().Format(time.RFC3339Nano)
 	err := s.Service.UpdateAlert(alert)
 	if err != nil {
 		utils.ErrorResponse(ctx, utils.NewError(UPDATE_ALERT_ERROR, err))

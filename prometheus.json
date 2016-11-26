@@ -1,0 +1,77 @@
+{
+    "order": 0,
+    "template": ".dataman-prometheus",
+    "settings": {
+        "index": {
+            "number_of_shards": 5,
+	    "number_of_replicas": 0
+        }
+    },
+    "mappings": {
+        "_default_": {
+            "dynamic_templates": [
+                {
+                    "string_template": {
+                        "match": "*",
+                        "mapping": {
+                            "type": "string",
+                            "index": "not_analyzed"
+                        },
+                        "match_mapping_type": "string"
+                    }
+                }
+            ],
+            "_ttl": {
+                "enabled": true,
+                "default": "7d"
+            },
+            "properties": {
+                "alertname": {
+                    "type": "string",
+                    "index": "not_analyzed"
+                },
+                "container_label_APP_ID": {
+                    "type": "string",
+                    "index": "not_analyzed"
+                },
+                "container_label_VCLUSTER": {
+                    "type": "string",
+                    "index": "not_analyzed"
+                },
+                "id": {
+                    "type": "string",
+                    "index": "not_analyzed"
+                },
+                "instance": {
+                    "type": "string",
+                    "index": "not_analyzed"
+                },
+                "job": {
+                    "type": "string",
+                    "index": "not_analyzed"
+                },
+                "name": {
+                    "type": "string",
+                    "index": "not_analyzed"
+                },
+                "createtime": {
+                    "type": "multi_field",
+                    "fields": {
+                        "timestamp": {
+                            "type": "date",
+			    "format": "strict_date_optional_time||epoch_millis"
+                        },
+                        "sort": {
+                            "type": "string",
+                            "index": "not_analyzed"
+                        }
+                    }
+                }
+            },
+            "_all": {
+                "enabled": true
+            }
+        }
+    },
+    "aliases": {}
+}
