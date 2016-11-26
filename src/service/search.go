@@ -115,10 +115,15 @@ func (s *SearchService) Tasks(appName string, page models.Page) (map[string]int6
 
 func (s *SearchService) Paths(appName, taskId string, page models.Page) (map[string]int64, error) {
 	paths := make(map[string]int64)
+	var querys []elastic.Query
+	querys = append(querys, elastic.NewTermQuery("appid", appName))
+	if taskId != "" {
+		querys = append(querys, elastic.NewTermQuery("taskid", taskId))
+	}
 
 	bquery := elastic.NewBoolQuery().
 		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte(page.RangeFrom).Lte(page.RangeTo).Format("epoch_millis")).
-		Must(elastic.NewTermQuery("appid", appName), elastic.NewTermQuery("taskid", taskId))
+		Must(querys...)
 
 	//Index("dataman-*").
 	result, err := s.ESClient.Search().
