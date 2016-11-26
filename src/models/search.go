@@ -19,6 +19,7 @@ type Alert struct {
 	AppId      string `json:"appid"`
 	Keyword    string `json:"keyword"`
 	Condition  int64  `json:"condition"`
+	Enable     bool   `json:"enable"`
 	CreateTime string `json:"createtime"`
 }
 
