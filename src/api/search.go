@@ -29,7 +29,7 @@ type search struct {
 
 func GetSearch() *search {
 	return &search{
-		Service: service.NewSearchService(),
+		Service: service.NewEsService(),
 	}
 }
 

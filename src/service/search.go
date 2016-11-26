@@ -27,7 +27,7 @@ type SearchResult struct {
 	Message []string `json:"message"`
 }
 
-func NewSearchService() *SearchService {
+func NewEsService() *SearchService {
 	var ofs []elastic.ClientOptionFunc
 	ofs = append(ofs, elastic.SetURL(strings.Split(config.GetConfig().ES_URL, ",")...))
 	ofs = append(ofs, elastic.SetMaxRetries(10))
