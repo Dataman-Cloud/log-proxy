@@ -1,0 +1,85 @@
+{
+    "order": 0,
+    "template": "dataman-*",
+    "settings": {
+        "index": {
+            "query": {
+                "default_field": "message"
+            }
+        }
+    },
+    "mappings": {
+        "_default_": {
+            "dynamic_templates": [
+                {
+                    "string_template": {
+                        "match": "*",
+                        "mapping": {
+                            "type": "string",
+                            "index": "not_analyzed"
+                        },
+                        "match_mapping_type": "string"
+                    }
+                }
+            ],
+            "_ttl": {
+                "enabled": true,
+                "default": "7d"
+            },
+            "properties": {
+                "containerid": {
+                    "type": "string",
+                    "index": "not_analyzed"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "logtime": {
+                    "type": "multi_field",
+                    "fields": {
+                        "timestamp": {
+                            "type": "date",
+			    "format": "strict_date_optional_time||epoch_millis"
+                        },
+                        "sort": {
+                            "type": "string",
+                            "index": "not_analyzed"
+                        }
+                    }
+                },
+                "path": {
+                    "type": "string",
+                    "index": "not_analyzed"
+                },
+                "offset": {
+                    "type": "long",
+                    "index": "not_analyzed"
+                },
+                "appid": {
+                    "type": "string",
+                    "index": "not_analyzed"
+                },
+                "userid": {
+                    "type": "string",
+                    "index": "not_analyzed"
+                },
+                "taskid": {
+                    "type": "string",
+                    "index": "not_analyzed"
+                },
+                "groupid": {
+                    "type": "string",
+                    "index": "not_analyzed"
+                },
+                "clusterid": {
+                    "type": "string",
+                    "index": "not_analyzed"
+                }
+            },
+            "_all": {
+                "enabled": true
+            }
+        }
+    },
+    "aliases": {}
+}

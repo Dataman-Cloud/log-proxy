@@ -220,48 +220,50 @@ func (s *SearchService) Search(appid, taskid, source, keyword string, page model
 	return data, nil
 }
 
-func (s *SearchService) Context(appid, taskid, source, timestamp string) ([]map[string]interface{}, error) {
+func (s *SearchService) Context(appid, taskid, source, timestamp string, page models.Page) ([]map[string]interface{}, error) {
 	offset, err := strconv.ParseInt(timestamp, 10, 64)
 	if err != nil {
 		return nil, err
 	}
+	var results []map[string]interface{}
+
+	if page.PageFrom == 0 {
+		bquery := elastic.NewBoolQuery().
+			Filter(elastic.NewRangeQuery("offset").Lt(offset)).
+			Must(elastic.NewTermQuery("appid", appid), elastic.NewTermQuery("taskid", taskid), elastic.NewTermQuery("path", source))
+
+		result, err := s.ESClient.Search().
+			Index("dataman-"+strings.Split(appid, "-")[0]+"-"+time.Unix(offset/1e9, 0).Format("2006-01-02")).
+			Type("dataman-"+appid).
+			Query(bquery).
+			Sort("logtime.sort", false).
+			From(0).
+			Size(page.PageSize).
+			Pretty(true).
+			Do()
+
+		if err != nil {
+			return nil, err
+		}
+
+		for i := len(result.Hits.Hits) - 1; i >= 0; i-- {
+			data := make(map[string]interface{})
+			json.Unmarshal(*result.Hits.Hits[i].Source, &data)
+			results = append(results, data)
+		}
+	}
 
 	bquery := elastic.NewBoolQuery().
-		Filter(elastic.NewRangeQuery("offset").Lte(offset)).
+		Filter(elastic.NewRangeQuery("offset").Gte(offset)).
 		Must(elastic.NewTermQuery("appid", appid), elastic.NewTermQuery("taskid", taskid), elastic.NewTermQuery("path", source))
 
 	result, err := s.ESClient.Search().
 		Index("dataman-"+strings.Split(appid, "-")[0]+"-"+time.Unix(offset/1e9, 0).Format("2006-01-02")).
 		Type("dataman-"+appid).
 		Query(bquery).
-		Sort("logtime.sort", false).
-		From(0).
-		Size(100).
-		Pretty(true).
-		Do()
-
-	if err != nil {
-		return nil, err
-	}
-
-	var results []map[string]interface{}
-	for i := len(result.Hits.Hits) - 1; i >= 0; i-- {
-		data := make(map[string]interface{})
-		json.Unmarshal(*result.Hits.Hits[i].Source, &data)
-		results = append(results, data)
-	}
-
-	bquery = elastic.NewBoolQuery().
-		Filter(elastic.NewRangeQuery("offset").Gte(offset)).
-		Must(elastic.NewTermQuery("appid", appid), elastic.NewTermQuery("taskid", taskid), elastic.NewTermQuery("path", source))
-
-	result, err = s.ESClient.Search().
-		Index("dataman-"+strings.Split(appid, "-")[0]+"-"+time.Unix(offset/1e9, 0).Format("2006-01-02")).
-		Type("dataman-"+appid).
-		Query(bquery).
 		Sort("logtime.sort", true).
-		From(0).
-		Size(100).
+		From(page.PageFrom).
+		Size(page.PageSize).
 		Pretty(true).
 		Do()
 
