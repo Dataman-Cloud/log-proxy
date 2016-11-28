@@ -223,7 +223,7 @@ func (s *SearchService) Search(appid, taskid, source, keyword string) (map[strin
 
 func (s *SearchService) Context(appid, taskid, source, timestamp string) ([]map[string]interface{}, error) {
 	bquery := elastic.NewBoolQuery().
-		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte(timestamp).Format("epoch_millis").TimeZone("+08:00")).
+		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte(timestamp).Format("strict_date_optional_time").TimeZone("+08:00")).
 		Must(elastic.NewTermQuery("appid", appid), elastic.NewTermQuery("taskid", taskid), elastic.NewTermQuery("path", source))
 
 	result, err := s.ESClient.Search().
@@ -244,12 +244,6 @@ func (s *SearchService) Context(appid, taskid, source, timestamp string) ([]map[
 	for _, hit := range result.Hits.Hits {
 		data := make(map[string]interface{})
 		json.Unmarshal(*hit.Source, &data)
-		if len(hit.Highlight["message"]) > 0 {
-			str := html.EscapeString(hit.Highlight["message"][0])
-			str = strings.Replace(str, "@dataman-highlighted-field@", "<mark>", -1)
-			str = strings.Replace(str, "@/dataman-highlighted-field@", "</mark>", -1)
-			data["message"] = str
-		}
 		results = append(results, data)
 	}
 
