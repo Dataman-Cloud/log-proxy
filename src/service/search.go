@@ -223,7 +223,7 @@ func (s *SearchService) Search(appid, taskid, source, keyword string) (map[strin
 
 func (s *SearchService) Context(appid, taskid, source, timestamp string) ([]map[string]interface{}, error) {
 	bquery := elastic.NewBoolQuery().
-		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte(timestamp).Format("strict_date_optional_time").TimeZone("+08:00")).
+		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte(timestamp).TimeZone("+08:00")).
 		Must(elastic.NewTermQuery("appid", appid), elastic.NewTermQuery("taskid", taskid), elastic.NewTermQuery("path", source))
 
 	result, err := s.ESClient.Search().
