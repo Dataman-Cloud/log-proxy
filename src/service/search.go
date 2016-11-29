@@ -187,7 +187,7 @@ func (s *SearchService) Search(appid, taskid, source, keyword string) (map[strin
 			MinDocCount(0).
 			ExtendedBounds(s.RangeFrom, s.RangeTo)).
 		Highlight(elastic.NewHighlight().Field("message").PreTags(`@dataman-highlighted-field@`).PostTags(`@/dataman-highlighted-field@`)).
-		Sort("logtime.timestamp", true).From(s.PageFrom).Size(s.PageSize).Pretty(true).IgnoreUnavailable(true).Do()
+		Sort("logtime.sort", true).From(s.PageFrom).Size(s.PageSize).Pretty(true).IgnoreUnavailable(true).Do()
 
 	if err != nil {
 		return nil, err
@@ -223,19 +223,20 @@ func (s *SearchService) Search(appid, taskid, source, keyword string) (map[strin
 }
 
 func (s *SearchService) Context(appid, taskid, source, timestamp string) ([]map[string]interface{}, error) {
-	date, err := time.Parse(time.RFC3339Nano, timestamp)
+	offset, err := strconv.ParseInt(timestamp, 10, 64)
 	if err != nil {
 		return nil, err
 	}
+
 	bquery := elastic.NewBoolQuery().
-		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte(date.UnixNano()/1e6).Format("epoch_millis")).
+		Filter(elastic.NewRangeQuery("offset").Lte(offset)).
 		Must(elastic.NewTermQuery("appid", appid), elastic.NewTermQuery("taskid", taskid), elastic.NewTermQuery("path", source))
 
 	result, err := s.ESClient.Search().
-		Index("dataman-"+strings.Split(appid, "-")[0]+"-"+utils.ParseDate(s.RangeFrom, s.RangeTo)).
+		Index("dataman-"+strings.Split(appid, "-")[0]+"-"+time.Unix(offset/1e9, 0).Format("2006-01-02")).
 		Type("dataman-"+appid).
 		Query(bquery).
-		Sort("logtime.timestamp", true).
+		Sort("logtime.sort", false).
 		From(0).
 		Size(100).
 		Pretty(true).
@@ -246,6 +247,30 @@ func (s *SearchService) Context(appid, taskid, source, timestamp string) ([]map[
 	}
 
 	var results []map[string]interface{}
+	for i := len(result.Hits.Hits) - 1; i >= 0; i-- {
+		data := make(map[string]interface{})
+		json.Unmarshal(*result.Hits.Hits[i].Source, &data)
+		results = append(results, data)
+	}
+
+	bquery = elastic.NewBoolQuery().
+		Filter(elastic.NewRangeQuery("offset").Gte(offset)).
+		Must(elastic.NewTermQuery("appid", appid), elastic.NewTermQuery("taskid", taskid), elastic.NewTermQuery("path", source))
+
+	result, err = s.ESClient.Search().
+		Index("dataman-"+strings.Split(appid, "-")[0]+"-"+time.Unix(offset/1e9, 0).Format("2006-01-02")).
+		Type("dataman-"+appid).
+		Query(bquery).
+		Sort("logtime.sort", true).
+		From(0).
+		Size(100).
+		Pretty(true).
+		Do()
+
+	if err != nil {
+		return nil, err
+	}
+
 	for _, hit := range result.Hits.Hits {
 		data := make(map[string]interface{})
 		json.Unmarshal(*hit.Source, &data)
