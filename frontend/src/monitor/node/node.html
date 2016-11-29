@@ -7,6 +7,7 @@
                 <th md-column>CPU</th>
                 <th md-column>内存</th>
                 <th md-column>网络I/O</th>
+                <th md-column>磁盘使用量</th>
             </tr>
             </thead>
             <tbody md-body>
@@ -23,6 +24,11 @@
                 <td md-cell>
                     <p ng-repeat="(networkKey, networkValue) in value.network">
                         网卡: {/networkKey/} 发送:{/networkValue.transmit[1] | netRate/} 接收:{/networkValue.receive[1] | netRate/}
+                    </p>
+                </td>
+                <td md-cell>
+                    <p ng-repeat="(filesystemKey, filesystemValue) in value.filesystem">
+                        磁盘: {/filesystemKey/} {/filesystemValue.usage_bytes[1] | size/}/{/filesystemValue.total_bytes[1] | size/}
                     </p>
                 </td>
             </tr>
