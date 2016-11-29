@@ -23,6 +23,7 @@ type Promql struct {
 const (
 	QUERYRANGEPATH = "/api/v1/query_range"
 	QUERYPATH      = "/api/v1/query"
+	RULESPATH      = "/api/v1/rules"
 )
 
 func (pm Promql) GetPromqlQuery() (map[string]interface{}, error) {
@@ -46,17 +47,19 @@ func (pm Promql) getResponse() ([]byte, string, error) {
 		return nil, "", err
 	}
 	u.Path = strings.TrimRight(u.Path, "/") + pm.Path
-	q := u.Query()
-
-	q.Set("query", pm.Query)
-	if pm.Path == QUERYPATH {
-		q.Set("time", pm.Time)
-	} else if pm.Path == QUERYRANGEPATH {
-		q.Set("start", pm.Start)
-		q.Set("end", pm.End)
-		q.Set("step", pm.Step)
+	if pm.Path == RULESPATH {
+	} else {
+		q := u.Query()
+		q.Set("query", pm.Query)
+		if pm.Path == QUERYPATH {
+			q.Set("time", pm.Time)
+		} else if pm.Path == QUERYRANGEPATH {
+			q.Set("start", pm.Start)
+			q.Set("end", pm.End)
+			q.Set("step", pm.Step)
+		}
+		u.RawQuery = q.Encode()
 	}
-	u.RawQuery = q.Encode()
 
 	resp, err := pm.HttpClient.Get(u.String())
 	if err != nil {

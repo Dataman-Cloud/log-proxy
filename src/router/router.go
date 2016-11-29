@@ -52,6 +52,8 @@ func Router(middlewares ...gin.HandlerFunc) *gin.Engine {
 		monitorv1.GET("/alerts", monitor.GetAlerts)
 		monitorv1.GET("/alerts/groups", monitor.GetAlertsGroups)
 		monitorv1.GET("/alerts/status", monitor.GetAlertsStatus)
+		// Rules
+		monitorv1.GET("/alerts/rules", monitor.GetAlertsRules)
 	}
 
 	staticRouter := r.Group("/ui")

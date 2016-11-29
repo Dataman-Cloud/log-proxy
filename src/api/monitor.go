@@ -18,6 +18,7 @@ const (
 const (
 	QUERYRANGEPATH = "/api/v1/query_range"
 	QUERYPATH      = "/api/v1/query"
+	RULESPATH      = "/api/v1/rules"
 )
 
 type monitor struct {
@@ -183,6 +184,21 @@ func (m *monitor) GetAlertsStatus(ctx *gin.Context) {
 		HttpClient: http.DefaultClient,
 		Server:     config.GetConfig().ALERTMANAGER_URL,
 		Path:       ALERTSSTATUSPATH,
+	}
+
+	data, err := query.GetAlertManagerResponse()
+	if err != nil {
+		utils.ErrorResponse(ctx, err)
+		return
+	}
+	ctx.JSON(http.StatusOK, data)
+}
+
+func (m *monitor) GetAlertsRules(ctx *gin.Context) {
+	query := &backends.AlertManager{
+		HttpClient: http.DefaultClient,
+		Server:     config.GetConfig().PROMETHEUS_URL,
+		Path:       RULESPATH,
 	}
 
 	data, err := query.GetAlertManagerResponse()
