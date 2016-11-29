@@ -181,8 +181,8 @@ type NetworkMetric struct {
 type FilesystemMetric struct {
 	Read  []interface{} `json:"read,omitempty"`
 	Write []interface{} `json:"write,omitempty"`
-	Usage []interface{} `json:"usage,omitempty"`
-	Limit []interface{} `json:"limit,omitempty"`
+	Usage []interface{} `json:"usage_bytes,omitempty"`
+	Limit []interface{} `json:"total_bytes,omitempty"`
 }
 
 func NewNodesMetric() *NodesMetric {
