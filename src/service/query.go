@@ -290,6 +290,10 @@ func (query *QueryRange) setQueryNodesExpr(metric, node string) (expr string) {
 			expr = "irate(container_network_receive_bytes_total{id=~'/',instance='" + node + ":5014'}[5m])"
 		case "network_tx":
 			expr = "irate(container_network_transmit_bytes_total{id=~'/',instance='" + node + ":5014'}[5m])"
+		case "fs_usage":
+			expr = "container_fs_usage_bytes{id=~'/',device!='overlay',instance='" + node + ":5014'}"
+		case "fs_limit":
+			expr = "container_fs_limit_bytes{id=~'/',device!='overlay',instance='" + node + ":5014'}"
 		default:
 			expr = ""
 		}
@@ -309,6 +313,10 @@ func (query *QueryRange) setQueryNodesExpr(metric, node string) (expr string) {
 		expr = "irate(container_network_receive_bytes_total{id=~'/'}[5m])"
 	case "network_tx":
 		expr = "irate(container_network_transmit_bytes_total{id=~'/'}[5m])"
+	case "fs_usage":
+		expr = "container_fs_usage_bytes{id=~'/', device!='overlay'}"
+	case "fs_limit":
+		expr = "container_fs_limit_bytes{id=~'/', device!='overlay'}"
 	default:
 		expr = ""
 	}

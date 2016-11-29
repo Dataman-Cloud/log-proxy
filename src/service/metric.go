@@ -158,9 +158,10 @@ type NodesMetric struct {
 }
 
 type NodeMetric struct {
-	CPU     *CPUMetric                `json:"cpu"`
-	Memory  *MemoryMetric             `json:"memory"`
-	Network map[string]*NetworkMetric `json:"network"`
+	CPU        *CPUMetric                   `json:"cpu"`
+	Memory     *MemoryMetric                `json:"memory"`
+	Network    map[string]*NetworkMetric    `json:"network"`
+	Filesystem map[string]*FilesystemMetric `json:"filesystem"`
 }
 
 type CPUMetric struct {
@@ -178,8 +179,10 @@ type NetworkMetric struct {
 }
 
 type FilesystemMetric struct {
-	Read  []interface{} `json:"read"`
-	Write []interface{} `json:"write"`
+	Read  []interface{} `json:"read,omitempty"`
+	Write []interface{} `json:"write,omitempty"`
+	Usage []interface{} `json:"usage,omitempty"`
+	Limit []interface{} `json:"limit,omitempty"`
 }
 
 func NewNodesMetric() *NodesMetric {
@@ -192,11 +195,16 @@ func NewNetworkMetric() *NetworkMetric {
 	return &NetworkMetric{}
 }
 
+func NewFilesystemMetric() *FilesystemMetric {
+	return &FilesystemMetric{}
+}
+
 func NewNodeMetric() *NodeMetric {
 	return &NodeMetric{
-		CPU:     &CPUMetric{},
-		Memory:  &MemoryMetric{},
-		Network: make(map[string]*NetworkMetric),
+		CPU:        &CPUMetric{},
+		Memory:     &MemoryMetric{},
+		Network:    make(map[string]*NetworkMetric),
+		Filesystem: make(map[string]*FilesystemMetric),
 	}
 }
 
@@ -209,7 +217,7 @@ func (nm *NodesMetric) GetNodesMetric(query *QueryRange) error {
 }
 
 func (nm *NodesMetric) SetNodesMetric(query *QueryRange) error {
-	metrics := []string{"cpu", "memory_usage", "memory_total", "network_rx", "network_tx"}
+	metrics := []string{"cpu", "memory_usage", "memory_total", "network_rx", "network_tx", "fs_usage", "fs_limit"}
 	for _, metric := range metrics {
 		query.Metric = metric
 		data, err := query.QueryNodesFromProm()
@@ -236,9 +244,21 @@ func (nm *NodesMetric) SetNodesMetric(query *QueryRange) error {
 			}
 		}
 
+		if metric == "fs_usage" || metric == "fs_limit" {
+			for _, node := range nm.Nodes {
+				if len(node.Filesystem) == 0 {
+					for _, originData := range data.Data.Result {
+						device := originData.Metric.Device
+						node.Filesystem[device] = NewFilesystemMetric()
+					}
+				}
+			}
+		}
+
 		for _, originData := range data.Data.Result {
 			name := strings.Split(originData.Metric.Instance, ":")[0]
 			nic := originData.Metric.Interface
+			device := originData.Metric.Device
 			value := originData.Values[0]
 			for k, v := range nm.Nodes {
 				if name == k {
@@ -259,6 +279,18 @@ func (nm *NodesMetric) SetNodesMetric(query *QueryRange) error {
 						for nicK, nicV := range v.Network {
 							if nic == nicK {
 								nicV.Transmit = value
+							}
+						}
+					case "fs_usage":
+						for fsK, fsV := range v.Filesystem {
+							if device == fsK {
+								fsV.Usage = value
+							}
+						}
+					case "fs_limit":
+						for fsK, fsV := range v.Filesystem {
+							if device == fsK {
+								fsV.Limit = value
 							}
 						}
 					}

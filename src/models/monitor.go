@@ -26,4 +26,5 @@ type Metric struct {
 	Name                string `json:"name"`
 	Group               string `json:"group,omitempty"`
 	Interface           string `json:"interface,omitempty"`
+	Device              string `json:"device,omitempty"`
 }
