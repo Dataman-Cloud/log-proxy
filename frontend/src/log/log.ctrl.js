@@ -3,7 +3,7 @@
     angular.module('app')
         .controller('LogCtrl', LogCtrl);
     /* @ngInject */
-    function LogCtrl(logBackend, moment) {
+    function LogCtrl(logBackend, moment, logcurd) {
         var self = this;
         var tempLogQuery = {};
 
@@ -39,6 +39,7 @@
         self.loadTasks = loadTasks;
         self.loadPaths = loadPaths;
         self.searchLog = searchLog;
+        self.logContext = logContext;
 
         activate();
 
@@ -150,6 +151,10 @@
                 self.logs = data.data.results;
                 self.count = data.data.count;
             })
+        }
+
+        function logContext(ev, log) {
+            logcurd.openLogContext(ev, log);
         }
     }
 })();

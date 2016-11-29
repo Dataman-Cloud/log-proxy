@@ -75,6 +75,7 @@
                     <th md-column style="width: 60px;"></th>
                     <th md-column style="width: 160px;">时间</th>
                     <th md-column>信息</th>
+                    <th md-column>上下文</th>
                 </tr>
                 </thead>
                 <tbody md-body>
@@ -86,6 +87,9 @@
                     </td>
                     <td md-cell>
                         <div ng-bind-html="log.message"></div>
+                    </td>
+                    <td md-cell>
+                        <md-button ng-click="vm.logContext($event, log)">上下文</md-button>
                     </td>
                 </tr>
                 <tr ng-repeat-end ng-hide="!vm.logDisplaySet[$index]">
