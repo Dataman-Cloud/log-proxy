@@ -68,6 +68,14 @@
     </div>
     <div flex class="panel log-result">
         <div class="result-sum">总计<em>{/vm.count/}</em>条记录</div>
+
+        <div class="chart" layout="row" layout-align="space-around start" layout-wrap
+             ng-if="vm.chartOptions.logData.length">
+            <div class="chart-panel" flex="100">
+                <nvd3 options="vm.chartOptions.logOptions" data="vm.chartOptions.logData"></nvd3>
+            </div>
+        </div>
+
         <md-table-container ng-hide="!vm.logs.length">
             <table md-table id="user-list-table">
                 <thead md-head>
@@ -75,17 +83,26 @@
                     <th md-column style="width: 60px;"></th>
                     <th md-column style="width: 160px;">时间</th>
                     <th md-column>信息</th>
+                    <th md-column>上下文</th>
                 </tr>
                 </thead>
                 <tbody md-body>
                 <tr md-row
                     ng-repeat-start="log in vm.logs track by $index">
-                    <td md-cell><a ng-click="vm.logDisplaySet[$index] = !vm.logDisplaySet[$index]"><i class="fa " ng-class="{'fa-chevron-down':vm.logDisplaySet[$index], 'fa-chevron-right':!vm.logDisplaySet[$index]}"></i></a></td>
+                    <td md-cell>
+                        <a ng-click="vm.logDisplaySet[$index] = !vm.logDisplaySet[$index]">
+                            <i class="fa"
+                               ng-class="{'fa-chevron-down':vm.logDisplaySet[$index], 'fa-chevron-right':!vm.logDisplaySet[$index]}"></i>
+                        </a>
+                    </td>
                     <td md-cell>
                         {/log.logtime | date: 'yyyy-MM-dd HH:mm:ss'/}
                     </td>
                     <td md-cell>
                         <div ng-bind-html="log.message"></div>
+                    </td>
+                    <td md-cell>
+                        <md-button ng-click="vm.logContext($event, log)">上下文</md-button>
                     </td>
                 </tr>
                 <tr ng-repeat-end ng-hide="!vm.logDisplaySet[$index]">

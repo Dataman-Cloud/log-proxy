@@ -14,7 +14,7 @@
             updateForceY: updateForceY
         };
 
-        function createDefaultOptions() {
+        function createDefaultOptions(chartType) {
             var colors = [
                 '#1f77b4',
                 '#ff7f0e',
@@ -29,7 +29,7 @@
             ];
             return {
                 chart: {
-                    type: 'lineChart',
+                    type: chartType || 'lineChart',
                     noData: '暂无数据',
                     height: 200,
                     margin: {

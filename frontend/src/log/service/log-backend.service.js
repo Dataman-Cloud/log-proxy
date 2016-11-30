@@ -8,7 +8,8 @@
             listApp: listApp,
             listTask: listTask,
             listPath: listPath,
-            searchLogs: searchLogs
+            searchLogs: searchLogs,
+            logContext: logContext
         };
 
         function listApp(data) {
@@ -49,6 +50,16 @@
                 to: paramObj.to,
                 page: paramObj.page,
                 size: paramObj.size
+            });
+        }
+
+        function logContext(data) {
+            var paramObj = data || {};
+            return $resource(BACKEND_URL_BASE.defaultBase + '/v1/search/context', {
+                appid: paramObj.appid,
+                taskid: paramObj.taskid,
+                path: paramObj.path,
+                offset: paramObj.offset
             });
         }
     }
