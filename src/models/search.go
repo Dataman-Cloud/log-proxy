@@ -22,6 +22,6 @@ type Alert struct {
 	Period     string    `json:"period"`
 	AppId      string    `json:"appid"`
 	Keyword    string    `json:"keyword"`
-	Condition  int       `json:"condition"`
+	Condition  int64     `json:"condition"`
 	CreateTime time.Time `json:"createtime"`
 }
