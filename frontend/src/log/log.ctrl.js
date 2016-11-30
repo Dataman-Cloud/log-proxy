@@ -3,9 +3,11 @@
     angular.module('app')
         .controller('LogCtrl', LogCtrl);
     /* @ngInject */
-    function LogCtrl(logBackend, moment, logcurd) {
+    function LogCtrl(logBackend, moment, logcurd, logChart) {
         var self = this;
         var tempLogQuery = {};
+
+        self.chartOptions = logChart.Options();
 
         //md-table parameter
         self.options = {
@@ -150,6 +152,8 @@
             }).get(function (data) {
                 self.logs = data.data.results;
                 self.count = data.data.count;
+
+                self.chartOptions.pushData(data.data.history);
             })
         }
 
