@@ -6,9 +6,11 @@ import (
 	"html"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/Dataman-Cloud/log-proxy/src/config"
+	"github.com/Dataman-Cloud/log-proxy/src/models"
 	"github.com/Dataman-Cloud/log-proxy/src/utils"
 
 	log "github.com/Sirupsen/logrus"
@@ -16,11 +18,9 @@ import (
 )
 
 type SearchService struct {
-	RangeFrom interface{}
-	RangeTo   interface{}
-	PageSize  int
-	PageFrom  int
 	ESClient  *elastic.Client
+	AlertFlag map[string]time.Time
+	Maf       *sync.Mutex
 }
 
 type SearchResult struct {
@@ -41,15 +41,15 @@ func NewSearchService() *SearchService {
 	}
 
 	return &SearchService{
-		PageFrom: 0,
-		PageSize: 100,
-		ESClient: client,
+		ESClient:  client,
+		AlertFlag: make(map[string]time.Time),
+		Maf:       new(sync.Mutex),
 	}
 }
 
-func (s *SearchService) Applications() (map[string]int64, error) {
+func (s *SearchService) Applications(page models.Page) (map[string]int64, error) {
 	bquery := elastic.NewBoolQuery().
-		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte(s.RangeFrom).Lte(s.RangeTo).Format("epoch_millis"))
+		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte(page.RangeFrom).Lte(page.RangeTo).Format("epoch_millis"))
 
 	apps := make(map[string]int64)
 	result, err := s.ESClient.Search().
@@ -78,15 +78,15 @@ func (s *SearchService) Applications() (map[string]int64, error) {
 	return apps, nil
 }
 
-func (s *SearchService) Tasks(appName string) (map[string]int64, error) {
+func (s *SearchService) Tasks(appName string, page models.Page) (map[string]int64, error) {
 	bquery := elastic.NewBoolQuery().
-		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte(s.RangeFrom).Lte(s.RangeTo).Format("epoch_millis")).
+		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte(page.RangeFrom).Lte(page.RangeTo).Format("epoch_millis")).
 		Must(elastic.NewTermQuery("appid", appName))
 
 	//Index("dataman-*").
 	tasks := make(map[string]int64)
 	result, err := s.ESClient.Search().
-		Index("dataman-"+strings.Split(appName, "-")[0]+"-"+utils.ParseDate(s.RangeFrom, s.RangeTo)).
+		Index("dataman-"+strings.Split(appName, "-")[0]+"-"+utils.ParseDate(page.RangeFrom, page.RangeTo)).
 		Type("dataman-"+appName).
 		Query(bquery).
 		SearchType("count").
@@ -113,16 +113,16 @@ func (s *SearchService) Tasks(appName string) (map[string]int64, error) {
 	return tasks, nil
 }
 
-func (s *SearchService) Paths(appName, taskId string) (map[string]int64, error) {
+func (s *SearchService) Paths(appName, taskId string, page models.Page) (map[string]int64, error) {
 	paths := make(map[string]int64)
 
 	bquery := elastic.NewBoolQuery().
-		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte(s.RangeFrom).Lte(s.RangeTo).Format("epoch_millis")).
+		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte(page.RangeFrom).Lte(page.RangeTo).Format("epoch_millis")).
 		Must(elastic.NewTermQuery("appid", appName), elastic.NewTermQuery("taskid", taskId))
 
 	//Index("dataman-*").
 	result, err := s.ESClient.Search().
-		Index("dataman-"+strings.Split(appName, "-")[0]+"-"+utils.ParseDate(s.RangeFrom, s.RangeTo)).
+		Index("dataman-"+strings.Split(appName, "-")[0]+"-"+utils.ParseDate(page.RangeFrom, page.RangeTo)).
 		Type("dataman-"+appName).
 		Query(bquery).
 		SearchType("count").
@@ -150,7 +150,7 @@ func (s *SearchService) Paths(appName, taskId string) (map[string]int64, error) 
 	return paths, nil
 }
 
-func (s *SearchService) Search(appid, taskid, source, keyword string) (map[string]interface{}, error) {
+func (s *SearchService) Search(appid, taskid, source, keyword string, page models.Page) (map[string]interface{}, error) {
 	data := make(map[string]interface{})
 
 	var querys []elastic.Query
@@ -165,27 +165,27 @@ func (s *SearchService) Search(appid, taskid, source, keyword string) (map[strin
 	}
 
 	interval := "1m"
-	f, fok := s.RangeFrom.(int64)
-	t, tok := s.RangeTo.(int64)
+	f, fok := page.RangeFrom.(int64)
+	t, tok := page.RangeTo.(int64)
 	if fok && tok {
 		interval = fmt.Sprintf("%dms", (t-f)/12)
 	}
 
 	bquery := elastic.NewBoolQuery().
-		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte(s.RangeFrom).Lte(s.RangeTo).Format("epoch_millis")).
+		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte(page.RangeFrom).Lte(page.RangeTo).Format("epoch_millis")).
 		Must(querys...)
 
 	result, err := s.ESClient.Search().
-		Index("dataman-"+strings.Split(appid, "-")[0]+"-"+utils.ParseDate(s.RangeFrom, s.RangeTo)).
+		Index("dataman-"+strings.Split(appid, "-")[0]+"-"+utils.ParseDate(page.RangeFrom, page.RangeTo)).
 		Type("dataman-"+appid).
 		Query(bquery).
 		Aggregation("history", elastic.NewDateHistogramAggregation().
 			Field("logtime.timestamp").
 			Interval(interval).
 			MinDocCount(0).
-			ExtendedBounds(s.RangeFrom, s.RangeTo)).
+			ExtendedBounds(page.RangeFrom, page.RangeTo)).
 		Highlight(elastic.NewHighlight().Field("message").PreTags(`@dataman-highlighted-field@`).PostTags(`@/dataman-highlighted-field@`)).
-		Sort("logtime.sort", true).From(s.PageFrom).Size(s.PageSize).Pretty(true).IgnoreUnavailable(true).Do()
+		Sort("logtime.sort", true).From(page.PageFrom).Size(page.PageSize).Pretty(true).IgnoreUnavailable(true).Do()
 
 	if err != nil {
 		return nil, err

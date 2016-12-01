@@ -17,7 +17,7 @@ func (s *search) CreateAlert(ctx *gin.Context) {
 		return
 	}
 
-	if alert.Period == "" {
+	if alert.Period <= 0 {
 		utils.ErrorResponse(ctx, utils.NewError(PARAM_ERROR, errors.New("period can't be empty")))
 		return
 	}
@@ -57,7 +57,7 @@ func (s *search) DeleteAlert(ctx *gin.Context) {
 }
 
 func (s *search) GetAlerts(ctx *gin.Context) {
-	results, err := s.Service.GetAlerts()
+	results, err := s.Service.GetAlerts(ctx.MustGet("page").(models.Page))
 	if err != nil {
 		utils.ErrorResponse(ctx, utils.NewError(GET_ALERT_ERROR, err))
 		return
@@ -78,7 +78,7 @@ func (s *search) UpdateAlert(ctx *gin.Context) {
 		return
 	}
 
-	if alert.Period == "" {
+	if alert.Period <= 0 {
 		utils.ErrorResponse(ctx, utils.NewError(PARAM_ERROR, errors.New("period can't be empty")))
 		return
 	}
@@ -103,14 +103,26 @@ func (s *search) UpdateAlert(ctx *gin.Context) {
 	utils.Ok(ctx, "update success")
 }
 
+func (s *search) GetKeywordAlertHistory(ctx *gin.Context) {
+	result, err := s.Service.GetKeywordAlertHistory()
+	if err != nil {
+		utils.ErrorResponse(ctx, utils.NewError(INDEX_ERROR, err))
+		return
+	}
+
+	utils.Ok(ctx, result)
+}
+
+func (s *search) Receiver(ctx *gin.Context) {
+}
+
 func (s *search) PollAlert() {
 	for {
 		select {
 		case <-time.After(time.Second * 1):
 			alerts := s.Service.GetAlertCondition()
 			for _, alert := range alerts {
-				if s.Service.ExecuteAlert(alert) >= alert.Condition {
-				}
+				s.Service.ExecuteAlert(alert)
 			}
 		}
 	}
