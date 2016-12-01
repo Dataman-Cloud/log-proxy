@@ -83,7 +83,7 @@
                     <th md-column style="width: 60px;"></th>
                     <th md-column style="width: 160px;">时间</th>
                     <th md-column>信息</th>
-                    <th md-column>上下文</th>
+                    <th md-column ng-show="vm.hasLogContext">上下文</th>
                 </tr>
                 </thead>
                 <tbody md-body>
@@ -101,7 +101,7 @@
                     <td md-cell>
                         <div ng-bind-html="log.message"></div>
                     </td>
-                    <td md-cell>
+                    <td md-cell ng-show="vm.hasLogContext">
                         <md-button ng-click="vm.logContext($event, log)">上下文</md-button>
                     </td>
                 </tr>

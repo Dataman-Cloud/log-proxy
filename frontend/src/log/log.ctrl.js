@@ -32,6 +32,7 @@
         self.logDisplaySet = {};
         self.count = 0;
         self.logs = [];
+        self.hasLogContext = false;
 
         self.onPaginate = onPaginate;
         self.periodChange = periodChange;
@@ -139,6 +140,8 @@
             };
 
             checkTimeRange();
+
+            self.hasLogContext = !!self.keyword;
 
             logBackend.searchLogs({
                 from: self.fromTimestamp,
