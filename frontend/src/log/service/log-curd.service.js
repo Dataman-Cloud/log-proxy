@@ -7,13 +7,9 @@
         .factory('logcurd', logcurd);
 
     /* @ngInject */
-    function logcurd(logContextModal) {
+    function logcurd() {
         return {
-            openLogContext: openLogContext
-        };
 
-        function openLogContext(ev, log) {
-            logContextModal.open('/src/log/modals/log-context.html', ev, log)
-        }
+        };
     }
 })();

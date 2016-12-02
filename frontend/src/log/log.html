@@ -102,7 +102,8 @@
                         <div ng-bind-html="log.message"></div>
                     </td>
                     <td md-cell ng-show="vm.hasLogContext">
-                        <md-button ng-click="vm.logContext($event, log)">上下文</md-button>
+                        <a ui-sref="logcontext({appid: log.appid, taskid: log.taskid, path: log.path, offset: log.offset})"
+                           target="_blank">上下文</a>
                     </td>
                 </tr>
                 <tr ng-repeat-end ng-hide="!vm.logDisplaySet[$index]">
