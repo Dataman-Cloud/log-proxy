@@ -21,7 +21,6 @@ func Router(middlewares ...gin.HandlerFunc) *gin.Engine {
 	r.Use(middlewares...)
 
 	s := api.GetSearch()
-	go s.PollAlert()
 	go s.ReceiverMarathonEvent()
 	logv1 := r.Group("/v1/search")
 	{

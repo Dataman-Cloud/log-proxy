@@ -80,6 +80,7 @@ func (s *SearchService) GetAlert(id string) (models.Alert, error) {
 	if err != nil {
 		return alert, err
 	}
+	alert.Id = result.Id
 
 	return alert, nil
 }

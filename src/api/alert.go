@@ -122,15 +122,3 @@ func (s *search) GetKeywordAlertHistory(ctx *gin.Context) {
 
 	utils.Ok(ctx, result)
 }
-
-func (s *search) PollAlert() {
-	for {
-		select {
-		case <-time.After(time.Minute * 1):
-			alerts := s.Service.GetAlertCondition()
-			for _, alert := range alerts {
-				s.Service.ExecuteAlert(alert)
-			}
-		}
-	}
-}
