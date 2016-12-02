@@ -68,13 +68,7 @@ func (s *search) Paths(ctx *gin.Context) {
 		return
 	}
 
-	taskId := ctx.Param("taskid")
-	if taskId == "" {
-		utils.ErrorResponse(ctx, utils.NewError(PARAM_ERROR, errors.New("param error")))
-		return
-	}
-
-	paths, err := s.Service.Paths(appName, taskId, ctx.MustGet("page").(models.Page))
+	paths, err := s.Service.Paths(appName, ctx.Query("taskid"), ctx.MustGet("page").(models.Page))
 	if err != nil {
 		utils.ErrorResponse(ctx, utils.NewError(GETTASK_ERROR, err))
 		return
