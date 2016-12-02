@@ -64,6 +64,26 @@ func (s *SearchService) GetAlerts(page models.Page) ([]models.Alert, error) {
 	return results, nil
 }
 
+func (s *SearchService) GetAlert(id string) (models.Alert, error) {
+	var alert models.Alert
+
+	result, err := s.ESClient.Get().
+		Index(ALERT_INDEX).
+		Type(ALERT_TYPE).
+		Id(id).
+		Do()
+	if err != nil {
+		return alert, err
+	}
+
+	err = json.Unmarshal(*result.Source, &alert)
+	if err != nil {
+		return alert, err
+	}
+
+	return alert, nil
+}
+
 func (s *SearchService) UpdateAlert(alert *models.Alert) error {
 	_, err := s.ESClient.Update().
 		Index(ALERT_INDEX).
@@ -107,10 +127,15 @@ func (s *SearchService) ExecuteAlert(alert models.Alert) {
 	if ok && !time.Now().After(t.Add(+time.Duration(alert.Period)*time.Minute)) {
 		return
 	}
+	var querys []elastic.Query
+	querys = append(querys, elastic.NewQueryStringQuery("message:"+alert.Keyword).AnalyzeWildcard(true))
+	if alert.Path != "" {
+		querys = append(querys, elastic.NewTermQuery("path", alert.Path))
+	}
 
 	query := elastic.NewBoolQuery().
 		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte(fmt.Sprintf("now-%dm", alert.Period)).Lte("now")).
-		Must(elastic.NewQueryStringQuery("message:" + alert.Keyword).AnalyzeWildcard(true))
+		Must(querys...)
 
 	clusterName := strings.Split(alert.AppId, "-")[0]
 	result, err := s.ESClient.Search().

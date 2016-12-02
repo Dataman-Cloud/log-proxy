@@ -66,6 +66,16 @@ func (s *search) GetAlerts(ctx *gin.Context) {
 	utils.Ok(ctx, results)
 }
 
+func (s *search) GetAlert(ctx *gin.Context) {
+	results, err := s.Service.GetAlert(ctx.Param("id"))
+	if err != nil {
+		utils.ErrorResponse(ctx, utils.NewError(GET_ALERT_ERROR, err))
+		return
+	}
+
+	utils.Ok(ctx, results)
+}
+
 func (s *search) UpdateAlert(ctx *gin.Context) {
 	alert := new(models.Alert)
 	if err := ctx.BindJSON(alert); err != nil {

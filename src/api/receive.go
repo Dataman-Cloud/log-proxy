@@ -22,6 +22,8 @@ func (s *search) Receiver(ctx *gin.Context) {
 		utils.ErrorResponse(ctx, utils.NewError(GET_EVENTS_ERROR, err))
 		return
 	}
+	pro.CLs.Condition = pro.CAs.Summary
+	pro.CLs.Usage = pro.CAs.Description
 
 	s.Service.SavePrometheus(pro.CLs)
 	utils.Ok(ctx, map[string]string{"status": "success"})
