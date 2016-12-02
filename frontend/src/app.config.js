@@ -45,7 +45,7 @@
                 controller: 'LogCtrl as vm'
             })
             .state('logcontext', {
-                url: '/logcontext?appid&taskid&path&offset',
+                url: '/ui/logcontext?appid&taskid&path&offset',
                 templateUrl: '/src/log/context.html',
                 controller: 'LogContextCtrl as vm'
             });
