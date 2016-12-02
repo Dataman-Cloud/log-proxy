@@ -24,10 +24,19 @@
                 <md-button ui-sref="home.logbase">日志</md-button>
             </li>
             <li>
-                <md-button ng-href="#">事件</md-button>
+                <md-menu>
+                    <md-button aria-label="More" ng-click="$mdOpenMenu($event)">
+                        事件
+                    </md-button>
+                    <md-menu-content>
+                        <md-menu-item>
+                            <md-button ui-sref="home.eventmonitor">监控</md-button>
+                        </md-menu-item>
+                    </md-menu-content>
+                </md-menu>
             </li>
             <li>
-                <md-button ng-href="#">告警</md-button>
+                <md-button ui-sref="home.alertlist">告警</md-button>
             </li>
         </ul>
     </nav>

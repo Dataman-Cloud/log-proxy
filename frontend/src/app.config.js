@@ -58,6 +58,40 @@
                 url: '/logcontext?appid&taskid&path&offset',
                 templateUrl: '/src/log/log-context/logs.html',
                 controller: 'LogContextCtrl as vm'
+            })
+            .state('home.alertcreate', {
+                url: '/alert-create',
+                templateUrl: '/src/alert/create-update/create-update.html',
+                controller: 'CreateAlertCtrl as vm',
+                resolve: {
+                    target: function () {
+                        return 'create'
+                    },
+                    alert: function () {
+                        return {}
+                    }
+                }
+            })
+            .state('home.alertupdate', {
+                url: '/alert-update/:id',
+                templateUrl: '/src/alert/create-update/create-update.html',
+                controller: 'CreateAlertCtrl as vm',
+                resolve: {
+                    target: function () {
+                        return 'update'
+                    },
+                    alert: getAlert
+                }
+            })
+            .state('home.alertlist', {
+                url: '/alertlist',
+                templateUrl: '/src/alert/list/list.html',
+                controller: 'AlertListCtrl as vm'
+            })
+            .state('home.eventmonitor', {
+                url: '/eventmonitor',
+                templateUrl: '/src/event/monitor/list/list.html',
+                controller: 'EventMonitorCtrl as vm'
             });
 
         /* @ngInject */
@@ -68,6 +102,11 @@
         /* @ngInject */
         function listNode(monitorBackend) {
             return monitorBackend.listNode().get().$promise
+        }
+
+        /* @ngInject */
+        function getAlert(alertBackend, $stateParams) {
+            return alertBackend.alert($stateParams.id).get().$promise
         }
 
         $locationProvider.html5Mode(true);
