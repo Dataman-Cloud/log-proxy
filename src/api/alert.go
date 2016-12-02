@@ -17,11 +17,6 @@ func (s *search) CreateAlert(ctx *gin.Context) {
 		return
 	}
 
-	if alert.Period <= 0 {
-		utils.ErrorResponse(ctx, utils.NewError(PARAM_ERROR, errors.New("period can't be empty")))
-		return
-	}
-
 	if alert.AppId == "" {
 		utils.ErrorResponse(ctx, utils.NewError(PARAM_ERROR, errors.New("appid can't be empty")))
 		return
@@ -85,11 +80,6 @@ func (s *search) UpdateAlert(ctx *gin.Context) {
 
 	if alert.Id == "" {
 		utils.ErrorResponse(ctx, utils.NewError(PARAM_ERROR, errors.New("id can't be empty")))
-		return
-	}
-
-	if alert.Period <= 0 {
-		utils.ErrorResponse(ctx, utils.NewError(PARAM_ERROR, errors.New("period can't be empty")))
 		return
 	}
 
