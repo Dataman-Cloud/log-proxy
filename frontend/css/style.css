@@ -82,13 +82,12 @@ md-table-container {
     -webkit-overflow-scrolling: touch;
 }
 
-
-
 /* ******* table style ******* */
 table.md-table {
     table-layout: fixed;
     word-wrap: break-word;
 }
+
 table.md-table tbody.md-body > tr.md-row,
 table.md-table tfoot.md-foot > tr.md-row {
     height: 40px;
@@ -118,7 +117,7 @@ table.md-table th.md-column {
     color: rgba(0, 0, 0, 0.9);
     font-size: 12px;
     font-weight: bold;
-    padding: 8px!important;
+    padding: 8px !important;
     white-space: nowrap;
 }
 
@@ -127,7 +126,7 @@ table.md-table td.md-cell {
     font-size: 12px;
     border-top: none;
     min-height: 40px;
-    padding: 8px!important;
+    padding: 8px !important;
 }
 
 table.md-table td.md-cell .md-button {
@@ -275,7 +274,8 @@ textarea {
     margin-right: 4px;
 }
 
-.monitor-tab .content {}
+.monitor-tab .content {
+}
 
 .statistic {
 
@@ -331,20 +331,29 @@ textarea {
     background-color: transparent;
     padding-top: 12px;
 }
+
 .log-result tbody .md-row td {
     border-bottom: 1px solid white;
 }
+
 .log-result tbody .md-row td a {
     cursor: pointer;
 }
+
 .log-result table dl {
     margin-bottom: 12px;
     font-size: 12px;
 }
+
 .log-result table dt {
     min-width: 120px;
     font-weight: 500;
 }
+
 .log-result .json-detail {
     padding: 20px 8px;
+}
+
+.context-highlight {
+    background-color: yellowgreen;
 }

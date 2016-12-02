@@ -3,7 +3,7 @@
     angular.module('app')
         .controller('LogCtrl', LogCtrl);
     /* @ngInject */
-    function LogCtrl(logBackend, moment, logcurd, logChart) {
+    function LogCtrl(logBackend, moment, logChart) {
         var self = this;
         var tempLogQuery = {};
 
@@ -32,6 +32,7 @@
         self.logDisplaySet = {};
         self.count = 0;
         self.logs = [];
+        self.hasLogContext = false;
 
         self.onPaginate = onPaginate;
         self.periodChange = periodChange;
@@ -41,7 +42,6 @@
         self.loadTasks = loadTasks;
         self.loadPaths = loadPaths;
         self.searchLog = searchLog;
-        self.logContext = logContext;
 
         activate();
 
@@ -140,6 +140,8 @@
 
             checkTimeRange();
 
+            self.hasLogContext = !!self.keyword;
+
             logBackend.searchLogs({
                 from: self.fromTimestamp,
                 to: self.curTimestamp,
@@ -155,10 +157,6 @@
 
                 self.chartOptions.pushData(data.data.history);
             })
-        }
-
-        function logContext(ev, log) {
-            logcurd.openLogContext(ev, log);
         }
     }
 })();
