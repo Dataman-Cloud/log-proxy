@@ -44,6 +44,9 @@
                 "condition": {
                     "type": "long"
                 },
+                "enable": {
+                    "type": "boolean"
+                },
                 "createtime": {
                     "type": "multi_field",
                     "fields": {

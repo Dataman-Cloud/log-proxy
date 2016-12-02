@@ -97,6 +97,9 @@ func (s *SearchService) GetAlertCondition() []models.Alert {
 }
 
 func (s *SearchService) ExecuteAlert(alert models.Alert) {
+	if !alert.Enable {
+		return
+	}
 	s.Maf.Lock()
 	defer s.Maf.Unlock()
 
