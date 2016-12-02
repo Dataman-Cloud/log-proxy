@@ -17,7 +17,6 @@
         function listEvents() {
             eventBackend.monitor().get(function (data) {
                 self.monitors = data.data.results;
-                console.log(self.monitors)
             })
         }
     }
