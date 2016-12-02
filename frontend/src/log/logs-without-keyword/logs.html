@@ -1,0 +1,6 @@
+<p ng-show="!vm.infiniteLogs.items.length">未查询到日志</p>
+<md-virtual-repeat-container id="vertical-container" style="height: 515px;">
+    <p md-virtual-repeat="log in vm.infiniteLogs" md-on-demand>
+        {/log.message/}
+    </p>
+</md-virtual-repeat-container>

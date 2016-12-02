@@ -1,0 +1,6 @@
+<md-virtual-repeat-container id="vertical-container" style="height: 515px;">
+    <p id="{/log.offset/}" md-virtual-repeat="log in vm.infiniteLogs" md-on-demand
+       ng-class="{'context-highlight' : log.offset == vm.contextQueryObj.offset}">
+        {/log.message/}
+    </p>
+</md-virtual-repeat-container>

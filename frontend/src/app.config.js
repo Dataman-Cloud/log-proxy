@@ -39,17 +39,26 @@
                     nodes: listNode
                 }
             })
-            .state('home.log', {
-                url: '/log',
-                templateUrl: '/src/log/log.html',
-                controller: 'LogCtrl as vm'
+            .state('home.logbase', {
+                url: '/logbase',
+                templateUrl: '/src/log/logbase.html',
+                controller: 'LogBaseCtrl as vm'
             })
-            .state('logcontext', {
-                url: '/ui/logcontext?appid&taskid&path&offset',
-                templateUrl: '/src/log/context.html',
+            .state('home.logbase.logs', {
+                url: '/logs?appid&taskid&path&from&to&keyword',
+                templateUrl: '/src/log/logs/logs.html',
+                controller: 'LogsCtrl as vm'
+            })
+            .state('home.logbase.logWithoutKey', {
+                url: '/logWithoutKey?appid&taskid&path&from&to',
+                templateUrl: '/src/log/logs-without-keyword/logs.html',
+                controller: 'LogWithoutKeyCtrl as vm'
+            })
+            .state('home.logbase.logcontext', {
+                url: '/logcontext?appid&taskid&path&offset',
+                templateUrl: '/src/log/log-context/logs.html',
                 controller: 'LogContextCtrl as vm'
             });
-
 
         /* @ngInject */
         function listApp(monitorBackend) {
