@@ -20,6 +20,7 @@ type Alert struct {
 	Keyword    string `json:"keyword"`
 	Condition  int64  `json:"condition"`
 	Enable     bool   `json:"enable"`
+	Path       string `json:"path"`
 	CreateTime string `json:"createtime"`
 }
 
