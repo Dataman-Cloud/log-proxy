@@ -738,3 +738,17 @@ return
 ]
 }
 ```
+
+GET /v1/search/alert
+
+POST /v1/search/alert -d '{"period":1,"appid":"test","keyword":"keyword","condition":1,"enable":true}'
+
+PUT /v1/search/alert -d '{"id":"x","period":1,"appid":"test","keyword":"keyword","condition":1,"enable":true}'
+
+DELETE /v1/search/alert/:id
+
+GET /v1/search/keyword/history
+
+GET /v1/search/events
+
+GET /v1/search/mointor
