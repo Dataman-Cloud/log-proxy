@@ -2,13 +2,9 @@ package service
 
 import (
 	"encoding/json"
-	"fmt"
-	"strings"
 	"time"
 
 	"github.com/Dataman-Cloud/log-proxy/src/models"
-
-	"gopkg.in/olivere/elastic.v3"
 )
 
 const (
@@ -115,50 +111,6 @@ func (s *SearchService) GetAlertCondition() []models.Alert {
 	}
 
 	return alerts
-}
-
-func (s *SearchService) ExecuteAlert(alert models.Alert) {
-	if !alert.Enable {
-		return
-	}
-	s.Maf.Lock()
-	defer s.Maf.Unlock()
-
-	t, ok := s.AlertFlag[alert.Id]
-	if ok && !time.Now().After(t.Add(+time.Duration(alert.Period)*time.Minute)) {
-		return
-	}
-	var querys []elastic.Query
-	querys = append(querys, elastic.NewQueryStringQuery("message:"+alert.Keyword).AnalyzeWildcard(true))
-	if alert.Path != "" {
-		querys = append(querys, elastic.NewTermQuery("path", alert.Path))
-	}
-
-	query := elastic.NewBoolQuery().
-		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte(fmt.Sprintf("now-%dm", alert.Period)).Lte("now")).
-		Must(querys...)
-
-	clusterName := strings.Split(alert.AppId, "-")[0]
-	result, err := s.ESClient.Search().
-		Index(fmt.Sprintf("dataman-%s-*", clusterName)).
-		Type("dataman-"+alert.AppId).
-		Query(query).
-		Aggregation("tasks", elastic.NewTermsAggregation().Field("taskid").OrderByCountDesc()).
-		Pretty(true).
-		SearchType("count").
-		Do()
-
-	if err != nil {
-		return
-	}
-	s.AlertFlag[alert.Id] = time.Now()
-
-	s.CreateKeywordAlertInfo(models.KeywordAlertHistory{
-		AppId:      alert.AppId,
-		Keyword:    alert.Keyword,
-		Count:      result.Hits.TotalHits,
-		CreateTime: time.Now().Format(time.RFC3339Nano),
-	})
 }
 
 func (s *SearchService) CreateKeywordAlertInfo(info models.KeywordAlertHistory) {

@@ -15,11 +15,8 @@ type Log struct {
 
 type Alert struct {
 	Id         string `json:"id,omitempty"`
-	Period     int64  `json:"period"`
 	AppId      string `json:"appid"`
 	Keyword    string `json:"keyword"`
-	Condition  int64  `json:"condition"`
-	Enable     bool   `json:"enable"`
 	Path       string `json:"path"`
 	CreateTime string `json:"createtime"`
 }
