@@ -14,4 +14,5 @@ type StatusUpdate struct {
 	Host       string    `json:"host"`
 	Ports      []int     `json:"ports"`
 	Version    string    `json:"version"`
+	CreateTime string    `json:"createtime"`
 }

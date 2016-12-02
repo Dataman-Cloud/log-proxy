@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/json"
+	"time"
 
 	"github.com/Dataman-Cloud/log-proxy/src/models"
 )
@@ -9,6 +10,8 @@ import (
 const (
 	EVENT_INDEX = ".dataman-event"
 	EVENT_TYPE  = "dataman-event"
+
+	TASK_FAILED = "TASK_FAILED"
 )
 
 func (s *SearchService) SaveFaildEvent(data []byte) error {
@@ -17,6 +20,11 @@ func (s *SearchService) SaveFaildEvent(data []byte) error {
 	if err != nil {
 		return err
 	}
+
+	if event.TaskStatus != TASK_FAILED {
+		return nil
+	}
+	event.CreateTime = time.Now().Format(time.RFC3339Nano)
 
 	_, err = s.ESClient.Index().
 		Index(EVENT_INDEX).
