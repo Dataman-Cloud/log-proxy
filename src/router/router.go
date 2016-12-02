@@ -41,7 +41,6 @@ func Router(middlewares ...gin.HandlerFunc) *gin.Engine {
 		av1.PUT("/alert", s.UpdateAlert)
 		av1.DELETE("/alert/:id", s.DeleteAlert)
 		av1.GET("/alert/:id", s.GetAlert)
-		av1.GET("/alert/keyword/hostory", s.GetKeywordAlertHistory)
 		av1.GET("/events", s.GetEvents)
 		av1.GET("/mointor", s.GetPrometheus)
 	}
