@@ -31,7 +31,7 @@
 
         function listPath(data) {
             var paramObj = data || {};
-            return $resource(BACKEND_URL_BASE.defaultBase + '/v1/search/paths/:appid/:taskid', {
+            return $resource(BACKEND_URL_BASE.defaultBase + '/v1/search/paths/:appid', {
                 appid: paramObj.appid,
                 taskid: paramObj.taskid,
                 from: paramObj.from,
@@ -59,7 +59,9 @@
                 appid: paramObj.appid,
                 taskid: paramObj.taskid,
                 path: paramObj.path,
-                offset: paramObj.offset
+                offset: paramObj.offset,
+                page: paramObj.page,
+                size: paramObj.size
             });
         }
     }

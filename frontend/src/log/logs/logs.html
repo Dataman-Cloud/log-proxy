@@ -1,0 +1,60 @@
+<div class="result-sum">总计<em>{/vm.count/}</em>条记录</div>
+
+<div class="chart" layout="row" layout-align="space-around start" layout-wrap
+     ng-if="vm.chartOptions.logData.length">
+    <div class="chart-panel" flex="100">
+        <nvd3 options="vm.chartOptions.logOptions" data="vm.chartOptions.logData"></nvd3>
+    </div>
+</div>
+
+<md-table-container ng-hide="!vm.logs.length">
+    <table md-table id="user-list-table">
+        <thead md-head>
+        <tr md-row>
+            <th md-column style="width: 60px;"></th>
+            <th md-column style="width: 160px;">时间</th>
+            <th md-column>信息</th>
+            <th md-column style="width: 100px;">上下文</th>
+        </tr>
+        </thead>
+        <tbody md-body>
+        <tr md-row
+            ng-repeat-start="log in vm.logs track by $index">
+            <td md-cell>
+                <a ng-click="vm.logDisplaySet[$index] = !vm.logDisplaySet[$index]">
+                    <i class="fa"
+                       ng-class="{'fa-chevron-down':vm.logDisplaySet[$index], 'fa-chevron-right':!vm.logDisplaySet[$index]}"></i>
+                </a>
+            </td>
+            <td md-cell>
+                {/log.logtime | date: 'yyyy-MM-dd HH:mm:ss'/}
+            </td>
+            <td md-cell>
+                <div ng-bind-html="log.message"></div>
+            </td>
+            <td md-cell>
+                <a ui-sref="home.logbase.logcontext({appid: log.appid, taskid: log.taskid, path: log.path, offset: log.offset})">上下文</a>
+            </td>
+        </tr>
+        <tr ng-repeat-end ng-hide="!vm.logDisplaySet[$index]">
+            <td colspan="3">
+                <div class="json-detail">
+                    <dl layout="row" ng-repeat="(key, value) in log track by $index">
+                        <dt>{/key/}</dt>
+                        <dd ng-bind-html="value"></dd>
+                    </dl>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <md-table-pagination md-limit="vm.query.limit"
+                         md-label="{page: '页:', rowsPerPage: '每页:', of: 'of'}"
+                         md-limit-options="vm.limitOptions"
+                         md-boundary-links="vm.limitOptions.boundaryLinks"
+                         md-page="vm.query.page"
+                         md-total="{/vm.count/}"
+                         md-on-paginate="vm.onPaginate"
+                         md-page-select="vm.options.pageSelect">
+    </md-table-pagination>
+</md-table-container>

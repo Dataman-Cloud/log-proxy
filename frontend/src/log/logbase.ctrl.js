@@ -1,43 +1,20 @@
 (function () {
     'use strict';
     angular.module('app')
-        .controller('LogCtrl', LogCtrl);
+        .controller('LogBaseCtrl', LogBaseCtrl);
     /* @ngInject */
-    function LogCtrl(logBackend, moment, logChart) {
+    function LogBaseCtrl(moment, $state, logBackend) {
         var self = this;
-        var tempLogQuery = {};
 
-        self.chartOptions = logChart.Options();
-
-        //md-table parameter
-        self.options = {
-            rowSelection: true,
-            decapitate: false,
-            boundaryLinks: false,
-            limitSelect: true,
-            pageSelect: true
-        };
-
-        self.defaultLimit = 50;
-        self.limitOptions = [50, 100, 200];
-        self.query = {
-            limit: 50,
-            page: 1
-        };
+        self.tempLogQuery = {};
 
         self.timePeriod = 120;
         self.curTimestamp = moment().unix() * 1000;
         self.fromTimestamp = moment().subtract(self.timePeriod, 'minutes').unix() * 1000;
         self.selectedTabIndex = 0;
-        self.logDisplaySet = {};
-        self.count = 0;
-        self.logs = [];
-        self.hasLogContext = false;
 
-        self.onPaginate = onPaginate;
         self.periodChange = periodChange;
         self.selectAppChange = selectAppChange;
-        self.selectTasksChange = selectTasksChange;
         self.loadApps = loadApps;
         self.loadTasks = loadTasks;
         self.loadPaths = loadPaths;
@@ -49,23 +26,6 @@
 
         }
 
-        function onPaginate(page, limit) {
-            self.logDisplaySet = {};
-            logBackend.searchLogs({
-                from: tempLogQuery.from,
-                to: tempLogQuery.to,
-                appid: tempLogQuery.appid,
-                taskid: tempLogQuery.taskid,
-                path: tempLogQuery.path,
-                keyword: tempLogQuery.keyword,
-                page: page,
-                size: limit
-            }).get(function (data) {
-                self.logs = data.data.results;
-                self.count = data.data.count;
-            })
-        }
-
         function periodChange(period) {
             self.selectApp = '';
             self.curTimestamp = moment().unix() * 1000;
@@ -74,10 +34,7 @@
 
         function selectAppChange(app) {
             self.selectTasks = '';
-        }
-
-        function selectTasksChange(tasks) {
-            self.selectPaths = [];
+            self.selectPaths = '';
         }
 
         function loadApps() {
@@ -123,40 +80,26 @@
         }
 
         function searchLog() {
-            self.logDisplaySet = {};
-            self.query.page = 1;
-            self.query.limit = 50;
-
-            tempLogQuery = {
-                from: self.fromTimestamp,
-                to: self.curTimestamp,
-                appid: self.selectApp,
-                taskid: self.selectTasks,
-                path: self.selectPaths,
-                keyword: self.keyword,
-                page: 1,
-                size: 50
-            };
-
             checkTimeRange();
 
-            self.hasLogContext = !!self.keyword;
-
-            logBackend.searchLogs({
-                from: self.fromTimestamp,
-                to: self.curTimestamp,
-                appid: self.selectApp,
-                taskid: self.selectTasks,
-                path: self.selectPaths,
-                keyword: self.keyword,
-                page: 1,
-                size: 50
-            }).get(function (data) {
-                self.logs = data.data.results;
-                self.count = data.data.count;
-
-                self.chartOptions.pushData(data.data.history);
-            })
+            if (self.keyword) {
+                $state.go('home.logbase.logs', {
+                    from: self.fromTimestamp,
+                    to: self.curTimestamp,
+                    appid: self.selectApp,
+                    taskid: self.selectTasks,
+                    path: self.selectPaths,
+                    keyword: self.keyword
+                });
+            } else {
+                $state.go('home.logbase.logWithoutKey', {
+                    from: self.fromTimestamp,
+                    to: self.curTimestamp,
+                    appid: self.selectApp,
+                    taskid: self.selectTasks,
+                    path: self.selectPaths
+                });
+            }
         }
     }
 })();
