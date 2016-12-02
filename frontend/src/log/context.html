@@ -1,4 +1,4 @@
 <p id="{/$index/}" ng-repeat="context in vm.logContexts track by $index"
    ng-class="{'context-highlight' : context.offset == vm.contextQueryObj.offset}">
-    {/context/}
+    {/context.message/}
 </p>
