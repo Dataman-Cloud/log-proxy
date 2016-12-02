@@ -1,0 +1,30 @@
+<div layout="row" layout-align="space-between start">
+    <div flex class="panel">
+        <form layout="column" name="staticForm">
+            <div flex class="form-item">
+                <label>应用名称</label>
+                <input type="text" ng-model="vm.form.appid" data-required="required">
+            </div>
+            <div flex class="form-item">
+                <label>关键字</label>
+                <input type="text" ng-model="vm.form.keyword" data-required="required">
+            </div>
+            <div flex class="form-item">
+                <label>来源</label>
+                <input type="text" ng-model="vm.form.path">
+            </div>
+            <div class="form-buttons-footer" layout="column">
+                <md-button class="md-raised md-primary" style="width: 100px;"
+                           ng-disabled="staticForm.$invalid" ng-show="vm.target === 'create'"
+                           ng-click="vm.create()">
+                    创建
+                </md-button>
+                <md-button class="md-raised md-primary" style="width: 100px;"
+                           ng-disabled="staticForm.$invalid" ng-show="vm.target === 'update'"
+                           ng-click="vm.update()">
+                    更新
+                </md-button>
+            </div>
+        </form>
+    </div>
+</div>
