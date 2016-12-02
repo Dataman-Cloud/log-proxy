@@ -671,11 +671,11 @@ curl -XGET http://localhost:5098/v1/search/tasks/test
 ```
 
 ### 根据应用实例获取所有日志来源
-`GET /v1/search/paths/:appid/:taskid
+`GET /v1/search/paths/:appid
 
 <span id="itm1">For example:</span>
 ```
-curl -XGET http://localhost:5098/v1/search/paths/appid/taskid
+curl -XGET http://localhost:5098/v1/search/paths/appid
 ```
 
 - URL Params: appid
