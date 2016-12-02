@@ -20,7 +20,7 @@ const (
 )
 
 func (s *SearchService) CreateAlert(alert *models.Alert) error {
-	alert.CreateTime = time.Now()
+	alert.CreateTime = time.Now().Format(time.RFC3339Nano)
 	_, err := s.ESClient.Index().
 		Index(ALERT_INDEX).
 		Type(ALERT_TYPE).
@@ -128,12 +128,12 @@ func (s *SearchService) ExecuteAlert(alert models.Alert) {
 		AppId:      alert.AppId,
 		Keyword:    alert.Keyword,
 		Count:      result.Hits.TotalHits,
-		CreateTime: time.Now(),
+		CreateTime: time.Now().Format(time.RFC3339Nano),
 	})
 }
 
 func (s *SearchService) CreateKeywordAlertInfo(info models.KeywordAlertHistory) {
-	info.CreateTime = time.Now()
+	info.CreateTime = time.Now().Format(time.RFC3339Nano)
 	s.ESClient.Index().
 		Index(ALERT_HISTORY_INDEX).
 		Type(ALERT_HISTORY_TYPE).
