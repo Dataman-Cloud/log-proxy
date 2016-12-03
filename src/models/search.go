@@ -20,11 +20,3 @@ type Alert struct {
 	Path       string `json:"path"`
 	CreateTime string `json:"createtime"`
 }
-
-type KeywordAlertHistory struct {
-	Id         string `json:"id,omitempty"`
-	AppId      string `json:"appid"`
-	Keyword    string `json:"keyword"`
-	Count      int64  `json:"count"`
-	CreateTime string `json:"createtime"`
-}

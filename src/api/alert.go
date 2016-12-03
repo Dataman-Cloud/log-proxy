@@ -102,13 +102,3 @@ func (s *search) UpdateAlert(ctx *gin.Context) {
 
 	utils.Ok(ctx, "update success")
 }
-
-func (s *search) GetKeywordAlertHistory(ctx *gin.Context) {
-	result, err := s.Service.GetKeywordAlertHistory(ctx.MustGet("page").(models.Page))
-	if err != nil {
-		utils.ErrorResponse(ctx, utils.NewError(INDEX_ERROR, err))
-		return
-	}
-
-	utils.Ok(ctx, result)
-}

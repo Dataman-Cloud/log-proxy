@@ -34,7 +34,8 @@ func (s *SearchService) DeleteAlert(id string) error {
 	return err
 }
 
-func (s *SearchService) GetAlerts(page models.Page) ([]models.Alert, error) {
+func (s *SearchService) GetAlerts(page models.Page) (map[string]interface{}, error) {
+	m := make(map[string]interface{})
 	var results []models.Alert
 
 	result, err := s.ESClient.Search().
@@ -45,7 +46,7 @@ func (s *SearchService) GetAlerts(page models.Page) ([]models.Alert, error) {
 		Pretty(true).
 		Do()
 	if err != nil {
-		return results, err
+		return nil, err
 	}
 
 	for _, hit := range result.Hits.Hits {
@@ -57,7 +58,10 @@ func (s *SearchService) GetAlerts(page models.Page) ([]models.Alert, error) {
 		results = append(results, data)
 	}
 
-	return results, nil
+	m["results"] = results
+	m["count"] = result.Hits.TotalHits
+
+	return m, nil
 }
 
 func (s *SearchService) GetAlert(id string) (models.Alert, error) {
@@ -111,37 +115,4 @@ func (s *SearchService) GetAlertCondition() []models.Alert {
 	}
 
 	return alerts
-}
-
-func (s *SearchService) CreateKeywordAlertInfo(info models.KeywordAlertHistory) {
-	info.CreateTime = time.Now().Format(time.RFC3339Nano)
-	s.ESClient.Index().
-		Index(ALERT_HISTORY_INDEX).
-		Type(ALERT_HISTORY_TYPE).
-		BodyJson(info).
-		Do()
-}
-
-func (s *SearchService) GetKeywordAlertHistory(page models.Page) (map[string]interface{}, error) {
-	result, err := s.ESClient.Search().
-		Index(ALERT_HISTORY_INDEX).
-		Type(ALERT_HISTORY_TYPE).
-		From(page.PageFrom).
-		Size(page.PageSize).
-		Pretty(true).
-		Do()
-	if err != nil {
-		return nil, err
-	}
-
-	var results []models.KeywordAlertHistory
-	for _, hit := range result.Hits.Hits {
-		var kh models.KeywordAlertHistory
-		json.Unmarshal(*hit.Source, &kh)
-		results = append(results, kh)
-	}
-	return map[string]interface{}{
-		"results": results,
-		"count":   result.Hits.TotalHits,
-	}, nil
 }

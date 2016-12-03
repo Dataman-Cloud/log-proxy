@@ -33,3 +33,8 @@ func ReadRequestBody(request *http.Request) ([]byte, error) {
 	defer request.Body.Close()
 	return ioutil.ReadAll(request.Body)
 }
+
+func ReadResponseBody(resp *http.Response) ([]byte, error) {
+	defer resp.Body.Close()
+	return ioutil.ReadAll(resp.Body)
+}
