@@ -169,26 +169,14 @@ func (s *SearchService) Search(appid, taskid, source, keyword string, page model
 		querys = append(querys, elastic.NewQueryStringQuery("message:"+keyword).AnalyzeWildcard(true))
 	}
 
-	interval := "1m"
-	f, fok := page.RangeFrom.(int64)
-	t, tok := page.RangeTo.(int64)
-	if fok && tok {
-		interval = fmt.Sprintf("%dms", (t-f)/12)
-	}
-
 	bquery := elastic.NewBoolQuery().
 		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte(page.RangeFrom).Lte(page.RangeTo).Format("epoch_millis")).
 		Must(querys...)
 
 	result, err := s.ESClient.Search().
-		Index("dataman-"+strings.Split(appid, "-")[0]+"-"+utils.ParseDate(page.RangeFrom, page.RangeTo)).
-		Type("dataman-"+appid).
+		Index("dataman-" + strings.Split(appid, "-")[0] + "-" + utils.ParseDate(page.RangeFrom, page.RangeTo)).
+		Type("dataman-" + appid).
 		Query(bquery).
-		Aggregation("history", elastic.NewDateHistogramAggregation().
-			Field("logtime.timestamp").
-			Interval(interval).
-			MinDocCount(0).
-			ExtendedBounds(page.RangeFrom, page.RangeTo)).
 		Highlight(elastic.NewHighlight().Field("message").PreTags(`@dataman-highlighted-field@`).PostTags(`@/dataman-highlighted-field@`)).
 		From(page.PageFrom).Size(page.PageSize).Pretty(true).IgnoreUnavailable(true).Do()
 
@@ -210,17 +198,6 @@ func (s *SearchService) Search(appid, taskid, source, keyword string, page model
 	}
 	data["results"] = results
 	data["count"] = result.Hits.TotalHits
-
-	var history []map[string]interface{}
-	agg, _ := result.Aggregations.DateHistogram("history")
-	for _, bucket := range agg.Buckets {
-		history = append(history, map[string]interface{}{
-			"key":         bucket.Key,
-			"KeyAsString": bucket.KeyAsString,
-			"DocCount":    bucket.DocCount,
-		})
-	}
-	data["history"] = history
 
 	return data, nil
 }
