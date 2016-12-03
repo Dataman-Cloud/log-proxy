@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/Dataman-Cloud/log-proxy/src/backends"
@@ -94,7 +93,7 @@ func (m *monitor) UpdateSilence(ctx *gin.Context) {
 		return
 	}
 
-	err := query.DeleteSilence(fmt.Sprint(silence["id"]))
+	err := query.DeleteSilence(ctx.Param("id"))
 	if err != nil {
 		utils.ErrorResponse(ctx, err)
 		return
