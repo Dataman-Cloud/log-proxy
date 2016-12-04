@@ -2,9 +2,12 @@ package service
 
 import (
 	"encoding/json"
+	"net/http"
 	"time"
 
 	"github.com/Dataman-Cloud/log-proxy/src/models"
+
+	"gopkg.in/olivere/elastic.v3"
 )
 
 const (
@@ -48,6 +51,11 @@ func (s *SearchService) GetAlerts(page models.Page) (map[string]interface{}, err
 		Sort("createtime.timestamp", true).
 		Pretty(true).
 		Do()
+
+	if err.(*elastic.Error).Status == http.StatusNotFound {
+		return nil, nil
+	}
+
 	if err != nil {
 		return nil, err
 	}
@@ -75,6 +83,11 @@ func (s *SearchService) GetAlert(id string) (models.Alert, error) {
 		Type(ALERT_TYPE).
 		Id(id).
 		Do()
+
+	if err.(*elastic.Error).Status == http.StatusNotFound {
+		return alert, nil
+	}
+
 	if err != nil {
 		return alert, err
 	}
@@ -106,6 +119,11 @@ func (s *SearchService) GetAlertCondition() []models.Alert {
 		Type("dataman-alerts").
 		Pretty(true).
 		Do()
+
+	if err.(*elastic.Error).Status == http.StatusNotFound {
+		return nil
+	}
+
 	if err != nil {
 		return alerts
 	}

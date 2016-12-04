@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"html"
+	"net/http"
 	"strconv"
 	"strings"
 	"sync"
@@ -62,6 +63,11 @@ func (s *SearchService) Applications(page models.Page) (map[string]int64, error)
 			OrderByCountDesc()).
 		Pretty(true).
 		Do()
+
+	if err.(*elastic.Error).Status == http.StatusNotFound {
+		return nil, nil
+	}
+
 	if err != nil {
 		log.Errorf("get applications error: %v", err)
 		return apps, err
@@ -96,6 +102,10 @@ func (s *SearchService) Tasks(appName string, page models.Page) (map[string]int6
 			OrderByCountDesc()).
 		Pretty(true).
 		Do()
+
+	if err.(*elastic.Error).Status == http.StatusNotFound {
+		return nil, nil
+	}
 
 	if err != nil {
 		log.Errorf("get app %s tasks error: %v", appName, err)
@@ -138,6 +148,10 @@ func (s *SearchService) Paths(appName, taskId string, page models.Page) (map[str
 		Pretty(true).
 		Do()
 
+	if err.(*elastic.Error).Status == http.StatusNotFound {
+		return nil, nil
+	}
+
 	if err != nil {
 		log.Errorf("get app %s paths error: %v", appName, err)
 		return paths, err
@@ -179,6 +193,10 @@ func (s *SearchService) Search(appid, taskid, source, keyword string, page model
 		Query(bquery).
 		Highlight(elastic.NewHighlight().Field("message").PreTags(`@dataman-highlighted-field@`).PostTags(`@/dataman-highlighted-field@`)).
 		From(page.PageFrom).Size(page.PageSize).Pretty(true).IgnoreUnavailable(true).Do()
+
+	if err.(*elastic.Error).Status == http.StatusNotFound {
+		return nil, nil
+	}
 
 	if err != nil {
 		return nil, err
@@ -224,6 +242,10 @@ func (s *SearchService) Context(appid, taskid, source, timestamp string, page mo
 			Pretty(true).
 			Do()
 
+		if err.(*elastic.Error).Status == http.StatusNotFound {
+			return nil, nil
+		}
+
 		if err != nil {
 			return nil, err
 		}
@@ -248,6 +270,10 @@ func (s *SearchService) Context(appid, taskid, source, timestamp string, page mo
 		Size(page.PageSize).
 		Pretty(true).
 		Do()
+
+	if err.(*elastic.Error).Status == http.StatusNotFound {
+		return nil, nil
+	}
 
 	if err != nil {
 		return nil, err
