@@ -30,33 +30,52 @@
                     "type": "string",
                     "index": "not_analyzed"
                 },
-                "container_label_APP_ID": {
+                "generatorURL": {
                     "type": "string",
                     "index": "not_analyzed"
                 },
-                "container_label_VCLUSTER": {
+                "status": {
                     "type": "string",
                     "index": "not_analyzed"
                 },
-                "id": {
-                    "type": "string",
-                    "index": "not_analyzed"
+		"annotations": {
+		    "properties": {
+			"summary": {
+			    "type": "string"
+			},
+			"description": {
+			    "type": "string"
+			}
+		    }
+		},
+                "labels": {
+                    "type": "string"
                 },
-                "instance": {
-                    "type": "string",
-                    "index": "not_analyzed"
+                "startsAt": {
+                    "type": "multi_field",
+                    "fields": {
+                        "timestamp": {
+                            "type": "date",
+			    "format": "strict_date_optional_time||epoch_millis"
+                        },
+                        "sort": {
+                            "type": "string",
+                            "index": "not_analyzed"
+                        }
+                    }
                 },
-                "job": {
-                    "type": "string",
-                    "index": "not_analyzed"
-                },
-                "name": {
-                    "type": "string",
-                    "index": "not_analyzed"
-                },
-                "critical": {
-                    "type": "string",
-                    "index": "not_analyzed"
+                "endsAt": {
+                    "type": "multi_field",
+                    "fields": {
+                        "timestamp": {
+                            "type": "date",
+			    "format": "strict_date_optional_time||epoch_millis"
+                        },
+                        "sort": {
+                            "type": "string",
+                            "index": "not_analyzed"
+                        }
+                    }
                 },
                 "createtime": {
                     "type": "multi_field",
