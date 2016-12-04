@@ -36,7 +36,7 @@ func (s *SearchService) GetPrometheus(page models.Page) (map[string]interface{},
 		Pretty(true).
 		Do()
 
-	if err.(*elastic.Error).Status == http.StatusNotFound {
+	if err != nil && err.(*elastic.Error).Status == http.StatusNotFound {
 		return nil, nil
 	}
 

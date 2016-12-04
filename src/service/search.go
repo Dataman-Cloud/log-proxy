@@ -31,7 +31,7 @@ type SearchResult struct {
 func NewEsService() *SearchService {
 	var ofs []elastic.ClientOptionFunc
 	ofs = append(ofs, elastic.SetURL(strings.Split(config.GetConfig().ES_URL, ",")...))
-	ofs = append(ofs, elastic.SetMaxRetries(10))
+	ofs = append(ofs, elastic.SetMaxRetries(3))
 	if config.GetConfig().SEARCH_DEBUG {
 		ofs = append(ofs, elastic.SetTraceLog(log.StandardLogger()))
 	}
@@ -64,7 +64,7 @@ func (s *SearchService) Applications(page models.Page) (map[string]int64, error)
 		Pretty(true).
 		Do()
 
-	if err.(*elastic.Error).Status == http.StatusNotFound {
+	if err != nil && err.(*elastic.Error).Status == http.StatusNotFound {
 		return nil, nil
 	}
 
@@ -103,7 +103,7 @@ func (s *SearchService) Tasks(appName string, page models.Page) (map[string]int6
 		Pretty(true).
 		Do()
 
-	if err.(*elastic.Error).Status == http.StatusNotFound {
+	if err != nil && err.(*elastic.Error).Status == http.StatusNotFound {
 		return nil, nil
 	}
 
@@ -135,7 +135,6 @@ func (s *SearchService) Paths(appName, taskId string, page models.Page) (map[str
 		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte(page.RangeFrom).Lte(page.RangeTo).Format("epoch_millis")).
 		Must(querys...)
 
-	//Index("dataman-*").
 	result, err := s.ESClient.Search().
 		Index("dataman-"+strings.Split(appName, "-")[0]+"-"+utils.ParseDate(page.RangeFrom, page.RangeTo)).
 		Type("dataman-"+appName).
@@ -148,7 +147,7 @@ func (s *SearchService) Paths(appName, taskId string, page models.Page) (map[str
 		Pretty(true).
 		Do()
 
-	if err.(*elastic.Error).Status == http.StatusNotFound {
+	if err != nil && err.(*elastic.Error).Status == http.StatusNotFound {
 		return nil, nil
 	}
 
@@ -194,7 +193,7 @@ func (s *SearchService) Search(appid, taskid, source, keyword string, page model
 		Highlight(elastic.NewHighlight().Field("message").PreTags(`@dataman-highlighted-field@`).PostTags(`@/dataman-highlighted-field@`)).
 		From(page.PageFrom).Size(page.PageSize).Pretty(true).IgnoreUnavailable(true).Do()
 
-	if err.(*elastic.Error).Status == http.StatusNotFound {
+	if err != nil && err.(*elastic.Error).Status == http.StatusNotFound {
 		return nil, nil
 	}
 
@@ -242,7 +241,7 @@ func (s *SearchService) Context(appid, taskid, source, timestamp string, page mo
 			Pretty(true).
 			Do()
 
-		if err.(*elastic.Error).Status == http.StatusNotFound {
+		if err != nil && err.(*elastic.Error).Status == http.StatusNotFound {
 			return nil, nil
 		}
 
@@ -271,7 +270,7 @@ func (s *SearchService) Context(appid, taskid, source, timestamp string, page mo
 		Pretty(true).
 		Do()
 
-	if err.(*elastic.Error).Status == http.StatusNotFound {
+	if err != nil && err.(*elastic.Error).Status == http.StatusNotFound {
 		return nil, nil
 	}
 

@@ -48,6 +48,10 @@ func GetSearch() *search {
 	}
 	prometheus.MustRegister(s.Counter)
 
+	if s.Service == nil {
+		return s
+	}
+
 	alerts, err := s.Service.GetAlerts(models.Page{
 		PageFrom: 0,
 		PageSize: 0,
