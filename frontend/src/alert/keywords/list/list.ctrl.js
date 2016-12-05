@@ -4,28 +4,28 @@
 (function () {
     'use strict';
     angular.module('app')
-        .controller('AlertListCtrl', AlertListCtrl);
+        .controller('AlertKeywordsCtrl', AlertKeywordsCtrl);
     /* @ngInject */
-    function AlertListCtrl(alertBackend, alertcurd) {
+    function AlertKeywordsCtrl(alertBackend, alertcurd) {
         var self = this;
         self.alerts = [];
 
-        self.deleteAlert = deleteAlert;
+        self.deleteKeyword = deleteKeyword;
 
         activate();
 
         function activate() {
-            listAlert()
+            listKeyword()
         }
-        
-        function listAlert() {
+
+        function listKeyword() {
             alertBackend.alerts().get(function (data) {
-                self.alerts = data.data
+                self.keywords = data.data
             })
         }
 
-        function deleteAlert(id) {
-            alertcurd.deleteAlert(id)
+        function deleteKeyword(id) {
+            alertcurd.deleteKeyword(id)
         }
 
     }

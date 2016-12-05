@@ -2,9 +2,9 @@
     <h2>日志告警关键词列表</h2>
     <div class="panel">
         <div layout="row" layout-align="end start">
-            <md-button class="md-raised md-primary" ui-sref="home.alertcreate">
-            新建
-        </md-button>
+            <md-button class="md-raised md-primary" ui-sref="home.alertKeywordCreate">
+                新建
+            </md-button>
         </div>
         <md-table-container>
             <table md-table id="user-list-table">
@@ -18,17 +18,18 @@
                 </tr>
                 </thead>
                 <tbody md-body>
-                <tr md-row ng-repeat="alert in vm.alerts track by $index">
-                    <td md-cell>{/alert.appid/}</td>
-                    <td md-cell>{/alert.keyword/}</td>
-                    <td md-cell>{/alert.createtime | date:" yyyy-MM-dd HH:mm:ss"/}</td>
-                    <td md-cell>{/alert.path/}</td>
+                <tr md-row ng-repeat="keyword in vm.keywords track by $index">
+                    <td md-cell>{/keyword.appid/}</td>
+                    <td md-cell>{/keyword.keyword/}</td>
+                    <td md-cell>{/keyword.createtime | date:" yyyy-MM-dd HH:mm:ss"/}</td>
+                    <td md-cell>{/keyword.path/}</td>
                     <td md-cell>
                         <div class="action" layout="row">
-                            <md-button aria-label="delete" class="md-raised" data-ng-click="vm.deleteAlert(alert.id)">删除
+                            <md-button aria-label="delete" class="md-raised" data-ng-click="vm.deleteKeyword(keyword.id)">
+                                删除
                             </md-button>
                             <md-button aria-label="update" class="md-raised"
-                                       data-ui-sref="home.alertupdate({id: alert.id})">更新
+                                       data-ui-sref="home.alertKeywordUpdate({id: keyword.id})">更新
                             </md-button>
                         </div>
                     </td>

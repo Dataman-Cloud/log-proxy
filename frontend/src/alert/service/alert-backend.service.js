@@ -10,7 +10,8 @@
     function alertBackend($resource) {
         return {
             alerts: alerts,
-            alert: alert
+            alert: alert,
+            history : history
         };
 
         function alerts() {
@@ -21,6 +22,10 @@
 
         function alert(id) {
             return $resource(BACKEND_URL_BASE.defaultBase + '/v1/monitor/alert/:id', {id: id});
+        }
+
+        function history() {
+            return $resource(BACKEND_URL_BASE.defaultBase + '/v1/monitor/prometheus');
         }
     }
 })();

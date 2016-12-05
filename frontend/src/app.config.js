@@ -59,9 +59,9 @@
                 templateUrl: '/src/log/log-context/logs.html',
                 controller: 'LogContextCtrl as vm'
             })
-            .state('home.alertcreate', {
-                url: '/alert-create',
-                templateUrl: '/src/alert/create-update/create-update.html',
+            .state('home.alertKeywordCreate', {
+                url: '/alertKeywordCreate',
+                templateUrl: '/src/alert/keywords/create-update/create-update.html',
                 controller: 'CreateAlertCtrl as vm',
                 resolve: {
                     target: function () {
@@ -72,9 +72,9 @@
                     }
                 }
             })
-            .state('home.alertupdate', {
-                url: '/alert-update/:id',
-                templateUrl: '/src/alert/create-update/create-update.html',
+            .state('home.alertKeywordUpdate', {
+                url: '/alertKeywordUpdate/:id',
+                templateUrl: '/src/alert/keywords/create-update/create-update.html',
                 controller: 'CreateAlertCtrl as vm',
                 resolve: {
                     target: function () {
@@ -83,15 +83,15 @@
                     alert: getAlert
                 }
             })
-            .state('home.alertlist', {
-                url: '/alertlist',
-                templateUrl: '/src/alert/list/list.html',
-                controller: 'AlertListCtrl as vm'
+            .state('home.alertkeyword', {
+                url: '/alertkeyword',
+                templateUrl: '/src/alert/keywords/list/list.html',
+                controller: 'AlertKeywordsCtrl as vm'
             })
-            .state('home.eventmonitor', {
-                url: '/eventmonitor',
-                templateUrl: '/src/event/monitor/list/list.html',
-                controller: 'EventMonitorCtrl as vm'
+            .state('home.alerthistory', {
+                url: '/alerthistory',
+                templateUrl: '/src/alert/history/list/list.html',
+                controller: 'AlertHistoriesCtrl as vm'
             });
 
         /* @ngInject */
