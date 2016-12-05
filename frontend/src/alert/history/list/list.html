@@ -14,13 +14,13 @@
                 </tr>
                 </thead>
                 <tbody md-body>
-                <tr md-row ng-repeat="monitor in vm.monitors track by $index">
-                    <td md-cell>{/monitor.alertname/}</td>
-                    <td md-cell>{/monitor.container_label_APP_ID/}</td>
-                    <td md-cell>{/monitor.instance/}</td>
-                    <td md-cell>{/monitor.severity/}</td>
-                    <td md-cell>{/monitor.instance/}</td>
-                    <td md-cell>{/monitor.instance/}</td>
+                <tr md-row ng-repeat="history in vm.histories track by $index">
+                    <td md-cell>{/history.alertname/}</td>
+                    <td md-cell>{/history.container_label_APP_ID/}</td>
+                    <td md-cell>{/history.instance/}</td>
+                    <td md-cell>{/history.severity/}</td>
+                    <td md-cell>{/history.instance/}</td>
+                    <td md-cell>{/history.instance/}</td>
                 </tr>
                 </tbody>
             </table>

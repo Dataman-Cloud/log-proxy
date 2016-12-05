@@ -26,14 +26,14 @@
 
         function create() {
             alertBackend.alerts().save(self.form, function (data) {
-                $state.go('home.alertlist', null, {reload: true})
+                $state.go('home.alertkeyword', null, {reload: true})
             });
         }
 
         function update() {
             self.form.id = alert.id;
             alertBackend.alerts().update(self.form, function (data) {
-                $state.go('home.alertlist', null, {reload: true})
+                $state.go('home.alertkeyword', null, {reload: true})
             });
         }
     }
