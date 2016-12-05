@@ -145,3 +145,13 @@ func (s *search) GetPrometheus(ctx *gin.Context) {
 
 	utils.Ok(ctx, result)
 }
+
+func (s *search) GetPrometheu(ctx *gin.Context) {
+	result, err := s.Service.GetPrometheu(ctx.Param("id"))
+	if err != nil {
+		utils.ErrorResponse(ctx, utils.NewError(GET_PROMETHEUS_ERROR, err))
+		return
+	}
+
+	utils.Ok(ctx, result)
+}
