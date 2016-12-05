@@ -45,7 +45,7 @@
                 <md-select placeholder="选择实例" ng-model="vm.selectTasks" md-on-open="vm.loadTasks()"
                            ng-required="!vm.keyword"
                            ng-disabled="!vm.selectApp">
-                    <md-option value="">空</md-option>
+                    <md-option value="">未选</md-option>
                     <md-option ng-value="key" ng-repeat="(key, value) in vm.tasks">{/key/}</md-option>
                 </md-select>
             </div>
@@ -54,7 +54,7 @@
                 <md-select placeholder="选择来源" ng-model="vm.selectPaths" md-on-open="vm.loadPaths()"
                            ng-required="!vm.keyword"
                            ng-disabled="!vm.selectApp">
-                    <md-option value="">空</md-option>
+                    <md-option value="">未选</md-option>
                     <md-option ng-value="key" ng-repeat="(key, value) in vm.paths">{/key/}</md-option>
                 </md-select>
             </div>

@@ -3,7 +3,7 @@
     angular.module('app')
         .controller('LogsCtrl', LogsCtrl);
     /* @ngInject */
-    function LogsCtrl(logBackend, logChart, $stateParams) {
+    function LogsCtrl(logBackend, $stateParams) {
         var tempLogQuery = {
             from: $stateParams.from,
             to: $stateParams.to,
@@ -16,7 +16,7 @@
         };
         var self = this;
 
-        self.chartOptions = logChart.Options();
+        self.count = null; //log total
 
         //md-table parameter
         self.options = {
@@ -67,7 +67,6 @@
             logBackend.searchLogs(tempLogQuery).get(function (data) {
                 self.logs = data.data.results;
                 self.count = data.data.count;
-                self.chartOptions.pushData(data.data.history);
             })
         }
     }

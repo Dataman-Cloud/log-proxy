@@ -1,10 +1,8 @@
-<div class="result-sum">总计<em>{/vm.count/}</em>条记录</div>
-
-<div class="chart" layout="row" layout-align="space-around start" layout-wrap
-     ng-if="vm.chartOptions.logData.length">
-    <div class="chart-panel" flex="100">
-        <nvd3 options="vm.chartOptions.logOptions" data="vm.chartOptions.logData"></nvd3>
-    </div>
+<div class="result-sum">
+    <span ng-show="vm.count === null">加载中...</span>
+    <span ng-hide="vm.count === null">
+        总计<em>{/vm.count/}</em>条记录
+    </span>
 </div>
 
 <md-table-container ng-hide="!vm.logs.length">
