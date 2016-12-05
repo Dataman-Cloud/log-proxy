@@ -16,8 +16,6 @@
         };
         var self = this;
 
-        self.count = null; //log total
-
         //md-table parameter
         self.options = {
             rowSelection: true,
@@ -64,7 +62,10 @@
         }
 
         function getLogs() {
+            self.loadingFlag = true;
+
             logBackend.searchLogs(tempLogQuery).get(function (data) {
+                self.loadingFlag = false;
                 self.logs = data.data.results;
                 self.count = data.data.count;
             })

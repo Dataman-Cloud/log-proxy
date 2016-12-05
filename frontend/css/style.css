@@ -358,3 +358,14 @@ textarea {
 .context-highlight {
     background-color: yellowgreen;
 }
+.search-keyword {
+    background-color: rgba(0,0,0,0.05);
+    padding: 5px;
+}
+.search-keyword p {
+    margin-right: 24px;
+    display: inline-block;
+}
+.result-sum {
+    margin: 10px 5px;
+}
