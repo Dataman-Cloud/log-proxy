@@ -1,3 +1,10 @@
+<div>
+    日志上下文 搜索条件:
+    <p ng-show="$stateParams.appid">应用: {/$stateParams.appid/}</p>
+    <p ng-show="$stateParams.taskid">实例: {/$stateParams.taskid/}</p>
+    <p ng-show="$stateParams.path">来源: {/$stateParams.path/}</p>
+</div>
+
 <md-virtual-repeat-container id="vertical-container" style="height: 515px;">
     <p id="{/log.offset/}" md-virtual-repeat="log in vm.infiniteLogs" md-on-demand
        ng-class="{'context-highlight' : log.offset == vm.contextQueryObj.offset}">
