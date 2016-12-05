@@ -1,17 +1,16 @@
-<div>
-    日志 搜索条件:
-    <p ng-show="$stateParams.appid">应用: {/$stateParams.appid/}</p>
-    <p ng-show="$stateParams.taskid">实例: {/$stateParams.taskid/}</p>
-    <p ng-show="$stateParams.path">来源: {/$stateParams.path/}</p>
-    <p ng-show="$stateParams.keyword">关键词: {/$stateParams.keyword/}</p>
-    <p ng-show="$stateParams.from">起始时间: {/$stateParams.from | date: 'yyyy-MM-dd HH:mm'/}</p>
-    <p ng-show="$stateParams.to">结束时间: {/$stateParams.to | date: 'yyyy-MM-dd HH:mm'/}</p>
+<div class="search-keyword">
+    <p ng-show="$stateParams.appid">应用: <em>{/$stateParams.appid/}</em></p>
+    <p ng-show="$stateParams.taskid">实例: <em>{/$stateParams.taskid/}</em></p>
+    <p ng-show="$stateParams.path">来源: <em>{/$stateParams.path/}</em></p>
+    <p ng-show="$stateParams.keyword">关键词: <em>{/$stateParams.keyword/}</em></p>
+    <p ng-show="$stateParams.from">起始时间: <em>{/$stateParams.from | date: 'yyyy-MM-dd HH:mm'/}</em></p>
+    <p ng-show="$stateParams.to">结束时间: <em>{/$stateParams.to | date: 'yyyy-MM-dd HH:mm'/}</em></p>
 </div>
 
 <div class="result-sum">
-    <span ng-show="vm.count === null">加载中...</span>
-    <span ng-hide="vm.count === null">
-        总计<em>{/vm.count/}</em>条记录
+    <span ng-show="vm.loadingFlag">加载中...</span>
+    <span ng-hide="vm.loadingFlag">
+        总计 <em>{/vm.count/}</em> 条记录
     </span>
 </div>
 
