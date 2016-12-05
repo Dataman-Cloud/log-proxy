@@ -1,3 +1,12 @@
+<div>
+    日志 搜索条件:
+    <p ng-show="$stateParams.appid">应用: {/$stateParams.appid/}</p>
+    <p ng-show="$stateParams.taskid">实例: {/$stateParams.taskid/}</p>
+    <p ng-show="$stateParams.path">来源: {/$stateParams.path/}</p>
+    <p ng-show="$stateParams.from">起始时间: {/$stateParams.from | date: 'yyyy-MM-dd HH:mm'/}</p>
+    <p ng-show="$stateParams.to">结束时间: {/$stateParams.to | date: 'yyyy-MM-dd HH:mm'/}</p>
+</div>
+
 <p ng-show="!vm.infiniteLogs.items.length">未查询到日志</p>
 <md-virtual-repeat-container id="vertical-container" style="height: 515px;">
     <p md-virtual-repeat="log in vm.infiniteLogs" md-on-demand>

@@ -1,10 +1,18 @@
-<div class="result-sum">总计<em>{/vm.count/}</em>条记录</div>
+<div>
+    日志 搜索条件:
+    <p ng-show="$stateParams.appid">应用: {/$stateParams.appid/}</p>
+    <p ng-show="$stateParams.taskid">实例: {/$stateParams.taskid/}</p>
+    <p ng-show="$stateParams.path">来源: {/$stateParams.path/}</p>
+    <p ng-show="$stateParams.keyword">关键词: {/$stateParams.keyword/}</p>
+    <p ng-show="$stateParams.from">起始时间: {/$stateParams.from | date: 'yyyy-MM-dd HH:mm'/}</p>
+    <p ng-show="$stateParams.to">结束时间: {/$stateParams.to | date: 'yyyy-MM-dd HH:mm'/}</p>
+</div>
 
-<div class="chart" layout="row" layout-align="space-around start" layout-wrap
-     ng-if="vm.chartOptions.logData.length">
-    <div class="chart-panel" flex="100">
-        <nvd3 options="vm.chartOptions.logOptions" data="vm.chartOptions.logData"></nvd3>
-    </div>
+<div class="result-sum">
+    <span ng-show="vm.count === null">加载中...</span>
+    <span ng-hide="vm.count === null">
+        总计<em>{/vm.count/}</em>条记录
+    </span>
 </div>
 
 <md-table-container ng-hide="!vm.logs.length">
