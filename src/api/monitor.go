@@ -21,6 +21,13 @@ const (
 	RULESPATH      = "/api/v1/rules"
 )
 
+// Backends API: AlertManager
+const (
+	ALERTSPATH       = "/api/v1/alerts"
+	ALERTSGROUSPPATH = "/api/v1/alerts/groups"
+	ALERTSSTATUSPATH = "/api/v1/status"
+)
+
 type monitor struct {
 }
 
@@ -120,7 +127,7 @@ func (m *monitor) PromqlQuery(ctx *gin.Context) {
 		utils.ErrorResponse(ctx, err)
 		return
 	}
-	ctx.JSON(http.StatusOK, data)
+	utils.Ok(ctx, data)
 }
 
 func (m *monitor) PromqlQueryRange(ctx *gin.Context) {
@@ -139,15 +146,8 @@ func (m *monitor) PromqlQueryRange(ctx *gin.Context) {
 		utils.ErrorResponse(ctx, err)
 		return
 	}
-	ctx.JSON(http.StatusOK, data)
+	utils.Ok(ctx, data)
 }
-
-// Backends API: AlertManager
-const (
-	ALERTSPATH       = "/api/v1/alerts"
-	ALERTSGROUSPPATH = "/api/v1/alerts/groups"
-	ALERTSSTATUSPATH = "/api/v1/status"
-)
 
 func (m *monitor) GetAlerts(ctx *gin.Context) {
 	query := &backends.AlertManager{
@@ -161,7 +161,7 @@ func (m *monitor) GetAlerts(ctx *gin.Context) {
 		utils.ErrorResponse(ctx, err)
 		return
 	}
-	ctx.JSON(http.StatusOK, data)
+	utils.Ok(ctx, data)
 }
 
 func (m *monitor) GetAlertsGroups(ctx *gin.Context) {
@@ -176,7 +176,7 @@ func (m *monitor) GetAlertsGroups(ctx *gin.Context) {
 		utils.ErrorResponse(ctx, err)
 		return
 	}
-	ctx.JSON(http.StatusOK, data)
+	utils.Ok(ctx, data)
 }
 
 func (m *monitor) GetAlertsStatus(ctx *gin.Context) {
@@ -191,7 +191,7 @@ func (m *monitor) GetAlertsStatus(ctx *gin.Context) {
 		utils.ErrorResponse(ctx, err)
 		return
 	}
-	ctx.JSON(http.StatusOK, data)
+	utils.Ok(ctx, data)
 }
 
 func (m *monitor) GetAlertsRules(ctx *gin.Context) {
@@ -206,5 +206,5 @@ func (m *monitor) GetAlertsRules(ctx *gin.Context) {
 		utils.ErrorResponse(ctx, err)
 		return
 	}
-	ctx.JSON(http.StatusOK, data)
+	utils.Ok(ctx, data)
 }

@@ -8,6 +8,7 @@ import (
 	"github.com/Dataman-Cloud/log-proxy/src/utils"
 
 	"github.com/gin-gonic/gin"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 const (
@@ -21,16 +22,52 @@ const (
 	UPDATE_ALERT_ERROR   = "503-11007"
 	GET_EVENTS_ERROR     = "503-11008"
 	GET_PROMETHEUS_ERROR = "503-11009"
+	GET_LOG_ERROR        = "503-11010"
 )
 
 type search struct {
-	Service *service.SearchService
+	Service       *service.SearchService
+	KeywordFilter map[string][]string
+	Counter       *prometheus.CounterVec
 }
 
 func GetSearch() *search {
-	return &search{
-		Service: service.NewEsService(),
+	s := &search{
+		Service:       service.NewEsService(),
+		KeywordFilter: make(map[string][]string),
+		Counter: prometheus.NewCounterVec(
+			prometheus.CounterOpts{
+				Name: "log_keyword",
+				Help: "log keyword counter",
+			},
+			[]string{"appid", "taskid", "path", "keyword", "userid", "clusterid", "offset"},
+		),
 	}
+	prometheus.MustRegister(s.Counter)
+
+	alerts, err := s.Service.GetAlerts(models.Page{
+		PageFrom: 0,
+		PageSize: 0,
+	})
+
+	if err != nil {
+		return s
+	}
+
+	alerts, err = s.Service.GetAlerts(models.Page{
+		PageFrom: 0,
+		PageSize: int(alerts["count"].(int64)),
+	})
+
+	if err != nil {
+		return s
+	}
+
+	for _, alert := range alerts["results"].([]models.Alert) {
+		s.KeywordFilter[alert.AppId+alert.Path] = append(s.KeywordFilter[alert.AppId+alert.Path], alert.Keyword)
+	}
+
+	return s
 }
 
 func (s *search) Ping(ctx *gin.Context) {
