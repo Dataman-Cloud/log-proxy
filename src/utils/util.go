@@ -12,6 +12,10 @@ func Byte2str(b []byte) string {
 }
 
 func ParseDate(from, to interface{}) string {
+	if from == nil || to == nil {
+		return "*"
+	}
+
 	f, ok := from.(int64)
 	if !ok {
 		return time.Now().Format("2006-01-02")

@@ -22,6 +22,7 @@ func (s *SearchService) CreateAlert(alert *models.Alert) error {
 		Type(ALERT_TYPE).
 		BodyJson(alert).
 		Do()
+	s.ESClient.Flush()
 	return err
 }
 
@@ -31,6 +32,7 @@ func (s *SearchService) DeleteAlert(id string) error {
 		Type(ALERT_TYPE).
 		Id(id).
 		Do()
+	s.ESClient.Flush()
 	return err
 }
 
@@ -43,6 +45,7 @@ func (s *SearchService) GetAlerts(page models.Page) (map[string]interface{}, err
 		Type(ALERT_TYPE).
 		From(page.PageFrom).
 		Size(page.PageSize).
+		Sort("createtime.timestamp", true).
 		Pretty(true).
 		Do()
 	if err != nil {
@@ -92,6 +95,7 @@ func (s *SearchService) UpdateAlert(alert *models.Alert) error {
 		Id(alert.Id).
 		Doc(alert).
 		Do()
+	s.ESClient.Flush()
 	return err
 }
 
