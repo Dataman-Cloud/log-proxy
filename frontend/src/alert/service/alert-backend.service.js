@@ -11,7 +11,9 @@
         return {
             alerts: alerts,
             alert: alert,
-            history : history
+            history: history,
+            silences: silences,
+            silence: silence
         };
 
         function alerts() {
@@ -26,6 +28,16 @@
 
         function history() {
             return $resource(BACKEND_URL_BASE.defaultBase + '/v1/monitor/prometheus');
+        }
+
+        function silences() {
+            return $resource(BACKEND_URL_BASE.defaultBase + '/v1/monitor/silences');
+        }
+
+        function silence(id) {
+            return $resource(BACKEND_URL_BASE.defaultBase + '/v1/monitor/silence/:id', {id: id}, {
+                'update': {method: 'PUT'}
+            });
         }
     }
 })();

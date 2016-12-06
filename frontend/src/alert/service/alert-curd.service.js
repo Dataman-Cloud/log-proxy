@@ -9,7 +9,8 @@
     /* @ngInject */
     function alertcurd(alertBackend, confirmModal, Notification, $state) {
         return {
-            deleteKeyword: deleteKeyword
+            deleteKeyword: deleteKeyword,
+            deleteSilence: deleteSilence
         };
 
         function deleteKeyword(id) {
@@ -18,6 +19,16 @@
                     .delete(function (data) {
                         Notification.success('删除成功');
                         $state.go('home.alertkeyword', null, {reload: true});
+                    })
+            });
+        }
+
+        function deleteSilence(id) {
+            confirmModal.open("是否确认删除该 Silence?").then(function () {
+                alertBackend.silence(id)
+                    .delete(function (data) {
+                        Notification.success('删除成功');
+                        $state.go('home.alertSilences', null, {reload: true});
                     })
             });
         }
