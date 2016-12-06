@@ -42,7 +42,7 @@
                 }
             })
             //end monitor
-            
+
             //about log
             .state('home.logbase', {
                 url: '/logbase',
