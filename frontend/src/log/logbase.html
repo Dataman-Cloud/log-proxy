@@ -35,8 +35,7 @@
             <div flex class="form-item">
                 <label class="requirement">应用名</label>
                 <md-select placeholder="选择应用" ng-model="vm.selectApp" md-on-open="vm.loadApps()"
-                           ng-change="vm.selectAppChange(vm.selectApp)" data-required="required"
-                           ng-disabled="staticForm.startTime.$error.max || staticForm.endTime.$error.min">
+                           ng-change="vm.selectAppChange(vm.selectApp)" data-required="required">
                     <md-option ng-value="key" ng-repeat="(key, value) in vm.apps">{/key/}</md-option>
                 </md-select>
             </div>
