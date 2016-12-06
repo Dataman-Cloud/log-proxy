@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/Dataman-Cloud/log-proxy/src/backends"
@@ -73,6 +74,33 @@ func (m *monitor) DeleteSilence(ctx *gin.Context) {
 	}
 
 	err := query.DeleteSilence(ctx.Param("id"))
+	if err != nil {
+		utils.ErrorResponse(ctx, err)
+		return
+	}
+	utils.Ok(ctx, "success")
+}
+
+func (m *monitor) UpdateSilence(ctx *gin.Context) {
+	query := &backends.AlertManager{
+		HttpClient: http.DefaultClient,
+		Server:     config.GetConfig().ALERTMANAGER_URL,
+		Path:       ALERTSPATH,
+	}
+
+	var silence map[string]interface{}
+	if err := ctx.BindJSON(&silence); err != nil {
+		utils.ErrorResponse(ctx, err)
+		return
+	}
+
+	err := query.DeleteSilence(fmt.Sprint(silence["id"]))
+	if err != nil {
+		utils.ErrorResponse(ctx, err)
+		return
+	}
+
+	err = query.CreateSilence(silence)
 	if err != nil {
 		utils.ErrorResponse(ctx, err)
 		return

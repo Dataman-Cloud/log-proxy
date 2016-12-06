@@ -79,8 +79,6 @@ func (am *AlertManager) GetSilences() ([]interface{}, error) {
 		return nil, err
 	}
 
-	fmt.Println(m["data"])
-
 	return m["data"].(map[string]interface{})["silences"].([]interface{}), nil
 }
 
@@ -108,6 +106,9 @@ func (am *AlertManager) GetSilence(id string) (map[string]interface{}, error) {
 	var m map[string]interface{}
 
 	json.Unmarshal(body, &m)
+	if m["data"] == nil {
+		return nil, nil
+	}
 
 	return m["data"].(map[string]interface{}), nil
 }

@@ -2,6 +2,7 @@ package api
 
 import (
 	"errors"
+	"sync"
 
 	"github.com/Dataman-Cloud/log-proxy/src/models"
 	"github.com/Dataman-Cloud/log-proxy/src/service"
@@ -29,6 +30,7 @@ type search struct {
 	Service       *service.SearchService
 	KeywordFilter map[string][]string
 	Counter       *prometheus.CounterVec
+	Kmutex        *sync.Mutex
 }
 
 func GetSearch() *search {
@@ -42,6 +44,7 @@ func GetSearch() *search {
 			},
 			[]string{"appid", "taskid", "path", "keyword", "userid", "clusterid", "offset"},
 		),
+		Kmutex: new(sync.Mutex),
 	}
 	prometheus.MustRegister(s.Counter)
 
@@ -63,6 +66,8 @@ func GetSearch() *search {
 		return s
 	}
 
+	s.Kmutex.Lock()
+	defer s.Kmutex.Unlock()
 	for _, alert := range alerts["results"].([]models.Alert) {
 		s.KeywordFilter[alert.AppId+alert.Path] = append(s.KeywordFilter[alert.AppId+alert.Path], alert.Keyword)
 	}

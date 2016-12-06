@@ -33,6 +33,10 @@ func (s *search) CreateAlert(ctx *gin.Context) {
 		return
 	}
 
+	s.Kmutex.Lock()
+	defer s.Kmutex.Unlock()
+	s.KeywordFilter[alert.AppId+alert.Path] = append(s.KeywordFilter[alert.AppId+alert.Path], alert.Keyword)
+
 	utils.Ok(ctx, "create success")
 }
 
@@ -42,10 +46,26 @@ func (s *search) DeleteAlert(ctx *gin.Context) {
 		return
 	}
 
-	err := s.Service.DeleteAlert(ctx.Param("id"))
+	alert, err := s.Service.GetAlert(ctx.Param("id"))
+	if err != nil {
+		utils.ErrorResponse(ctx, utils.NewError(GET_ALERT_ERROR, err))
+		return
+	}
+
+	err = s.Service.DeleteAlert(ctx.Param("id"))
 	if err != nil {
 		utils.ErrorResponse(ctx, utils.NewError(DELETE_ALERT_ERROR, err))
 		return
+	}
+
+	s.Kmutex.Lock()
+	defer s.Kmutex.Unlock()
+	for i, v := range s.KeywordFilter[alert.AppId+alert.Path] {
+		if v == alert.Keyword {
+			s.KeywordFilter[alert.AppId+alert.Path] = append(s.KeywordFilter[alert.AppId+alert.Path][:i],
+				s.KeywordFilter[alert.AppId+alert.Path][i+1:]...)
+			break
+		}
 	}
 
 	utils.Ok(ctx, "delete success")
@@ -62,13 +82,13 @@ func (s *search) GetAlerts(ctx *gin.Context) {
 }
 
 func (s *search) GetAlert(ctx *gin.Context) {
-	results, err := s.Service.GetAlert(ctx.Param("id"))
+	result, err := s.Service.GetAlert(ctx.Param("id"))
 	if err != nil {
 		utils.ErrorResponse(ctx, utils.NewError(GET_ALERT_ERROR, err))
 		return
 	}
 
-	utils.Ok(ctx, results)
+	utils.Ok(ctx, result)
 }
 
 func (s *search) UpdateAlert(ctx *gin.Context) {
@@ -93,12 +113,29 @@ func (s *search) UpdateAlert(ctx *gin.Context) {
 		return
 	}
 
+	result, err := s.Service.GetAlert(ctx.Param("id"))
+	if err != nil {
+		utils.ErrorResponse(ctx, utils.NewError(GET_ALERT_ERROR, err))
+		return
+	}
+
 	alert.CreateTime = time.Now().Format(time.RFC3339Nano)
-	err := s.Service.UpdateAlert(alert)
+	err = s.Service.UpdateAlert(alert)
 	if err != nil {
 		utils.ErrorResponse(ctx, utils.NewError(UPDATE_ALERT_ERROR, err))
 		return
 	}
+
+	s.Kmutex.Lock()
+	defer s.Kmutex.Unlock()
+	for i, v := range s.KeywordFilter[result.AppId+result.Path] {
+		if v == alert.Keyword {
+			s.KeywordFilter[result.AppId+result.Path] = append(s.KeywordFilter[result.AppId+result.Path][:i],
+				s.KeywordFilter[result.AppId+result.Path][i+1:]...)
+			break
+		}
+	}
+	s.KeywordFilter[result.AppId+result.Path] = append(s.KeywordFilter[result.AppId+result.Path], alert.Keyword)
 
 	utils.Ok(ctx, "update success")
 }
