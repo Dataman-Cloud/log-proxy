@@ -1,0 +1,64 @@
+<div class="alarm-strategy-list" layout="column">
+    <h2>静默</h2>
+    <div class="panel">
+        <div layout="row" layout-align="end start">
+            <md-button class="md-raised md-primary" ui-sref="home.alertSilencesCreate">
+                新建
+            </md-button>
+        </div>
+        <md-table-container>
+            <table md-table id="user-list-table">
+                <thead md-head>
+                <tr md-row>
+                    <th md-column style="width: 60px;"></th>
+                    <th md-column>创建时间</th>
+                    <th md-column>matchers</th>
+                    <th md-column>状态</th>
+                    <th md-column>操作</th>
+                </tr>
+                </thead>
+                <tbody md-body>
+                <tr md-row ng-repeat-start="silence in vm.silences track by $index">
+                    <td md-cell>
+                        <a ng-click="vm.silenceDetailSet[$index] = !vm.silenceDetailSet[$index]">
+                            <i class="fa"
+                               ng-class="{'fa-chevron-down':vm.silenceDetailSet[$index], 'fa-chevron-right':!vm.silenceDetailSet[$index]}"></i>
+                        </a>
+                    </td>
+                    <td md-cell>{/silence.createdAt | date:" yyyy-MM-dd HH:mm:ss"/}</td>
+                    <td md-cell>
+                        <p ng-repeat="matcher in silence.matchers track by $index">{/matcher.name/} :
+                            {/matcher.value/}</p>
+                    </td>
+                    <td md-cell>
+                        <p ng-show="vm.checkState(silence.startsAt, silence.endsAt) === 'Active'">Active</p>
+                        <p ng-show="vm.checkState(silence.startsAt, silence.endsAt) === 'Pending'">Pending</p>
+                        <p ng-show="vm.checkState(silence.startsAt, silence.endsAt) === 'Elapsed'">Elapsed</p>
+                    </td>
+                    <td md-cell>
+                        <div class="action" layout="row">
+                            <md-button aria-label="delete" class="md-raised"
+                                       data-ng-click="vm.deleteSilence(silence.id)">
+                                删除
+                            </md-button>
+                            <md-button aria-label="update" class="md-raised"
+                                       ui-sref="home.alertSilencesUpdate({id: silence.id, from: 'silence'})">编辑
+                            </md-button>
+                        </div>
+                    </td>
+                </tr>
+                <tr ng-repeat-end ng-hide="!vm.silenceDetailSet[$index]">
+                    <td colspan="3">
+                        <div class="json-detail">
+                            <dl layout="row" ng-repeat="(key, value) in silence track by $index">
+                                <dt>{/key/}</dt>
+                                <dd>{/value/}</dd>
+                            </dl>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </md-table-container>
+    </div>
+</div>

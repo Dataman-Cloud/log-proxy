@@ -1,9 +1,9 @@
 (function () {
     'use strict';
     angular.module('app')
-        .controller('CreateAlertCtrl', CreateAlertCtrl);
+        .controller('CreateAlertKeywordCtrl', CreateAlertKeywordCtrl);
     /* @ngInject */
-    function CreateAlertCtrl(alertBackend, $state, target, alert) {
+    function CreateAlertKeywordCtrl(alertBackend, $state, target, alert) {
         var alert = alert.data || {};
 
         var self = this;
