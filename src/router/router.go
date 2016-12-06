@@ -54,14 +54,12 @@ func Router(middlewares ...gin.HandlerFunc) *gin.Engine {
 	monitorv1 := r.Group("/v1/monitor")
 	{
 		monitorv1.GET("/ping", monitor.Ping)
-		monitorv1.GET("", monitor.QueryRange)
-		monitorv1.GET("/applications", monitor.QueryApps)
+		// Query metric/expr
+		monitorv1.GET("/query", monitor.Query)
+		// Query info
+		monitorv1.GET("/info", monitor.QueryInfo)
 		monitorv1.GET("/nodes", monitor.QueryNodes)
-		monitorv1.GET("/application", monitor.QueryApp)
 
-		// Promethues HTTP API
-		monitorv1.GET("/promql/query", monitor.PromqlQuery)
-		monitorv1.GET("/promql/query_range", monitor.PromqlQueryRange)
 		// AlertManager API
 		monitorv1.GET("/alerts", monitor.GetAlerts)
 		monitorv1.GET("/alerts/groups", monitor.GetAlertsGroups)
@@ -71,9 +69,6 @@ func Router(middlewares ...gin.HandlerFunc) *gin.Engine {
 		monitorv1.GET("/silence/:id", monitor.GetSilence)
 		monitorv1.DELETE("/silence/:id", monitor.DeleteSilence)
 		monitorv1.PUT("/silence/:id", monitor.UpdateSilence)
-
-		// Rules
-		monitorv1.GET("/alerts/rules", monitor.GetAlertsRules)
 	}
 
 	staticRouter := r.Group("/ui")
