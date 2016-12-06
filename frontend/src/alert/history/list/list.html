@@ -1,29 +1,138 @@
+<!--<div class="alarm-strategy-list" layout="column">-->
+    <!--<h2>告警历史</h2>-->
+    <!--<div class="panel">-->
+        <!--<md-table-container>-->
+            <!--<table md-table id="user-list-table">-->
+                <!--<thead md-head>-->
+                <!--<tr md-row>-->
+                    <!--<th md-column style="width: 80px;">报警名</th>-->
+                    <!--&lt;!&ndash;<th md-column>应用</th>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<th md-column>实例</th>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<th md-column>报警级别</th>&ndash;&gt;-->
+                    <!--<th md-column style="width: 315px;">详情</th>-->
+                    <!--<th md-column>时间</th>-->
+                    <!--<th md-column style="width: 690px;">资源</th>-->
+                    <!--<th md-column style="width: 100px;">操作</th>-->
+
+                <!--</tr>-->
+                <!--</thead>-->
+                <!--<tbody md-body>-->
+                <!--<tr md-row ng-repeat="history in vm.histories track by $index">-->
+                    <!--<td md-cell>{/history.alertname/}</td>-->
+                    <!--&lt;!&ndash;<td md-cell>{/history.container_label_APP_ID/}</td>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<td md-cell></td>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<td md-cell>{/history.severity/}</td>&ndash;&gt;-->
+                    <!--<td md-cell>{/history.annotations/}</td>-->
+                    <!--<td md-cell>{/history.createtime | date:" yyyy-MM-dd HH:mm:ss"/}</td>-->
+                    <!--<td md-cell>{/history.labels/}</td>-->
+                    <!--<td md-cell>-->
+                        <!--<div class="action" layout="row">-->
+                            <!--<md-button aria-label="update" class="md-raised"-->
+                                       <!--data-ui-sref="home.historySilence">静默-->
+                            <!--</md-button>-->
+                        <!--</div>-->
+                    <!--</td>-->
+                <!--</tr>-->
+                <!--</tbody>-->
+            <!--</table>-->
+            <!--<md-table-pagination md-limit="vm.query.limit"-->
+                                 <!--md-label="{page: '页:', rowsPerPage: '每页:', of: 'of'}"-->
+                                 <!--md-limit-options="vm.limitOptions"-->
+                                 <!--md-boundary-links="vm.limitOptions.boundaryLinks"-->
+                                 <!--md-page="vm.query.page"-->
+                                 <!--md-total="{/vm.count/}"-->
+                                 <!--md-on-paginate="vm.onPaginate"-->
+                                 <!--md-page-select="vm.options.pageSelect">-->
+            <!--</md-table-pagination>-->
+        <!--</md-table-container>-->
+    <!--</div>-->
+<!--</div>-->
+<!--<div class="search-keyword">-->
+    <!--<p ng-show="$stateParams.appid">应用: <em>{/$stateParams.appid/}</em></p>-->
+    <!--<p ng-show="$stateParams.taskid">实例: <em>{/$stateParams.taskid/}</em></p>-->
+    <!--<p ng-show="$stateParams.path">来源: <em>{/$stateParams.path/}</em></p>-->
+    <!--<p ng-show="$stateParams.keyword">关键词: <em>{/$stateParams.keyword/}</em></p>-->
+    <!--<p ng-show="$stateParams.from">起始时间: <em>{/$stateParams.from | date: 'yyyy-MM-dd HH:mm'/}</em></p>-->
+    <!--<p ng-show="$stateParams.to">结束时间: <em>{/$stateParams.to | date: 'yyyy-MM-dd HH:mm'/}</em></p>-->
+<!--</div>-->
+
+
 <div class="alarm-strategy-list" layout="column">
-    <h2>告警历史</h2>
+    <div class="result-sum">
+        <h2>告警历史</h2>
+    </div>
+    <div class="result-sum">
+        <span ng-show="vm.loadingFlag">加载中...</span>
+        <span ng-hide="vm.loadingFlag">
+        总计 <em>{/vm.histories.length/}</em> 条记录
+    </span>
+    </div>
     <div class="panel">
-        <md-table-container>
+        <md-table-container ng-hide="!vm.histories.length">
             <table md-table id="user-list-table">
                 <thead md-head>
                 <tr md-row>
-                    <th md-column>报警名</th>
-                    <th md-column>应用</th>
-                    <th md-column>实例</th>
-                    <th md-column>报警级别</th>
-                    <th md-column>详情</th>
-                    <th md-column>时间</th>
+                    <th md-column style="width: 60px;"></th>
+                    <th md-column style="width: 160px;">时间</th>
+                    <th md-column style="width: 160px;">报警名称</th>
+                    <th md-column style="width: 160px;">描述</th>
+                    <th md-column style="width: 160px;">摘要</th>
+                    <th md-column style="width: 100px;">操作</th>
                 </tr>
                 </thead>
                 <tbody md-body>
-                <tr md-row ng-repeat="history in vm.histories track by $index">
-                    <td md-cell>{/history.alertname/}</td>
-                    <td md-cell>{/history.container_label_APP_ID/}</td>
-                    <td md-cell>{/history.instance/}</td>
-                    <td md-cell>{/history.severity/}</td>
-                    <td md-cell>{/history.instance/}</td>
-                    <td md-cell>{/history.instance/}</td>
+                <tr md-row ng-repeat-start="history in vm.histories track by $index">
+                    <td md-cell>
+                        <a ng-click="vm.logDisplaySet[$index] = !vm.logDisplaySet[$index]">
+                            <i class="fa"
+                               ng-class="{'fa-chevron-down':vm.logDisplaySet[$index], 'fa-chevron-right':!vm.logDisplaySet[$index]}"></i>
+                        </a>
+                    </td>
+                    <td md-cell>
+                        {/history.createtime | date: 'yyyy-MM-dd HH:mm:ss'/}
+                    </td>
+                    <td md-cell>
+                        {/history.alertname/}
+                    </td>
+                    <td md-cell>
+                        {/history.annotations.description/}
+                    </td>
+                    <td md-cell>
+                        {/history.annotations.summary/}
+                    </td>
+                    <td md-cell>
+                        <div class="action" layout="row">
+                            <md-button aria-label="update" class="md-raised" data-ui-sref="home.historySilence">
+                                静默
+                            </md-button>
+                        </div>
+                    </td>
+                </tr>
+                <tr ng-repeat-end ng-hide="!vm.logDisplaySet[$index]">
+                    <td colspan="3">
+                        <div class="json-detail">
+                            <dl layout="row" ng-repeat="(key, value) in history.annotations track by $index">
+                                <dt flex="25">{/key/}</dt>
+                                <dd flex ng-bind-html="value"></dd>
+                            </dl>
+                            <dl layout="row" ng-repeat="(key, value) in history.labels track by $index">
+                                <dt flex="25">{/key/} </dt>
+                                <dd flex ng-bind-html="value"></dd>
+                            </dl>
+                        </div>
+                    </td>
                 </tr>
                 </tbody>
             </table>
+            <md-table-pagination md-limit="vm.query.limit"
+                                 md-label="{page: '页:', rowsPerPage: '每页:', of: 'of'}"
+                                 md-limit-options="vm.limitOptions"
+                                 md-boundary-links="vm.limitOptions.boundaryLinks"
+                                 md-page="vm.query.page"
+                                 md-total="{/vm.count/}"
+                                 md-on-paginate="vm.onPaginate"
+                                 md-page-select="vm.options.pageSelect">
+            </md-table-pagination>
         </md-table-container>
     </div>
 </div>
