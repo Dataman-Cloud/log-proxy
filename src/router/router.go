@@ -70,7 +70,7 @@ func Router(middlewares ...gin.HandlerFunc) *gin.Engine {
 		monitorv1.POST("/silences", monitor.CreateSilence)
 		monitorv1.GET("/silence/:id", monitor.GetSilence)
 		monitorv1.DELETE("/silence/:id", monitor.DeleteSilence)
-		monitorv1.PUT("/silence", monitor.UpdateSilence)
+		monitorv1.PUT("/silence/:id", monitor.UpdateSilence)
 
 		// Rules
 		monitorv1.GET("/alerts/rules", monitor.GetAlertsRules)
