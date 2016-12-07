@@ -331,9 +331,11 @@ func (ni *NodesInfo) GetQueryNodesInfo(query *backends.Query) error {
 			return err
 		}
 
-		for _, originData := range data.Data.Result {
-			name := strings.Split(originData.Metric.Instance, ":")[0]
-			ni.Nodes[name] = NewNodeInfo()
+		if len(ni.Nodes) == 0 {
+			for _, originData := range data.Data.Result {
+				name := strings.Split(originData.Metric.Instance, ":")[0]
+				ni.Nodes[name] = NewNodeInfo()
+			}
 		}
 		if metric == "network_rx" || metric == "network_tx" {
 			for _, node := range ni.Nodes {
@@ -399,6 +401,7 @@ func (ni *NodesInfo) GetQueryNodesInfo(query *backends.Query) error {
 				}
 			}
 		}
+
 	}
 	return nil
 }
