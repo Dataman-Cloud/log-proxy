@@ -52,7 +52,7 @@ func (s *SearchService) GetAlerts(page models.Page) (map[string]interface{}, err
 		Pretty(true).
 		Do()
 
-	if err.(*elastic.Error).Status == http.StatusNotFound {
+	if err != nil && err.(*elastic.Error).Status == http.StatusNotFound {
 		return nil, nil
 	}
 
@@ -84,7 +84,7 @@ func (s *SearchService) GetAlert(id string) (models.Alert, error) {
 		Id(id).
 		Do()
 
-	if err.(*elastic.Error).Status == http.StatusNotFound {
+	if err != nil && err.(*elastic.Error).Status == http.StatusNotFound {
 		return alert, nil
 	}
 
@@ -120,7 +120,7 @@ func (s *SearchService) GetAlertCondition() []models.Alert {
 		Pretty(true).
 		Do()
 
-	if err.(*elastic.Error).Status == http.StatusNotFound {
+	if err != nil && err.(*elastic.Error).Status == http.StatusNotFound {
 		return nil
 	}
 
