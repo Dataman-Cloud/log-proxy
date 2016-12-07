@@ -4,396 +4,57 @@
 
 ### Metric(监控数据)
 
+
 #### Get the metric values (CPU/Memory/Network/Filesystem)
 
-```GET /v1/monitor/```
-- path: /v1/monitor
+```GET /v1/monitor/query```
+- path: /v1/monitor/query
 - HTTP Method: GET
 - URL Params: Null
-- Query Params: type, metric, appid, instanceid, from, to, step
-  - type=[app]: the type string
-  - metric=[all/cpu/memory/network_rx/network_tx/fs_read/fs_write]: the metric string.
+- Query Params: metric, clusterid, appid, taskid, start, end, step, expr
+  - metric=[cpu/memory/memory_usage/memory_total/network_rx/network_tx/fs_read/fs_write]: the metric string.
   - appid=<string>: the name of application.
   - taskid=<string>: the id string of the docker instance.
-  - from=<2006-01-02 15:04:05>: the start time of the query range.
-  - to=<2006-01-02 15:04:05>: the end time of the query range.
+  - start=<2016-12-02T00:00:01.781Z>: the start time of the query range.
+  - end=<2016-12-02T00:00:01.781Z>: the end time of the query range.
   - step=<duration>: Query resolution step width.
+  - expr=<string>: Prometheus expression query string. it is conflict with metric.
 
 For example:
 
-Get the metrics of the instances in one application.
+Get the metrics by Expr, Refer to "https://prometheus.io/docs/querying/api/"
 ```
-curl http://127.0.0.1:5098/v1/monitor?metric=all&appid=work-nginx&from=2016-11-17%2000:01:00&to=2016-11-17%2000:01:00&step=10s
-{
-  "code": 0,
-  "data": {
-    "cpu": {
-      "usage": [
-        {
-          "metric": {
-            "container_label_APP_ID": "work-nginx",
-            "group": "",
-            "id": "/docker/d2f1c5324cced328d766fb858055bc0a5f9fa04402343379077e89ce6c9c0b6f",
-            "image": "nginx:latest",
-            "instance": "192.168.1.102:5014",
-            "job": "cadvisor",
-            "name": "mesos-2f4c9ba3-a8ca-4df1-a4d4-cbec4343a64c-S1.fb702a72-000d-4244-a644-f85d42fcee08"
-          },
-          "values": [
-            [
-              1479340860,
-              "0"
-            ]
-          ]
-        },
-        {
-          "metric": {
-            "container_label_APP_ID": "work-nginx",
-            "group": "",
-            "id": "/docker/e58177e632ca1a6ef5404a76ae129f047e295cd4aab1c262eaec4811d24f9b6f",
-            "image": "nginx:latest",
-            "instance": "192.168.1.102:5014",
-            "job": "cadvisor",
-            "name": "mesos-2f4c9ba3-a8ca-4df1-a4d4-cbec4343a64c-S1.07346023-b17b-4c97-8b29-f28063e8aa05"
-          },
-          "values": [
-            [
-              1479340860,
-              "0"
-            ]
-          ]
-        }
-      ],
-      "count": 2
-    },
-    "memory": {
-      "usage": [
-        {
-          "metric": {
-            "container_label_APP_ID": "work-nginx",
-            "group": "",
-            "id": "/docker/d2f1c5324cced328d766fb858055bc0a5f9fa04402343379077e89ce6c9c0b6f",
-            "image": "nginx:latest",
-            "instance": "192.168.1.102:5014",
-            "job": "cadvisor",
-            "name": "mesos-2f4c9ba3-a8ca-4df1-a4d4-cbec4343a64c-S1.fb702a72-000d-4244-a644-f85d42fcee08"
-          },
-          "values": [
-            [
-              1479340860,
-              "0.0213623046875"
-            ]
-          ]
-        },
-        {
-          "metric": {
-            "container_label_APP_ID": "work-nginx",
-            "group": "",
-            "id": "/docker/e58177e632ca1a6ef5404a76ae129f047e295cd4aab1c262eaec4811d24f9b6f",
-            "image": "nginx:latest",
-            "instance": "192.168.1.102:5014",
-            "job": "cadvisor",
-            "name": "mesos-2f4c9ba3-a8ca-4df1-a4d4-cbec4343a64c-S1.07346023-b17b-4c97-8b29-f28063e8aa05"
-          },
-          "values": [
-            [
-              1479340860,
-              "0.02130126953125"
-            ]
-          ]
-        }
-      ],
-      "count": 2
-    },
-    "network": {
-      "receive": [
-        {
-          "metric": {
-            "container_label_APP_ID": "work-nginx",
-            "group": "",
-            "id": "/docker/d2f1c5324cced328d766fb858055bc0a5f9fa04402343379077e89ce6c9c0b6f",
-            "image": "nginx:latest",
-            "instance": "192.168.1.102:5014",
-            "job": "cadvisor",
-            "name": "mesos-2f4c9ba3-a8ca-4df1-a4d4-cbec4343a64c-S1.fb702a72-000d-4244-a644-f85d42fcee08"
-          },
-          "values": [
-            [
-              1479340860,
-              "1854"
-            ]
-          ]
-        },
-        {
-          "metric": {
-            "container_label_APP_ID": "work-nginx",
-            "group": "",
-            "id": "/docker/e58177e632ca1a6ef5404a76ae129f047e295cd4aab1c262eaec4811d24f9b6f",
-            "image": "nginx:latest",
-            "instance": "192.168.1.102:5014",
-            "job": "cadvisor",
-            "name": "mesos-2f4c9ba3-a8ca-4df1-a4d4-cbec4343a64c-S1.07346023-b17b-4c97-8b29-f28063e8aa05"
-          },
-          "values": [
-            [
-              1479340860,
-              "1944"
-            ]
-          ]
-        }
-      ],
-      "transmit": [
-        {
-          "metric": {
-            "container_label_APP_ID": "work-nginx",
-            "group": "",
-            "id": "/docker/d2f1c5324cced328d766fb858055bc0a5f9fa04402343379077e89ce6c9c0b6f",
-            "image": "nginx:latest",
-            "instance": "192.168.1.102:5014",
-            "job": "cadvisor",
-            "name": "mesos-2f4c9ba3-a8ca-4df1-a4d4-cbec4343a64c-S1.fb702a72-000d-4244-a644-f85d42fcee08"
-          },
-          "values": [
-            [
-              1479340860,
-              "648"
-            ]
-          ]
-        },
-        {
-          "metric": {
-            "container_label_APP_ID": "work-nginx",
-            "group": "",
-            "id": "/docker/e58177e632ca1a6ef5404a76ae129f047e295cd4aab1c262eaec4811d24f9b6f",
-            "image": "nginx:latest",
-            "instance": "192.168.1.102:5014",
-            "job": "cadvisor",
-            "name": "mesos-2f4c9ba3-a8ca-4df1-a4d4-cbec4343a64c-S1.07346023-b17b-4c97-8b29-f28063e8aa05"
-          },
-          "values": [
-            [
-              1479340860,
-              "648"
-            ]
-          ]
-        }
-      ],
-      "count": 2
-    },
-    "filesystem": {
-      "read": [
-        {
-          "metric": {
-            "container_label_APP_ID": "work-nginx",
-            "group": "",
-            "id": "/docker/d2f1c5324cced328d766fb858055bc0a5f9fa04402343379077e89ce6c9c0b6f",
-            "image": "nginx:latest",
-            "instance": "192.168.1.102:5014",
-            "job": "cadvisor",
-            "name": "mesos-2f4c9ba3-a8ca-4df1-a4d4-cbec4343a64c-S1.fb702a72-000d-4244-a644-f85d42fcee08"
-          },
-          "values": [
-            [
-              1479340860,
-              "0"
-            ]
-          ]
-        },
-        {
-          "metric": {
-            "container_label_APP_ID": "work-nginx",
-            "group": "",
-            "id": "/docker/e58177e632ca1a6ef5404a76ae129f047e295cd4aab1c262eaec4811d24f9b6f",
-            "image": "nginx:latest",
-            "instance": "192.168.1.102:5014",
-            "job": "cadvisor",
-            "name": "mesos-2f4c9ba3-a8ca-4df1-a4d4-cbec4343a64c-S1.07346023-b17b-4c97-8b29-f28063e8aa05"
-          },
-          "values": [
-            [
-              1479340860,
-              "0"
-            ]
-          ]
-        }
-      ],
-      "write": [
-        {
-          "metric": {
-            "container_label_APP_ID": "work-nginx",
-            "group": "",
-            "id": "/docker/d2f1c5324cced328d766fb858055bc0a5f9fa04402343379077e89ce6c9c0b6f",
-            "image": "nginx:latest",
-            "instance": "192.168.1.102:5014",
-            "job": "cadvisor",
-            "name": "mesos-2f4c9ba3-a8ca-4df1-a4d4-cbec4343a64c-S1.fb702a72-000d-4244-a644-f85d42fcee08"
-          },
-          "values": [
-            [
-              1479340860,
-              "0"
-            ]
-          ]
-        },
-        {
-          "metric": {
-            "container_label_APP_ID": "work-nginx",
-            "group": "",
-            "id": "/docker/e58177e632ca1a6ef5404a76ae129f047e295cd4aab1c262eaec4811d24f9b6f",
-            "image": "nginx:latest",
-            "instance": "192.168.1.102:5014",
-            "job": "cadvisor",
-            "name": "mesos-2f4c9ba3-a8ca-4df1-a4d4-cbec4343a64c-S1.07346023-b17b-4c97-8b29-f28063e8aa05"
-          },
-          "values": [
-            [
-              1479340860,
-              "0"
-            ]
-          ]
-        }
-      ],
-      "count": 2
-    }
-  }
-}
-```
-Get the metrics of one instance in one application.
-```
-http://127.0.0.1:5098/v1/monitor?metric=cpu&appid=work-nginx&taskid=d2f1c53
-{
-  "code": 0,
-  "data": {
-    "cpu": {
-      "usage": [
-        {
-          "metric": {
-            "container_label_APP_ID": "work-nginx",
-            "group": "",
-            "id": "/docker/d2f1c5324cced328d766fb858055bc0a5f9fa04402343379077e89ce6c9c0b6f",
-            "image": "nginx:latest",
-            "instance": "192.168.1.102:5014",
-            "job": "cadvisor",
-            "name": "mesos-2f4c9ba3-a8ca-4df1-a4d4-cbec4343a64c-S1.fb702a72-000d-4244-a644-f85d42fcee08"
-          },
-          "values": [
-            [
-              1479361498,
-              "0"
-            ]
-          ]
-        }
-      ],
-      "count": 1
-    },
-    "memory": {
-      "usage": null,
-      "count": 0
-    },
-    "network": {
-      "receive": null,
-      "transmit": null,
-      "count": 0
-    },
-    "filesystem": {
-      "read": null,
-      "write": null,
-      "count": 0
-    }
-  }
-}
-```
-Get the aggregation of the metrics data of one applications
-```
-http://127.0.0.1:5098/v1/monitor?type=app&metric=cpu&appid=work-nginx&taskid=d2f1c53
-{
-  "code": 0,
-  "data": {
-    "cpu": {
-      "usage": [
-        {
-          "metric": {
-            "container_label_APP_ID": "work-nginx",
-            "group": "",
-            "id": "",
-            "image": "",
-            "instance": "",
-            "job": "",
-            "name": ""
-          },
-          "values": [
-            [
-              1479361556,
-              "0"
-            ]
-          ]
-        }
-      ],
-      "count": 1
-    },
-    "memory": {
-      "usage": null,
-      "count": 0
-    },
-    "network": {
-      "receive": null,
-      "transmit": null,
-      "count": 0
-    },
-    "filesystem": {
-      "read": null,
-      "write": null,
-      "count": 0
-    }
-  }
-}
+http://127.0.0.1:5098/v1/monitor/query?expr=avg(irate(container_cpu_usage_seconds_total{container_label_APP_ID='work-web',id=~'/docker/.*',name=~'mesos.*'}[5m])) by (container_label_VCLUSTER, container_label_APP_ID)&start=2016-12-05T00:00:01.781Z&end=2016-12-05T00:01:00.781Z&step=30s
 ```
 
-#### Get the list of applications
+Get the metrics by URL
+```
+http://127.0.0.1:5098/v1/monitor/query?start=2016-12-02T00:00:01.781Z&end=2016-12-02T00:01:00.781Z&step=30s&metric=memory_total&appid=work-web
+```
 
-```GET /v1/monitor/applications```
+#### Get the info of clusters, cluster, application
+
+```GET /v1/monitor/info```
 
 - path: /v1/monitor/applications
 - HTTP Method: GET
 - URL Params: Null
-- Query Params: appid
+- Query Params: clusterid, appid
+  - clusterid=<string>: the name of cluster.
   - appid=<string>: the name of application.
 
 For example:
-Get the instances of all applications
+Get the info of Clusters
 ```
-curl http://127.0.0.1:5098/v1/monitor/applications
-{
-  "code": 0,
-  "data": {
-    "apps": {
-      "work-nginx": [
-        "/docker/d2f1c5324cced328d766fb858055bc0a5f9fa04402343379077e89ce6c9c0b6f",
-        "/docker/e58177e632ca1a6ef5404a76ae129f047e295cd4aab1c262eaec4811d24f9b6f"
-      ],
-      "work-nginx2": [
-        "/docker/130c1a4d5ec79315e98deafb1445bb79a94125297f27d20847efb9ba961ebd7f",
-        "/docker/5b8d5c0c1dea877c21e225ab9dfc6b7b0b5255f4e593b80a335613a5439ab425"
-      ]
-    }
-  }
-}
+http://127.0.0.1:5098/v1/monitor/info
 ```
-
-Get the instances of one Applications
+Get the info of cluster
 ```
-http://127.0.0.1:5098/v1/monitor/applications?appid=work-nginx
-{
-  "code": 0,
-  "data": {
-    "apps": {
-      "work-nginx": [
-        "/docker/e58177e632ca1a6ef5404a76ae129f047e295cd4aab1c262eaec4811d24f9b6f",
-        "/docker/d2f1c5324cced328d766fb858055bc0a5f9fa04402343379077e89ce6c9c0b6f"
-      ]
-    }
-  }
-}
+http://127.0.0.1:5098/v1/monitor/info?clusterid=work
+```
+Get the info of application
+```
+http://127.0.0.1:5098/v1/monitor/info?appid=work-web
 ```
 
 #### Get the metric data of nodes
@@ -403,194 +64,18 @@ http://127.0.0.1:5098/v1/monitor/applications?appid=work-nginx
 - path: /v1/monitor/nodes
 - HTTP Method: GET
 - URL Params: Null
-- Query Params: node
-  - node=<string>: the IP address of node.
+- Query Params: nodeid
+  - nodeid=<string>: the IP address of node.
 
 For example:
 Get the metric data of all nodes
 ```
 http://127.0.0.1:5098/v1/monitor/nodes
-{
-  "code": 0,
-  "data": {
-    "nodes": {
-      "192.168.1.101": {
-        "cpu": {
-          "usage": [
-            1480409373,
-            "0.03590153046667789"
-          ]
-        },
-        "memory": {
-          "usage_bytes": [
-            1480409373,
-            "1189441536"
-          ],
-          "total_bytes": [
-            1480409373,
-            "3975892992"
-          ]
-        },
-        "network": {
-          "eno16777984": {
-            "receive": [
-              1480409373,
-              "5120.2"
-            ],
-            "transmit": [
-              1480409373,
-              "4275.733333333334"
-            ]
-          },
-          "eno33557248": {
-            "receive": [
-              1480409373,
-              "281.6"
-            ],
-            "transmit": [
-              1480409373,
-              "0"
-            ]
-          }
-        },
-        "filesystem": {
-          "/dev/mapper/centos-root": {
-            "usage_bytes": [
-              1480409373,
-              "7745433600"
-            ],
-            "total_bytes": [
-              1480409373,
-              "28406726656"
-            ]
-          },
-          "/dev/sda1": {
-            "usage_bytes": [
-              1480409373,
-              "172580864"
-            ],
-            "total_bytes": [
-              1480409373,
-              "520794112"
-            ]
-          }
-        }
-      }
-    }
-  }
-}
 ```
 Get the metric data of one node
 ```
-http://127.0.0.1:5098/v1/monitor/nodes?node=192.168.1.101
+http://127.0.0.1:5098/v1/monitor/nodes?nodeid=192.168.1.101
 ```
-
-
-#### Get the metric data of application
-
-```GET /v1/monitor/application```
-
-- path: /v1/monitor/application
-- HTTP Method: GET
-- URL Params: Null
-- Query Params: appid
-  - appid=<string>: the name of application.
-
-For example:
-
-Get the metric data of the tasks in one application
-```
-http://127.0.0.1:5098/v1/monitor/application?appid=work-nginx
-{
-  "code": 0,
-  "data": {
-    "app": {
-      "d2f1c5324cced328d766fb858055bc0a5f9fa04402343379077e89ce6c9c0b6f": {
-        "cpu": {
-          "usage": [
-            1479452528,
-            "0"
-          ]
-        },
-        "memory": {
-          "usage": [
-            1479452528,
-            "0.0213623046875"
-          ]
-        },
-        "network": {
-          "receive": [
-            1479452528,
-            "1854"
-          ],
-          "transmit": [
-            1479452528,
-            "648"
-          ]
-        },
-        "filesystem": {
-          "read": [
-            1479452528,
-            "0"
-          ],
-          "write": [
-            1479452528,
-            "0"
-          ]
-        }
-      },
-      "e58177e632ca1a6ef5404a76ae129f047e295cd4aab1c262eaec4811d24f9b6f": {
-        "cpu": {
-          "usage": [
-            1479452528,
-            "0"
-          ]
-        },
-        "memory": {
-          "usage": [
-            1479452528,
-            "0.02130126953125"
-          ]
-        },
-        "network": {
-          "receive": [
-            1479452528,
-            "1944"
-          ],
-          "transmit": [
-            1479452528,
-            "648"
-          ]
-        },
-        "filesystem": {
-          "read": [
-            1479452528,
-            "0"
-          ],
-          "write": [
-            1479452528,
-            "0"
-          ]
-        }
-      }
-    }
-  }
-}
-```
-
-### PromQL API
-
-Refer to "https://prometheus.io/docs/querying/api/"
-
-#### 单时间点查询
-`GET /v1/monitor/promql/query`
-
-https://prometheus.io/docs/querying/api/#instant-queries
-
-#### 时间范围查询
-`GET /v1/monitor/promql/query_range`
-
-https://prometheus.io/docs/querying/api/#range-queries
 
 ### AlertManager API
 
@@ -762,5 +247,3 @@ GET /v1/monitor/silence/:id
 DELETE /v1/monitor/silence/:id
 
 POST /v1/monitor/silences -d '{"matchers":[{"name":"alertname","value":"cpu_usage","isRegex":false},{"name":"container_label_APP_ID","value":"work-web","isRegex":false},{"name":"container_label_VCLUSTER","value":"work","isRegex":false},{"name":"cpu","value":"cpu01","isRegex":false},{"name":"id","value":"/docker/e4a59106d9f763626c70fc5e6bfa8c46a14a471ad66f102618a142f1e2f3e33f","isRegex":false},{"name":"image","value":"192.168.1.75/library/nginx-stress:1.10","isRegex":false},{"name":"instance","value":"192.168.1.102:5014","isRegex":false},{"name":"job","value":"cadvisor","isRegex":false},{"name":"name","value":"mesos-f011c830-7bb0-4edf-8c25-f9e64fa2246a-S0.3836a388-864b-48dc-95dd-25119b9ee3fa","isRegex":false},{"name":"severity","value":"critical","isRegex":false}],"startsAt":"2016-12-05T11:08:00.000Z","endsAt":"2016-12-05T15:08:00.000Z","createdBy":"yqguo@dataman-inc.com","comment":"this is a test"}'
-
-
