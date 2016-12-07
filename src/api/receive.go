@@ -33,6 +33,7 @@ func (s *search) Receiver(ctx *gin.Context) {
 		}
 		delete(a, "labels")
 		a["labels"] = utils.Byte2str(labels)
+		a["alertname"] = a["labels"].(map[string]interface{})["alertname"]
 		fmt.Printf("%s\n", labels)
 		s.Service.SavePrometheus(a)
 	}
