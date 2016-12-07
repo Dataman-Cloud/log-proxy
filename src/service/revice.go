@@ -37,11 +37,11 @@ func (s *SearchService) GetPrometheus(page models.Page) (map[string]interface{},
 		return nil, err
 	}
 
-	var cls []models.CommonLabels
+	var cls []map[string]interface{}
 	for _, hit := range result.Hits.Hits {
-		var pro models.Prometheus
+		var pro map[string]interface{}
 		if json.Unmarshal(*hit.Source, &pro) == nil {
-			cls = append(cls, pro.CLs)
+			cls = append(cls, pro)
 		}
 	}
 
