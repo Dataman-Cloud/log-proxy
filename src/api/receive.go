@@ -18,16 +18,25 @@ func (s *search) Receiver(ctx *gin.Context) {
 		return
 	}
 
-	var pro models.Prometheus
-	err = json.Unmarshal(data, &pro)
+	var m map[string]interface{}
+	err = json.Unmarshal(data, &m)
 	if err != nil {
 		utils.ErrorResponse(ctx, utils.NewError(GET_EVENTS_ERROR, err))
 		return
 	}
-	pro.CLs.Condition = pro.CAs.Summary
-	pro.CLs.Usage = pro.CAs.Description
 
-	s.Service.SavePrometheus(pro.CLs)
+	for _, alert := range m["alerts"].([]interface{}) {
+		a := alert.(map[string]interface{})
+		labels, err := json.Marshal(a["labels"])
+		if err != nil {
+			continue
+		}
+		delete(a, "labels")
+		a["labels"] = utils.Byte2str(labels)
+		fmt.Printf("%s\n", labels)
+		s.Service.SavePrometheus(a)
+	}
+
 	utils.Ok(ctx, map[string]string{"status": "success"})
 }
 
