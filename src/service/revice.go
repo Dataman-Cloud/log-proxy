@@ -2,9 +2,12 @@ package service
 
 import (
 	"encoding/json"
+	"net/http"
 	"time"
 
 	"github.com/Dataman-Cloud/log-proxy/src/models"
+
+	"gopkg.in/olivere/elastic.v3"
 )
 
 const (
@@ -32,6 +35,10 @@ func (s *SearchService) GetPrometheus(page models.Page) (map[string]interface{},
 		Size(page.PageSize).
 		Pretty(true).
 		Do()
+
+	if err.(*elastic.Error).Status == http.StatusNotFound {
+		return nil, nil
+	}
 
 	if err != nil {
 		return nil, err

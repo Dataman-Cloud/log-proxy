@@ -53,7 +53,7 @@ func GetSearch() *search {
 		PageSize: 0,
 	})
 
-	if err != nil {
+	if err != nil || alerts == nil {
 		return s
 	}
 
