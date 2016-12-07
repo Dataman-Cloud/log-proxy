@@ -27,14 +27,13 @@ func (s *search) Receiver(ctx *gin.Context) {
 
 	for _, alert := range m["alerts"].([]interface{}) {
 		a := alert.(map[string]interface{})
+		a["alertname"] = a["labels"].(map[string]interface{})["alertname"]
 		labels, err := json.Marshal(a["labels"])
 		if err != nil {
 			continue
 		}
 		delete(a, "labels")
 		a["labels"] = utils.Byte2str(labels)
-		a["alertname"] = a["labels"].(map[string]interface{})["alertname"]
-		fmt.Printf("%s\n", labels)
 		s.Service.SavePrometheus(a)
 	}
 
