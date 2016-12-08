@@ -64,29 +64,55 @@ func (expr *MetricExpr) GetAppExpr(query *Query) {
 }
 
 func (expr *MetricExpr) setExpr(query *Query, byItems string) {
-	expr.CPU.Usage = fmt.Sprintf("avg(irate(container_cpu_usage_seconds_total{container_label_APP_ID=~'.*',"+
-		"id=~'/docker/%s.*', name=~'mesos.*'}[5m])) by (%s)",
-		query.TaskID, byItems)
+	appid := query.AppID
+	if appid == "" {
+		expr.CPU.Usage = fmt.Sprintf("avg(irate(container_cpu_usage_seconds_total{container_label_APP_ID=~'.*',"+
+			"id=~'/docker/%s.*', name=~'mesos.*'}[5m])) by (%s)",
+			query.TaskID, byItems)
 
-	expr.Memory.Usage = fmt.Sprintf("sum(container_memory_usage_bytes{container_label_APP_ID=~'.*',"+
-		"id=~'/docker/%s.*', name=~'mesos.*'}) by (%s)", query.TaskID, byItems)
+		expr.Memory.Usage = fmt.Sprintf("sum(container_memory_usage_bytes{container_label_APP_ID=~'.*',"+
+			"id=~'/docker/%s.*', name=~'mesos.*'}) by (%s)", query.TaskID, byItems)
 
-	expr.Memory.Total = fmt.Sprintf("sum(container_spec_memory_limit_bytes{container_label_APP_ID=~'.*',"+
-		"id=~'/docker/%s.*', name=~'mesos.*'}) by (%s)", query.TaskID, byItems)
+		expr.Memory.Total = fmt.Sprintf("sum(container_spec_memory_limit_bytes{container_label_APP_ID=~'.*',"+
+			"id=~'/docker/%s.*', name=~'mesos.*'}) by (%s)", query.TaskID, byItems)
+
+		expr.Memory.Percentage = fmt.Sprintf("%s / %s", expr.Memory.Usage, expr.Memory.Total)
+
+		expr.Network.Receive = fmt.Sprintf("sum(irate(container_network_receive_bytes_total{container_label_APP_ID=~'.*',"+
+			"id=~'/docker/%s.*', name=~'mesos.*'}[5m])) by (%s)", query.TaskID, byItems)
+
+		expr.Network.Transmit = fmt.Sprintf("sum(irate(container_network_transmit_bytes_total{container_label_APP_ID=~'.*',"+
+			"id=~'/docker/%s.*', name=~'mesos.*'}[5m])) by (%s)", query.TaskID, byItems)
+
+		expr.Filesystem.Read = fmt.Sprintf("sum(irate(container_fs_reads_total{container_label_APP_ID=~'.*',"+
+			"id=~'/docker/%s.*', name=~'mesos.*'}[5m])) by (%s)", query.TaskID, byItems)
+
+		expr.Filesystem.Write = fmt.Sprintf("sum(irate(container_fs_writes_total{container_label_APP_ID=~'.*',"+
+			"id=~'/docker/%s.*', name=~'mesos.*'}[5m])) by (%s)", query.TaskID, byItems)
+		return
+	}
+	expr.CPU.Usage = fmt.Sprintf("avg(irate(container_cpu_usage_seconds_total{container_label_APP_ID='%s',"+
+		"id=~'/docker/%s.*', name=~'mesos.*'}[5m])) by (%s)", appid, query.TaskID, byItems)
+
+	expr.Memory.Usage = fmt.Sprintf("sum(container_memory_usage_bytes{container_label_APP_ID='%s',"+
+		"id=~'/docker/%s.*', name=~'mesos.*'}) by (%s)", appid, query.TaskID, byItems)
+
+	expr.Memory.Total = fmt.Sprintf("sum(container_spec_memory_limit_bytes{container_label_APP_ID='%s',"+
+		"id=~'/docker/%s.*', name=~'mesos.*'}) by (%s)", appid, query.TaskID, byItems)
 
 	expr.Memory.Percentage = fmt.Sprintf("%s / %s", expr.Memory.Usage, expr.Memory.Total)
 
-	expr.Network.Receive = fmt.Sprintf("sum(irate(container_network_receive_bytes_total{container_label_APP_ID=~'.*',"+
-		"id=~'/docker/%s.*', name=~'mesos.*'}[5m])) by (%s)", query.TaskID, byItems)
+	expr.Network.Receive = fmt.Sprintf("sum(irate(container_network_receive_bytes_total{container_label_APP_ID='%s',"+
+		"id=~'/docker/%s.*', name=~'mesos.*'}[5m])) by (%s)", appid, query.TaskID, byItems)
 
-	expr.Network.Transmit = fmt.Sprintf("sum(irate(container_network_transmit_bytes_total{container_label_APP_ID=~'.*',"+
-		"id=~'/docker/%s.*', name=~'mesos.*'}[5m])) by (%s)", query.TaskID, byItems)
+	expr.Network.Transmit = fmt.Sprintf("sum(irate(container_network_transmit_bytes_total{container_label_APP_ID='%s',"+
+		"id=~'/docker/%s.*', name=~'mesos.*'}[5m])) by (%s)", appid, query.TaskID, byItems)
 
-	expr.Filesystem.Read = fmt.Sprintf("sum(irate(container_fs_reads_total{container_label_APP_ID=~'.*',"+
-		"id=~'/docker/%s.*', name=~'mesos.*'}[5m])) by (%s)", query.TaskID, byItems)
+	expr.Filesystem.Read = fmt.Sprintf("sum(irate(container_fs_reads_total{container_label_APP_ID='%s',"+
+		"id=~'/docker/%s.*', name=~'mesos.*'}[5m])) by (%s)", appid, query.TaskID, byItems)
 
-	expr.Filesystem.Write = fmt.Sprintf("sum(irate(container_fs_writes_total{container_label_APP_ID=~'.*',"+
-		"id=~'/docker/%s.*', name=~'mesos.*'}[5m])) by (%s)", query.TaskID, byItems)
+	expr.Filesystem.Write = fmt.Sprintf("sum(irate(container_fs_writes_total{container_label_APP_ID='%s',"+
+		"id=~'/docker/%s.*', name=~'mesos.*'}[5m])) by (%s)", appid, query.TaskID, byItems)
 }
 
 func (expr *MetricExpr) GetNodeExpr(query *Query) {
@@ -97,8 +123,8 @@ func (expr *MetricExpr) GetNodeExpr(query *Query) {
 		expr.Memory.Total = fmt.Sprintf("sum(container_spec_memory_limit_bytes{id='/',instance='%s:5014'}) by (instance)", node)
 		expr.Network.Receive = fmt.Sprintf("irate(container_network_receive_bytes_total{id=~'/',instance='%s:5014'}[5m])", node)
 		expr.Network.Transmit = fmt.Sprintf("irate(container_network_transmit_bytes_total{id=~'/',instance='%s:5014'}[5m])", node)
-		expr.Filesystem.Usage = fmt.Sprintf("irate(container_fs_usage_bytes{id=~'/',instance='%s:5014'}[5m])", node)
-		expr.Filesystem.Limit = fmt.Sprintf("irate(container_fs_limit_bytes{id=~'/',instance='%s:5014'}[5m])", node)
+		expr.Filesystem.Usage = fmt.Sprintf("container_fs_usage_bytes{id=~'/',instance='%s:5014'}", node)
+		expr.Filesystem.Limit = fmt.Sprintf("container_fs_limit_bytes{id=~'/',instance='%s:5014'}", node)
 		return
 	}
 	expr.CPU.Usage = fmt.Sprintf("avg(irate(container_cpu_usage_seconds_total{id='/'}[5m])) by (instance)")
@@ -106,8 +132,8 @@ func (expr *MetricExpr) GetNodeExpr(query *Query) {
 	expr.Memory.Total = fmt.Sprintf("sum(container_spec_memory_limit_bytes{id='/'}) by (instance)")
 	expr.Network.Receive = fmt.Sprintf("irate(container_network_receive_bytes_total{id=~'/'}[5m])")
 	expr.Network.Transmit = fmt.Sprintf("irate(container_network_transmit_bytes_total{id=~'/'}[5m])")
-	expr.Filesystem.Usage = fmt.Sprintf("irate(container_fs_usage_bytes{id=~'/'}[5m])")
-	expr.Filesystem.Limit = fmt.Sprintf("irate(container_fs_limit_bytes{id=~'/'}[5m])")
+	expr.Filesystem.Usage = fmt.Sprintf("container_fs_usage_bytes{id=~'/'}")
+	expr.Filesystem.Limit = fmt.Sprintf("container_fs_limit_bytes{id=~'/'}")
 	return
 }
 

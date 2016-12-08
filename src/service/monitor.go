@@ -56,7 +56,7 @@ func (m *Metric) GetQueryMetric(query *backends.Query) error {
 type Info struct {
 	Clusters     map[string]*ClusterInfo `json:"clusters"`
 	Applications []string                `json:"applications"`
-	Tasks        []string                `json:"Tasks"`
+	Tasks        []string                `json:"tasks"`
 	Nodes        []string                `json:"nodes"`
 }
 
