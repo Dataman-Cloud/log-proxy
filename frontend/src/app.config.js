@@ -33,6 +33,11 @@
                 templateUrl: '/src/dashboard/monitor/app/detail.html',
                 controller: 'DashboardAppDetailCtrl as vm'
             })
+            .state('home.dashboardInstanceMonitor', {
+                url: '/dashboardMonitor/:clusterId/:appId/instances/:taskId',
+                templateUrl: '/src/dashboard/monitor/instance/detail.html',
+                controller: 'DashboardInstanceCtrl as vm'
+            })
             //end dashboard
 
             // //about monitor

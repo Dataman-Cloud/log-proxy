@@ -22,17 +22,17 @@
     <div class="chart" layout="row" layout-align="space-around start" layout-wrap>
         <div class="chart-panel" flex="45">
             <div>
-                <nvd3 options="vm.chartOptions.networkOptions" data="vm.chartOptions.networkData" api="vm.networkApi" config="{deepWatchData: false, deepWatchOptions:false}"></nvd3>
-            </div>
-        </div>
-        <div class="chart-panel" flex="45">
-            <div>
                 <nvd3 options="vm.chartOptions.cpuOptions" data="vm.chartOptions.cpuData" api="vm.cpuApi" config="{deepWatchData: false, deepWatchOptions:false}"></nvd3>
             </div>
         </div>
         <div class="chart-panel" flex="45">
             <div>
                 <nvd3 options="vm.chartOptions.memOptions" data="vm.chartOptions.memData" api="vm.memApi" config="{deepWatchData: false, deepWatchOptions:false}"></nvd3>
+            </div>
+        </div>
+        <div class="chart-panel" flex="45">
+            <div>
+                <nvd3 options="vm.chartOptions.networkOptions" data="vm.chartOptions.networkData" api="vm.networkApi" config="{deepWatchData: false, deepWatchOptions:false}"></nvd3>
             </div>
         </div>
         <div class="chart-panel" flex="45">

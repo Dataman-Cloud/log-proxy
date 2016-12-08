@@ -1,9 +1,5 @@
 <div class="statistic" layout="row" layout-align="space-between stretch">
     <div class="statistic-panel" layout="column" layout-align="space-around center">
-        <h3>实例个数</h3>
-        <em>{/keys(vm.tasks).length/}</em>
-    </div>
-    <div class="statistic-panel" layout="column" layout-align="space-around center">
         <h3>CPU</h3>
         <em>{/vm.realTimeData.cpuPercent.toFixed(2)/} %</em>
     </div>
@@ -63,7 +59,7 @@
         <tbody md-body>
         <tr md-row ng-repeat="(key, value) in vm.tasks track by $index">
             <td md-cell>
-                <a ui-sref="home.instancemonitor({appId: $stateParams.appId, taskId: key.substring(8)})">{/key/}</a>
+                <a ui-sref="home.dashboardInstanceMonitor({clusterId: $stateParams.clusterId, appId: $stateParams.appId, taskId: key.substring(8)})">{/key/}</a>
             </td>
             <td md-cell>
                 {/value.node/}
