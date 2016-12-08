@@ -18,10 +18,10 @@
             pageSelect: true
         };
 
-        self.defaultLimit = 50;
-        self.limitOptions = [50, 100, 200];
+        self.defaultLimit = 100;
+        self.limitOptions = [100, 200, 500];
         self.query = {
-            limit: 50,
+            limit: 100,
             page: 1
         };
 
@@ -35,7 +35,7 @@
         }
 
         function listHistory() {
-            alertBackend.histories({size: 50, page: 1}).get(function (data) {
+            alertBackend.histories({size: 100, page: 1}).get(function (data) {
                 self.histories = data.data.results;
                 self.count = data.data.count;
                 angular.forEach(self.histories, function (history, index) {
