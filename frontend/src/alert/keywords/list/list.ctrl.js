@@ -20,7 +20,7 @@
 
         function listKeyword() {
             alertBackend.alerts().get(function (data) {
-                self.keywords = data.data
+                self.keywords = data.data.results
             })
         }
 
