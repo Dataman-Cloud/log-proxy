@@ -14,34 +14,52 @@
                 abstract: true
             })
 
-            //about monitor
-            .state('home.appmonitor', {
-                url: '/appmonitor',
-                templateUrl: '/src/monitor/app/list.html',
-                controller: 'MonitorListAppCtrl as vm',
+            //about dashboard
+            .state('home.dashboard', {
+                url: '/dashboard',
+                templateUrl: '/src/dashboard/dashboard.html',
+                controller: 'DashboardCtrl as vm'
+            })
+            .state('home.dashboardMonitor', {
+                url: '/dashboardMonitor/:clusterId',
+                templateUrl: '/src/dashboard/monitor/app/list.html',
+                controller: 'DashboardListAppCtrl as vm',
                 resolve: {
-                    apps: listApp
+                    info: getInfo
                 }
             })
-            .state('home.appmonitor.detail', {
+            .state('home.dashboardMonitor.detail', {
                 url: '/:appId',
-                controller: 'MonitorAppDetailCtrl as vm',
-                templateUrl: '/src/monitor/app/detail.html'
+                templateUrl: '/src/dashboard/monitor/app/detail.html',
+                controller: 'DashboardAppDetailCtrl as vm'
             })
-            .state('home.instancemonitor', {
-                url: '/appmonitor/:appId/instances/:taskId',
-                templateUrl: '/src/monitor/instance/detail.html',
-                controller: 'MonitorInstanceCtrl as vm'
+            .state('home.dashboardInstanceMonitor', {
+                url: '/dashboardMonitor/:clusterId/:appId/instances/:taskId',
+                templateUrl: '/src/dashboard/monitor/instance/detail.html',
+                controller: 'DashboardInstanceCtrl as vm'
             })
-            .state('home.nodemonitor', {
-                url: '/nodemonitor',
-                templateUrl: '/src/monitor/node/node.html',
-                controller: 'MonitorNodeCtrl as vm',
-                resolve: {
-                    nodes: listNode
-                }
-            })
-            //end monitor
+            //end dashboard
+
+            // //about monitor
+            // .state('home.appmonitor', {
+            //     url: '/appmonitor/:clusterId',
+            //     templateUrl: '/src/monitor/app/list.html',
+            //     controller: 'MonitorListAppCtrl as vm',
+            //     resolve: {
+            //         apps: listApp
+            //     }
+            // })
+            // .state('home.appmonitor.detail', {
+            //     url: '/:appId',
+            //     controller: 'MonitorAppDetailCtrl as vm',
+            //     templateUrl: '/src/monitor/app/detail.html'
+            // })
+            // .state('home.instancemonitor', {
+            //     url: '/appmonitor/:appId/instances/:taskId',
+            //     templateUrl: '/src/monitor/instance/detail.html',
+            //     controller: 'MonitorInstanceCtrl as vm'
+            // })
+            // //end monitor
 
             //about log
             .state('home.logbase', {
@@ -132,8 +150,8 @@
             });
 
         /* @ngInject */
-        function listApp(monitorBackend) {
-            return monitorBackend.listApp().get().$promise
+        function getInfo(dashboardBackend, $stateParams) {
+            return dashboardBackend.info({clusterid: $stateParams.clusterId}).get().$promise
         }
 
         /* @ngInject */
@@ -154,7 +172,7 @@
         //warning: otherwise(url) will be redirect loop on state with errored resolve
         $urlRouterProvider.otherwise(function ($injector) {
             var $state = $injector.get('$state');
-            $state.go('home.appmonitor');
+            $state.go('home.dashboard');
         });
         $interpolateProvider.startSymbol('{/');
         $interpolateProvider.endSymbol('/}');
