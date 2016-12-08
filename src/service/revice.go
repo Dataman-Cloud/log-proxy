@@ -48,6 +48,7 @@ func (s *SearchService) GetPrometheus(page models.Page) (map[string]interface{},
 	for _, hit := range result.Hits.Hits {
 		var pro map[string]interface{}
 		if json.Unmarshal(*hit.Source, &pro) == nil {
+			pro["id"] = hit.Id
 			cls = append(cls, pro)
 		}
 	}
@@ -56,4 +57,25 @@ func (s *SearchService) GetPrometheus(page models.Page) (map[string]interface{},
 	data["count"] = result.Hits.TotalHits
 
 	return data, nil
+}
+
+func (s *SearchService) GetPrometheu(id string) (map[string]interface{}, error) {
+	result, err := s.ESClient.Get().
+		Index(PROMETHEUS_INDEX).
+		Type(PROMETHEUS_TYPE).
+		Id(id).
+		Do()
+
+	if err != nil && err.(*elastic.Error).Status == http.StatusNotFound {
+		return nil, nil
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	var m map[string]interface{}
+	err = json.Unmarshal(*result.Source, &m)
+
+	return m, err
 }
