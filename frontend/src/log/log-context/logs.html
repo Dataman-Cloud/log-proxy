@@ -1,4 +1,10 @@
-<md-virtual-repeat-container id="vertical-container" style="height: 515px;">
+<div class="search-keyword">
+    <p ng-show="$stateParams.appid">应用: <em>{/$stateParams.appid/}</em></p>
+    <p ng-show="$stateParams.taskid">实例: <em>{/$stateParams.taskid/}</em></p>
+    <p ng-show="$stateParams.path">来源: <em>{/$stateParams.path/}</em></p>
+</div>
+
+<md-virtual-repeat-container id="vertical-container" style="min-height: 515px;" md-top-index="vm.offsetIndex">
     <p id="{/log.offset/}" md-virtual-repeat="log in vm.infiniteLogs" md-on-demand
        ng-class="{'context-highlight' : log.offset == vm.contextQueryObj.offset}">
         {/log.message/}

@@ -1,0 +1,93 @@
+<div layout="row" layout-align="space-between start">
+    <div flex class="panel">
+        <form layout="column" name="staticForm">
+            <div flex class="form-item">
+                <label>起始时间</label>
+                <input type="datetime-local" placeholder="开始时间" ng-model="vm.form.startsAt" ng-max="vm.form.endsAt"
+                       name="startsAt" data-required="required" placeholder="yyyy-MM-ddTHH:mm">
+                <p data-ng-show="staticForm.startsAt.$error.max && !staticForm.startsAt.$pristine">
+                    起始时间大于结束时间</p>
+                <span ng-show="staticForm.startsAt.$error.datetimelocal">请填写正确时间格式</span>
+            </div>
+            <div flex class="form-item">
+                <label>结束时间</label>
+                <input type="datetime-local" placeholder="结束时间" ng-model="vm.form.endsAt" ng-min="vm.form.startsAt"
+                       name="endsAt" data-required="required" placeholder="yyyy-MM-ddTHH:mm">
+                <p data-ng-show="staticForm.endsAt.$error.min && !staticForm.endsAt.$pristine">结束时间小于起始时间</p>
+                <span ng-show="staticForm.endsAt.$error.datetimelocal">请填写正确时间格式</span>
+
+            </div>
+            <div flex class="form-item">
+                <label>Creator</label>
+                <input type="email" name="creator" ng-model="vm.form.createdBy" data-required="required">
+                <p class="error-info help-info-bottom"
+                   data-ng-show="staticForm.creator.$error.required && !staticForm.creator.$pristine">邮箱地址不能为空</p>
+                <p class="error-info help-info-bottom"
+                   data-ng-show="staticForm.creator.$error.email && !staticForm.creator.$pristine">邮箱格式不正确</p>
+            </div>
+            <div flex class="form-item">
+                <label>Comment</label>
+                <input type="text" name="comment" ng-model="vm.form.comment" data-required="required">
+                <p class="error-info help-info-bottom"
+                   data-ng-show="staticForm.comment.$error.required && !staticForm.comment.$pristine">Comment 不能为空</p>
+            </div>
+
+            <div layout="column" class="form-item">
+                <div layout="row" class="header-panel">
+                    <label>Matchers
+                        <md-tooltip md-direction="left">
+                            Matchers
+                        </md-tooltip>
+                        <small>Alerts affected by this silence.</small>
+                    </label>
+                    <md-button id="AddMatcher" class="md-primary md-raised"
+                               aria-label="Add matcher" data-ng-click="vm.addMatcher()">
+                        <i class="fa fa-plus"></i> 添加
+                    </md-button>
+                </div>
+                <div layout="column">
+                    <div data-ng-repeat="matcher in vm.form.matchers track by $index"
+                         class="form-subitem">
+                        <ng-form name="matcherForm" layout="row" layout-align="start center">
+                            <input id="matcherName{/$index/}" type="text" placeholder="NAME" flex="40"
+                                   data-ng-model="matcher.name" data-required="required" name="name">
+                            <input id="matcherValue{/$index/}" type="text" placeholder="VALUE" flex-offset="5"
+                                   flex="40" data-ng-model="matcher.value" data-required="required"
+                                   name="value">
+                            <md-checkbox ng-model="matcher.isRegex" aria-label="Regex matcher">
+                                Regex
+                            </md-checkbox>
+                            <div flex>
+                                <md-button id="matcherDelete{/$index/}" class="md-icon-button md-accent"
+                                           aria-label="delete"
+                                           data-ng-click="vm.deleteMatcher($index)">
+                                    <i class="fa fa-trash"></i>
+                                </md-button>
+                            </div>
+                        </ng-form>
+                        <p data-ng-if="envs.envKey.$error.samename" class="help-info-bottom error-info">
+                            环境变量的 KEY 重复</p>
+                        <p data-ng-if="envs.envKey.$error.pattern && !envs.envKey.$pristine"
+                           class="help-info-bottom error-info">环境变量 Key 不能包含中文</p>
+                        <p data-ng-if="envs.envValue.$error.pattern && !envs.envValue.$pristine"
+                           class="help-info-bottom error-info">环境变量 Value 不能包含中文</p>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="form-buttons-footer" layout="column">
+                <md-button class="md-raised md-primary" style="width: 100px;"
+                           ng-disabled="staticForm.$invalid" ng-show="vm.target === 'create'"
+                           ng-click="vm.create()">
+                    创建
+                </md-button>
+                <md-button class="md-raised md-primary" style="width: 100px;"
+                           ng-disabled="staticForm.$invalid" ng-show="vm.target === 'update'"
+                           ng-click="vm.update()">
+                    更新
+                </md-button>
+            </div>
+        </form>
+    </div>
+</div>

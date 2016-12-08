@@ -2,13 +2,11 @@
     <div class="logo"><a href="#"><img src="../pics/logo-white-full.svg"></a></div>
     <nav>
         <ul layout="row" layout-align="start center">
-            <li>
-                <md-button ng-href="#">首页</md-button>
-            </li>
+
             <li>
                 <md-menu>
                     <md-button aria-label="More" ng-click="$mdOpenMenu($event)" id="open-user-menu">
-                        监控
+                        Dashboard
                     </md-button>
                     <md-menu-content>
                         <md-menu-item>
@@ -21,22 +19,28 @@
                 </md-menu>
             </li>
             <li>
+                <md-button ng-href="#">监控</md-button>
+            </li>
+            <li>
                 <md-button ui-sref="home.logbase">日志</md-button>
             </li>
             <li>
                 <md-menu>
                     <md-button aria-label="More" ng-click="$mdOpenMenu($event)">
-                        事件
+                        告警
                     </md-button>
                     <md-menu-content>
                         <md-menu-item>
-                            <md-button ui-sref="home.eventmonitor">监控</md-button>
+                            <md-button ui-sref="home.alerthistory">告警历史</md-button>
+                        </md-menu-item>
+                        <md-menu-item>
+                            <md-button ui-sref="home.alertkeyword">日志过滤关键字</md-button>
+                        </md-menu-item>
+                        <md-menu-item>
+                            <md-button ui-sref="home.alertSilences">静默管理</md-button>
                         </md-menu-item>
                     </md-menu-content>
                 </md-menu>
-            </li>
-            <li>
-                <md-button ui-sref="home.alertlist">告警</md-button>
             </li>
         </ul>
     </nav>

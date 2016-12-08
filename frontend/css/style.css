@@ -59,6 +59,7 @@ dd {
     top: 0;
     left: 0;
     width: 100%;
+    z-index: 99;
 }
 
 #header .logo img {
@@ -356,4 +357,15 @@ textarea {
 
 .context-highlight {
     background-color: yellowgreen;
+}
+.search-keyword {
+    background-color: rgba(0,0,0,0.05);
+    padding: 5px;
+}
+.search-keyword p {
+    margin-right: 24px;
+    display: inline-block;
+}
+.result-sum {
+    margin: 10px 5px;
 }

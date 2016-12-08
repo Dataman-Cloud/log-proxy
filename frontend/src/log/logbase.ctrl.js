@@ -6,11 +6,7 @@
     function LogBaseCtrl(moment, $state, logBackend) {
         var self = this;
 
-        self.tempLogQuery = {};
-
         self.timePeriod = 120;
-        self.curTimestamp = moment().unix() * 1000;
-        self.fromTimestamp = moment().subtract(self.timePeriod, 'minutes').unix() * 1000;
         self.selectedTabIndex = 0;
 
         self.periodChange = periodChange;
@@ -27,7 +23,6 @@
         }
 
         function periodChange(period) {
-            self.selectApp = '';
             self.curTimestamp = moment().unix() * 1000;
             self.fromTimestamp = moment().subtract(period, 'minutes').unix() * 1000;
         }
@@ -38,17 +33,13 @@
         }
 
         function loadApps() {
-            checkTimeRange();
-            logBackend.listApp({from: self.fromTimestamp, to: self.curTimestamp}).get(function (data) {
+            logBackend.listApp().get(function (data) {
                 self.apps = data.data;
             })
         }
 
         function loadTasks() {
-            checkTimeRange();
             logBackend.listTask({
-                from: self.fromTimestamp,
-                to: self.curTimestamp,
                 appid: self.selectApp
             }).get(function (data) {
                 self.tasks = data.data;
@@ -56,10 +47,7 @@
         }
 
         function loadPaths() {
-            checkTimeRange();
             logBackend.listPath({
-                from: self.fromTimestamp,
-                to: self.curTimestamp,
                 appid: self.selectApp,
                 taskid: self.selectTasks
             }).get(function (data) {

@@ -13,6 +13,8 @@
                 controller: 'RootCtrl as vm',
                 abstract: true
             })
+
+            //about monitor
             .state('home.appmonitor', {
                 url: '/appmonitor',
                 templateUrl: '/src/monitor/app/list.html',
@@ -39,6 +41,9 @@
                     nodes: listNode
                 }
             })
+            //end monitor
+
+            //about log
             .state('home.logbase', {
                 url: '/logbase',
                 templateUrl: '/src/log/logbase.html',
@@ -59,10 +64,13 @@
                 templateUrl: '/src/log/log-context/logs.html',
                 controller: 'LogContextCtrl as vm'
             })
-            .state('home.alertcreate', {
-                url: '/alert-create',
-                templateUrl: '/src/alert/create-update/create-update.html',
-                controller: 'CreateAlertCtrl as vm',
+            //end log
+
+            //about alert
+            .state('home.alertKeywordCreate', {
+                url: '/alertKeywordCreate',
+                templateUrl: '/src/alert/keywords/create-update/create-update.html',
+                controller: 'CreateAlertKeywordCtrl as vm',
                 resolve: {
                     target: function () {
                         return 'create'
@@ -72,10 +80,10 @@
                     }
                 }
             })
-            .state('home.alertupdate', {
-                url: '/alert-update/:id',
-                templateUrl: '/src/alert/create-update/create-update.html',
-                controller: 'CreateAlertCtrl as vm',
+            .state('home.alertKeywordUpdate', {
+                url: '/alertKeywordUpdate/:id',
+                templateUrl: '/src/alert/keywords/create-update/create-update.html',
+                controller: 'CreateAlertKeywordCtrl as vm',
                 resolve: {
                     target: function () {
                         return 'update'
@@ -83,15 +91,44 @@
                     alert: getAlert
                 }
             })
-            .state('home.alertlist', {
-                url: '/alertlist',
-                templateUrl: '/src/alert/list/list.html',
-                controller: 'AlertListCtrl as vm'
+            .state('home.alertkeyword', {
+                url: '/alertkeyword',
+                templateUrl: '/src/alert/keywords/list/list.html',
+                controller: 'AlertKeywordsCtrl as vm'
             })
-            .state('home.eventmonitor', {
-                url: '/eventmonitor',
-                templateUrl: '/src/event/monitor/list/list.html',
-                controller: 'EventMonitorCtrl as vm'
+            .state('home.alerthistory', {
+                url: '/alerthistory',
+                templateUrl: '/src/alert/history/list/list.html',
+                controller: 'AlertHistoriesCtrl as vm'
+            })
+            .state('home.alertSilences', {
+                url: '/alertSilences',
+                templateUrl: '/src/alert/silence/list/list.html',
+                controller: 'AlertSilencesCtrl as vm'
+            })
+            .state('home.alertSilencesCreate', {
+                url: '/alertSilencesCreate?fromByHistory',
+                templateUrl: '/src/alert/silence/create-update/create-update.html',
+                controller: 'CreateAlertSilenceCtrl as vm',
+                resolve: {
+                    target: function () {
+                        return 'create'
+                    },
+                    silence: function () {
+                        return {}
+                    }
+                }
+            })
+            .state('home.alertSilencesUpdate', {
+                url: '/alertSilencesUpdate/:id?from',
+                templateUrl: '/src/alert/silence/create-update/create-update.html',
+                controller: 'CreateAlertSilenceCtrl as vm',
+                resolve: {
+                    target: function () {
+                        return 'update'
+                    },
+                    silence: getSilence
+                }
             });
 
         /* @ngInject */
@@ -107,6 +144,10 @@
         /* @ngInject */
         function getAlert(alertBackend, $stateParams) {
             return alertBackend.alert($stateParams.id).get().$promise
+        }
+
+        function getSilence(alertBackend, $stateParams) {
+            return alertBackend.silence($stateParams.id).get().$promise
         }
 
         $locationProvider.html5Mode(true);
