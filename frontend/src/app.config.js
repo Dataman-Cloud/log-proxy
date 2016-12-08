@@ -20,28 +20,41 @@
                 templateUrl: '/src/dashboard/dashboard.html',
                 controller: 'DashboardCtrl as vm'
             })
-            //end dashboard
-
-            //about monitor
-            .state('home.appmonitor', {
-                url: '/appmonitor',
-                templateUrl: '/src/monitor/app/list.html',
-                controller: 'MonitorListAppCtrl as vm',
+            .state('home.dashboardMonitor', {
+                url: '/dashboardMonitor/:clusterId',
+                templateUrl: '/src/dashboard/monitor/app/list.html',
+                controller: 'DashboardListAppCtrl as vm',
                 resolve: {
-                    apps: listApp
+                    info: getInfo
                 }
             })
-            .state('home.appmonitor.detail', {
+            .state('home.dashboardMonitor.detail', {
                 url: '/:appId',
-                controller: 'MonitorAppDetailCtrl as vm',
-                templateUrl: '/src/monitor/app/detail.html'
+                templateUrl: '/src/dashboard/monitor/app/detail.html',
+                controller: 'DashboardAppDetailCtrl as vm'
             })
-            .state('home.instancemonitor', {
-                url: '/appmonitor/:appId/instances/:taskId',
-                templateUrl: '/src/monitor/instance/detail.html',
-                controller: 'MonitorInstanceCtrl as vm'
-            })
-            //end monitor
+            //end dashboard
+
+            // //about monitor
+            // .state('home.appmonitor', {
+            //     url: '/appmonitor/:clusterId',
+            //     templateUrl: '/src/monitor/app/list.html',
+            //     controller: 'MonitorListAppCtrl as vm',
+            //     resolve: {
+            //         apps: listApp
+            //     }
+            // })
+            // .state('home.appmonitor.detail', {
+            //     url: '/:appId',
+            //     controller: 'MonitorAppDetailCtrl as vm',
+            //     templateUrl: '/src/monitor/app/detail.html'
+            // })
+            // .state('home.instancemonitor', {
+            //     url: '/appmonitor/:appId/instances/:taskId',
+            //     templateUrl: '/src/monitor/instance/detail.html',
+            //     controller: 'MonitorInstanceCtrl as vm'
+            // })
+            // //end monitor
 
             //about log
             .state('home.logbase', {
@@ -132,8 +145,8 @@
             });
 
         /* @ngInject */
-        function listApp(monitorBackend) {
-            return monitorBackend.listApp().get().$promise
+        function getInfo(dashboardBackend, $stateParams) {
+            return dashboardBackend.info({clusterid: $stateParams.clusterId}).get().$promise
         }
 
         /* @ngInject */

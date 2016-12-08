@@ -1,0 +1,111 @@
+<div class="statistic" layout="row" layout-align="space-between stretch">
+    <div class="statistic-panel" layout="column" layout-align="space-around center">
+        <h3>实例个数</h3>
+        <em>{/keys(vm.tasks).length/}</em>
+    </div>
+    <div class="statistic-panel" layout="column" layout-align="space-around center">
+        <h3>CPU</h3>
+        <em>{/vm.realTimeData.cpuPercent.toFixed(2)/} %</em>
+    </div>
+    <div class="statistic-panel" layout="column" layout-align="space-around center">
+        <h3>内存</h3>
+        <em>{/vm.realTimeData.memUsage.toFixed(2)/} %</em>
+    </div>
+    <div class="statistic-panel statictic-io" layout="column" layout-align="space-around center">
+        <h3>网络 IO</h3>
+        <em><i class="fa fa-upload" aria-hidden="true">
+            <md-tooltip md-direction="left">读</md-tooltip>
+        </i> {/vm.realTimeData.networkReceive | netRate/}</em>
+        <em><i class="fa fa-download" aria-hidden="true">
+            <md-tooltip md-direction="left">写</md-tooltip>
+        </i> {/vm.realTimeData.networkTransmit | netRate/}</em>
+    </div>
+    <div class="statistic-panel statictic-io" layout="column" layout-align="space-around center">
+        <h3>磁盘 IO</h3>
+        <em><i class="fa fa-upload" aria-hidden="true">
+            <md-tooltip md-direction="left">读</md-tooltip>
+        </i> {/vm.realTimeData.fileSysRead | netRate/}</em>
+        <em><i class="fa fa-download" aria-hidden="true">
+            <md-tooltip md-direction="left">写</md-tooltip>
+        </i> {/vm.realTimeData.fileSysWrite | netRate/}</em>
+    </div>
+</div>
+<div class="chart" layout="row" layout-align="space-around start" layout-wrap>
+    <div class="chart-panel" flex="45">
+        <nvd3 options="vm.chartOptions.cpuOptions" data="vm.chartOptions.cpuData" api="vm.cpuApi" layout-wrap
+              config="{deepWatchData: false, deepWatchOptions:false}"></nvd3>
+    </div>
+    <div class="chart-panel" flex="45">
+        <nvd3 options="vm.chartOptions.memOptions" data="vm.chartOptions.memData" api="vm.memApi"
+              config="{deepWatchData: false, deepWatchOptions:false}"></nvd3>
+    </div>
+    <div class="chart-panel" flex="45">
+        <nvd3 options="vm.chartOptions.networkOptions" data="vm.chartOptions.networkData" api="vm.networkApi"
+              config="{deepWatchData: false, deepWatchOptions:false}"></nvd3>
+    </div>
+    <div class="chart-panel" flex="45">
+        <nvd3 options="vm.chartOptions.fileSysOptions" data="vm.chartOptions.fileSysData" api="vm.fileSysApi"
+              config="{deepWatchData: false, deepWatchOptions:false}"></nvd3>
+    </div>
+</div>
+<md-table-container>
+    <table md-table id="node-list">
+        <thead md-head>
+        <tr md-row>
+            <th md-column>实例</th>
+            <th md-column style="width: 100px;">主机</th>
+            <th md-column style="width: 80px;">CPU</th>
+            <th md-column style="width: 100px;">内存</th>
+            <th md-column style="width: 120px;">网络 I/O</th>
+            <th md-column style="width: 120px;">磁盘 I/O</th>
+        </tr>
+        </thead>
+        <tbody md-body>
+        <tr md-row ng-repeat="(key, value) in vm.tasks track by $index">
+            <td md-cell>
+                <a ui-sref="home.instancemonitor({appId: $stateParams.appId, taskId: key.substring(8)})">{/key/}</a>
+            </td>
+            <td md-cell>
+                {/value.node/}
+            </td>
+            <td md-cell>
+                {/ ((value.cpu.usage[1] | num) * 100).toFixed(2)/}%
+            </td>
+            <td md-cell>
+                <ul>
+                    <li>{/value.memory.usage_bytes[1] | size/}</li>
+                    <li>{/value.memory.total_bytes[1] | size/}</li>
+                </ul>
+            </td>
+            <td md-cell>
+                <ul>
+                    <li ng-repeat="(networkKey, networkValue) in value.network">
+                        <dl layout="row">
+                            <dt flex="none">网卡:</dt>
+                            <dd flex="auto">{/networkKey/}</dd>
+                        </dl>
+                        <dl layout="row">
+                            <dt flex="none">发送:</dt>
+                            <dd>{/networkValue.transmit[1] | netRate/}</dd>
+                        </dl>
+                        <dl layout="row">
+                            <dt flex="none">接收:</dt>
+                            <dd>{/networkValue.receive[1] | netRate/}</dd>
+                        </dl>
+                    </li>
+                </ul>
+            </td>
+            <td md-cell>
+                <dl layout="row">
+                    <dt flex="none">读:</dt>
+                    <dd>{/value.filesystem.read[1] | netRate/}</dd>
+                </dl>
+                <dl layout="row">
+                    <dt flex="none">写:</dt>
+                    <dd>{/value.filesystem.write[1] | netRate/}</dd>
+                </dl>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</md-table-container>

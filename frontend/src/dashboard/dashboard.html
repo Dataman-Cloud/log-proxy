@@ -31,7 +31,7 @@
             <tbody md-body>
             <tr md-row ng-repeat="(key, value) in vm.info.clusters track by $index">
                 <td md-cell>
-                    {/key/}
+                    <a ui-sref="home.dashboardMonitor({clusterId: key})">{/key/}</a>
                 </td>
                 <td md-cell>
                     <p ng-repeat="(appKey, appValue) in value.applications track by $index">{/appKey/}</p>
