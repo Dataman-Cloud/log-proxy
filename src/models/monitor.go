@@ -35,7 +35,7 @@ type MetricCPU struct {
 }
 
 type MetricMemory struct {
-	Percentage []*Result `json:"percentage"`
+	Percentage []*Result `json:"usage"`
 	Usage      []*Result `json:"usage_bytes"`
 	Total      []*Result `json:"total_bytes"`
 }
@@ -55,7 +55,7 @@ type InfoCPU struct {
 }
 
 type InfoMemory struct {
-	Percetange []interface{} `json:"percentage"`
+	Percetange []interface{} `json:"usage"`
 	Usage      []interface{} `json:"usage_bytes"`
 	Total      []interface{} `json:"total_bytes"`
 }
