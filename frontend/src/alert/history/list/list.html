@@ -1,5 +1,7 @@
 <div class="alarm-strategy-list" layout="column">
-    <h2>告警历史</h2>
+    <div class="result-sum">
+        <h2>告警历史</h2>
+    </div>
     <div class="panel">
         <md-table-container>
             <table md-table id="user-list-table">
@@ -14,16 +16,58 @@
                 </tr>
                 </thead>
                 <tbody md-body>
-                <tr md-row ng-repeat="history in vm.histories track by $index">
-                    <td md-cell>{/history.alertname/}</td>
-                    <td md-cell>{/history.container_label_APP_ID/}</td>
-                    <td md-cell>{/history.instance/}</td>
-                    <td md-cell>{/history.severity/}</td>
-                    <td md-cell>{/history.instance/}</td>
-                    <td md-cell>{/history.instance/}</td>
+                <tr md-row ng-repeat-start="history in vm.histories track by $index">
+                    <td md-cell>
+                        <a ng-click="vm.historyDisplaySet[$index] = !vm.historyDisplaySet[$index]">
+                            <i class="fa"
+                               ng-class="{'fa-chevron-down':vm.historyDisplaySet[$index], 'fa-chevron-right':!vm.historyDisplaySet[$index]}"></i>
+                        </a>
+                    </td>
+                    <td md-cell>
+                        {/history.createtime | date: 'yyyy-MM-dd HH:mm:ss'/}
+                    </td>
+                    <td md-cell>
+                        {/history.alertname/}
+                    </td>
+                    <td md-cell>
+                        {/history.annotations.description/}
+                    </td>
+                    <td md-cell>
+                        {/history.annotations.summary/}
+                    </td>
+                    <td md-cell>
+                        <div class="action" layout="row">
+                            <md-button aria-label="update" class="md-raised">
+                                静默
+                            </md-button>
+                        </div>
+                    </td>
+                </tr>
+                <tr ng-repeat-end ng-if="vm.historyDisplaySet[$index]">
+                    <td colspan="3">
+                        <div class="json-detail">
+                            <dl layout="row" ng-repeat="(key, value) in history.annotations track by $index">
+                                <dt flex="30">{/key/}</dt>
+                                <dd flex>{/value/}</dd>
+                            </dl>
+                            <dl layout="row" ng-repeat="(key, value) in history.labels track by $index">
+                                <dt flex="30">{/key/}</dt>
+                                <dd flex>{/value/}</dd>
+                            </dl>
+                        </div>
+                    </td>
                 </tr>
                 </tbody>
             </table>
+            <md-table-pagination md-limit="vm.query.limit"
+                                 md-label="{page: '页:', rowsPerPage: '每页:', of: 'of'}"
+                                 md-limit-options="vm.limitOptions"
+                                 md-boundary-links="vm.limitOptions.boundaryLinks"
+                                 md-page="vm.query.page"
+                                 md-total="{/vm.count/}"
+                                 md-on-paginate="vm.onPaginate"
+                                 md-page-select="vm.options.pageSelect">
+            </md-table-pagination>
         </md-table-container>
     </div>
 </div>

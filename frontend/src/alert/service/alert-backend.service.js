@@ -11,6 +11,7 @@
         return {
             alerts: alerts,
             alert: alert,
+            histories: histories,
             history: history,
             silences: silences,
             silence: silence
@@ -26,8 +27,16 @@
             return $resource(BACKEND_URL_BASE.defaultBase + '/v1/monitor/alert/:id', {id: id});
         }
 
-        function history() {
-            return $resource(BACKEND_URL_BASE.defaultBase + '/v1/monitor/prometheus');
+        function histories(data) {
+            var paramObj = data || {};
+            return $resource(BACKEND_URL_BASE.defaultBase + '/v1/monitor/prometheus', {
+                page: paramObj.page,
+                size: paramObj.size
+            });
+        }
+
+        function history(id) {
+            return $resource(BACKEND_URL_BASE.defaultBase + '/v1/monitor/prometheus/:id', {id: id});
         }
 
         function silences() {
