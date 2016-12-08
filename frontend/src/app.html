@@ -4,22 +4,19 @@
         <ul layout="row" layout-align="start center">
 
             <li>
+                <md-button ui-sref=".dashboard">Dashboard</md-button>
+            </li>
+            <li>
                 <md-menu>
                     <md-button aria-label="More" ng-click="$mdOpenMenu($event)" id="open-user-menu">
-                        Dashboard
+                        监控
                     </md-button>
                     <md-menu-content>
                         <md-menu-item>
                             <md-button ui-sref=".appmonitor">应用</md-button>
                         </md-menu-item>
-                        <md-menu-item>
-                            <md-button ui-sref=".nodemonitor">主机</md-button>
-                        </md-menu-item>
                     </md-menu-content>
                 </md-menu>
-            </li>
-            <li>
-                <md-button ng-href="#">监控</md-button>
             </li>
             <li>
                 <md-button ui-sref="home.logbase">日志</md-button>

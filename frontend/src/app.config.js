@@ -14,6 +14,14 @@
                 abstract: true
             })
 
+            //about dashboard
+            .state('home.dashboard', {
+                url: '/dashboard',
+                templateUrl: '/src/dashboard/dashboard.html',
+                controller: 'DashboardCtrl as vm'
+            })
+            //end dashboard
+
             //about monitor
             .state('home.appmonitor', {
                 url: '/appmonitor',
@@ -32,14 +40,6 @@
                 url: '/appmonitor/:appId/instances/:taskId',
                 templateUrl: '/src/monitor/instance/detail.html',
                 controller: 'MonitorInstanceCtrl as vm'
-            })
-            .state('home.nodemonitor', {
-                url: '/nodemonitor',
-                templateUrl: '/src/monitor/node/node.html',
-                controller: 'MonitorNodeCtrl as vm',
-                resolve: {
-                    nodes: listNode
-                }
             })
             //end monitor
 
@@ -154,7 +154,7 @@
         //warning: otherwise(url) will be redirect loop on state with errored resolve
         $urlRouterProvider.otherwise(function ($injector) {
             var $state = $injector.get('$state');
-            $state.go('home.appmonitor');
+            $state.go('home.dashboard');
         });
         $interpolateProvider.startSymbol('{/');
         $interpolateProvider.endSymbol('/}');
