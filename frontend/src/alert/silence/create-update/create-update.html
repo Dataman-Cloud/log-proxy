@@ -19,7 +19,7 @@
             </div>
             <div flex class="form-item">
                 <label>Creator</label>
-                <input type="email" name="creator" ng-model="vm.form.createdBy">
+                <input type="email" name="creator" ng-model="vm.form.createdBy" data-required="required">
                 <p class="error-info help-info-bottom"
                    data-ng-show="staticForm.creator.$error.required && !staticForm.creator.$pristine">邮箱地址不能为空</p>
                 <p class="error-info help-info-bottom"
@@ -27,7 +27,9 @@
             </div>
             <div flex class="form-item">
                 <label>Comment</label>
-                <input type="text" name="comment" ng-model="vm.form.comment">
+                <input type="text" name="comment" ng-model="vm.form.comment" data-required="required">
+                <p class="error-info help-info-bottom"
+                   data-ng-show="staticForm.comment.$error.required && !staticForm.comment.$pristine">Comment 不能为空</p>
             </div>
 
             <div layout="column" class="form-item">

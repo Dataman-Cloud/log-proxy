@@ -107,7 +107,7 @@
                 controller: 'AlertSilencesCtrl as vm'
             })
             .state('home.alertSilencesCreate', {
-                url: '/alertSilencesCreate',
+                url: '/alertSilencesCreate?fromByHistory',
                 templateUrl: '/src/alert/silence/create-update/create-update.html',
                 controller: 'CreateAlertSilenceCtrl as vm',
                 resolve: {

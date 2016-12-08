@@ -3,15 +3,15 @@
     angular.module('app')
         .controller('CreateAlertSilenceCtrl', CreateAlertSilenceCtrl);
     /* @ngInject */
-    function CreateAlertSilenceCtrl(alertBackend, $state, $stateParams, target, silence, Notification) {
+    function CreateAlertSilenceCtrl(alertBackend, $state, $stateParams, target, silence, Notification, moment) {
         var self = this;
 
         self.target = target;
         self.target === 'create' ? self.form = {
             createdBy: '',
             comment: '',
-            endsAt: '',
-            startsAt: '',
+            endsAt: new Date(moment().unix() * 1000),
+            startsAt: new Date(moment().subtract(2, 'hours').unix() * 1000),
             matchers: [{
                 name: '',
                 value: ''
@@ -26,7 +26,25 @@
         activate();
 
         function activate() {
+            if (target === 'create' && $stateParams.fromByHistory) {
+                initMatchers();
+            }
+        }
 
+        function initMatchers() {
+            var matchers = [];
+            alertBackend.history($stateParams.fromByHistory).get(function (data) {
+                var labels = angular.fromJson(data.data.labels);
+                angular.forEach(labels, function (value, key) {
+                    var matcher = {name: '', value: ''};
+                    matcher.name = key;
+                    matcher.value = value;
+
+                    matchers.push(matcher);
+                });
+
+                self.form.matchers = matchers;
+            })
         }
 
         function formatSilence(silence) {
