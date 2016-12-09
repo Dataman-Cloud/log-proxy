@@ -1,0 +1,15 @@
+FROM demoregistry.dataman-inc.com/library/centos7-base:latest
+
+MAINTAINER Zhongqiang Dou zqdou@dataman-inc.com
+
+RUN mkdir /dataman
+
+ADD bin/mola /dataman/mola
+ADD frontend /dataman/frontend
+ADD env_file.template /dataman/env_file
+
+WORKDIR dataman
+
+EXPOSE 5098
+
+ENTRYPOINT ["./mola"]
