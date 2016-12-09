@@ -60,8 +60,23 @@ gulp.task('template-min-utils', ['template-min-directives'], function () {
         .pipe(gulp.dest('dist/src/'));
 });
 
+//dashboard html to js
+gulp.task('template-min-dashboard', ['template-min-utils'], function () {
+    return gulp.src('src/dashboard/**/*.html')
+        .pipe($.minifyHtml({
+            empty: true,
+            spare: true,
+            quotes: true
+        }))
+        .pipe($.angularTemplatecache('templateCacheHtmlDashboard.js', {
+            module: 'app',
+            root: '/src/dashboard'
+        }))
+        .pipe(gulp.dest('dist/src/'));
+});
+
 //monitor html to js
-gulp.task('template-min-monitor', ['template-min-utils'], function () {
+gulp.task('template-min-monitor', ['template-min-dashboard'], function () {
     return gulp.src('src/monitor/**/*.html')
         .pipe($.minifyHtml({
             empty: true,
@@ -90,7 +105,22 @@ gulp.task('template-min-log', ['template-min-monitor'], function () {
         .pipe(gulp.dest('dist/src/'));
 });
 
-gulp.task('ng-annotate', ['template-min-log'], function () {
+//alert html to js
+gulp.task('template-min-alert', ['template-min-log'], function () {
+    return gulp.src('src/alert/**/*.html')
+        .pipe($.minifyHtml({
+            empty: true,
+            spare: true,
+            quotes: true
+        }))
+        .pipe($.angularTemplatecache('templateCacheHtmlAlert.js', {
+            module: 'app',
+            root: '/src/alert'
+        }))
+        .pipe(gulp.dest('dist/src/'));
+});
+
+gulp.task('ng-annotate', ['template-min-alert'], function () {
     return gulp.src('src/**/*.js')
         .pipe($.ngAnnotate({add: true}))
         .pipe(gulp.dest('dist/src'))
