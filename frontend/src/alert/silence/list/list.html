@@ -10,11 +10,11 @@
             <table md-table id="user-list-table">
                 <thead md-head>
                 <tr md-row>
-                    <th md-column style="width: 60px;"></th>
-                    <th md-column>创建时间</th>
-                    <th md-column>matchers</th>
-                    <th md-column>状态</th>
-                    <th md-column>操作</th>
+                    <th md-column style="width: 50px;"></th>
+                    <th md-column style="width: 150px;">创建时间</th>
+                    <th md-column>匹配项</th>
+                    <th md-column style="width: 150px;">状态</th>
+                    <th md-column style="width: 150px;">操作</th>
                 </tr>
                 </thead>
                 <tbody md-body>
@@ -27,8 +27,9 @@
                     </td>
                     <td md-cell>{/silence.createdAt | date:" yyyy-MM-dd HH:mm:ss"/}</td>
                     <td md-cell>
-                        <p ng-repeat="matcher in silence.matchers track by $index">{/matcher.name/} :
-                            {/matcher.value/}</p>
+                        <dl ng-repeat="matcher in silence.matchers track by $index" class="matcher-list">
+                            <dt>{/matcher.name/}:<dt><dd>{/matcher.value/}</dd>
+                        </dl>
                     </td>
                     <td md-cell>
                         <p ng-show="vm.checkState(silence.startsAt, silence.endsAt) === 'Active'">Active</p>
@@ -47,8 +48,8 @@
                         </div>
                     </td>
                 </tr>
-                <tr ng-repeat-end ng-hide="!vm.silenceDetailSet[$index]">
-                    <td colspan="3">
+                <tr ng-repeat-end ng-if="vm.silenceDetailSet[$index]">
+                    <td colspan="5">
                         <div class="json-detail">
                             <dl layout="row" ng-repeat="(key, value) in silence track by $index">
                                 <dt>{/key/}</dt>

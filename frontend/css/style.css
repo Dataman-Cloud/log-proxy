@@ -46,6 +46,7 @@ dd {
     background-color: #FFF;
     border-radius: 4px;
     padding: 20px;
+    margin-bottom: 40px;
 }
 
 #container {
@@ -122,6 +123,12 @@ table.md-table th.md-column {
     white-space: nowrap;
 }
 
+table.md-table th.md-column small {
+    color: rgba(0, 0, 0, 0.5);
+    font-weight: 300;   
+    margin-left: 8px;
+}
+
 table.md-table td.md-cell {
     color: rgba(0, 0, 0, 0.85);
     font-size: 12px;
@@ -155,6 +162,19 @@ table.md-table td.md-cell ul li {
 
 table.md-table td.md-cell ul li:last-child {
     margin-bottom: 0;
+}
+
+table.md-table td.md-cell ul li span {
+    margin-left: 12px;
+    margin-right: 12px;
+}
+
+table.md-table td.md-cell ul li span:first-child {
+    margin-left: 0;
+}
+
+table.md-table td.md-cell ul li span:last-child {
+    margin-right: 0;
 }
 
 form {
@@ -289,7 +309,6 @@ textarea {
     padding: 12px;
     text-align: center;
     width: 18%;
-    margin-bottom: 40px;
 }
 
 .statistic-panel h3 {
@@ -350,9 +369,27 @@ textarea {
     min-width: 120px;
     font-weight: 500;
 }
+.json-detail {
+    padding: 20px 60px;
+    background: -ms-linear-gradient(top, #fff,  #0000ff);
+    background:-moz-linear-gradient(top,#b8c4cb,#f6f6f8);
+    background:-webkit-gradient(linear, 0% 0%, 0% 90%, from(rgba(0,0,0,0.05)), to(#FFF));
+    background: -o-linear-gradient(top, #fff, #0000ff);
+}
+.json-detail dl {
+    margin-bottom: 8px;
+}
 
-.log-result .json-detail {
-    padding: 20px 8px;
+.json-detail dl dt, .json-detail dl dd {
+    display: inline-block;
+    font-size: 12px;
+}
+.json-detail dl dt {
+    min-width: 240px;
+    font-weight: 500;
+}
+.json-detail dl dd {
+    word-wrap: break-word;
 }
 
 .context-highlight {
@@ -368,4 +405,23 @@ textarea {
 }
 .result-sum {
     margin: 10px 5px;
+}
+.matcher-list {
+    display: inline-block;
+    margin-bottom: 5px;
+    margin-right: 10px;
+}
+.matcher-list dt, .matcher-list dd {
+    display: inline-block;
+    margin-right: 15px;
+
+}
+.matcher-list dt {
+    font-weight: 500;
+    margin-right: 5px;
+}
+.error-info.help-info-bottom {
+    font-size: 12px;
+    color: red;
+    margin-top: 5px;
 }

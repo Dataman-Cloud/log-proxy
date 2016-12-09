@@ -1,4 +1,4 @@
-<div class="statistic" layout="row" layout-align="space-between stretch">
+<div class="statistic panel" layout="row" layout-align="space-between stretch">
     <div class="statistic-panel" layout="column" layout-align="space-around center">
         <h3>集群数</h3>
         <em>{/keys(vm.info.clusters).length/}</em>
@@ -16,16 +16,15 @@
         <em>{/vm.info.nodes.length/}</em>
     </div>
 </div>
-
-<md-content class="main-tab-content">
+<div class="panel">
     <md-table-container>
         <table md-table id="cluster-list">
             <thead md-head>
             <tr md-row>
-                <th md-column>集群</th>
-                <th md-column>应用</th>
+                <th md-column style="width:150px;">集群</th>
+                <th md-column style="width:200px;">应用</th>
                 <th md-column>实例</th>
-                <th md-column>主机</th>
+                <th md-column style="width:150px;">主机</th>
             </tr>
             </thead>
             <tbody md-body>
@@ -46,18 +45,17 @@
             </tbody>
         </table>
     </md-table-container>
-</md-content>
-
-<md-content class="main-tab-content">
+</div>
+<div class="panel">
     <md-table-container>
         <table md-table id="node-list">
             <thead md-head>
             <tr md-row>
-                <th md-column>主机</th>
-                <th md-column>CPU</th>
-                <th md-column>内存</th>
-                <th md-column>网络I/O</th>
-                <th md-column>磁盘使用量</th>
+                <th md-column style="width:150px;">主机</th>
+                <th md-column style="width:100px;">CPU</th>
+                <th md-column style="width:200px;">内存<small>使用量 | 总量</small></th>
+                <th md-column>网络I/O<small>网卡名 | 发送 | 接收</small></th>
+                <th md-column>磁盘使用量<small>磁盘名 | 使用量 | 总量 | 占用比</small></th>
             </tr>
             </thead>
             <tbody md-body>
@@ -69,27 +67,27 @@
                     {/ ((value.cpu.usage[1] | num) * 100).toFixed(2) /} %
                 </td>
                 <td md-cell>
-                    {/value.memory.usage_bytes[1] | size/} / {/value.memory.total_bytes[1] | size/}
+                    <ul>
+                        <li><span>{/value.memory.usage_bytes[1] | size/}</span><span>{/value.memory.total_bytes[1] | size/}</span></li>
+                    </ul>
                 </td>
                 <td md-cell>
-                    <p ng-repeat="(networkKey, networkValue) in value.network">
-                        网卡: {/networkKey/}
-                        <span ng-show="networkValue.transmit">发送:{/networkValue.transmit[1] | netRate/}</span>
-                        <span ng-hide="networkValue.transmit">发送: - </span>
-                        <span ng-show="networkValue.receive">接收:{/networkValue.receive[1] | netRate/}</span>
-                        <span ng-hide="networkValue.receive">接收: - </span>
-                    </p>
+                    <ul>
+                        <li ng-repeat="(networkKey, networkValue) in value.network">
+                            <span>{/networkKey/}</span><span ng-show="networkValue.transmit">{/networkValue.transmit[1] | netRate/}</span><span ng-hide="networkValue.transmit">-</span><span ng-show="networkValue.receive">{/networkValue.receive[1] | netRate/}</span><span ng-hide="networkValue.receive">-</span>
+                        </li>
+                    </ul>
                 </td>
                 <td md-cell>
-                    <p ng-repeat="(filesystemKey, filesystemValue) in value.filesystem">
-                        磁盘: {/filesystemKey/} {/filesystemValue.usage_bytes[1] | size/}/{/filesystemValue.total_bytes[1]
-                        | size/}
-
-                        磁盘占用比: {/ ((filesystemValue.usage_bytes[1] / filesystemValue.total_bytes[1]) * 100).toFixed(2) /}%
-                    </p>
+                    <ul>
+                        <li ng-repeat="(filesystemKey, filesystemValue) in value.filesystem">
+                            <span>{/filesystemKey/}</span><span>{/filesystemValue.usage_bytes[1] | size/}</span><span>{/filesystemValue.total_bytes[1]
+                            | size/}</span><span>{/ ((filesystemValue.usage_bytes[1] / filesystemValue.total_bytes[1]) * 100).toFixed(2) /}%</span>
+                        </li>
+                    </ul>
                 </td>
             </tr>
             </tbody>
         </table>
     </md-table-container>
-</md-content>
+</div>
