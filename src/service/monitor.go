@@ -150,12 +150,6 @@ func (info *Info) GetQueryInfo(query *backends.Query) error {
 		task := originData.Metric.ID
 		node := strings.Split(originData.Metric.Instance, ":")[0]
 		for name, value := range info.Clusters {
-			if !isInArray(value.Tasks, task) {
-				value.Tasks = append(value.Tasks, task)
-			}
-			if !isInArray(value.Nodes, node) {
-				value.Nodes = append(value.Nodes, node)
-			}
 			if cluster == name {
 				value.Applications[app] = NewAppInfo()
 				if !isInArray(value.Tasks, task) {
