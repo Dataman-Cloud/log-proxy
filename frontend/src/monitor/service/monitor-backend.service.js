@@ -11,15 +11,14 @@
         function monitor(data) {
             var paramObj = data || {};
             return $resource(BACKEND_URL_BASE.defaultBase + '/v1/monitor/query', {
-                appid: paramObj.appid,
                 metric: paramObj.metric,
-                start: paramObj.start,
-                end : paramObj.end,
-                step: paramObj.step,
+                appid: paramObj.appid,
                 taskid: paramObj.taskid,
+                start: paramObj.start,
+                end: paramObj.end,
+                step: paramObj.step,
                 expr: paramObj.expr
             });
         }
-
     }
 })();
