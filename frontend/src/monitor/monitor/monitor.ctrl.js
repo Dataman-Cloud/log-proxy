@@ -3,7 +3,7 @@
     angular.module('app')
         .controller('MonitorCtrl', MonitorCtrl);
     /* @ngInject */
-    function MonitorCtrl($state, $stateParams, monitorBackend) {
+    function MonitorCtrl($stateParams, monitorBackend, monitorSingleChart) {
         var self = this;
 
         self.query = {
@@ -16,13 +16,23 @@
             expr: $stateParams.expr
         };
 
+        if ($stateParams.metric) {
+            self.chartOptions = monitorSingleChart.Options($stateParams.metric);
+        } else if ($stateParams.expr) {
+            self.chartOptions = monitorSingleChart.Options('expr');
+        }
+
         activate();
 
         function activate() {
-            monitorBackend.monitor(self.query).get(function (data) {
-
-            })
-
+            if (self.chartOptions) {
+                monitorBackend.monitor(self.query).get(function (data) {
+                    self.chartOptions.pushData(data.data, self.api);
+                    setTimeout(function () {
+                        self.chartOptions.flushCharts(self.api)
+                    }, 0);
+                })
+            }
         }
     }
 })();

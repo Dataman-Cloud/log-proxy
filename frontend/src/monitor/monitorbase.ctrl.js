@@ -6,7 +6,7 @@
     function MonitorBaseCtrl($state, $stateParams, moment) {
         var self = this;
         self.timePeriod = 120;
-        self.selectedTabIndex = 0;
+        self.selectedTabIndex = ($stateParams.start || $stateParams.end) ? 1 : 0;
         self.querymodel = $stateParams.expr ? 'advance' : 'quick';
 
         self.form = {
@@ -18,7 +18,7 @@
         };
 
         self.startTime = new Date(parseInt($stateParams.start) * 1000);
-        self.endTime = new Date(parseInt($stateParams.end)  * 1000);
+        self.endTime = new Date(parseInt($stateParams.end) * 1000);
 
         self.search = search;
 
@@ -29,7 +29,7 @@
         }
 
         function checkTimeRange() {
-            if (self.selectedTabIndex) {
+            if (!self.selectedTabIndex) {
                 self.form.end = moment().unix();
                 self.form.start = moment().subtract(self.timePeriod, 'minutes').unix();
             } else {
@@ -38,6 +38,7 @@
                     self.form.start = self.startTime.getTime() / 1000;
                 }
             }
+            self.form.step = Math.ceil((self.form.end - self.form.start) / 400);
         }
 
         function search() {
@@ -45,7 +46,12 @@
             var form = angular.copy(self.form);
 
             if (self.querymodel === 'advance') {
-                form = {expr: self.form.expr};
+                form = {
+                    expr: self.form.expr,
+                    start: self.form.start,
+                    end: self.form.end,
+                    step: self.form.step
+                };
             } else {
                 form = {
                     metric: self.form.metric,

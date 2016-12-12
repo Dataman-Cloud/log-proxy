@@ -14,7 +14,8 @@
             updateForceY: updateForceY
         };
 
-        function createDefaultOptions(chartType) {
+        function createDefaultOptions(Options) {
+            Options = Options || {};
             var colors = [
                 '#1f77b4',
                 '#ff7f0e',
@@ -29,9 +30,9 @@
             ];
             return {
                 chart: {
-                    type: chartType || 'lineChart',
+                    type: Options.chartType || 'lineChart',
                     noData: '暂无数据',
-                    height: 200,
+                    height: Options.height || 200,
                     margin: {
                         top: 20,
                         right: 20,
@@ -45,7 +46,7 @@
                         return d.y;
                     },
                     useInteractiveGuideline: true,
-                    showLegend: false,
+                    showLegend: Options.showLegend || false,
                     xAxis: {
                         tickFormat: function (d) {
                             return $filter('date')(d, 'yy/M/d HH:mm');
@@ -56,7 +57,8 @@
                         tickFormat: function (d) {
                             return d3.format('.02f')(d) + '%';
                         },
-                        axisLabelDistance: 10
+                        axisLabelDistance: 10,
+                        showMaxMin: false
                     },
                     pointSize: 0.1,
                     forceY: [0],
