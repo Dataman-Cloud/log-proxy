@@ -31,7 +31,7 @@
             return {
                 chart: {
                     type: Options.chartType || 'lineChart',
-                    noData: '暂无数据',
+                    noData: '加载中',
                     height: Options.height || 200,
                     margin: {
                         top: 20,
@@ -45,8 +45,44 @@
                     y: function (d) {
                         return d.y;
                     },
-                    useInteractiveGuideline: true,
+                    tooltip: {
+                        contentGenerator: function (e) {
+                            var series = e.series[0];
+                            if (series.value === null) return;
+
+                            var rows =
+                                "<td class='key'>" + 'Value: ' + "</td>" +
+                                "<td class='x-value'><strong>" + (series.value ? series.value.toFixed(2) : 0) + "</strong></td>" +
+                                "</tr>";
+
+                            var header =
+                                "<thead>" +
+                                "<tr>" +
+                                "<td class='legend-color-guide'><div style='background-color: " + series.color + ";'></div></td>" +
+                                "<td class='key'><strong>" + series.key + "</strong></td>" +
+                                "</tr>" +
+                                "</thead>";
+
+                            return "<table>" +
+                                header +
+                                "<tbody>" +
+                                rows +
+                                "</tbody>" +
+                                "</table>";
+                        }
+                    },
+                    useInteractiveGuideline: !Options.hideGuideline,
+                    interactive: true,
                     showLegend: Options.showLegend || false,
+                    legendPosition: 'bottom',
+                    legend: {
+                        margin: {
+                            top: 14
+                        },
+                        rightAlign: false,
+                        maxKeyLength: 12
+                    },
+                    duration: 50,
                     xAxis: {
                         tickFormat: function (d) {
                             return $filter('date')(d, 'yy/M/d HH:mm');

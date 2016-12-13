@@ -50,7 +50,7 @@
             }
 
             Options.prototype._createExprOptions = function () {
-                var options = chartUtil.createDefaultOptions({height: 500, showLegend: true});
+                var options = chartUtil.createDefaultOptions({height: 500, showLegend: true, hideGuideline: true});
                 options.title.text = 'expr';
                 options.chart.yAxis.tickFormat = function (d) {
                     return d;
@@ -227,7 +227,7 @@
             };
 
             Options.prototype._pushData = function (data, api, target, serialKeyBuilder) {
-                angular.forEach(data, function (item) {
+                angular.forEach(data, function (item, index) {
                     var serialKey;
                     if (serialKeyBuilder) {
                         if (this.type === 'expr') {
