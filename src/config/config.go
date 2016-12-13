@@ -2,7 +2,6 @@ package config
 
 import (
 	"bufio"
-	"flag"
 	"io"
 	"log"
 	"os"
@@ -28,14 +27,12 @@ func GetConfig() *Config {
 	return c
 }
 
-func init() {
+func InitConfig(file string) {
 	c = new(Config)
-	configFile := flag.String("config", "env_file", "config file path")
-	flag.Parse()
 
-	f, err := os.Open(*configFile)
+	f, err := os.Open(file)
 	if err != nil {
-		log.Printf("open config file %s error: %v", *configFile, err)
+		log.Printf("open config file %s error: %v", file, err)
 		return
 	}
 	defer func() {
@@ -72,24 +69,6 @@ func LoadConfig() {
 			robj.Field(i).Set(reflect.ValueOf(os.Getenv(robj.Type().Field(i).Name)))
 		case "bool":
 			if b, err := strconv.ParseBool(os.Getenv(robj.Type().Field(i).Name)); err == nil {
-				robj.Field(i).Set(reflect.ValueOf(b))
-			} else if rb {
-				log.Fatalf("config %s value invalid", robj.Type().Field(i).Name)
-			}
-		case "int":
-			if b, err := strconv.Atoi(os.Getenv(robj.Type().Field(i).Name)); err == nil {
-				robj.Field(i).Set(reflect.ValueOf(b))
-			} else if rb {
-				log.Fatalf("config %s value invalid", robj.Type().Field(i).Name)
-			}
-		case "uint64":
-			if b, err := strconv.ParseUint(os.Getenv(robj.Type().Field(i).Name), 10, 64); err == nil {
-				robj.Field(i).Set(reflect.ValueOf(b))
-			} else if rb {
-				log.Fatalf("config %s value invalid", robj.Type().Field(i).Name)
-			}
-		case "int64":
-			if b, err := strconv.ParseInt(os.Getenv(robj.Type().Field(i).Name), 10, 64); err == nil {
 				robj.Field(i).Set(reflect.ValueOf(b))
 			} else if rb {
 				log.Fatalf("config %s value invalid", robj.Type().Field(i).Name)

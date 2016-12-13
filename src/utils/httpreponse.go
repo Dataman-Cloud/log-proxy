@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -40,7 +39,8 @@ func Create(ctx *gin.Context, data interface{}) {
 }
 
 func Delete(ctx *gin.Context, data interface{}) {
-	ctx.JSON(http.StatusNoContent, gin.H{"code": CODE_OK, "data": data})
+	//ctx.JSON(http.StatusNoContent, gin.H{"code": CODE_OK, "data": data})
+	ctx.Writer.WriteHeader(http.StatusNoContent)
 	return
 }
 
@@ -54,7 +54,6 @@ func ErrorResponse(ctx *gin.Context, err error) {
 	ecode := CODE_UNDEFINE
 
 	e, ok := err.(*Error)
-	fmt.Println(e, ok)
 	if ok {
 		if codes := strings.Split(e.Code, "-"); len(codes) == 2 {
 			hcode, _ = strconv.Atoi(codes[0])
