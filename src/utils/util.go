@@ -1,8 +1,10 @@
 package utils
 
 import (
+	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"time"
 	"unsafe"
 )
@@ -16,13 +18,13 @@ func ParseDate(from, to interface{}) string {
 		return "*"
 	}
 
-	f, ok := from.(int64)
-	if !ok {
+	f, err := strconv.ParseInt(fmt.Sprint(from), 10, 64)
+	if err != nil {
 		return time.Now().Format("2006-01-02")
 	}
 
-	t, ok := to.(int64)
-	if !ok {
+	t, err := strconv.ParseInt(fmt.Sprint(to), 10, 64)
+	if err != nil {
 		return time.Now().Format("2006-01-02")
 	}
 

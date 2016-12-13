@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"net/http"
 	"path"
 	"time"
@@ -14,6 +15,10 @@ import (
 )
 
 func main() {
+	configFile := flag.String("config", "env_file", "config file path")
+	flag.Parse()
+	config.InitConfig(*configFile)
+
 	log.Infof("http server: %s start...", config.GetConfig().ADDR)
 
 	server := &http.Server{

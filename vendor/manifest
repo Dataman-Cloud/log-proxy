@@ -2,6 +2,15 @@
 	"version": 0,
 	"dependencies": [
 		{
+			"importpath": "github.com/Dataman-Cloud/mock-server/server",
+			"repository": "https://github.com/Dataman-Cloud/mock-server",
+			"vcs": "git",
+			"revision": "ef0d093d355c6c405177a1b5ba1716005a0d3309",
+			"branch": "master",
+			"path": "/server",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/Sirupsen/logrus",
 			"repository": "https://github.com/Sirupsen/logrus",
 			"vcs": "git",
@@ -61,6 +70,22 @@
 			"notests": true
 		},
 		{
+			"importpath": "github.com/gorilla/context",
+			"repository": "https://github.com/gorilla/context",
+			"vcs": "git",
+			"revision": "08b5f424b9271eedf6f9f0ce86cb9396ed337a42",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/gorilla/mux",
+			"repository": "https://github.com/gorilla/mux",
+			"vcs": "git",
+			"revision": "757bef944d0f21880861c2dd9c871ca543023cba",
+			"branch": "master",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/manucorporat/sse",
 			"repository": "https://github.com/manucorporat/sse",
 			"vcs": "git",
@@ -83,6 +108,33 @@
 			"revision": "fa8ad6fec33561be4280a8f0514318c79d7f6cb6",
 			"branch": "master",
 			"path": "/go",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/stretchr/testify/assert",
+			"repository": "https://github.com/stretchr/testify",
+			"vcs": "git",
+			"revision": "18a02ba4a312f95da08ff4cfc0055750ce50ae9e",
+			"branch": "master",
+			"path": "/assert",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/stretchr/testify/vendor/github.com/davecgh/go-spew/spew",
+			"repository": "https://github.com/stretchr/testify",
+			"vcs": "git",
+			"revision": "18a02ba4a312f95da08ff4cfc0055750ce50ae9e",
+			"branch": "master",
+			"path": "vendor/github.com/davecgh/go-spew/spew",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/stretchr/testify/vendor/github.com/pmezard/go-difflib/difflib",
+			"repository": "https://github.com/stretchr/testify",
+			"vcs": "git",
+			"revision": "18a02ba4a312f95da08ff4cfc0055750ce50ae9e",
+			"branch": "master",
+			"path": "vendor/github.com/pmezard/go-difflib/difflib",
 			"notests": true
 		},
 		{
