@@ -1,0 +1,93 @@
+<div class="log" layout="row" layout-align="space-between start">
+    <div class="panel log-condition">
+        <form layout="column" name="staticForm">
+            <md-tabs id="querymodelTabs" layout="column" md-dynamic-height md-border-bottom md-selected="vm.queryTabIndex">
+                <md-tab label="快捷查询">
+                    <md-content>
+                        <div flex class="form-item">
+                            <label class="requirement">应用</label>
+                            <input id="app" type="text" placeholder="应用" ng-model="vm.form.appid" name="appid"
+                                   ng-required="!vm.queryTabIndex">
+                            <p data-ng-show="staticForm.appid.$error.required && !staticForm.appid.$pristine">
+                                应用名称不能为空</p>
+                        </div>
+                        <div flex class="form-item">
+                            <label>实例</label>
+                            <input id="instance" name="taskid" type="text" placeholder="实例" ng-model="vm.form.taskid">
+                            <p data-ng-show="staticForm.taskid.$error.required && !staticForm.taskid.$pristine">
+                                实例名称不能为空</p>
+                        </div>
+                        <div flex class="form-item">
+                            <label>监控指标</label>
+                            <md-select id="monitoringIndicators" placeholder="监控指标" ng-model="vm.form.metric"
+                                       aria-label="metric" ng-required="!vm.queryTabIndex">
+                                <md-option value="cpu">cpu</md-option>
+                                <md-option value="memory">memory</md-option>
+                                <md-option value="memory_usage">memory_usage</md-option>
+                                <md-option value="memory_total">memory_total</md-option>
+                                <md-option value="network_rx">network_rx</md-option>
+                                <md-option value="network_tx">network_tx</md-option>
+                                <md-option value="fs_read">fs_read</md-option>
+                                <md-option value="fs_write">fs_write</md-option>
+                            </md-select>
+                        </div>
+                    </md-content>
+                </md-tab>
+                <md-tab label="高级查询">
+                    <md-content>
+                        <div flex class="form-item">
+                            <label class="requirement">表达式</label>
+                            <textarea ng-model="vm.form.expr" id="expr" name="advance" rows="15"
+                                      ng-required="vm.queryTabIndex"></textarea>
+                            <p data-ng-show="staticForm.advance.$error.required && !staticForm.advance.$pristine">
+                                表达式不能为空</p>
+                        </div>
+                    </md-content>
+                </md-tab>
+            </md-tabs>
+
+
+            <md-tabs id="timeTabs" layout="column" md-dynamic-height md-border-bottom md-selected="vm.selectedTabIndex">
+                <md-tab label="最近">
+                    <md-content>
+                        <div flex class="form-item">
+                            <md-select aria-label="role" ng-model="vm.timePeriod">
+                                <md-option ng-value="30">最近三十分钟</md-option>
+                                <md-option ng-value="120">最近两小时</md-option>
+                                <md-option ng-value="360">最近六小时</md-option>
+                                <md-option ng-value="720">最近12小时</md-option>
+                                <md-option ng-value="1440">最近一天</md-option>
+                            </md-select>
+                        </div>
+                    </md-content>
+                </md-tab>
+                <md-tab label="起止">
+                    <md-content>
+                        <div flex class="form-item">
+                            <div flex class="form-item">
+                                <input type="datetime-local" placeholder="开始时间" ng-model="vm.startTime"
+                                       ng-max="vm.endTime" name="startTime" ng-required="vm.selectedTabIndex">
+                                <input type="datetime-local" placeholder="结束时间" ng-model="vm.endTime"
+                                       ng-min="vm.startTime" name="endTime" ng-required="vm.selectedTabIndex">
+                            </div>
+                            <p data-ng-show="staticForm.startTime.$error.max && !staticForm.startTime.$pristine">
+                                起始时间大于结束时间</p>
+                            <p data-ng-show="staticForm.endTime.$error.min && !staticForm.endTime.$pristine">
+                                结束时间小于起始时间</p>
+                            <span ng-show="staticForm.startTime.$error.datetimelocal">请填写正确时间格式</span>
+                            <span ng-show="staticForm.endTime.$error.datetimelocal">请填写正确时间格式</span>
+                        </div>
+                    </md-content>
+                </md-tab>
+            </md-tabs>
+
+            <div flex class="form-item" layout="column">
+                <md-button class="md-raised md-primary" ng-click="vm.search()" ng-disabled="staticForm.$invalid">查询
+                </md-button>
+            </div>
+        </form>
+    </div>
+    <div flex class="panel" style="margin-left: 10px;" ui-view>
+        请在左侧输入查询条件
+    </div>
+</div>

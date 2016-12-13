@@ -40,26 +40,18 @@
             })
             //end dashboard
 
-            // //about monitor
-            // .state('home.appmonitor', {
-            //     url: '/appmonitor/:clusterId',
-            //     templateUrl: '/src/monitor/app/list.html',
-            //     controller: 'MonitorListAppCtrl as vm',
-            //     resolve: {
-            //         apps: listApp
-            //     }
-            // })
-            // .state('home.appmonitor.detail', {
-            //     url: '/:appId',
-            //     controller: 'MonitorAppDetailCtrl as vm',
-            //     templateUrl: '/src/monitor/app/detail.html'
-            // })
-            // .state('home.instancemonitor', {
-            //     url: '/appmonitor/:appId/instances/:taskId',
-            //     templateUrl: '/src/monitor/instance/detail.html',
-            //     controller: 'MonitorInstanceCtrl as vm'
-            // })
-            // //end monitor
+            //about monitor
+            .state('home.monitor', {
+                url: '/monitor?metric&appid&taskid&start&end&step&expr',
+                templateUrl: '/src/monitor/monitorbase.html',
+                controller: 'MonitorBaseCtrl as vm'
+            })
+            .state('home.monitor.chart', {
+                url: '/chart',
+                templateUrl: '/src/monitor/monitor/monitor.html',
+                controller: 'MonitorCtrl as vm'
+            })
+            //end monitor
 
             //about log
             .state('home.logbase', {
