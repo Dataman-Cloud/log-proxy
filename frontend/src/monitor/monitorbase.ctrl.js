@@ -7,7 +7,7 @@
         var self = this;
         self.timePeriod = 120;
         self.selectedTabIndex = ($stateParams.start || $stateParams.end) ? 1 : 0;
-        self.querymodel = $stateParams.expr ? 'advance' : 'quick';
+        self.queryTabIndex = $stateParams.expr ? 1 : 0;
 
         self.form = {
             metric: $stateParams.metric,
@@ -45,7 +45,7 @@
             checkTimeRange();
             var form = angular.copy(self.form);
 
-            if (self.querymodel === 'advance') {
+            if (self.queryTabIndex) {
                 form = {
                     expr: self.form.expr,
                     start: self.form.start,
