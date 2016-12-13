@@ -2,8 +2,10 @@ package api
 
 import (
 	"errors"
+	"strings"
 	"sync"
 
+	"github.com/Dataman-Cloud/log-proxy/src/config"
 	"github.com/Dataman-Cloud/log-proxy/src/models"
 	"github.com/Dataman-Cloud/log-proxy/src/service"
 	"github.com/Dataman-Cloud/log-proxy/src/utils"
@@ -35,7 +37,7 @@ type search struct {
 
 func GetSearch() *search {
 	s := &search{
-		Service:       service.NewEsService(),
+		Service:       service.NewEsService(strings.Split(config.GetConfig().ES_URL, ",")),
 		KeywordFilter: make(map[string][]string),
 		Counter: prometheus.NewCounterVec(
 			prometheus.CounterOpts{
