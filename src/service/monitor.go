@@ -177,8 +177,6 @@ func (info *Info) GetQueryInfo(query *backends.Query) error {
 
 	// Fill the metric of app
 	if query.ClusterID != "" || query.AppID != "" {
-		fmt.Printf("clusterid : %s\n", query.ClusterID)
-		fmt.Printf("appid: %s\n", query.AppID)
 		metrics := []string{"cpu", "memory", "network_rx", "network_tx", "fs_read", "fs_write"}
 		for _, metric := range metrics {
 			query.Metric = metric

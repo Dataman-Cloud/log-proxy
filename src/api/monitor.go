@@ -12,13 +12,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Backends API: AlertManager
-const (
-	ALERTSPATH       = "/api/v1/alerts"
-	ALERTSGROUSPPATH = "/api/v1/alerts/groups"
-	ALERTSSTATUSPATH = "/api/v1/status"
-)
-
 type monitor struct {
 }
 
@@ -142,7 +135,7 @@ func (m *monitor) GetAlerts(ctx *gin.Context) {
 	query := &backends.AlertManager{
 		HttpClient: http.DefaultClient,
 		Server:     config.GetConfig().ALERTMANAGER_URL,
-		Path:       ALERTSPATH,
+		Path:       backends.ALERTSPATH,
 	}
 
 	data, err := query.GetAlertManagerResponse()
@@ -157,7 +150,7 @@ func (m *monitor) GetAlertsGroups(ctx *gin.Context) {
 	query := &backends.AlertManager{
 		HttpClient: http.DefaultClient,
 		Server:     config.GetConfig().ALERTMANAGER_URL,
-		Path:       ALERTSGROUSPPATH,
+		Path:       backends.ALERTSGROUSPPATH,
 	}
 
 	data, err := query.GetAlertManagerResponse()
@@ -172,7 +165,7 @@ func (m *monitor) GetAlertsStatus(ctx *gin.Context) {
 	query := &backends.AlertManager{
 		HttpClient: http.DefaultClient,
 		Server:     config.GetConfig().ALERTMANAGER_URL,
-		Path:       ALERTSSTATUSPATH,
+		Path:       backends.ALERTSSTATUSPATH,
 	}
 
 	data, err := query.GetAlertManagerResponse()

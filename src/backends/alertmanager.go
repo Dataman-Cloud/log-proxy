@@ -13,8 +13,11 @@ import (
 )
 
 const (
-	SILENCES_API = "/api/v1/silences"
-	GET_SILENCE  = "/api/v1/silence/"
+	SILENCES_API     = "/api/v1/silences"
+	GET_SILENCE      = "/api/v1/silence/"
+	ALERTSPATH       = "/api/v1/alerts"
+	ALERTSGROUSPPATH = "/api/v1/alerts/groups"
+	ALERTSSTATUSPATH = "/api/v1/status"
 )
 
 type AlertManager struct {

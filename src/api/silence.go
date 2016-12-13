@@ -18,7 +18,7 @@ func (m *monitor) GetSilences(ctx *gin.Context) {
 	query := &backends.AlertManager{
 		HttpClient: http.DefaultClient,
 		Server:     config.GetConfig().ALERTMANAGER_URL,
-		Path:       ALERTSPATH,
+		Path:       backends.ALERTSPATH,
 	}
 
 	data, err := query.GetSilences()
@@ -33,7 +33,7 @@ func (m *monitor) CreateSilence(ctx *gin.Context) {
 	query := &backends.AlertManager{
 		HttpClient: http.DefaultClient,
 		Server:     config.GetConfig().ALERTMANAGER_URL,
-		Path:       ALERTSPATH,
+		Path:       backends.ALERTSPATH,
 	}
 
 	var silence map[string]interface{}
@@ -54,7 +54,7 @@ func (m *monitor) GetSilence(ctx *gin.Context) {
 	query := &backends.AlertManager{
 		HttpClient: http.DefaultClient,
 		Server:     config.GetConfig().ALERTMANAGER_URL,
-		Path:       ALERTSPATH,
+		Path:       backends.ALERTSPATH,
 	}
 
 	data, err := query.GetSilence(ctx.Param("id"))
@@ -69,7 +69,7 @@ func (m *monitor) DeleteSilence(ctx *gin.Context) {
 	query := &backends.AlertManager{
 		HttpClient: http.DefaultClient,
 		Server:     config.GetConfig().ALERTMANAGER_URL,
-		Path:       ALERTSPATH,
+		Path:       backends.ALERTSPATH,
 	}
 
 	err := query.DeleteSilence(ctx.Param("id"))
@@ -84,7 +84,7 @@ func (m *monitor) UpdateSilence(ctx *gin.Context) {
 	query := &backends.AlertManager{
 		HttpClient: http.DefaultClient,
 		Server:     config.GetConfig().ALERTMANAGER_URL,
-		Path:       ALERTSPATH,
+		Path:       backends.ALERTSPATH,
 	}
 
 	var silence map[string]interface{}
