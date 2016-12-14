@@ -70,8 +70,10 @@ func nodes(ctx *gin.Context) {
 }
 
 func TestMain(m *testing.M) {
+	config.InitConfig("../../env_file.template")
 	server = startHttpServer()
 	baseUrl = server.URL
+	config.GetConfig().ES_URL = baseUrl
 	ret := m.Run()
 	server.Close()
 	os.Exit(ret)
@@ -92,31 +94,26 @@ func TestNewEsService(t *testing.T) {
 }
 
 func TestApplications(t *testing.T) {
-	config.InitConfig("../../env_file.template")
 	service := NewEsService([]string{baseUrl})
 	service.Applications(models.Page{})
 }
 
 func TestTasks(t *testing.T) {
-	config.InitConfig("../../env_file.template")
 	service := NewEsService([]string{baseUrl})
 	service.Tasks("test-web", models.Page{})
 }
 
 func TestPath(t *testing.T) {
-	config.InitConfig("../../env_file.template")
 	service := NewEsService([]string{baseUrl})
 	service.Paths("test-web", "test-web.ac4616e4-c02b-11e6-9030-024245dc84c8", models.Page{})
 }
 
 func TestSearch(t *testing.T) {
-	config.InitConfig("../../env_file.template")
 	service := NewEsService([]string{baseUrl})
 	service.Search("test-web", "test-web.ac4616e4-c02b-11e6-9030-024245dc84c8", "stdout", "GET", models.Page{})
 }
 
 func TestContext(t *testing.T) {
-	config.InitConfig("../../env_file.template")
 	service := NewEsService([]string{baseUrl})
 	service.Context("test-web", "test-web.ac4616e4-c02b-11e6-9030-024245dc84c8", "stdout", "1481650415421815800", models.Page{})
 }
