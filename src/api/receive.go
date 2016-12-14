@@ -111,7 +111,6 @@ func (s *search) ReceiverLog(ctx *gin.Context) {
 	}
 
 	keywords, ok := s.KeywordFilter[appid.(string)+path.(string)]
-	fmt.Println("---------", string(data), "--------", keywords)
 	if !ok {
 		utils.Ok(ctx, "ok")
 		return

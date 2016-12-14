@@ -111,30 +111,3 @@ func (s *SearchService) UpdateAlert(alert *models.Alert) error {
 	s.ESClient.Flush()
 	return err
 }
-
-func (s *SearchService) GetAlertCondition() []models.Alert {
-	var alerts []models.Alert
-	result, err := s.ESClient.Search().
-		Index(".dataman-alerts").
-		Type("dataman-alerts").
-		Pretty(true).
-		Do()
-
-	if err != nil && err.(*elastic.Error).Status == http.StatusNotFound {
-		return nil
-	}
-
-	if err != nil {
-		return alerts
-	}
-
-	for _, hit := range result.Hits.Hits {
-		alert := models.Alert{
-			Id: hit.Id,
-		}
-		json.Unmarshal(*hit.Source, &alert)
-		alerts = append(alerts, alert)
-	}
-
-	return alerts
-}

@@ -2,8 +2,6 @@ package service
 
 import (
 	"encoding/json"
-	//"io/ioutil"
-	//"fmt"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -26,10 +24,24 @@ func startHttpServer() *httptest.Server {
 	router := gin.New()
 	router.HEAD("/", func(ctx *gin.Context) { ctx.String(200, "") })
 	router.GET("/_nodes/http", nodes)
+	router.POST("/:index/dataman-test-web", task)
 	router.POST("/:index/dataman-test-web/_search", task)
+	router.POST("/:index/dataman-prometheus/*action", task)
+	router.POST("/:index/dataman-alerts/*action", task)
 	router.POST("/:index/_search", app)
+	router.GET("/.dataman-prometheus/dataman-prometheus/AVj3kWyMIIGpJqE63T3m", getp)
+	router.GET("/.dataman-alerts/dataman-alerts/test", getp)
+	router.DELETE("/.dataman-alerts/dataman-alerts/test", getp)
 
 	return httptest.NewServer(router)
+}
+
+func getp(ctx *gin.Context) {
+	data := `{"_index":"1","_type":"1","_id":"1","_source":{"test":"value"}}`
+	var info elastic.GetResult
+	json.Unmarshal([]byte(data), &info)
+
+	ctx.JSON(http.StatusOK, info)
 }
 
 func app(ctx *gin.Context) {
