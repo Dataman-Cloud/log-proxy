@@ -41,10 +41,6 @@ func (s *search) CreateAlert(ctx *gin.Context) {
 }
 
 func (s *search) DeleteAlert(ctx *gin.Context) {
-	if ctx.Param("id") == "" {
-		utils.ErrorResponse(ctx, utils.NewError(PARAM_ERROR, errors.New("alert id can't be empty")))
-		return
-	}
 
 	alert, err := s.Service.GetAlert(ctx.Param("id"))
 	if err != nil {
@@ -113,7 +109,7 @@ func (s *search) UpdateAlert(ctx *gin.Context) {
 		return
 	}
 
-	result, err := s.Service.GetAlert(ctx.Param("id"))
+	result, err := s.Service.GetAlert(alert.Id)
 	if err != nil {
 		utils.ErrorResponse(ctx, utils.NewError(GET_ALERT_ERROR, err))
 		return
