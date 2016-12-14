@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strings"
 	"testing"
+	"time"
 
 	ms "github.com/Dataman-Cloud/mock-server/server"
 )
@@ -24,13 +25,13 @@ func TestParseDate(t *testing.T) {
 		t.Error("faild")
 	}
 
-	if ParseDate("test", "1481596014000") == "2016-12-13" {
+	if ParseDate("test", "1481596014000") == time.Now().Format("2006-01-02") {
 		t.Log("success")
 	} else {
 		t.Error("faild")
 	}
 
-	if ParseDate("1481596014000", "test") == "2016-12-13" {
+	if ParseDate("1481596014000", "test") == time.Now().Format("2006-01-02") {
 		t.Log("success")
 	} else {
 		t.Error("faild")
@@ -42,7 +43,7 @@ func TestParseDate(t *testing.T) {
 		t.Error("faild", s)
 	}
 
-	if ParseDate("1481596014000", "1481596014000") == "2016-12-13" {
+	if ParseDate("1481596014000", "1481596014000") == time.Now().Format("2006-01-02") {
 		t.Log("success")
 	} else {
 		t.Error("faild")
