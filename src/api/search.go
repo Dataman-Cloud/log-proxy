@@ -95,13 +95,8 @@ func (s *search) Applications(ctx *gin.Context) {
 }
 
 func (s *search) Tasks(ctx *gin.Context) {
-	appName := ctx.Param("appid")
-	if appName == "" {
-		utils.ErrorResponse(ctx, utils.NewError(PARAM_ERROR, errors.New("param error")))
-		return
-	}
 
-	tasks, err := s.Service.Tasks(appName, ctx.MustGet("page").(models.Page))
+	tasks, err := s.Service.Tasks(ctx.Param("appid"), ctx.MustGet("page").(models.Page))
 	if err != nil {
 		utils.ErrorResponse(ctx, utils.NewError(GETTASK_ERROR, err))
 		return
@@ -110,13 +105,8 @@ func (s *search) Tasks(ctx *gin.Context) {
 }
 
 func (s *search) Paths(ctx *gin.Context) {
-	appName := ctx.Param("appid")
-	if appName == "" {
-		utils.ErrorResponse(ctx, utils.NewError(PARAM_ERROR, errors.New("param error")))
-		return
-	}
 
-	paths, err := s.Service.Paths(appName, ctx.Query("taskid"), ctx.MustGet("page").(models.Page))
+	paths, err := s.Service.Paths(ctx.Param("appid"), ctx.Query("taskid"), ctx.MustGet("page").(models.Page))
 	if err != nil {
 		utils.ErrorResponse(ctx, utils.NewError(GETTASK_ERROR, err))
 		return
