@@ -33,6 +33,7 @@ func (s *SearchService) GetPrometheus(page models.Page) (map[string]interface{},
 		Type(PROMETHEUS_TYPE).
 		From(page.PageFrom).
 		Size(page.PageSize).
+		Sort("createtime.timestamp", false).
 		Pretty(true).
 		Do()
 
