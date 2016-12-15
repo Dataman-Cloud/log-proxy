@@ -3,25 +3,25 @@
     angular.module('app')
         .controller('LogBaseCtrl', LogBaseCtrl);
     /* @ngInject */
-    function LogBaseCtrl(moment, $state, logBackend) {
+    function LogBaseCtrl(moment, $state, logBackend, $stateParams) {
         var self = this;
 
         self.form = {
-            appid: $state.params.appid || '',
-            taskid: $state.params.taskid || '',
-            path: $state.params.path || '',
-            keyword: $state.params.keyword || ''
+            appid: $stateParams.appid || '',
+            taskid: $stateParams.taskid || '',
+            path: $stateParams.path || '',
+            keyword: $stateParams.keyword || ''
         };
 
         self.apps = [];
         self.tasks = [];
         self.paths = [];
 
-        self.startTime = new Date(parseInt($state.params.from));
-        self.endTime = new Date(parseInt($state.params.to));
+        self.startTime = new Date(parseInt($stateParams.from));
+        self.endTime = new Date(parseInt($stateParams.to));
 
         self.timePeriod = 120;
-        self.selectedTabIndex = ($state.params.from && $state.params.to) ? 1 : 0;
+        self.selectedTabIndex = ($stateParams.from && $stateParams.to) ? 1 : 0;
 
         self.selectAppChange = selectAppChange;
         self.loadApps = loadApps;
@@ -60,7 +60,7 @@
         }
 
         function loadPaths() {
-            if (self.form.appid && self.form.taskid) {
+            if (self.form.appid) {
                 logBackend.listPath({
                     appid: self.form.appid,
                     taskid: self.form.taskid

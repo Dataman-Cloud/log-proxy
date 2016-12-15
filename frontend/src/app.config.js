@@ -55,22 +55,22 @@
 
             //about log
             .state('home.logbase', {
-                url: '/logbase',
+                url: '/logbase?appid&taskid&path&from&to&keyword',
                 templateUrl: '/src/log/logbase.html',
                 controller: 'LogBaseCtrl as vm'
             })
             .state('home.logbase.logs', {
-                url: '/logs?appid&taskid&path&from&to&keyword',
+                url: '/logs',
                 templateUrl: '/src/log/logs/logs.html',
                 controller: 'LogsCtrl as vm'
             })
             .state('home.logbase.logWithoutKey', {
-                url: '/logWithoutKey?appid&taskid&path&from&to',
+                url: '/logWithoutKey',
                 templateUrl: '/src/log/logs-without-keyword/logs.html',
                 controller: 'LogWithoutKeyCtrl as vm'
             })
             .state('home.logbase.logcontext', {
-                url: '/logcontext?appid&taskid&path&offset',
+                url: '/logcontext?offset',
                 templateUrl: '/src/log/log-context/logs.html',
                 controller: 'LogContextCtrl as vm'
             })
