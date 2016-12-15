@@ -2,7 +2,6 @@ package service
 
 import (
 	"errors"
-	"fmt"
 	"strings"
 
 	"github.com/Dataman-Cloud/log-proxy/src/backends"
@@ -188,7 +187,6 @@ func (info *Info) GetQueryInfo(query *backends.Query) error {
 			for _, originData := range data.Data.Result {
 				app := originData.Metric.ContainerLabelAPPID
 				value := originData.Values[0]
-				fmt.Printf("appid in cluster: %s\n", app)
 				for _, cluster := range info.Clusters {
 					for name, v := range cluster.Applications {
 						if app == name {

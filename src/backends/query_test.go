@@ -10,17 +10,16 @@ import (
 )
 
 var (
-	prometheus []*url.URL
-	mux        *http.ServeMux
-	server     *httptest.Server
+	mux    *http.ServeMux
+	server *httptest.Server
 )
 
 func setup() string {
 	mux = http.NewServeMux()
 	server = httptest.NewServer(mux)
 
-	prometheus, _ := url.Parse(server.URL)
-	return prometheus.String()
+	serverUrl, _ := url.Parse(server.URL)
+	return serverUrl.String()
 }
 
 func teardown() {
@@ -70,7 +69,6 @@ func TestQueryExpr(t *testing.T) {
 	if err == nil {
 		t.Errorf("Expect err is nil, got %v", err)
 	}
-	//fmt.Printf("%s\n", data)
 }
 
 func TestQueryExprWrongJson(t *testing.T) {
@@ -343,7 +341,7 @@ func TestQueryInfoError(t *testing.T) {
 	query.PromServer = server
 	mux.HandleFunc(query.Path, func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		c := getContentOfFile("tests/query.default.response.json")
+		c := getContentOfFile("tests/query.error.response.json")
 		fmt.Fprint(w, string(c))
 	})
 
@@ -403,7 +401,7 @@ func TestQueryAppMetricError(t *testing.T) {
 	query.PromServer = server
 	mux.HandleFunc(query.Path, func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		c := getContentOfFile("tests/query.default.response.json")
+		c := getContentOfFile("tests/query.error.response.json")
 		fmt.Fprint(w, string(c))
 	})
 
@@ -463,7 +461,7 @@ func TestQueryNodeMetricError(t *testing.T) {
 	query.PromServer = server
 	mux.HandleFunc(query.Path, func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		c := getContentOfFile("tests/query.default.response.json")
+		c := getContentOfFile("tests/query.error.response.json")
 		fmt.Fprint(w, string(c))
 	})
 
