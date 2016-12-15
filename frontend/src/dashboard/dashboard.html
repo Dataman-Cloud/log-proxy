@@ -36,7 +36,7 @@
                     <p ng-repeat="(appKey, appValue) in value.applications track by $index">{/appKey/}</p>
                 </td>
                 <td md-cell>
-                    <p ng-repeat="task in value.tasks track by $index">{/task/}</p>
+                    <p ng-repeat="task in value.tasks | orderBy: task track by $index">{/task/}</p>
                 </td>
                 <td md-cell>
                     <p ng-repeat="node in value.nodes track by $index">{/node/}</p>

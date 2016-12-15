@@ -31,7 +31,7 @@
             return {
                 chart: {
                     type: Options.chartType || 'lineChart',
-                    noData: '加载中',
+                    noData: '暂无数据',
                     height: Options.height || 200,
                     margin: {
                         top: 20,
