@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"time"
 
+	"github.com/Dataman-Cloud/log-proxy/src/config"
 	"github.com/Dataman-Cloud/log-proxy/src/models"
 	"github.com/Dataman-Cloud/log-proxy/src/utils"
 
@@ -29,6 +31,21 @@ func (s *search) Receiver(ctx *gin.Context) {
 		a := alert.(map[string]interface{})
 		a["alertname"] = a["labels"].(map[string]interface{})["alertname"]
 		labels, err := json.Marshal(a["labels"])
+
+		if config.GetConfig().NOTIFICATION_URL != "" {
+			utils.AlertNotification(config.GetConfig().NOTIFICATION_URL, map[string]interface{}{
+				"alarminfo": []map[string]interface{}{
+					map[string]interface{}{
+						"level":         a["labels"].(map[string]interface{})["severity"],
+						"modelIdentify": a["alertname"],
+						"content":       utils.Byte2str(labels),
+						"alarmTime":     time.Now().Format(time.RFC3339Nano),
+					},
+				},
+				"apiVersion": time.Now().Format("2006-01-02"),
+			})
+		}
+
 		if err != nil {
 			continue
 		}
