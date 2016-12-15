@@ -19,6 +19,7 @@ type Config struct {
 	ALERTMANAGER_URL string `require:"true"`
 	FRONTEND_PATH    string
 	MARATHON_URL     string
+	NOTIFICATION_URL string
 }
 
 var c *Config
