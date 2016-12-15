@@ -425,3 +425,10 @@ textarea {
     color: red;
     margin-top: 5px;
 }
+#monitoringIndicators{
+    font-weight: 400;
+}
+#logKeyW{
+    opacity: 0.6;
+    font-weight: 400;
+}
