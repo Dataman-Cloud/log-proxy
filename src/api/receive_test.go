@@ -11,22 +11,18 @@ import (
 
 func receiver(ctx *gin.Context) {
 	s.Receiver(ctx)
-	ctx.String(200, "success")
 }
 
 func receiverlog(ctx *gin.Context) {
 	s.ReceiverLog(ctx)
-	ctx.String(200, "success")
 }
 
 func getprometheus(ctx *gin.Context) {
 	s.GetPrometheus(ctx)
-	ctx.String(200, "success")
 }
 
 func getprometheu(ctx *gin.Context) {
 	s.GetPrometheu(ctx)
-	ctx.String(200, "success")
 }
 
 func TestReciver(t *testing.T) {

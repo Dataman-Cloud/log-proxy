@@ -13,27 +13,22 @@ import (
 
 func createAlert(ctx *gin.Context) {
 	s.CreateAlert(ctx)
-	ctx.JSON(http.StatusOK, "success")
 }
 
 func deleteAlert(ctx *gin.Context) {
 	s.DeleteAlert(ctx)
-	ctx.JSON(http.StatusOK, "success")
 }
 
 func getAlerts(ctx *gin.Context) {
 	s.GetAlerts(ctx)
-	ctx.JSON(http.StatusOK, "success")
 }
 
 func getAlert(ctx *gin.Context) {
 	s.GetAlert(ctx)
-	ctx.JSON(http.StatusOK, "success")
 }
 
 func updateAlert(ctx *gin.Context) {
 	s.UpdateAlert(ctx)
-	ctx.JSON(http.StatusOK, "success")
 }
 
 func TestCreateAlert(t *testing.T) {
