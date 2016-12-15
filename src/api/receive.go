@@ -56,58 +56,44 @@ func (s *search) ReceiverLog(ctx *gin.Context) {
 
 	appid, ok := m["appid"]
 	if !ok {
-		if err != nil {
-			utils.ErrorResponse(ctx, utils.NewError(GET_LOG_ERROR, err))
-			return
-		}
+		utils.ErrorResponse(ctx, utils.NewError(GET_LOG_ERROR, "not found appid"))
+		return
 	}
 
 	taskid, ok := m["taskid"]
 	if !ok {
-		if err != nil {
-			utils.ErrorResponse(ctx, utils.NewError(GET_LOG_ERROR, err))
-			return
-		}
+		utils.ErrorResponse(ctx, utils.NewError(GET_LOG_ERROR, "not found taskid"))
+		return
 	}
 
 	path, ok := m["path"]
 	if !ok {
-		if err != nil {
-			utils.ErrorResponse(ctx, utils.NewError(GET_LOG_ERROR, err))
-			return
-		}
+		utils.ErrorResponse(ctx, utils.NewError(GET_LOG_ERROR, "not found path"))
+		return
 	}
 
 	userid, ok := m["userid"]
 	if !ok {
-		if err != nil {
-			utils.ErrorResponse(ctx, utils.NewError(GET_LOG_ERROR, err))
-			return
-		}
+		utils.ErrorResponse(ctx, utils.NewError(GET_LOG_ERROR, "not found userid"))
+		return
 	}
 
 	clusterid, ok := m["clusterid"]
 	if !ok {
-		if err != nil {
-			utils.ErrorResponse(ctx, utils.NewError(GET_LOG_ERROR, err))
-			return
-		}
+		utils.ErrorResponse(ctx, utils.NewError(GET_LOG_ERROR, "not found clusterid"))
+		return
 	}
 
 	offset, ok := m["offset"]
 	if !ok {
-		if err != nil {
-			utils.ErrorResponse(ctx, utils.NewError(GET_LOG_ERROR, err))
-			return
-		}
+		utils.ErrorResponse(ctx, utils.NewError(GET_LOG_ERROR, "not found offset"))
+		return
 	}
 
 	message, ok := m["message"]
 	if !ok {
-		if err != nil {
-			utils.ErrorResponse(ctx, utils.NewError(GET_LOG_ERROR, err))
-			return
-		}
+		utils.ErrorResponse(ctx, utils.NewError(GET_LOG_ERROR, "not found message"))
+		return
 	}
 
 	keywords, ok := s.KeywordFilter[appid.(string)+path.(string)]

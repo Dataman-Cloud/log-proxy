@@ -35,6 +35,12 @@ func startApiServer() *httptest.Server {
 		v1.GET("/context", func(ctx *gin.Context) { s.Context(ctx) })
 	}
 
+	vr := router.Group("/v1/recive")
+	{
+		vr.POST("/prometheus", receiver)
+		vr.POST("/log", receiverlog)
+	}
+
 	v1m := router.Group("/api/v1/monitor", func(ctx *gin.Context) { ctx.Set("page", models.Page{}) })
 	{
 		v1m.POST("/alert", createAlert)
@@ -42,6 +48,8 @@ func startApiServer() *httptest.Server {
 		v1m.GET("/alert/:id", getAlert)
 		v1m.PUT("/alert", updateAlert)
 		v1m.DELETE("/alert/:id", deleteAlert)
+		v1m.GET("/prometheus", getprometheus)
+		v1m.GET("/prometheus/:id", getprometheu)
 	}
 	return httptest.NewServer(router)
 }
