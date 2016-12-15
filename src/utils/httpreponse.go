@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -18,10 +20,14 @@ type Error struct {
 	Err  error  `json:"Err"`
 }
 
-func NewError(code string, err error) *Error {
+func NewError(code string, err interface{}) *Error {
+	e, ok := err.(error)
+	if !ok {
+		e = errors.New(fmt.Sprint(err))
+	}
 	return &Error{
 		Code: code,
-		Err:  err,
+		Err:  e,
 	}
 }
 
