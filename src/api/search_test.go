@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -19,6 +20,7 @@ var (
 	baseUrl string
 	server  *httptest.Server
 	s       *search
+	mo      *monitor
 )
 
 func startApiServer() *httptest.Server {
@@ -50,6 +52,12 @@ func startApiServer() *httptest.Server {
 		v1m.DELETE("/alert/:id", deleteAlert)
 		v1m.GET("/prometheus", getprometheus)
 		v1m.GET("/prometheus/:id", getprometheu)
+		v1m.GET("/query", getQuery)
+		v1m.GET("/info", getQueryInfo)
+		v1m.GET("/nodes", getQueryNodes)
+		v1m.GET("/alerts", getMonitorAlerts)
+		v1m.GET("/alerts/groups", getMonitorAlertsGroups)
+		v1m.GET("/alerts/status", getMonitorAlertsStatus)
 	}
 	return httptest.NewServer(router)
 }
@@ -66,6 +74,10 @@ func startHttpServer() *httptest.Server {
 	router.GET("/.dataman-prometheus/dataman-prometheus/AVj3kWyMIIGpJqE63T3m", getp)
 	router.GET("/.dataman-alerts/dataman-alerts/test", getp)
 	router.DELETE("/.dataman-alerts/dataman-alerts/test", getp)
+	router.GET("/api/v1/query_rang", queryResult)
+	router.GET("/api/v1/alerts", queryAlerts)
+	router.GET("/api/v1/alerts/groups", queryAlertsGroups)
+	router.GET("/api/v1/alerts/status", queryAlertsStatus)
 
 	return httptest.NewServer(router)
 }
@@ -136,6 +148,36 @@ func nodes(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, nodes)
 }
 
+func queryResult(ctx *gin.Context) {
+	data := `{"code":0,"data":{"cpu":{"usage":null},"memory":{"usage":[{"metric":{"container_label_APP_ID":"work-web","container_label_VCLUSTER":"work","id":"/docker/4f84929cb252ed0c0f2d987f2f29f133395c1b26166f99562d76e64e0af6c80c","image":"192.168.1.75/library/nginx-stress:1.10","instance":"192.168.1.102:5014","job":"cadvisor","name":"mesos-05da0395-c3c4-4a76-bd6c-bfe8454f7244-S2.104a009e-c354-4bd3-8497-8e4d3212e3cf"},"values":[[1.481853425e+09,"0.02099609375"]]}],"usage_bytes":null,"total_bytes":null},"network":{"receive":null,"transmit":null},"filesystem":{"read":null,"write":null}}}`
+	var result map[string]interface{}
+	json.Unmarshal([]byte(data), &result)
+	fmt.Printf("%v\n", result)
+	ctx.JSON(http.StatusOK, result)
+}
+
+func queryAlerts(ctx *gin.Context) {
+	data := `{"status": "success","data":[]}`
+	var result map[string]interface{}
+	json.Unmarshal([]byte(data), &result)
+	ctx.JSON(http.StatusOK, result)
+}
+
+func queryAlertsGroups(ctx *gin.Context) {
+	data := `{"status": "success","data":[]}`
+	var result map[string]interface{}
+	json.Unmarshal([]byte(data), &result)
+	ctx.JSON(http.StatusOK, result)
+}
+
+func queryAlertsStatus(ctx *gin.Context) {
+	data := `{"status": "success","data":{}}`
+	var result map[string]interface{}
+	json.Unmarshal([]byte(data), &result)
+	fmt.Printf("%v\n", result)
+	ctx.JSON(http.StatusOK, result)
+}
+
 func TestMain(m *testing.M) {
 	apiserver := startApiServer()
 	apiUrl = apiserver.URL
@@ -144,6 +186,9 @@ func TestMain(m *testing.M) {
 	server = startHttpServer()
 	baseUrl = server.URL
 	config.GetConfig().ES_URL = baseUrl
+	config.GetConfig().PROMETHEUS_URL = baseUrl
+	config.GetConfig().ALERTMANAGER_URL = baseUrl
+	mo = NewMonitor()
 	ret := m.Run()
 	server.Close()
 	os.Exit(ret)

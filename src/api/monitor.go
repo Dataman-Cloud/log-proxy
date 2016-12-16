@@ -35,7 +35,6 @@ func (m *monitor) Query(ctx *gin.Context) {
 		Period:    ctx.Query("period"),
 		Expr:      ctx.Query("expr"),
 	}
-
 	if param.Metric != "" && param.Expr != "" {
 		err := fmt.Errorf("The paramter confict between metric and expr!")
 		utils.ErrorResponse(ctx, err)
@@ -127,8 +126,6 @@ func (m *monitor) QueryNodes(ctx *gin.Context) {
 		return
 	}
 	utils.Ok(ctx, data)
-
-	return
 }
 
 func (m *monitor) GetAlerts(ctx *gin.Context) {
@@ -137,7 +134,6 @@ func (m *monitor) GetAlerts(ctx *gin.Context) {
 		Server:     config.GetConfig().ALERTMANAGER_URL,
 		Path:       backends.ALERTSPATH,
 	}
-
 	data, err := query.GetAlertManagerResponse()
 	if err != nil {
 		utils.ErrorResponse(ctx, err)
