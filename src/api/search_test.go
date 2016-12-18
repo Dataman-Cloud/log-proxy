@@ -58,6 +58,11 @@ func startApiServer() *httptest.Server {
 		v1m.GET("/alerts", getMonitorAlerts)
 		v1m.GET("/alerts/groups", getMonitorAlertsGroups)
 		v1m.GET("/alerts/status", getMonitorAlertsStatus)
+		v1m.GET("/silences", getMonitorSilences)
+		v1m.GET("/silence", getMonitorSilence)
+		v1m.POST("/silence", createMonitorSilence)
+		v1m.PUT("/silence", updateMonitorSilence)
+		v1m.DELETE("/silence/:id", deleteMonitorSilence)
 	}
 	return httptest.NewServer(router)
 }
@@ -78,6 +83,7 @@ func startHttpServer() *httptest.Server {
 	router.GET("/api/v1/alerts", queryAlerts)
 	router.GET("/api/v1/alerts/groups", queryAlertsGroups)
 	router.GET("/api/v1/alerts/status", queryAlertsStatus)
+	router.GET("/api/v1/silences", querySliences)
 
 	return httptest.NewServer(router)
 }
@@ -172,6 +178,21 @@ func queryAlertsGroups(ctx *gin.Context) {
 
 func queryAlertsStatus(ctx *gin.Context) {
 	data := `{"status": "success","data":{}}`
+	var result map[string]interface{}
+	json.Unmarshal([]byte(data), &result)
+	ctx.JSON(http.StatusOK, result)
+}
+
+func querySliences(ctx *gin.Context) {
+	data := `{"status":"success","data":{"silences":[],"totalSilences":0}}`
+	var result map[string]interface{}
+	json.Unmarshal([]byte(data), &result)
+	fmt.Printf("%v\n", result)
+	ctx.JSON(http.StatusOK, result)
+}
+
+func querySlience(ctx *gin.Context) {
+	data := `{"status":"success","data":{"silences":[],"totalSilences":0}}`
 	var result map[string]interface{}
 	json.Unmarshal([]byte(data), &result)
 	fmt.Printf("%v\n", result)
