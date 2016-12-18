@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"net/http"
 	"net/url"
 	"strings"
@@ -178,6 +177,4 @@ func TestMonitorGetAlertsStatus(t *testing.T) {
 	if resp.StatusCode != expectResult {
 		t.Errorf("Expect query param metric is %v, got %v", expectResult, resp.StatusCode)
 	}
-
-	fmt.Printf("%v\n", resp)
 }
