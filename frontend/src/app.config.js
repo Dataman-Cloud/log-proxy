@@ -24,6 +24,7 @@
                 url: '/dashboardMonitor/:clusterId',
                 templateUrl: '/src/dashboard/monitor/app/list.html',
                 controller: 'DashboardListAppCtrl as vm',
+                abstract: true,
                 resolve: {
                     info: getInfo
                 }
