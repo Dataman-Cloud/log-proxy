@@ -8,6 +8,20 @@ import (
 	"github.com/Dataman-Cloud/log-proxy/src/models"
 )
 
+const (
+	cpuUsage      = "cpu"
+	memPercentage = "memory"
+	memUsage      = "memory_usage"
+	memTotal      = "memory_total"
+	networkRX     = "network_rx"
+	networkTX     = "network_tx"
+	fsRead        = "fs_read"
+	fsWrite       = "fs_write"
+	fsUsage       = "fs_usage"
+	fsLimit       = "fs_limit"
+)
+
+// Metric defines the JSON fomat from the Query Result
 type Metric struct {
 	CPU        *models.MetricCPU        `json:"cpu"`
 	Memory     *models.MetricMemory     `json:"memory"`
@@ -15,6 +29,7 @@ type Metric struct {
 	Filesystem *models.MetricFilesystem `json:"filesystem"`
 }
 
+// NewMetric init Metric
 func NewMetric() *Metric {
 	return &Metric{
 		CPU:        &models.MetricCPU{},
@@ -24,27 +39,29 @@ func NewMetric() *Metric {
 	}
 }
 
+// GetQueryMetric gets the result by calling func QueryMetric
+// and then set the vaule of the fields in struct Metric
 func (m *Metric) GetQueryMetric(query *backends.Query) error {
 	data, err := query.QueryMetric()
 	if err != nil {
 		return err
 	}
 	switch query.Metric {
-	case "cpu":
+	case cpuUsage:
 		m.CPU.Usage = data.Data.Result
-	case "memory":
+	case memPercentage:
 		m.Memory.Percentage = data.Data.Result
-	case "memory_usage":
+	case memUsage:
 		m.Memory.Usage = data.Data.Result
-	case "memory_total":
+	case memTotal:
 		m.Memory.Total = data.Data.Result
-	case "network_rx":
+	case networkRX:
 		m.Network.Receive = data.Data.Result
-	case "network_tx":
+	case networkTX:
 		m.Network.Transmit = data.Data.Result
-	case "fs_read":
+	case fsRead:
 		m.Filesystem.Read = data.Data.Result
-	case "fs_write":
+	case fsWrite:
 		m.Filesystem.Write = data.Data.Result
 	default:
 		return errors.New("No this kind of metric.")
@@ -52,6 +69,7 @@ func (m *Metric) GetQueryMetric(query *backends.Query) error {
 	return nil
 }
 
+// Info defines the JSON format of information in clusters/cluster/apps/nodes
 type Info struct {
 	Clusters     map[string]*ClusterInfo `json:"clusters"`
 	Applications []string                `json:"applications"`
@@ -59,6 +77,7 @@ type Info struct {
 	Nodes        []string                `json:"nodes"`
 }
 
+// NewInfo init struct Info
 func NewInfo() *Info {
 	return &Info{
 		Clusters:     make(map[string]*ClusterInfo),
@@ -68,12 +87,14 @@ func NewInfo() *Info {
 	}
 }
 
+// ClusterInfo defines the JSON format of information in cluster
 type ClusterInfo struct {
 	Applications map[string]*AppInfo `json:"applications"`
 	Nodes        []string            `json:"nodes"`
 	Tasks        []string            `json:"tasks"`
 }
 
+// NewClusterinfo init the struct ClusterInfo
 func NewClusterinfo() *ClusterInfo {
 	return &ClusterInfo{
 		Applications: make(map[string]*AppInfo),
@@ -82,6 +103,7 @@ func NewClusterinfo() *ClusterInfo {
 	}
 }
 
+// AppInfo defines the JSON format of information in application
 type AppInfo struct {
 	CPU        *models.InfoCPU        `json:"cpu,omitempty"`
 	Memory     *models.InfoMemory     `json:"memory,omitempty"`
@@ -90,6 +112,7 @@ type AppInfo struct {
 	Tasks      map[string]*TaskInfo   `json:"tasks"`
 }
 
+// NewAppInfo init struct AppInfo
 func NewAppInfo() *AppInfo {
 	return &AppInfo{
 		CPU:        &models.InfoCPU{},
@@ -100,6 +123,7 @@ func NewAppInfo() *AppInfo {
 	}
 }
 
+// TaskInfo defines the JSON format of information in task(container)
 type TaskInfo struct {
 	Node       string                         `json:"node"`
 	CPU        *models.InfoCPU                `json:"cpu"`
@@ -108,6 +132,7 @@ type TaskInfo struct {
 	Filesystem *models.InfoFilesystem         `json:"filesystem"`
 }
 
+// NewTaskInfo init the struct TaskInfo
 func NewTaskInfo() *TaskInfo {
 	return &TaskInfo{
 		CPU:        &models.InfoCPU{},
@@ -117,6 +142,8 @@ func NewTaskInfo() *TaskInfo {
 	}
 }
 
+// GetQueryInfo get result by calling QueryInfo
+// then set the vaules of fileds in Info
 func (info *Info) GetQueryInfo(query *backends.Query) error {
 	data, err := query.QueryInfo()
 	if err != nil {
@@ -176,7 +203,7 @@ func (info *Info) GetQueryInfo(query *backends.Query) error {
 
 	// Fill the metric of app
 	if query.ClusterID != "" || query.AppID != "" {
-		metrics := []string{"cpu", "memory", "network_rx", "network_tx", "fs_read", "fs_write"}
+		metrics := []string{cpuUsage, memPercentage, networkRX, networkTX, fsRead, fsWrite}
 		for _, metric := range metrics {
 			query.Metric = metric
 			query.Path = backends.QUERYRANGEPATH
@@ -191,17 +218,17 @@ func (info *Info) GetQueryInfo(query *backends.Query) error {
 					for name, v := range cluster.Applications {
 						if app == name {
 							switch query.Metric {
-							case "cpu":
+							case cpuUsage:
 								v.CPU.Usage = value
-							case "memory":
+							case memPercentage:
 								v.Memory.Percetange = value
-							case "network_rx":
+							case networkRX:
 								v.Network.Receive = value
-							case "network_tx":
+							case networkTX:
 								v.Network.Transmit = value
-							case "fs_read":
+							case fsRead:
 								v.Filesystem.Read = value
-							case "fs_write":
+							case fsWrite:
 								v.Filesystem.Write = value
 							}
 						}
@@ -211,7 +238,7 @@ func (info *Info) GetQueryInfo(query *backends.Query) error {
 		}
 
 		//Fill the metric of tasks
-		metrics = []string{"cpu", "memory_usage", "memory_total", "network_rx", "network_tx", "fs_read", "fs_write"}
+		metrics = []string{cpuUsage, memUsage, memTotal, networkRX, networkTX, fsRead, fsWrite}
 		for _, metric := range metrics {
 			query.Metric = metric
 			data, err := query.QueryMetric()
@@ -219,7 +246,7 @@ func (info *Info) GetQueryInfo(query *backends.Query) error {
 				return err
 			}
 
-			if metric == "network_rx" || metric == "network_tx" {
+			if metric == networkRX || metric == networkTX {
 				for _, cluster := range info.Clusters {
 					for _, app := range cluster.Applications {
 						for _, task := range app.Tasks {
@@ -244,27 +271,27 @@ func (info *Info) GetQueryInfo(query *backends.Query) error {
 							if task == name {
 								v.Node = node
 								switch query.Metric {
-								case "cpu":
+								case cpuUsage:
 									v.CPU.Usage = value
-								case "memory_usage":
+								case memUsage:
 									v.Memory.Usage = value
-								case "memory_total":
+								case memTotal:
 									v.Memory.Total = value
-								case "network_rx":
+								case networkRX:
 									for nicK, nicV := range v.Network {
 										if nic == nicK {
 											nicV.Receive = value
 										}
 									}
-								case "network_tx":
+								case networkTX:
 									for nicK, nicV := range v.Network {
 										if nic == nicK {
 											nicV.Transmit = value
 										}
 									}
-								case "fs_read":
+								case fsRead:
 									v.Filesystem.Read = value
-								case "fs_write":
+								case fsWrite:
 									v.Filesystem.Write = value
 								}
 							}
@@ -286,16 +313,19 @@ func isInArray(array []string, value string) bool {
 	return false
 }
 
+// NodesInfo defines the JSON format of Nodes list
 type NodesInfo struct {
 	Nodes map[string]*NodeInfo `json:"nodes"`
 }
 
+// NewNodesInfo init NodesInfo
 func NewNodesInfo() *NodesInfo {
 	return &NodesInfo{
 		Nodes: make(map[string]*NodeInfo),
 	}
 }
 
+// NodeInfo defines the JSON format of information in Node
 type NodeInfo struct {
 	CPU        *models.InfoCPU                   `json:"cpu"`
 	Memory     *models.InfoMemory                `json:"memory"`
@@ -303,6 +333,7 @@ type NodeInfo struct {
 	Filesystem map[string]*models.InfoFilesystem `json:"filesystem"`
 }
 
+// NewNodeInfo init the struct NodeInfo
 func NewNodeInfo() *NodeInfo {
 	return &NodeInfo{
 		CPU:        &models.InfoCPU{},
@@ -312,8 +343,10 @@ func NewNodeInfo() *NodeInfo {
 	}
 }
 
+// GetQueryNodesInfo gets the result by calling QueryNodeMetric
+// then set the value of fields in NodesInfo
 func (ni *NodesInfo) GetQueryNodesInfo(query *backends.Query) error {
-	metrics := []string{"cpu", "memory_usage", "memory_total", "network_rx", "network_tx", "fs_usage", "fs_limit"}
+	metrics := []string{cpuUsage, memUsage, memTotal, networkRX, networkTX, fsUsage, fsLimit}
 	for _, metric := range metrics {
 		query.Metric = metric
 		data, err := query.QueryNodeMetric()
@@ -327,7 +360,7 @@ func (ni *NodesInfo) GetQueryNodesInfo(query *backends.Query) error {
 				ni.Nodes[name] = NewNodeInfo()
 			}
 		}
-		if metric == "network_rx" || metric == "network_tx" {
+		if metric == networkRX || metric == networkTX {
 			for _, node := range ni.Nodes {
 				if len(node.Network) == 0 {
 					for _, originData := range data.Data.Result {
@@ -338,7 +371,7 @@ func (ni *NodesInfo) GetQueryNodesInfo(query *backends.Query) error {
 			}
 		}
 
-		if metric == "fs_usage" || metric == "fs_limit" {
+		if metric == fsUsage || metric == fsLimit {
 			for _, node := range ni.Nodes {
 				if len(node.Filesystem) == 0 {
 					for _, originData := range data.Data.Result {
@@ -357,31 +390,31 @@ func (ni *NodesInfo) GetQueryNodesInfo(query *backends.Query) error {
 			for k, v := range ni.Nodes {
 				if name == k {
 					switch query.Metric {
-					case "cpu":
+					case cpuUsage:
 						v.CPU.Usage = value
-					case "memory_usage":
+					case memUsage:
 						v.Memory.Usage = value
-					case "memory_total":
+					case memTotal:
 						v.Memory.Total = value
-					case "network_rx":
+					case networkRX:
 						for nicK, nicV := range v.Network {
 							if nic == nicK {
 								nicV.Receive = value
 							}
 						}
-					case "network_tx":
+					case networkTX:
 						for nicK, nicV := range v.Network {
 							if nic == nicK {
 								nicV.Transmit = value
 							}
 						}
-					case "fs_usage":
+					case fsUsage:
 						for fsK, fsV := range v.Filesystem {
 							if device == fsK {
 								fsV.Usage = value
 							}
 						}
-					case "fs_limit":
+					case fsLimit:
 						for fsK, fsV := range v.Filesystem {
 							if device == fsK {
 								fsV.Limit = value

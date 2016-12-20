@@ -20,12 +20,14 @@ const (
 	ALERTSSTATUSPATH = "/api/v1/status"
 )
 
+// AlertManager define the query info of AlertManager
 type AlertManager struct {
-	HttpClient *http.Client
+	HTTPClient *http.Client
 	Server     string
 	Path       string
 }
 
+// GetAlertManagerResponse return the result from func getResponse
 func (am AlertManager) GetAlertManagerResponse() (map[string]interface{}, error) {
 	response, err := am.getResponse()
 	if err != nil {
@@ -40,13 +42,14 @@ func (am AlertManager) GetAlertManagerResponse() (map[string]interface{}, error)
 	return result, nil
 }
 
+// getResponse return the response from AlertManager
 func (am AlertManager) getResponse() ([]byte, error) {
 	u, err := url.Parse(am.Server)
 	if err != nil {
 		return nil, err
 	}
 	u.Path = strings.TrimRight(u.Path, "/") + am.Path
-	resp, err := am.HttpClient.Get(u.String())
+	resp, err := am.HTTPClient.Get(u.String())
 	if err != nil {
 		err = fmt.Errorf("Failed to get response from %s", u.String())
 		return nil, err
@@ -59,13 +62,14 @@ func (am AlertManager) getResponse() ([]byte, error) {
 	return body, nil
 }
 
+// GetSilences return the list of Silences from AlertManager
 func (am *AlertManager) GetSilences() ([]interface{}, error) {
 	u, err := url.Parse(am.Server)
 	if err != nil {
 		return nil, err
 	}
 	u.Path = SILENCES_API
-	resp, err := am.HttpClient.Get(u.String())
+	resp, err := am.HTTPClient.Get(u.String())
 	if err != nil {
 		return nil, err
 	}
@@ -85,6 +89,7 @@ func (am *AlertManager) GetSilences() ([]interface{}, error) {
 	return m["data"].(map[string]interface{})["silences"].([]interface{}), nil
 }
 
+// CreateSilence post the json silence to AlertManager
 func (am *AlertManager) CreateSilence(silence map[string]interface{}) error {
 	u, err := url.Parse(am.Server)
 	if err != nil {
@@ -93,18 +98,23 @@ func (am *AlertManager) CreateSilence(silence map[string]interface{}) error {
 	u.Path = SILENCES_API
 
 	data, _ := json.Marshal(silence)
-	_, err = am.HttpClient.Post(u.String(), "application/json", bytes.NewBuffer(data))
+	_, err = am.HTTPClient.Post(u.String(), "application/json", bytes.NewBuffer(data))
 
 	return err
 }
 
+// GetSilence return the silence from AlertManager
 func (am *AlertManager) GetSilence(id string) (map[string]interface{}, error) {
 	u, err := url.Parse(am.Server)
 	if err != nil {
 		return nil, err
 	}
 	u.Path = GET_SILENCE + id
-	resp, err := am.HttpClient.Get(u.String())
+	resp, err := am.HTTPClient.Get(u.String())
+	if err != nil {
+		return nil, err
+	}
+
 	body, _ := utils.ReadResponseBody(resp)
 	var m map[string]interface{}
 
@@ -116,6 +126,7 @@ func (am *AlertManager) GetSilence(id string) (map[string]interface{}, error) {
 	return m["data"].(map[string]interface{}), nil
 }
 
+// DeleteSilence send the DELETE request to AlertManager
 func (am *AlertManager) DeleteSilence(id string) error {
 	u, err := url.Parse(am.Server)
 	if err != nil {
@@ -127,6 +138,6 @@ func (am *AlertManager) DeleteSilence(id string) error {
 		return err
 	}
 
-	_, err = am.HttpClient.Do(req)
+	_, err = am.HTTPClient.Do(req)
 	return err
 }

@@ -16,19 +16,23 @@ import (
 )
 
 const (
-	TIMEFORMAT     = "2006-01-02 15:04:05"
+	// QUERYRANGEPATH define the query_range path of prometheus
 	QUERYRANGEPATH = "/api/v1/query_range"
-	QUERYPATH      = "/api/v1/query"
-	RULESPATH      = "/api/v1/rules"
+	// QUERYPATH define the query path of prometheus
+	QUERYPATH = "/api/v1/query"
+	//OKRESULT define the value of status field in response
+	OKRESULT = "success"
 )
 
+// Query define the fields required by query from prometheus
 type Query struct {
-	HttpClient *http.Client
+	HTTPClient *http.Client
 	PromServer string
 	Path       string
 	*QueryParameter
 }
 
+// QueryParameter define the fields of query paramter
 type QueryParameter struct {
 	Metric    string
 	ClusterID string
@@ -42,6 +46,7 @@ type QueryParameter struct {
 	Expr      string
 }
 
+// QueryExpr return the result by calling function getExprResponse
 func (query *Query) QueryExpr() (map[string]interface{}, error) {
 	response, request, err := query.getExprResponse()
 	if err != nil {
@@ -56,6 +61,8 @@ func (query *Query) QueryExpr() (map[string]interface{}, error) {
 	return result, nil
 }
 
+// getExprResponse set the request url/query parameter and then
+// return the result by query from Prometheus
 func (query *Query) getExprResponse() ([]byte, string, error) {
 	u, err := url.Parse(query.PromServer)
 	if err != nil {
@@ -75,7 +82,7 @@ func (query *Query) getExprResponse() ([]byte, string, error) {
 	} else if query.Path == QUERYPATH {
 	}
 	u.RawQuery = q.Encode()
-	resp, err := query.HttpClient.Get(u.String())
+	resp, err := query.HTTPClient.Get(u.String())
 	if err != nil {
 		err = fmt.Errorf("Failed to get response from %s", u.String())
 		return nil, u.String(), err
@@ -91,6 +98,7 @@ func (query *Query) getExprResponse() ([]byte, string, error) {
 	return body, u.String(), nil
 }
 
+// QueryMetric return the result by calling function getExprResponse
 func (query *Query) QueryMetric() (*models.QueryRangeResult, error) {
 	// if start/end as "", set them as now
 	start, end := timeRange(query.Start, query.End)
@@ -110,7 +118,7 @@ func (query *Query) QueryMetric() (*models.QueryRangeResult, error) {
 		return nil, err
 	}
 
-	if result.Status != "success" {
+	if result.Status != OKRESULT {
 		err := fmt.Errorf("%s", result.Error)
 		return nil, err
 	}
@@ -118,6 +126,7 @@ func (query *Query) QueryMetric() (*models.QueryRangeResult, error) {
 	return result, nil
 }
 
+// getQueryMetricExpr return the expr for query.Metric
 func (query *Query) getQueryMetricExpr(level string) (expr string) {
 	// the level string declare the query precision, app, id and so on
 	me := GetExpr(query, level)
@@ -169,6 +178,9 @@ func timeOffset(t time.Time, offset string) time.Time {
 	return t.Add(duration)
 }
 
+// QueryInfo get expr string by calling func GetInfoExpr,
+// then get response by calling func getExprResponse,
+// return the success result
 func (query *Query) QueryInfo() (*models.QueryRangeResult, error) {
 	infoExpr := NewInfoExpr()
 	infoExpr.GetInfoExpr(query)
@@ -192,7 +204,7 @@ func (query *Query) QueryInfo() (*models.QueryRangeResult, error) {
 		return nil, err
 	}
 
-	if result.Status != "success" {
+	if result.Status != OKRESULT {
 		err := fmt.Errorf("%s", result.Error)
 		return nil, err
 	}
@@ -200,6 +212,9 @@ func (query *Query) QueryInfo() (*models.QueryRangeResult, error) {
 	return result, nil
 }
 
+// QueryAppMetric get the expr string by calling getQueryMetricExpr
+// then get response by calling getExprResponse
+// then return the success result
 func (query *Query) QueryAppMetric() (*models.QueryRangeResult, error) {
 	start, end := timeRange(query.Start, query.End)
 	query.Start = start
@@ -218,7 +233,7 @@ func (query *Query) QueryAppMetric() (*models.QueryRangeResult, error) {
 		return nil, err
 	}
 
-	if result.Status != "success" {
+	if result.Status != OKRESULT {
 		err := fmt.Errorf("%s", result.Error)
 		return nil, err
 	}
@@ -226,6 +241,9 @@ func (query *Query) QueryAppMetric() (*models.QueryRangeResult, error) {
 	return result, nil
 }
 
+// QueryNodeMetric get the expr string by calling getQueryMetricExpr
+// then get the response by calling getExprResponse
+// then return the success result
 func (query *Query) QueryNodeMetric() (*models.QueryRangeResult, error) {
 	start, end := timeRange(query.Start, query.End)
 	query.Start = start
@@ -244,7 +262,7 @@ func (query *Query) QueryNodeMetric() (*models.QueryRangeResult, error) {
 		return nil, err
 	}
 
-	if result.Status != "success" {
+	if result.Status != OKRESULT {
 		err := fmt.Errorf("%s", result.Error)
 		return nil, err
 	}

@@ -55,7 +55,7 @@ func initQueryMetric() *backends.Query {
 	}
 
 	query := &backends.Query{
-		HttpClient:     http.DefaultClient,
+		HTTPClient:     http.DefaultClient,
 		PromServer:     "http://127.0.0.1:9090",
 		Path:           backends.QUERYRANGEPATH,
 		QueryParameter: param,

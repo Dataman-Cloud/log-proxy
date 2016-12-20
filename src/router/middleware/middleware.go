@@ -8,10 +8,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Authenticate may add the authenticate methods.
 func Authenticate(ctx *gin.Context) {
 	ctx.Next()
 }
 
+// CORSMiddleware adds the CORS headers
 func CORSMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
