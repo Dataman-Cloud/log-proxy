@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	baseUrl string
+	baseURL string
 	server  *httptest.Server
 )
 
@@ -21,7 +21,7 @@ func TestNewError(t *testing.T) {
 	err.Error()
 }
 
-func startHttpServer() *httptest.Server {
+func startHTTPServer() *httptest.Server {
 	router := gin.New()
 	v1 := router.Group("v1")
 	{
@@ -59,33 +59,33 @@ func ErrResponse(ctx *gin.Context) {
 }
 
 func TestMain(m *testing.M) {
-	server = startHttpServer()
-	baseUrl = server.URL
+	server = startHTTPServer()
+	baseURL = server.URL
 	ret := m.Run()
 	server.Close()
 	os.Exit(ret)
 }
 
 func TestOk(t *testing.T) {
-	resp, _ := http.Get(baseUrl + "/v1/test/ok")
+	resp, _ := http.Get(baseURL + "/v1/test/ok")
 
 	assert.Equal(t, resp.StatusCode, http.StatusOK, "should be equal")
 }
 
 func TestCreate(t *testing.T) {
-	resp, _ := http.Get(baseUrl + "/v1/test/create")
+	resp, _ := http.Get(baseURL + "/v1/test/create")
 
 	assert.Equal(t, resp.StatusCode, http.StatusCreated, "should be equal")
 }
 
 func TestUpdate(t *testing.T) {
-	resp, _ := http.Get(baseUrl + "/v1/test/update")
+	resp, _ := http.Get(baseURL + "/v1/test/update")
 
 	assert.Equal(t, resp.StatusCode, http.StatusAccepted, "should be equal")
 }
 
 func TestDelete(t *testing.T) {
-	req, _ := http.NewRequest("DELETE", baseUrl+"/v1/test/delete", nil)
+	req, _ := http.NewRequest("DELETE", baseURL+"/v1/test/delete", nil)
 	resp, _ := http.DefaultClient.Do(req)
 
 	assert.Equal(t, resp.StatusCode, http.StatusNoContent, "should be equal")
@@ -93,6 +93,6 @@ func TestDelete(t *testing.T) {
 
 func TestErrorResponse(t *testing.T) {
 
-	http.Get(baseUrl + "/v1/test/error")
+	http.Get(baseURL + "/v1/test/error")
 
 }

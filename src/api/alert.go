@@ -10,56 +10,56 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (s *search) CreateAlert(ctx *gin.Context) {
+func (s *Search) CreateAlert(ctx *gin.Context) {
 	alert := new(models.Alert)
 	if err := ctx.BindJSON(alert); err != nil {
-		utils.ErrorResponse(ctx, utils.NewError(PARAM_ERROR, errors.New("request body param error")))
+		utils.ErrorResponse(ctx, utils.NewError(ParamError, errors.New("request body param error")))
 		return
 	}
 
-	if alert.AppId == "" {
-		utils.ErrorResponse(ctx, utils.NewError(PARAM_ERROR, errors.New("appid can't be empty")))
+	if alert.AppID == "" {
+		utils.ErrorResponse(ctx, utils.NewError(ParamError, errors.New("appid can't be empty")))
 		return
 	}
 
 	if alert.Keyword == "" {
-		utils.ErrorResponse(ctx, utils.NewError(PARAM_ERROR, errors.New("keyword can't be empty")))
+		utils.ErrorResponse(ctx, utils.NewError(ParamError, errors.New("keyword can't be empty")))
 		return
 	}
 
 	err := s.Service.CreateAlert(alert)
 	if err != nil {
-		utils.ErrorResponse(ctx, utils.NewError(CREATE_ALERT_ERROR, err))
+		utils.ErrorResponse(ctx, utils.NewError(CreateAlertError, err))
 		return
 	}
 
 	s.Kmutex.Lock()
 	defer s.Kmutex.Unlock()
-	s.KeywordFilter[alert.AppId+alert.Path] = append(s.KeywordFilter[alert.AppId+alert.Path], alert.Keyword)
+	s.KeywordFilter[alert.AppID+alert.Path] = append(s.KeywordFilter[alert.AppID+alert.Path], alert.Keyword)
 
 	utils.Ok(ctx, "create success")
 }
 
-func (s *search) DeleteAlert(ctx *gin.Context) {
+func (s *Search) DeleteAlert(ctx *gin.Context) {
 
 	alert, err := s.Service.GetAlert(ctx.Param("id"))
 	if err != nil {
-		utils.ErrorResponse(ctx, utils.NewError(GET_ALERT_ERROR, err))
+		utils.ErrorResponse(ctx, utils.NewError(GetAlertError, err))
 		return
 	}
 
 	err = s.Service.DeleteAlert(ctx.Param("id"))
 	if err != nil {
-		utils.ErrorResponse(ctx, utils.NewError(DELETE_ALERT_ERROR, err))
+		utils.ErrorResponse(ctx, utils.NewError(DeleteAlertError, err))
 		return
 	}
 
 	s.Kmutex.Lock()
 	defer s.Kmutex.Unlock()
-	for i, v := range s.KeywordFilter[alert.AppId+alert.Path] {
+	for i, v := range s.KeywordFilter[alert.AppID+alert.Path] {
 		if v == alert.Keyword {
-			s.KeywordFilter[alert.AppId+alert.Path] = append(s.KeywordFilter[alert.AppId+alert.Path][:i],
-				s.KeywordFilter[alert.AppId+alert.Path][i+1:]...)
+			s.KeywordFilter[alert.AppID+alert.Path] = append(s.KeywordFilter[alert.AppID+alert.Path][:i],
+				s.KeywordFilter[alert.AppID+alert.Path][i+1:]...)
 			break
 		}
 	}
@@ -67,71 +67,71 @@ func (s *search) DeleteAlert(ctx *gin.Context) {
 	utils.Ok(ctx, "delete success")
 }
 
-func (s *search) GetAlerts(ctx *gin.Context) {
+func (s *Search) GetAlerts(ctx *gin.Context) {
 	results, err := s.Service.GetAlerts(ctx.MustGet("page").(models.Page))
 	if err != nil {
-		utils.ErrorResponse(ctx, utils.NewError(GET_ALERT_ERROR, err))
+		utils.ErrorResponse(ctx, utils.NewError(GetAlertError, err))
 		return
 	}
 
 	utils.Ok(ctx, results)
 }
 
-func (s *search) GetAlert(ctx *gin.Context) {
+func (s *Search) GetAlert(ctx *gin.Context) {
 	result, err := s.Service.GetAlert(ctx.Param("id"))
 	if err != nil {
-		utils.ErrorResponse(ctx, utils.NewError(GET_ALERT_ERROR, err))
+		utils.ErrorResponse(ctx, utils.NewError(GetAlertError, err))
 		return
 	}
 
 	utils.Ok(ctx, result)
 }
 
-func (s *search) UpdateAlert(ctx *gin.Context) {
+func (s *Search) UpdateAlert(ctx *gin.Context) {
 	alert := new(models.Alert)
 	if err := ctx.BindJSON(alert); err != nil {
-		utils.ErrorResponse(ctx, utils.NewError(PARAM_ERROR, errors.New("request body param error")))
+		utils.ErrorResponse(ctx, utils.NewError(ParamError, errors.New("request body param error")))
 		return
 	}
 
-	if alert.Id == "" {
-		utils.ErrorResponse(ctx, utils.NewError(PARAM_ERROR, errors.New("id can't be empty")))
+	if alert.ID == "" {
+		utils.ErrorResponse(ctx, utils.NewError(ParamError, errors.New("id can't be empty")))
 		return
 	}
 
-	if alert.AppId == "" {
-		utils.ErrorResponse(ctx, utils.NewError(PARAM_ERROR, errors.New("appid can't be empty")))
+	if alert.AppID == "" {
+		utils.ErrorResponse(ctx, utils.NewError(ParamError, errors.New("appid can't be empty")))
 		return
 	}
 
 	if alert.Keyword == "" {
-		utils.ErrorResponse(ctx, utils.NewError(PARAM_ERROR, errors.New("keyword can't be empty")))
+		utils.ErrorResponse(ctx, utils.NewError(ParamError, errors.New("keyword can't be empty")))
 		return
 	}
 
-	result, err := s.Service.GetAlert(alert.Id)
+	result, err := s.Service.GetAlert(alert.ID)
 	if err != nil {
-		utils.ErrorResponse(ctx, utils.NewError(GET_ALERT_ERROR, err))
+		utils.ErrorResponse(ctx, utils.NewError(GetAlertError, err))
 		return
 	}
 
 	alert.CreateTime = time.Now().Format(time.RFC3339Nano)
 	err = s.Service.UpdateAlert(alert)
 	if err != nil {
-		utils.ErrorResponse(ctx, utils.NewError(UPDATE_ALERT_ERROR, err))
+		utils.ErrorResponse(ctx, utils.NewError(UpdateAlertError, err))
 		return
 	}
 
 	s.Kmutex.Lock()
 	defer s.Kmutex.Unlock()
-	for i, v := range s.KeywordFilter[result.AppId+result.Path] {
+	for i, v := range s.KeywordFilter[result.AppID+result.Path] {
 		if v == alert.Keyword {
-			s.KeywordFilter[result.AppId+result.Path] = append(s.KeywordFilter[result.AppId+result.Path][:i],
-				s.KeywordFilter[result.AppId+result.Path][i+1:]...)
+			s.KeywordFilter[result.AppID+result.Path] = append(s.KeywordFilter[result.AppID+result.Path][:i],
+				s.KeywordFilter[result.AppID+result.Path][i+1:]...)
 			break
 		}
 	}
-	s.KeywordFilter[result.AppId+result.Path] = append(s.KeywordFilter[result.AppId+result.Path], alert.Keyword)
+	s.KeywordFilter[result.AppID+result.Path] = append(s.KeywordFilter[result.AppID+result.Path], alert.Keyword)
 
 	utils.Ok(ctx, "update success")
 }

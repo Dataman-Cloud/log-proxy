@@ -10,11 +10,11 @@ import (
 )
 
 var (
-	baseUrl string
+	baseURL string
 	server  *httptest.Server
 )
 
-func startHttpServer() *httptest.Server {
+func startHTTPServer() *httptest.Server {
 	router := gin.New()
 	router.GET("/ping", Authenticate, CORSMiddleware(), packPage, ping)
 
@@ -26,43 +26,43 @@ func ping(ctx *gin.Context) {
 }
 
 func TestMain(m *testing.M) {
-	server = startHttpServer()
-	baseUrl = server.URL
+	server = startHTTPServer()
+	baseURL = server.URL
 	ret := m.Run()
 	server.Close()
 	os.Exit(ret)
 }
 
 func TestAll(t *testing.T) {
-	_, err := http.Get(baseUrl + "/ping")
+	_, err := http.Get(baseURL + "/ping")
 	if err == nil {
 		t.Log("success")
 	} else {
 		t.Error("faild")
 	}
 
-	_, err = http.Get(baseUrl + "/ping?to=1")
+	_, err = http.Get(baseURL + "/ping?to=1")
 	if err == nil {
 		t.Log("success")
 	} else {
 		t.Error("faild")
 	}
 
-	_, err = http.Get(baseUrl + "/ping?to=test")
+	_, err = http.Get(baseURL + "/ping?to=test")
 	if err == nil {
 		t.Log("success")
 	} else {
 		t.Error("faild")
 	}
 
-	_, err = http.Get(baseUrl + "/ping?from=test")
+	_, err = http.Get(baseURL + "/ping?from=test")
 	if err == nil {
 		t.Log("success")
 	} else {
 		t.Error("faild")
 	}
 
-	_, err = http.Get(baseUrl + "/ping?from=1")
+	_, err = http.Get(baseURL + "/ping?from=1")
 	if err == nil {
 		t.Log("success")
 	} else {

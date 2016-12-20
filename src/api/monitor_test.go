@@ -35,7 +35,7 @@ func getMonitorAlertsStatus(ctx *gin.Context) {
 
 func TestQueryMetric(t *testing.T) {
 	httpClient := http.DefaultClient
-	u, _ := url.Parse(apiUrl)
+	u, _ := url.Parse(apiURL)
 	u.Path = strings.TrimRight(u.Path, "/") + "/api/v1/monitor/query"
 	q := u.Query()
 	q.Set("metric", "memory")
@@ -54,7 +54,7 @@ func TestQueryMetric(t *testing.T) {
 func TestQueryExpr(t *testing.T) {
 	expr := "sum(container_memory_usage_bytes{id='/'}) by (instance)"
 	httpClient := http.DefaultClient
-	u, _ := url.Parse(apiUrl)
+	u, _ := url.Parse(apiURL)
 	u.Path = strings.TrimRight(u.Path, "/") + "/api/v1/monitor/query"
 	q := u.Query()
 	q.Set("expr", expr)
@@ -72,7 +72,7 @@ func TestQueryParamConflict(t *testing.T) {
 	metric := "memory"
 	expr := "sum(container_memory_usage_bytes{id='/'}) by (instance)"
 	httpClient := http.DefaultClient
-	u, _ := url.Parse(apiUrl)
+	u, _ := url.Parse(apiURL)
 	u.Path = strings.TrimRight(u.Path, "/") + "/api/v1/monitor/query"
 	q := u.Query()
 	q.Set("metric", metric)
@@ -93,7 +93,7 @@ func TestQueryParamConflict(t *testing.T) {
 func TestQueryParamMissing(t *testing.T) {
 	expectResult := 503
 	httpClient := http.DefaultClient
-	u, _ := url.Parse(apiUrl)
+	u, _ := url.Parse(apiURL)
 	u.Path = strings.TrimRight(u.Path, "/") + "/api/v1/monitor/query"
 	q := u.Query()
 	q.Set("start", "1481853425")
@@ -107,7 +107,7 @@ func TestQueryParamMissing(t *testing.T) {
 }
 func TestQueryInfo(t *testing.T) {
 	httpClient := http.DefaultClient
-	u, _ := url.Parse(apiUrl)
+	u, _ := url.Parse(apiURL)
 	u.Path = strings.TrimRight(u.Path, "/") + "/api/v1/monitor/info"
 	q := u.Query()
 	q.Set("clusterid", "work")
@@ -121,7 +121,7 @@ func TestQueryInfo(t *testing.T) {
 func TestQueryInfoConflict(t *testing.T) {
 	expectResult := 503
 	httpClient := http.DefaultClient
-	u, _ := url.Parse(apiUrl)
+	u, _ := url.Parse(apiURL)
 	u.Path = strings.TrimRight(u.Path, "/") + "/api/v1/monitor/info"
 	q := u.Query()
 	q.Set("clusterid", "work")
@@ -135,7 +135,7 @@ func TestQueryInfoConflict(t *testing.T) {
 
 func TestQueryNodes(t *testing.T) {
 	httpClient := http.DefaultClient
-	u, _ := url.Parse(apiUrl)
+	u, _ := url.Parse(apiURL)
 	u.Path = strings.TrimRight(u.Path, "/") + "/api/v1/monitor/nodes"
 	q := u.Query()
 	q.Set("clusterid", "work")
@@ -149,7 +149,7 @@ func TestQueryNodes(t *testing.T) {
 func TestMonitorGetAlerts(t *testing.T) {
 	expectResult := 200
 	httpClient := http.DefaultClient
-	u, _ := url.Parse(apiUrl)
+	u, _ := url.Parse(apiURL)
 	u.Path = strings.TrimRight(u.Path, "/") + "/api/v1/monitor/alerts"
 	resp, _ := httpClient.Get(u.String())
 	if resp.StatusCode != expectResult {
@@ -160,7 +160,7 @@ func TestMonitorGetAlerts(t *testing.T) {
 func TestMonitorGetAlertsGroups(t *testing.T) {
 	expectResult := 200
 	httpClient := http.DefaultClient
-	u, _ := url.Parse(apiUrl)
+	u, _ := url.Parse(apiURL)
 	u.Path = strings.TrimRight(u.Path, "/") + "/api/v1/monitor/alerts/groups"
 	resp, _ := httpClient.Get(u.String())
 	if resp.StatusCode != expectResult {
@@ -171,7 +171,7 @@ func TestMonitorGetAlertsGroups(t *testing.T) {
 func TestMonitorGetAlertsStatus(t *testing.T) {
 	expectResult := 503
 	httpClient := http.DefaultClient
-	u, _ := url.Parse(apiUrl)
+	u, _ := url.Parse(apiURL)
 	u.Path = strings.TrimRight(u.Path, "/") + "/api/v1/monitor/alerts/status"
 	resp, _ := httpClient.Get(u.String())
 	if resp.StatusCode != expectResult {

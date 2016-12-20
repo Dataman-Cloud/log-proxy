@@ -11,15 +11,19 @@ import (
 )
 
 const (
-	CODE_OK       = 0
-	CODE_UNDEFINE = 10001
+	// CodeOK ok status
+	CodeOK = 0
+	// CodeUndefine undefine status
+	CodeUndefine = 10001
 )
 
+// Error struct
 type Error struct {
 	Code string `json:"code"`
 	Err  error  `json:"Err"`
 }
 
+// NewError new error
 func NewError(code string, err interface{}) *Error {
 	e, ok := err.(error)
 	if !ok {
@@ -31,33 +35,39 @@ func NewError(code string, err interface{}) *Error {
 	}
 }
 
+// Error parse error to string
 func (e *Error) Error() string {
 	return e.Err.Error()
 }
 
+// Ok return 200 status
 func Ok(ctx *gin.Context, data interface{}) {
-	ctx.JSON(http.StatusOK, gin.H{"code": CODE_OK, "data": data})
+	ctx.JSON(http.StatusOK, gin.H{"code": CodeOK, "data": data})
 }
 
+// Create return create status
 func Create(ctx *gin.Context, data interface{}) {
-	ctx.JSON(http.StatusCreated, gin.H{"code": CODE_OK, "data": data})
+	ctx.JSON(http.StatusCreated, gin.H{"code": CodeOK, "data": data})
 	return
 }
 
+// Delete return delete status
 func Delete(ctx *gin.Context, data interface{}) {
-	//ctx.JSON(http.StatusNoContent, gin.H{"code": CODE_OK, "data": data})
+	//ctx.JSON(http.StatusNoContent, gin.H{"code": CodeOK, "data": data})
 	ctx.Writer.WriteHeader(http.StatusNoContent)
 	return
 }
 
+// Update return update status
 func Update(ctx *gin.Context, data interface{}) {
-	ctx.JSON(http.StatusAccepted, gin.H{"code": CODE_OK, "data": data})
+	ctx.JSON(http.StatusAccepted, gin.H{"code": CodeOK, "data": data})
 	return
 }
 
+// ErrorResponse return error status
 func ErrorResponse(ctx *gin.Context, err error) {
 	hcode := http.StatusServiceUnavailable
-	ecode := CODE_UNDEFINE
+	ecode := CodeUndefine
 
 	e, ok := err.(*Error)
 	if ok {

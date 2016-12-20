@@ -35,7 +35,7 @@ func TestCreateAlert(t *testing.T) {
 	if s == nil {
 		s = GetSearch()
 	}
-	resp, _ := http.NewRequest("POST", apiUrl+"/api/v1/monitor/alert", nil)
+	resp, _ := http.NewRequest("POST", apiURL+"/api/v1/monitor/alert", nil)
 	req, err := http.DefaultClient.Do(resp)
 	if err == nil && req.StatusCode == 400 {
 		t.Log("success")
@@ -45,7 +45,7 @@ func TestCreateAlert(t *testing.T) {
 
 	alert := models.Alert{}
 	data, _ := json.Marshal(alert)
-	resp, _ = http.NewRequest("POST", apiUrl+"/api/v1/monitor/alert", bytes.NewBuffer(data))
+	resp, _ = http.NewRequest("POST", apiURL+"/api/v1/monitor/alert", bytes.NewBuffer(data))
 	req, err = http.DefaultClient.Do(resp)
 	if err == nil && req.StatusCode == 400 {
 		t.Log("success")
@@ -54,10 +54,10 @@ func TestCreateAlert(t *testing.T) {
 	}
 
 	alert = models.Alert{
-		AppId: "test",
+		AppID: "test",
 	}
 	data, _ = json.Marshal(alert)
-	resp, _ = http.NewRequest("POST", apiUrl+"/api/v1/monitor/alert", bytes.NewBuffer(data))
+	resp, _ = http.NewRequest("POST", apiURL+"/api/v1/monitor/alert", bytes.NewBuffer(data))
 	req, err = http.DefaultClient.Do(resp)
 	if err == nil && req.StatusCode == 400 {
 		t.Log("success")
@@ -66,11 +66,11 @@ func TestCreateAlert(t *testing.T) {
 	}
 
 	alert = models.Alert{
-		AppId:   "test",
+		AppID:   "test",
 		Keyword: "test",
 	}
 	data, _ = json.Marshal(alert)
-	resp, _ = http.NewRequest("POST", apiUrl+"/api/v1/monitor/alert", bytes.NewBuffer(data))
+	resp, _ = http.NewRequest("POST", apiURL+"/api/v1/monitor/alert", bytes.NewBuffer(data))
 	req, err = http.DefaultClient.Do(resp)
 	if err == nil && req.StatusCode == 200 {
 		t.Log("success")
@@ -84,7 +84,7 @@ func TestDeleteAlert(t *testing.T) {
 		s = GetSearch()
 	}
 	s.KeywordFilter[""] = []string{"test", ""}
-	req, _ := http.NewRequest("DELETE", apiUrl+"/api/v1/monitor/alert/test", nil)
+	req, _ := http.NewRequest("DELETE", apiURL+"/api/v1/monitor/alert/test", nil)
 	resp, err := http.DefaultClient.Do(req)
 
 	if err == nil && resp.StatusCode == 200 {
@@ -100,7 +100,7 @@ func TestGetAlerts(t *testing.T) {
 		s = GetSearch()
 	}
 
-	resp, err := http.Get(apiUrl + "/api/v1/monitor/alert")
+	resp, err := http.Get(apiURL + "/api/v1/monitor/alert")
 	if err == nil && resp.StatusCode == 200 {
 		t.Log("success")
 	} else {
@@ -114,7 +114,7 @@ func TestGetAlert(t *testing.T) {
 		s = GetSearch()
 	}
 
-	resp, err := http.Get(apiUrl + "/api/v1/monitor/alert/test")
+	resp, err := http.Get(apiURL + "/api/v1/monitor/alert/test")
 	if err == nil && resp.StatusCode == 200 {
 		t.Log("success")
 	} else {
@@ -127,7 +127,7 @@ func TestUpdateAlert(t *testing.T) {
 		s = GetSearch()
 	}
 
-	req, _ := http.NewRequest("PUT", apiUrl+"/api/v1/monitor/alert", nil)
+	req, _ := http.NewRequest("PUT", apiURL+"/api/v1/monitor/alert", nil)
 	resp, err := http.DefaultClient.Do(req)
 	if err == nil && resp.StatusCode == 400 {
 		t.Log("success")
@@ -137,7 +137,7 @@ func TestUpdateAlert(t *testing.T) {
 
 	alert := models.Alert{}
 	data, _ := json.Marshal(alert)
-	req, _ = http.NewRequest("PUT", apiUrl+"/api/v1/monitor/alert", bytes.NewBuffer(data))
+	req, _ = http.NewRequest("PUT", apiURL+"/api/v1/monitor/alert", bytes.NewBuffer(data))
 	resp, err = http.DefaultClient.Do(req)
 	if err == nil && resp.StatusCode == 400 {
 		t.Log("success")
@@ -146,10 +146,10 @@ func TestUpdateAlert(t *testing.T) {
 	}
 
 	alert = models.Alert{
-		Id: "test",
+		ID: "test",
 	}
 	data, _ = json.Marshal(alert)
-	req, _ = http.NewRequest("PUT", apiUrl+"/api/v1/monitor/alert", bytes.NewBuffer(data))
+	req, _ = http.NewRequest("PUT", apiURL+"/api/v1/monitor/alert", bytes.NewBuffer(data))
 	resp, err = http.DefaultClient.Do(req)
 	if err == nil && resp.StatusCode == 400 {
 		t.Log("success")
@@ -158,11 +158,11 @@ func TestUpdateAlert(t *testing.T) {
 	}
 
 	alert = models.Alert{
-		Id:    "test",
-		AppId: "appid",
+		ID:    "test",
+		AppID: "appid",
 	}
 	data, _ = json.Marshal(alert)
-	req, _ = http.NewRequest("PUT", apiUrl+"/api/v1/monitor/alert", bytes.NewBuffer(data))
+	req, _ = http.NewRequest("PUT", apiURL+"/api/v1/monitor/alert", bytes.NewBuffer(data))
 	resp, err = http.DefaultClient.Do(req)
 	if err == nil && resp.StatusCode == 400 {
 		t.Log("success")
@@ -171,12 +171,12 @@ func TestUpdateAlert(t *testing.T) {
 	}
 
 	alert = models.Alert{
-		Id:      "test",
-		AppId:   "appid",
+		ID:      "test",
+		AppID:   "appid",
 		Keyword: "test",
 	}
 	data, _ = json.Marshal(alert)
-	req, _ = http.NewRequest("PUT", apiUrl+"/api/v1/monitor/alert", bytes.NewBuffer(data))
+	req, _ = http.NewRequest("PUT", apiURL+"/api/v1/monitor/alert", bytes.NewBuffer(data))
 	resp, err = http.DefaultClient.Do(req)
 	if err == nil && resp.StatusCode == 200 {
 		t.Log("success")

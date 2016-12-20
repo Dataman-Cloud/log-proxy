@@ -16,11 +16,11 @@ import (
 )
 
 var (
-	baseUrl string
+	baseURL string
 	server  *httptest.Server
 )
 
-func startHttpServer() *httptest.Server {
+func startHTTPServer() *httptest.Server {
 	router := gin.New()
 	router.HEAD("/", func(ctx *gin.Context) { ctx.String(200, "") })
 	router.GET("/_nodes/http", nodes)
@@ -61,7 +61,7 @@ func task(ctx *gin.Context) {
 }
 
 func nodes(ctx *gin.Context) {
-	u, _ := url.Parse(baseUrl)
+	u, _ := url.Parse(baseURL)
 	data := `{"cluster_name":"elasticsearch","nodes":{"Ijb_-48ZQYmEnQ0a5BnXAw":{"name":"Choice","transport_address":"172.17.0.5:9300","host":"172.17.0.5","ip":"172.17.0.5","version":"2.4.1","build":"c67dc32","http_address":"` + u.Host + `","http":{"bound_address":["[::]:9200"],"publish_address":"172.17.0.5:9200","max_content_length_in_bytes":104857600}}}}`
 	var nodes elastic.NodesInfoResponse
 	json.Unmarshal([]byte(data), &nodes)
@@ -71,9 +71,9 @@ func nodes(ctx *gin.Context) {
 
 func TestMain(m *testing.M) {
 	config.InitConfig("../../env_file.template")
-	server = startHttpServer()
-	baseUrl = server.URL
-	config.GetConfig().ES_URL = baseUrl
+	server = startHTTPServer()
+	baseURL = server.URL
+	config.GetConfig().EsURL = baseURL
 	ret := m.Run()
 	server.Close()
 	os.Exit(ret)
@@ -86,7 +86,7 @@ func TestNewEsService(t *testing.T) {
 	} else {
 		t.Error("faild")
 	}
-	if NewEsService([]string{baseUrl}) != nil {
+	if NewEsService([]string{baseURL}) != nil {
 		t.Log("success")
 	} else {
 		t.Error("faild")
@@ -94,26 +94,26 @@ func TestNewEsService(t *testing.T) {
 }
 
 func TestApplications(t *testing.T) {
-	service := NewEsService([]string{baseUrl})
+	service := NewEsService([]string{baseURL})
 	service.Applications(models.Page{})
 }
 
 func TestTasks(t *testing.T) {
-	service := NewEsService([]string{baseUrl})
+	service := NewEsService([]string{baseURL})
 	service.Tasks("test-web", models.Page{})
 }
 
 func TestPath(t *testing.T) {
-	service := NewEsService([]string{baseUrl})
+	service := NewEsService([]string{baseURL})
 	service.Paths("test-web", "test-web.ac4616e4-c02b-11e6-9030-024245dc84c8", models.Page{})
 }
 
 func TestSearch(t *testing.T) {
-	service := NewEsService([]string{baseUrl})
+	service := NewEsService([]string{baseURL})
 	service.Search("test-web", "test-web.ac4616e4-c02b-11e6-9030-024245dc84c8", "stdout", "GET", models.Page{})
 }
 
 func TestContext(t *testing.T) {
-	service := NewEsService([]string{baseUrl})
+	service := NewEsService([]string{baseURL})
 	service.Context("test-web", "test-web.ac4616e4-c02b-11e6-9030-024245dc84c8", "stdout", "1481650415421815800", models.Page{})
 }

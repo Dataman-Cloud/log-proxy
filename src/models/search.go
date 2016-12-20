@@ -1,21 +1,23 @@
 package models
 
+// Log log struct
 type Log struct {
 	Message   string
 	Host      string
 	Port      uint64
-	AppId     string
-	ClusterId string
-	GroupId   uint64
-	Id        string
+	AppID     string
+	ClusterID string
+	GroupID   uint64
+	ID        string
 	Offset    uint64
 	Path      string
-	TaskId    string
+	TaskID    string
 }
 
+// Alert keyword filter struct
 type Alert struct {
-	Id         string `json:"id,omitempty"`
-	AppId      string `json:"appid"`
+	ID         string `json:"id,omitempty"`
+	AppID      string `json:"appid"`
 	Keyword    string `json:"keyword"`
 	Path       string `json:"path"`
 	CreateTime string `json:"createtime"`

@@ -15,29 +15,42 @@ import (
 )
 
 const (
-	GETAPPS_ERROR        = "503-11000"
-	PARAM_ERROR          = "400-11001"
-	GETTASK_ERROR        = "503-11002"
-	INDEX_ERROR          = "503-11003"
-	CREATE_ALERT_ERROR   = "503-11004"
-	DELETE_ALERT_ERROR   = "503-11005"
-	GET_ALERT_ERROR      = "503-11006"
-	UPDATE_ALERT_ERROR   = "503-11007"
-	GET_EVENTS_ERROR     = "503-11008"
-	GET_PROMETHEUS_ERROR = "503-11009"
-	GET_LOG_ERROR        = "503-11010"
+	// GetAppsError get application error
+	GetAppsError = "503-11000"
+	// ParamError param error
+	ParamError = "400-11001"
+	// GetTaskError get task error
+	GetTaskError = "503-11002"
+	// IndexError search index log error
+	IndexError = "503-11003"
+	// CreateAlertError create keyword error
+	CreateAlertError = "503-11004"
+	// DeleteAlertError delete keywrod error
+	DeleteAlertError = "503-11005"
+	// GetAlertError get keyword error
+	GetAlertError = "503-11006"
+	// UpdateAlertError update keywrod error
+	UpdateAlertError = "503-11007"
+	// GetEventsError get event history error
+	GetEventsError = "503-11008"
+	// GetPrometheusError get prometheus event error
+	GetPrometheusError = "503-11009"
+	// GetLogError get log error
+	GetLogError = "503-11010"
 )
 
-type search struct {
+// Search search client struct
+type Search struct {
 	Service       *service.SearchService
 	KeywordFilter map[string][]string
 	Counter       *prometheus.CounterVec
 	Kmutex        *sync.Mutex
 }
 
-func GetSearch() *search {
-	s := &search{
-		Service:       service.NewEsService(strings.Split(config.GetConfig().ES_URL, ",")),
+// GetSearch new search client
+func GetSearch() *Search {
+	s := &Search{
+		Service:       service.NewEsService(strings.Split(config.GetConfig().EsURL, ",")),
 		KeywordFilter: make(map[string][]string),
 		Counter: prometheus.NewCounterVec(
 			prometheus.CounterOpts{
@@ -75,48 +88,53 @@ func GetSearch() *search {
 	s.Kmutex.Lock()
 	defer s.Kmutex.Unlock()
 	for _, alert := range alerts["results"].([]models.Alert) {
-		s.KeywordFilter[alert.AppId+alert.Path] = append(s.KeywordFilter[alert.AppId+alert.Path], alert.Keyword)
+		s.KeywordFilter[alert.AppID+alert.Path] = append(s.KeywordFilter[alert.AppID+alert.Path], alert.Keyword)
 	}
 
 	return s
 }
 
-func (s *search) Ping(ctx *gin.Context) {
+// Ping ping
+func (s *Search) Ping(ctx *gin.Context) {
 	utils.Ok(ctx, "success")
 }
 
-func (s *search) Applications(ctx *gin.Context) {
+// Applications get all applications
+func (s *Search) Applications(ctx *gin.Context) {
 	apps, err := s.Service.Applications(ctx.MustGet("page").(models.Page))
 	if err != nil {
-		utils.ErrorResponse(ctx, utils.NewError(GETAPPS_ERROR, err))
+		utils.ErrorResponse(ctx, utils.NewError(GetAppsError, err))
 		return
 	}
 	utils.Ok(ctx, apps)
 }
 
-func (s *search) Tasks(ctx *gin.Context) {
+// Tasks search applications tasks
+func (s *Search) Tasks(ctx *gin.Context) {
 
 	tasks, err := s.Service.Tasks(ctx.Param("appid"), ctx.MustGet("page").(models.Page))
 	if err != nil {
-		utils.ErrorResponse(ctx, utils.NewError(GETTASK_ERROR, err))
+		utils.ErrorResponse(ctx, utils.NewError(GetTaskError, err))
 		return
 	}
 	utils.Ok(ctx, tasks)
 }
 
-func (s *search) Paths(ctx *gin.Context) {
+// Paths search applications paths
+func (s *Search) Paths(ctx *gin.Context) {
 
 	paths, err := s.Service.Paths(ctx.Param("appid"), ctx.Query("taskid"), ctx.MustGet("page").(models.Page))
 	if err != nil {
-		utils.ErrorResponse(ctx, utils.NewError(GETTASK_ERROR, err))
+		utils.ErrorResponse(ctx, utils.NewError(GetTaskError, err))
 		return
 	}
 	utils.Ok(ctx, paths)
 }
 
-func (s *search) Index(ctx *gin.Context) {
+// Index search log by condition
+func (s *Search) Index(ctx *gin.Context) {
 	if ctx.Query("appid") == "" {
-		utils.ErrorResponse(ctx, utils.NewError(PARAM_ERROR, errors.New("appid can't be empty")))
+		utils.ErrorResponse(ctx, utils.NewError(ParamError, errors.New("appid can't be empty")))
 		return
 	}
 
@@ -126,31 +144,32 @@ func (s *search) Index(ctx *gin.Context) {
 		ctx.Query("keyword"),
 		ctx.MustGet("page").(models.Page))
 	if err != nil {
-		utils.ErrorResponse(ctx, utils.NewError(INDEX_ERROR, err))
+		utils.ErrorResponse(ctx, utils.NewError(IndexError, err))
 		return
 	}
 
 	utils.Ok(ctx, results)
 }
 
-func (s *search) Context(ctx *gin.Context) {
+// Context search log context
+func (s *Search) Context(ctx *gin.Context) {
 	if ctx.Query("appid") == "" {
-		utils.ErrorResponse(ctx, utils.NewError(PARAM_ERROR, errors.New("appid can't be empty")))
+		utils.ErrorResponse(ctx, utils.NewError(ParamError, errors.New("appid can't be empty")))
 		return
 	}
 
 	if ctx.Query("taskid") == "" {
-		utils.ErrorResponse(ctx, utils.NewError(PARAM_ERROR, errors.New("taskid can't be empty")))
+		utils.ErrorResponse(ctx, utils.NewError(ParamError, errors.New("taskid can't be empty")))
 		return
 	}
 
 	if ctx.Query("path") == "" {
-		utils.ErrorResponse(ctx, utils.NewError(PARAM_ERROR, errors.New("path can't be empty")))
+		utils.ErrorResponse(ctx, utils.NewError(ParamError, errors.New("path can't be empty")))
 		return
 	}
 
 	if ctx.Query("offset") == "" {
-		utils.ErrorResponse(ctx, utils.NewError(PARAM_ERROR, errors.New("offset can't be empty")))
+		utils.ErrorResponse(ctx, utils.NewError(ParamError, errors.New("offset can't be empty")))
 		return
 	}
 
@@ -160,7 +179,7 @@ func (s *search) Context(ctx *gin.Context) {
 		ctx.Query("offset"),
 		ctx.MustGet("page").(models.Page))
 	if err != nil {
-		utils.ErrorResponse(ctx, utils.NewError(INDEX_ERROR, err))
+		utils.ErrorResponse(ctx, utils.NewError(IndexError, err))
 		return
 	}
 

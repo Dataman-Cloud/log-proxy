@@ -12,22 +12,24 @@ import (
 
 // Config defines the conf info
 type Config struct {
-	ADDR             string `require:"true"`
-	ES_URL           string `require:"true"`
-	SEARCH_DEBUG     bool
-	PROMETHEUS_URL   string `require:"true"`
-	ALERTMANAGER_URL string `require:"true"`
-	FRONTEND_PATH    string
-	MARATHON_URL     string
-	NOTIFICATION_URL string
+	Addr            string `require:"true" alias:"ADDR"`
+	EsURL           string `require:"true" alias:"ES_URL"`
+	SearchDebug     bool   `alias:"SEARCH_DEBUG"`
+	PrometheusURL   string `require:"true" alias:"PROMETHEUS_URL"`
+	AlertManagerURL string `require:"true" alias:"ALERTMANAGER_URL"`
+	FrontendPath    string `alias:"FRONTEND_PATH"`
+	MarathonURL     string `alias:"MARATHON_URL"`
+	NotificationURL string `alias:"NOTIFICATION_URL"`
 }
 
 var c *Config
 
+// GetConfig get config data
 func GetConfig() *Config {
 	return c
 }
 
+// InitConfig init config
 func InitConfig(file string) {
 	c = new(Config)
 
@@ -56,23 +58,24 @@ func InitConfig(file string) {
 	LoadConfig()
 }
 
+// LoadConfig load config data
 func LoadConfig() {
 	robj := reflect.ValueOf(c).Elem()
 	for i := 0; i < robj.NumField(); i++ {
 		rb, err := strconv.ParseBool(robj.Type().Field(i).Tag.Get("require"))
 		if err == nil {
-			if rb && os.Getenv(robj.Type().Field(i).Name) == "" {
-				log.Fatalf("config field %s not setting", robj.Type().Field(i).Name)
+			if rb && os.Getenv(robj.Type().Field(i).Tag.Get("alias")) == "" {
+				log.Fatalf("config field %s not setting", robj.Type().Field(i).Tag.Get("alias"))
 			}
 		}
 		switch robj.Type().Field(i).Type.String() {
 		case "string":
-			robj.Field(i).Set(reflect.ValueOf(os.Getenv(robj.Type().Field(i).Name)))
+			robj.Field(i).Set(reflect.ValueOf(os.Getenv(robj.Type().Field(i).Tag.Get("alias"))))
 		case "bool":
-			if b, err := strconv.ParseBool(os.Getenv(robj.Type().Field(i).Name)); err == nil {
+			if b, err := strconv.ParseBool(os.Getenv(robj.Type().Field(i).Tag.Get("alias"))); err == nil {
 				robj.Field(i).Set(reflect.ValueOf(b))
 			} else if rb {
-				log.Fatalf("config %s value invalid", robj.Type().Field(i).Name)
+				log.Fatalf("config %s value invalid", robj.Type().Field(i).Tag.Get("alias"))
 			}
 		}
 	}

@@ -25,5 +25,5 @@ func LogT(ctx *gin.Context) {
 }
 
 func TestGinrus(t *testing.T) {
-	http.Get(baseUrl + "/v1/test/log")
+	http.Get(baseURL + "/v1/test/log")
 }

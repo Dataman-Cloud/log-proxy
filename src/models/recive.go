@@ -1,15 +1,17 @@
 package models
 
+// Prometheus prometheus event
 type Prometheus struct {
 	CLs CommonLabels     `json:"commonLabels"`
 	CAs CommonAnnotation `json:"commonAnnotations"`
 }
 
+// CommonLabels prometheus common labels
 type CommonLabels struct {
 	AlertName   string `json:"alertname"`
-	AppId       string `json:"container_label_APP_ID"`
+	AppID       string `json:"container_label_APP_ID"`
 	Vcluster    string `json:"container_label_VCLUSTER"`
-	ContainerId string `json:"id"`
+	ContainerID string `json:"id"`
 	Instance    string `json:"instance"`
 	Job         string `json:"job"`
 	Name        string `json:"name"`
@@ -19,6 +21,7 @@ type CommonLabels struct {
 	Usage       string `json:"usage"`
 }
 
+// CommonAnnotation prometheus commn annotation
 type CommonAnnotation struct {
 	Description string `json:"description"`
 	Summary     string `json:"summary"`

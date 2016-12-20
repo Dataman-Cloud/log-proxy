@@ -19,13 +19,13 @@ func main() {
 	flag.Parse()
 	config.InitConfig(*configFile)
 
-	log.Infof("http server: %s start...", config.GetConfig().ADDR)
+	log.Infof("http server: %s start...", config.GetConfig().Addr)
 
 	server := &http.Server{
-		Addr: config.GetConfig().ADDR,
+		Addr: config.GetConfig().Addr,
 		Handler: router.Router(middleware.Authenticate,
 			static.Serve("/",
-				static.LocalFile(path.Join(config.GetConfig().FRONTEND_PATH, "frontend"), true))),
+				static.LocalFile(path.Join(config.GetConfig().FrontendPath, "frontend"), true))),
 		WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}

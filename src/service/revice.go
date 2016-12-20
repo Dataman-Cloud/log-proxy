@@ -11,26 +11,30 @@ import (
 )
 
 const (
-	PROMETHEUS_INDEX = ".dataman-prometheus"
-	PROMETHEUS_TYPE  = "dataman-prometheus"
+	// PrometheusIndex prometheus index
+	PrometheusIndex = ".dataman-prometheus"
+	// PrometheusType prometheus type
+	PrometheusType = "dataman-prometheus"
 )
 
+// SavePrometheus recive prometheus event and save to es
 func (s *SearchService) SavePrometheus(pro map[string]interface{}) error {
 	//pro.CreateTime = time.Now().Format(time.RFC3339Nano)
 	pro["createtime"] = time.Now().Format(time.RFC3339Nano)
 	_, err := s.ESClient.Index().
-		Index(PROMETHEUS_INDEX).
-		Type(PROMETHEUS_TYPE).
+		Index(PrometheusIndex).
+		Type(PrometheusType).
 		BodyJson(pro).
 		Do()
 	return err
 }
 
+// GetPrometheus get all prometheus
 func (s *SearchService) GetPrometheus(page models.Page) (map[string]interface{}, error) {
 	data := make(map[string]interface{})
 	result, err := s.ESClient.Search().
-		Index(PROMETHEUS_INDEX).
-		Type(PROMETHEUS_TYPE).
+		Index(PrometheusIndex).
+		Type(PrometheusType).
 		From(page.PageFrom).
 		Size(page.PageSize).
 		Sort("createtime.timestamp", false).
@@ -60,10 +64,11 @@ func (s *SearchService) GetPrometheus(page models.Page) (map[string]interface{},
 	return data, nil
 }
 
+// GetPrometheu get prometheus by id
 func (s *SearchService) GetPrometheu(id string) (map[string]interface{}, error) {
 	result, err := s.ESClient.Get().
-		Index(PROMETHEUS_INDEX).
-		Type(PROMETHEUS_TYPE).
+		Index(PrometheusIndex).
+		Type(PrometheusType).
 		Id(id).
 		Do()
 
