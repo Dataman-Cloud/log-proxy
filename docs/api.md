@@ -253,7 +253,7 @@ return
 ```
 
 
-GET /v1/search/keywrod
+GET /v1/search/keyword
 
 return
 
@@ -262,7 +262,7 @@ return
 
 ```
 
-POST /v1/search/keywrod -d '{"period":1,"appid":"test","keyword":"keyword","condition":1,"enable":true}'
+POST /v1/search/keyword -d '{"period":1,"appid":"test","keyword":"keyword","condition":1,"enable":true}'
 
 return 
 
@@ -271,7 +271,7 @@ return
 ```
 
 
-PUT /v1/search/keywrod -d '{"id":"x","period":1,"appid":"test","keyword":"keyword","condition":1,"enable":true}'
+PUT /v1/search/keyword -d '{"id":"x","period":1,"appid":"test","keyword":"keyword","condition":1,"enable":true}'
 
 return
  
@@ -280,7 +280,7 @@ return
 ```
 
 
-DELETE /v1/search/keywrod/:id
+DELETE /v1/search/keyword/:id
 
 return
 
@@ -288,7 +288,7 @@ return
 {"code":0,"data":"delete success"}
 ```
 
-GET /v1/search/keywrod/:id
+GET /v1/search/keyword/:id
 
 return
 
