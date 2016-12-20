@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"strings"
 	"time"
 
@@ -101,12 +100,6 @@ func (s *Search) ReceiverLog(ctx *gin.Context) {
 		return
 	}
 
-	offset, ok := m["offset"]
-	if !ok {
-		utils.ErrorResponse(ctx, utils.NewError(GetLogError, "not found offset"))
-		return
-	}
-
 	message, ok := m["message"]
 	if !ok {
 		utils.ErrorResponse(ctx, utils.NewError(GetLogError, "not found message"))
@@ -131,7 +124,7 @@ func (s *Search) ReceiverLog(ctx *gin.Context) {
 			keyword,
 			userid.(string),
 			clusterid.(string),
-			fmt.Sprint(int64(offset.(float64)))).Inc()
+		).Inc()
 	}
 
 	utils.Ok(ctx, "ok")
