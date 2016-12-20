@@ -2,6 +2,7 @@ package backends
 
 import "fmt"
 
+// MetricExpr define the expr strings of metric type
 type MetricExpr struct {
 	CPU        *MetricExprCPU
 	Memory     *MetricExprMemory
@@ -9,6 +10,7 @@ type MetricExpr struct {
 	Filesystem *MetricExprFilesystem
 }
 
+// NewMetricExpr init the struct MetricExpr
 func NewMetricExpr() *MetricExpr {
 	return &MetricExpr{
 		CPU:        &MetricExprCPU{},
@@ -18,21 +20,26 @@ func NewMetricExpr() *MetricExpr {
 	}
 }
 
+// MetricExprCPU define the expr string of CPU usage
 type MetricExprCPU struct {
 	Usage string
 }
 
+// MetricExprMemory define the expr strings of CPU Percentage/Usage/Total
 type MetricExprMemory struct {
 	Percentage string
 	Usage      string
 	Total      string
 }
 
+// MetricExprNewtork define the expr strings of network receive/transmit
 type MetricExprNewtork struct {
 	Receive  string
 	Transmit string
 }
 
+// MetricExprFilesystem define the expr strings of Filesystem Read/Write
+// Usage/Limit
 type MetricExprFilesystem struct {
 	Read  string
 	Write string
@@ -40,6 +47,7 @@ type MetricExprFilesystem struct {
 	Limit string
 }
 
+// GetExpr return the struct MetricExpr by Query and Level string
 func GetExpr(query *Query, level string) *MetricExpr {
 	me := NewMetricExpr()
 	switch level {
@@ -53,11 +61,13 @@ func GetExpr(query *Query, level string) *MetricExpr {
 	return me
 }
 
+// GetMetricExpr return expr by the Tasks labels
 func (expr *MetricExpr) GetMetricExpr(query *Query) {
 	byItems := "container_label_VCLUSTER, container_label_APP_ID, group, id, image, instance, job, name, interface, device"
 	expr.setExpr(query, byItems)
 }
 
+// GetAppExpr return the expr by the App labels
 func (expr *MetricExpr) GetAppExpr(query *Query) {
 	byItems := "container_label_VCLUSTER, container_label_APP_ID"
 	expr.setExpr(query, byItems)
@@ -115,6 +125,7 @@ func (expr *MetricExpr) setExpr(query *Query, byItems string) {
 		"id=~'/docker/%s.*', name=~'mesos.*'}[5m])) by (%s)", appid, query.TaskID, byItems)
 }
 
+// GetNodeExpr return the struct MetricExpr with the expr strings of nodes
 func (expr *MetricExpr) GetNodeExpr(query *Query) {
 	node := query.NodeID
 	if node != "" {
@@ -137,16 +148,19 @@ func (expr *MetricExpr) GetNodeExpr(query *Query) {
 	return
 }
 
+// InfoExpr define the expr strings of Clusters/Cluster/Application
 type InfoExpr struct {
 	Clusters    string
 	Cluster     string
 	Application string
 }
 
+// NewInfoExpr init the struct InfoExpr
 func NewInfoExpr() *InfoExpr {
 	return &InfoExpr{}
 }
 
+// GetInfoExpr set the value for InfoExpr fileds
 func (expr *InfoExpr) GetInfoExpr(query *Query) {
 	expr.Clusters = fmt.Sprintf("container_tasks_state{id=~'/docker/.*', name=~'mesos.*', state='running'}")
 	expr.Cluster = fmt.Sprintf("container_tasks_state{id=~'/docker/.*', name=~'mesos.*', state='running',container_label_VCLUSTER='%s'}", query.ClusterID)

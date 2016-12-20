@@ -20,7 +20,7 @@ var (
 	baseUrl string
 	server  *httptest.Server
 	s       *search
-	mo      *monitor
+	mo      *Monitor
 )
 
 func startApiServer() *httptest.Server {

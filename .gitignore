@@ -1,3 +1,4 @@
 env_file
 data/
 bin/
+go_code_check*

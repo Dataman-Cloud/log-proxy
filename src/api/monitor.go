@@ -12,18 +12,22 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type monitor struct {
+// Monitor struct
+type Monitor struct {
 }
 
-func NewMonitor() *monitor {
-	return &monitor{}
+// NewMonitor init the struct monitor
+func NewMonitor() *Monitor {
+	return &Monitor{}
 }
 
-func (m *monitor) Ping(ctx *gin.Context) {
+// Ping return string "success"
+func (m *Monitor) Ping(ctx *gin.Context) {
 	utils.Ok(ctx, "success")
 }
 
-func (m *monitor) Query(ctx *gin.Context) {
+// Query return the result of metric query or expr query
+func (m *Monitor) Query(ctx *gin.Context) {
 	param := &backends.QueryParameter{
 		Metric:    ctx.Query("metric"),
 		ClusterID: ctx.Query("clusterid"),
@@ -49,7 +53,7 @@ func (m *monitor) Query(ctx *gin.Context) {
 
 	if param.Expr != "" {
 		query := &backends.Query{
-			HttpClient:     http.DefaultClient,
+			HTTPClient:     http.DefaultClient,
 			PromServer:     config.GetConfig().PROMETHEUS_URL,
 			Path:           backends.QUERYRANGEPATH,
 			QueryParameter: param,
@@ -65,7 +69,7 @@ func (m *monitor) Query(ctx *gin.Context) {
 
 	if param.Metric != "" {
 		query := &backends.Query{
-			HttpClient:     http.DefaultClient,
+			HTTPClient:     http.DefaultClient,
 			PromServer:     config.GetConfig().PROMETHEUS_URL,
 			Path:           backends.QUERYRANGEPATH,
 			QueryParameter: param,
@@ -80,13 +84,14 @@ func (m *monitor) Query(ctx *gin.Context) {
 	}
 }
 
-func (m *monitor) QueryInfo(ctx *gin.Context) {
+// QueryInfo return the info of clusters/cluster/app/node info
+func (m *Monitor) QueryInfo(ctx *gin.Context) {
 	param := &backends.QueryParameter{
 		ClusterID: ctx.Query("clusterid"),
 		AppID:     ctx.Query("appid"),
 	}
 	query := &backends.Query{
-		HttpClient:     http.DefaultClient,
+		HTTPClient:     http.DefaultClient,
 		PromServer:     config.GetConfig().PROMETHEUS_URL,
 		Path:           backends.QUERYPATH,
 		QueryParameter: param,
@@ -107,13 +112,14 @@ func (m *monitor) QueryInfo(ctx *gin.Context) {
 	utils.Ok(ctx, data)
 }
 
-func (m *monitor) QueryNodes(ctx *gin.Context) {
+// QueryNodes return the metric data of nodes
+func (m *Monitor) QueryNodes(ctx *gin.Context) {
 	param := &backends.QueryParameter{
 		ClusterID: ctx.Query("clusterid"),
 		NodeID:    ctx.Query("nodeid"),
 	}
 	query := &backends.Query{
-		HttpClient:     http.DefaultClient,
+		HTTPClient:     http.DefaultClient,
 		PromServer:     config.GetConfig().PROMETHEUS_URL,
 		Path:           backends.QUERYRANGEPATH,
 		QueryParameter: param,
@@ -128,9 +134,10 @@ func (m *monitor) QueryNodes(ctx *gin.Context) {
 	utils.Ok(ctx, data)
 }
 
-func (m *monitor) GetAlerts(ctx *gin.Context) {
+// GetAlerts return the Alerts
+func (m *Monitor) GetAlerts(ctx *gin.Context) {
 	query := &backends.AlertManager{
-		HttpClient: http.DefaultClient,
+		HTTPClient: http.DefaultClient,
 		Server:     config.GetConfig().ALERTMANAGER_URL,
 		Path:       backends.ALERTSPATH,
 	}
@@ -142,9 +149,10 @@ func (m *monitor) GetAlerts(ctx *gin.Context) {
 	utils.Ok(ctx, data)
 }
 
-func (m *monitor) GetAlertsGroups(ctx *gin.Context) {
+// GetAlertsGroups return the Alerts Groups queryed from Alertmanager
+func (m *Monitor) GetAlertsGroups(ctx *gin.Context) {
 	query := &backends.AlertManager{
-		HttpClient: http.DefaultClient,
+		HTTPClient: http.DefaultClient,
 		Server:     config.GetConfig().ALERTMANAGER_URL,
 		Path:       backends.ALERTSGROUSPPATH,
 	}
@@ -157,9 +165,10 @@ func (m *monitor) GetAlertsGroups(ctx *gin.Context) {
 	utils.Ok(ctx, data)
 }
 
-func (m *monitor) GetAlertsStatus(ctx *gin.Context) {
+// GetAlertsStatus return the Alerts Status queryed from Alertmanager
+func (m *Monitor) GetAlertsStatus(ctx *gin.Context) {
 	query := &backends.AlertManager{
-		HttpClient: http.DefaultClient,
+		HTTPClient: http.DefaultClient,
 		Server:     config.GetConfig().ALERTMANAGER_URL,
 		Path:       backends.ALERTSSTATUSPATH,
 	}

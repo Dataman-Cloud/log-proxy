@@ -9,7 +9,7 @@ import (
 
 func initQueryAlertManager() *AlertManager {
 	return &AlertManager{
-		HttpClient: http.DefaultClient,
+		HTTPClient: http.DefaultClient,
 		Server:     "http://127.0.0.1:9093",
 		Path:       ALERTSPATH,
 	}

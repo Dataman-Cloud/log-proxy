@@ -14,9 +14,10 @@ const (
 	SILENCE_PARAM_ERROR = "503-12000"
 )
 
-func (m *monitor) GetSilences(ctx *gin.Context) {
+// GetSilences return the silences list
+func (m *Monitor) GetSilences(ctx *gin.Context) {
 	query := &backends.AlertManager{
-		HttpClient: http.DefaultClient,
+		HTTPClient: http.DefaultClient,
 		Server:     config.GetConfig().ALERTMANAGER_URL,
 		Path:       backends.ALERTSPATH,
 	}
@@ -29,9 +30,10 @@ func (m *monitor) GetSilences(ctx *gin.Context) {
 	utils.Ok(ctx, data)
 }
 
-func (m *monitor) CreateSilence(ctx *gin.Context) {
+// CreateSilence pass the silence varabile to the func query.CreateSilence
+func (m *Monitor) CreateSilence(ctx *gin.Context) {
 	query := &backends.AlertManager{
-		HttpClient: http.DefaultClient,
+		HTTPClient: http.DefaultClient,
 		Server:     config.GetConfig().ALERTMANAGER_URL,
 		Path:       backends.ALERTSPATH,
 	}
@@ -50,9 +52,10 @@ func (m *monitor) CreateSilence(ctx *gin.Context) {
 	utils.Ok(ctx, "success")
 }
 
-func (m *monitor) GetSilence(ctx *gin.Context) {
+// GetSilence return the silence
+func (m *Monitor) GetSilence(ctx *gin.Context) {
 	query := &backends.AlertManager{
-		HttpClient: http.DefaultClient,
+		HTTPClient: http.DefaultClient,
 		Server:     config.GetConfig().ALERTMANAGER_URL,
 		Path:       backends.ALERTSPATH,
 	}
@@ -65,9 +68,10 @@ func (m *monitor) GetSilence(ctx *gin.Context) {
 	utils.Ok(ctx, data)
 }
 
-func (m *monitor) DeleteSilence(ctx *gin.Context) {
+// DeleteSilence pass the id to the func query.DeleteSilence
+func (m *Monitor) DeleteSilence(ctx *gin.Context) {
 	query := &backends.AlertManager{
-		HttpClient: http.DefaultClient,
+		HTTPClient: http.DefaultClient,
 		Server:     config.GetConfig().ALERTMANAGER_URL,
 		Path:       backends.ALERTSPATH,
 	}
@@ -80,9 +84,10 @@ func (m *monitor) DeleteSilence(ctx *gin.Context) {
 	utils.Ok(ctx, "success")
 }
 
-func (m *monitor) UpdateSilence(ctx *gin.Context) {
+// UpdateSilence delete and create the silence by id
+func (m *Monitor) UpdateSilence(ctx *gin.Context) {
 	query := &backends.AlertManager{
-		HttpClient: http.DefaultClient,
+		HTTPClient: http.DefaultClient,
 		Server:     config.GetConfig().ALERTMANAGER_URL,
 		Path:       backends.ALERTSPATH,
 	}

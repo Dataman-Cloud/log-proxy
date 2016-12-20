@@ -18,8 +18,8 @@ func setup() string {
 	mux = http.NewServeMux()
 	server = httptest.NewServer(mux)
 
-	serverUrl, _ := url.Parse(server.URL)
-	return serverUrl.String()
+	serverURL, _ := url.Parse(server.URL)
+	return serverURL.String()
 }
 
 func teardown() {
