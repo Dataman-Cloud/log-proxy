@@ -32,17 +32,14 @@ func Router(middlewares ...gin.HandlerFunc) *gin.Engine {
 		logv1.GET("/index", s.Index)
 		logv1.GET("/context", s.Context)
 
-	}
+		logv1.GET("/keyword", s.GetAlerts)
+		logv1.POST("/keyword", s.CreateAlert)
+		logv1.PUT("/keyword", s.UpdateAlert)
+		logv1.DELETE("/keyword/:id", s.DeleteAlert)
+		logv1.GET("/keyword/:id", s.GetAlert)
+		logv1.GET("/prometheus", s.GetPrometheus)
+		logv1.GET("/prometheus/:id", s.GetPrometheu)
 
-	av1 := r.Group("/v1/monitor")
-	{
-		av1.GET("/alert", s.GetAlerts)
-		av1.POST("/alert", s.CreateAlert)
-		av1.PUT("/alert", s.UpdateAlert)
-		av1.DELETE("/alert/:id", s.DeleteAlert)
-		av1.GET("/alert/:id", s.GetAlert)
-		av1.GET("/prometheus", s.GetPrometheus)
-		av1.GET("/prometheus/:id", s.GetPrometheu)
 	}
 
 	pv1 := r.Group("/v1/recive")
