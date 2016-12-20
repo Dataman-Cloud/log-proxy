@@ -18,25 +18,25 @@
         };
 
         function alerts() {
-            return $resource(BACKEND_URL_BASE.defaultBase + '/v1/monitor/alert', null, {
+            return $resource(BACKEND_URL_BASE.defaultBase + '/v1/search/keyword', null, {
                 'update': {method: 'PUT'}
             });
         }
 
         function alert(id) {
-            return $resource(BACKEND_URL_BASE.defaultBase + '/v1/monitor/alert/:id', {id: id});
+            return $resource(BACKEND_URL_BASE.defaultBase + '/v1/search/keyword/:id', {id: id});
         }
 
         function histories(data) {
             var paramObj = data || {};
-            return $resource(BACKEND_URL_BASE.defaultBase + '/v1/monitor/prometheus', {
+            return $resource(BACKEND_URL_BASE.defaultBase + '/v1/search/prometheus', {
                 page: paramObj.page,
                 size: paramObj.size
             });
         }
 
         function history(id) {
-            return $resource(BACKEND_URL_BASE.defaultBase + '/v1/monitor/prometheus/:id', {id: id});
+            return $resource(BACKEND_URL_BASE.defaultBase + '/v1/search/prometheus/:id', {id: id});
         }
 
         function silences() {

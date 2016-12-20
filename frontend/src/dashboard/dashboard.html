@@ -1,19 +1,19 @@
 <div class="statistic panel" layout="row" layout-align="space-between stretch">
     <div class="statistic-panel" layout="column" layout-align="space-around center">
         <h3>集群数</h3>
-        <em>{/keys(vm.info.clusters).length/}</em>
+        <em id="clusterNumb">{/keys(vm.info.clusters).length/}</em>
     </div>
     <div class="statistic-panel" layout="column" layout-align="space-around center">
         <h3>应用数</h3>
-        <em>{/vm.info.applications.length/}</em>
+        <em id="appNumb">{/vm.info.applications.length/}</em>
     </div>
     <div class="statistic-panel" layout="column" layout-align="space-around center">
         <h3>实例数</h3>
-        <em>{/vm.info.tasks.length/}</em>
+        <em id="instanceNumb">{/vm.info.tasks.length/}</em>
     </div>
     <div class="statistic-panel" layout="column" layout-align="space-around center">
         <h3>主机数</h3>
-        <em>{/vm.info.nodes.length/}</em>
+        <em id="hostNumb">{/vm.info.nodes.length/}</em>
     </div>
 </div>
 <div class="panel">
@@ -21,10 +21,10 @@
         <table md-table id="cluster-list">
             <thead md-head>
             <tr md-row>
-                <th md-column style="width:150px;">集群</th>
-                <th md-column style="width:200px;">应用</th>
-                <th md-column>实例</th>
-                <th md-column style="width:150px;">主机</th>
+                <th id="clusters" md-column style="width:150px;">集群</th>
+                <th id="apps" md-column style="width:200px;">应用</th>
+                <th id="instances" md-column>实例</th>
+                <th id="hosts" md-column style="width:150px;">主机</th>
             </tr>
             </thead>
             <tbody md-body>
