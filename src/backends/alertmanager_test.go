@@ -11,7 +11,7 @@ func initQueryAlertManager() *AlertManager {
 	return &AlertManager{
 		HTTPClient: http.DefaultClient,
 		Server:     "http://127.0.0.1:9093",
-		Path:       ALERTSPATH,
+		Path:       AlertsPath,
 	}
 }
 
@@ -96,7 +96,7 @@ func TestGetSilences(t *testing.T) {
 
 	am := initQueryAlertManager()
 	am.Server = server
-	am.Path = SILENCES_API
+	am.Path = SilencesAPI
 
 	mux.HandleFunc(am.Path, func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
@@ -116,7 +116,7 @@ func TestCreateSilence(t *testing.T) {
 
 	am := initQueryAlertManager()
 	am.Server = server
-	am.Path = SILENCES_API
+	am.Path = SilencesAPI
 
 	mux.HandleFunc(am.Path, func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
@@ -139,7 +139,7 @@ func TestGetSilence(t *testing.T) {
 
 	am := initQueryAlertManager()
 	am.Server = server
-	am.Path = GET_SILENCE + "2"
+	am.Path = GetSilence + "2"
 
 	mux.HandleFunc(am.Path, func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
@@ -160,7 +160,7 @@ func TestDeleteSilence(t *testing.T) {
 
 	am := initQueryAlertManager()
 	am.Server = server
-	am.Path = GET_SILENCE + "2"
+	am.Path = GetSilence + "2"
 
 	mux.HandleFunc(am.Path, func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "DELETE")

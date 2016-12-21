@@ -18,21 +18,24 @@ import (
 	"gopkg.in/olivere/elastic.v3"
 )
 
+// SearchService search service client
 type SearchService struct {
 	ESClient  *elastic.Client
 	AlertFlag map[string]time.Time
 	Maf       *sync.Mutex
 }
 
+// SearchResult search log result
 type SearchResult struct {
 	Message []string `json:"message"`
 }
 
+// NewEsService new es search client
 func NewEsService(url []string) *SearchService {
 	var ofs []elastic.ClientOptionFunc
 	ofs = append(ofs, elastic.SetURL(url...))
 	ofs = append(ofs, elastic.SetMaxRetries(3))
-	if config.GetConfig().SEARCH_DEBUG {
+	if config.GetConfig().SearchDebug {
 		ofs = append(ofs, elastic.SetTraceLog(log.StandardLogger()))
 	}
 	client, err := elastic.NewClient(ofs...)
@@ -48,6 +51,7 @@ func NewEsService(url []string) *SearchService {
 	}
 }
 
+// Applications get all applications
 func (s *SearchService) Applications(page models.Page) (map[string]int64, error) {
 	bquery := elastic.NewBoolQuery().
 		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte(page.RangeFrom).Lte(page.RangeTo).Format("epoch_millis"))
@@ -84,6 +88,7 @@ func (s *SearchService) Applications(page models.Page) (map[string]int64, error)
 	return apps, nil
 }
 
+// Tasks get application tasks
 func (s *SearchService) Tasks(appName string, page models.Page) (map[string]int64, error) {
 	bquery := elastic.NewBoolQuery().
 		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte(page.RangeFrom).Lte(page.RangeTo).Format("epoch_millis")).
@@ -123,12 +128,13 @@ func (s *SearchService) Tasks(appName string, page models.Page) (map[string]int6
 	return tasks, nil
 }
 
-func (s *SearchService) Paths(appName, taskId string, page models.Page) (map[string]int64, error) {
+// Paths get application paths
+func (s *SearchService) Paths(appName, taskID string, page models.Page) (map[string]int64, error) {
 	paths := make(map[string]int64)
 	var querys []elastic.Query
 	querys = append(querys, elastic.NewTermQuery("appid", appName))
-	if taskId != "" {
-		querys = append(querys, elastic.NewTermQuery("taskid", taskId))
+	if taskID != "" {
+		querys = append(querys, elastic.NewTermQuery("taskid", taskID))
 	}
 
 	bquery := elastic.NewBoolQuery().
@@ -168,6 +174,7 @@ func (s *SearchService) Paths(appName, taskId string, page models.Page) (map[str
 	return paths, nil
 }
 
+// Search search log by condition
 func (s *SearchService) Search(appid, taskid, source, keyword string, page models.Page) (map[string]interface{}, error) {
 	data := make(map[string]interface{})
 
@@ -219,6 +226,7 @@ func (s *SearchService) Search(appid, taskid, source, keyword string, page model
 	return data, nil
 }
 
+// Context search log context
 func (s *SearchService) Context(appid, taskid, source, timestamp string, page models.Page) ([]map[string]interface{}, error) {
 	offset, err := strconv.ParseInt(timestamp, 10, 64)
 	if err != nil {

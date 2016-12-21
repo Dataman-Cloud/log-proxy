@@ -13,17 +13,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (s *search) Receiver(ctx *gin.Context) {
+func (s *Search) Receiver(ctx *gin.Context) {
 	data, err := utils.ReadRequestBody(ctx.Request)
 	if err != nil {
-		utils.ErrorResponse(ctx, utils.NewError(GET_EVENTS_ERROR, err))
+		utils.ErrorResponse(ctx, utils.NewError(GetEventsError, err))
 		return
 	}
 
 	var m map[string]interface{}
 	err = json.Unmarshal(data, &m)
 	if err != nil {
-		utils.ErrorResponse(ctx, utils.NewError(GET_EVENTS_ERROR, err))
+		utils.ErrorResponse(ctx, utils.NewError(GetEventsError, err))
 		return
 	}
 
@@ -32,8 +32,8 @@ func (s *search) Receiver(ctx *gin.Context) {
 		a["alertname"] = a["labels"].(map[string]interface{})["alertname"]
 		labels, err := json.Marshal(a["labels"])
 
-		if config.GetConfig().NOTIFICATION_URL != "" {
-			utils.AlertNotification(config.GetConfig().NOTIFICATION_URL, map[string]interface{}{
+		if config.GetConfig().NotificationURL != "" {
+			utils.AlertNotification(config.GetConfig().NotificationURL, map[string]interface{}{
 				"alarminfo": []map[string]interface{}{
 					map[string]interface{}{
 						"level":         a["labels"].(map[string]interface{})["severity"],
@@ -57,59 +57,59 @@ func (s *search) Receiver(ctx *gin.Context) {
 	utils.Ok(ctx, map[string]string{"status": "success"})
 }
 
-func (s *search) ReceiverLog(ctx *gin.Context) {
+func (s *Search) ReceiverLog(ctx *gin.Context) {
 	data, err := utils.ReadRequestBody(ctx.Request)
 	if err != nil {
-		utils.ErrorResponse(ctx, utils.NewError(GET_LOG_ERROR, err))
+		utils.ErrorResponse(ctx, utils.NewError(GetLogError, err))
 		return
 	}
 
 	var m map[string]interface{}
 	err = json.Unmarshal(data, &m)
 	if err != nil {
-		utils.ErrorResponse(ctx, utils.NewError(GET_LOG_ERROR, err))
+		utils.ErrorResponse(ctx, utils.NewError(GetLogError, err))
 		return
 	}
 
 	appid, ok := m["appid"]
 	if !ok {
-		utils.ErrorResponse(ctx, utils.NewError(GET_LOG_ERROR, "not found appid"))
+		utils.ErrorResponse(ctx, utils.NewError(GetLogError, "not found appid"))
 		return
 	}
 
 	taskid, ok := m["taskid"]
 	if !ok {
-		utils.ErrorResponse(ctx, utils.NewError(GET_LOG_ERROR, "not found taskid"))
+		utils.ErrorResponse(ctx, utils.NewError(GetLogError, "not found taskid"))
 		return
 	}
 
 	path, ok := m["path"]
 	if !ok {
-		utils.ErrorResponse(ctx, utils.NewError(GET_LOG_ERROR, "not found path"))
+		utils.ErrorResponse(ctx, utils.NewError(GetLogError, "not found path"))
 		return
 	}
 
 	userid, ok := m["userid"]
 	if !ok {
-		utils.ErrorResponse(ctx, utils.NewError(GET_LOG_ERROR, "not found userid"))
+		utils.ErrorResponse(ctx, utils.NewError(GetLogError, "not found userid"))
 		return
 	}
 
 	clusterid, ok := m["clusterid"]
 	if !ok {
-		utils.ErrorResponse(ctx, utils.NewError(GET_LOG_ERROR, "not found clusterid"))
+		utils.ErrorResponse(ctx, utils.NewError(GetLogError, "not found clusterid"))
 		return
 	}
 
 	offset, ok := m["offset"]
 	if !ok {
-		utils.ErrorResponse(ctx, utils.NewError(GET_LOG_ERROR, "not found offset"))
+		utils.ErrorResponse(ctx, utils.NewError(GetLogError, "not found offset"))
 		return
 	}
 
 	message, ok := m["message"]
 	if !ok {
-		utils.ErrorResponse(ctx, utils.NewError(GET_LOG_ERROR, "not found message"))
+		utils.ErrorResponse(ctx, utils.NewError(GetLogError, "not found message"))
 		return
 	}
 
@@ -138,20 +138,20 @@ func (s *search) ReceiverLog(ctx *gin.Context) {
 	return
 }
 
-func (s *search) GetPrometheus(ctx *gin.Context) {
+func (s *Search) GetPrometheus(ctx *gin.Context) {
 	result, err := s.Service.GetPrometheus(ctx.MustGet("page").(models.Page))
 	if err != nil {
-		utils.ErrorResponse(ctx, utils.NewError(GET_PROMETHEUS_ERROR, err))
+		utils.ErrorResponse(ctx, utils.NewError(GetPrometheusError, err))
 		return
 	}
 
 	utils.Ok(ctx, result)
 }
 
-func (s *search) GetPrometheu(ctx *gin.Context) {
+func (s *Search) GetPrometheu(ctx *gin.Context) {
 	result, err := s.Service.GetPrometheu(ctx.Param("id"))
 	if err != nil {
-		utils.ErrorResponse(ctx, utils.NewError(GET_PROMETHEUS_ERROR, err))
+		utils.ErrorResponse(ctx, utils.NewError(GetPrometheusError, err))
 		return
 	}
 

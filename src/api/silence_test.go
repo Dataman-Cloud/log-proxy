@@ -34,7 +34,7 @@ func deleteMonitorSilence(ctx *gin.Context) {
 func TestMonitorGetSilences(t *testing.T) {
 	expectResult := 200
 	httpClient := http.DefaultClient
-	u, _ := url.Parse(apiUrl)
+	u, _ := url.Parse(apiURL)
 	u.Path = strings.TrimRight(u.Path, "/") + "/api/v1/monitor/silences"
 	resp, _ := httpClient.Get(u.String())
 	if resp.StatusCode != expectResult {
@@ -45,7 +45,7 @@ func TestMonitorGetSilences(t *testing.T) {
 func TestMonitorGetSilence(t *testing.T) {
 	expectResult := 200
 	httpClient := http.DefaultClient
-	u, _ := url.Parse(apiUrl)
+	u, _ := url.Parse(apiURL)
 	u.Path = strings.TrimRight(u.Path, "/") + "/api/v1/monitor/silence"
 	resp, _ := httpClient.Get(u.String())
 	if resp.StatusCode != expectResult {
@@ -85,7 +85,7 @@ func initSlience() *Silence {
 }
 
 func TestCreateSilence(t *testing.T) {
-	path := apiUrl + "/api/v1/monitor/silence"
+	path := apiURL + "/api/v1/monitor/silence"
 	resp, _ := http.NewRequest("POST", path, nil)
 	req, err := http.DefaultClient.Do(resp)
 	if err == nil && req.StatusCode == 400 {
@@ -106,7 +106,7 @@ func TestCreateSilence(t *testing.T) {
 }
 
 func TestUpdateSilence(t *testing.T) {
-	path := apiUrl + "/api/v1/monitor/silence"
+	path := apiURL + "/api/v1/monitor/silence"
 	resp, _ := http.NewRequest("PUT", path, nil)
 	req, err := http.DefaultClient.Do(resp)
 	if err == nil && req.StatusCode == 400 {
@@ -127,7 +127,7 @@ func TestUpdateSilence(t *testing.T) {
 }
 
 func TestDeleteSilence(t *testing.T) {
-	path := apiUrl + "/api/v1/monitor/silence/test"
+	path := apiURL + "/api/v1/monitor/silence/test"
 	resp, _ := http.NewRequest("DELETE", path, nil)
 	req, err := http.DefaultClient.Do(resp)
 	if err == nil && req.StatusCode == 200 {

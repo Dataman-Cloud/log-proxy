@@ -16,14 +16,14 @@ import (
 )
 
 var (
-	apiUrl  string
-	baseUrl string
+	apiURL  string
+	baseURL string
 	server  *httptest.Server
-	s       *search
+	s       *Search
 	mo      *Monitor
 )
 
-func startApiServer() *httptest.Server {
+func startAPIServer() *httptest.Server {
 	router := gin.New()
 	v1 := router.Group("/api/v1", func(ctx *gin.Context) { ctx.Set("page", models.Page{}) })
 	{
@@ -67,7 +67,7 @@ func startApiServer() *httptest.Server {
 	return httptest.NewServer(router)
 }
 
-func startHttpServer() *httptest.Server {
+func startHTTPServer() *httptest.Server {
 	router := gin.New()
 	router.HEAD("/", func(ctx *gin.Context) { ctx.String(200, "") })
 	router.GET("/_nodes/http", nodes)
@@ -146,7 +146,7 @@ func task(ctx *gin.Context) {
 }
 
 func nodes(ctx *gin.Context) {
-	u, _ := url.Parse(baseUrl)
+	u, _ := url.Parse(baseURL)
 	data := `{"cluster_name":"elasticsearch","nodes":{"Ijb_-48ZQYmEnQ0a5BnXAw":{"name":"Choice","transport_address":"172.17.0.5:9300","host":"172.17.0.5","ip":"172.17.0.5","version":"2.4.1","build":"c67dc32","http_address":"` + u.Host + `","http":{"bound_address":["[::]:9200"],"publish_address":"172.17.0.5:9200","max_content_length_in_bytes":104857600}}}}`
 	var nodes elastic.NodesInfoResponse
 	json.Unmarshal([]byte(data), &nodes)
@@ -200,15 +200,15 @@ func querySlience(ctx *gin.Context) {
 }
 
 func TestMain(m *testing.M) {
-	apiserver := startApiServer()
-	apiUrl = apiserver.URL
+	apiserver := startAPIServer()
+	apiURL = apiserver.URL
 	defer apiserver.Close()
 	config.InitConfig("../../env_file.template")
-	server = startHttpServer()
-	baseUrl = server.URL
-	config.GetConfig().ES_URL = baseUrl
-	config.GetConfig().PROMETHEUS_URL = baseUrl
-	config.GetConfig().ALERTMANAGER_URL = baseUrl
+	server = startHTTPServer()
+	baseURL = server.URL
+	config.GetConfig().EsURL = baseURL
+	config.GetConfig().PrometheusURL = baseURL
+	config.GetConfig().AlertManagerURL = baseURL
 	mo = NewMonitor()
 	ret := m.Run()
 	server.Close()
@@ -219,7 +219,7 @@ func TestPing(t *testing.T) {
 	if s == nil {
 		s = GetSearch()
 	}
-	_, err := http.Get(apiUrl + "/api/v1/ping")
+	_, err := http.Get(apiURL + "/api/v1/ping")
 	if err == nil {
 		t.Log("success")
 	} else {
@@ -231,7 +231,7 @@ func TestApplications(t *testing.T) {
 	if s == nil {
 		s = GetSearch()
 	}
-	_, err := http.Get(apiUrl + "/api/v1/applications")
+	_, err := http.Get(apiURL + "/api/v1/applications")
 	if err == nil {
 		t.Log("success")
 	} else {
@@ -244,7 +244,7 @@ func TestTasks(t *testing.T) {
 	if s == nil {
 		s = GetSearch()
 	}
-	resp, err := http.Get(apiUrl + "/api/v1/tasks/test")
+	resp, err := http.Get(apiURL + "/api/v1/tasks/test")
 	if err == nil && resp.StatusCode == 200 {
 		t.Log("success")
 	} else {
@@ -256,7 +256,7 @@ func TestPaths(t *testing.T) {
 	if s == nil {
 		s = GetSearch()
 	}
-	resp, err := http.Get(apiUrl + "/api/v1/paths/test")
+	resp, err := http.Get(apiURL + "/api/v1/paths/test")
 	if err == nil && resp.StatusCode == 200 {
 		t.Log("success")
 	} else {
@@ -268,21 +268,21 @@ func TestIndex(t *testing.T) {
 	if s == nil {
 		s = GetSearch()
 	}
-	resp, err := http.Get(apiUrl + "/api/v1/index")
+	resp, err := http.Get(apiURL + "/api/v1/index")
 	if err == nil && resp.StatusCode == 400 {
 		t.Log("success")
 	} else {
 		t.Error("faild")
 	}
 
-	resp, err = http.Get(apiUrl + "/api/v1/index?appid=test-web")
+	resp, err = http.Get(apiURL + "/api/v1/index?appid=test-web")
 	if err == nil && resp.StatusCode == 503 {
 		t.Log("success")
 	} else {
 		t.Error("faild")
 	}
 
-	resp, err = http.Get(apiUrl + "/api/v1/index?appid=test-web&keyword=test")
+	resp, err = http.Get(apiURL + "/api/v1/index?appid=test-web&keyword=test")
 	if err == nil && resp.StatusCode == 200 {
 		t.Log("success")
 	} else {
@@ -294,35 +294,35 @@ func TestContext(t *testing.T) {
 	if s == nil {
 		s = GetSearch()
 	}
-	resp, err := http.Get(apiUrl + "/api/v1/context")
+	resp, err := http.Get(apiURL + "/api/v1/context")
 	if err == nil && resp.StatusCode == 400 {
 		t.Log("success")
 	} else {
 		t.Error("faild")
 	}
 
-	resp, err = http.Get(apiUrl + "/api/v1/context?appid=test")
+	resp, err = http.Get(apiURL + "/api/v1/context?appid=test")
 	if err == nil && resp.StatusCode == 400 {
 		t.Log("success")
 	} else {
 		t.Error("faild")
 	}
 
-	resp, err = http.Get(apiUrl + "/api/v1/context?appid=test&taskid=test")
+	resp, err = http.Get(apiURL + "/api/v1/context?appid=test&taskid=test")
 	if err == nil && resp.StatusCode == 400 {
 		t.Log("success")
 	} else {
 		t.Error("faild")
 	}
 
-	resp, err = http.Get(apiUrl + "/api/v1/context?appid=test&taskid=test&path=appid")
+	resp, err = http.Get(apiURL + "/api/v1/context?appid=test&taskid=test&path=appid")
 	if err == nil && resp.StatusCode == 400 {
 		t.Log("success")
 	} else {
 		t.Error("faild")
 	}
 
-	resp, err = http.Get(apiUrl + "/api/v1/context?appid=test&taskid=test&path=appid&offset=100")
+	resp, err = http.Get(apiURL + "/api/v1/context?appid=test&taskid=test&path=appid&offset=100")
 	if err == nil && resp.StatusCode == 200 {
 		t.Log("success")
 	} else {

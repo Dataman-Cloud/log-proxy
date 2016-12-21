@@ -13,11 +13,16 @@ import (
 )
 
 const (
-	SILENCES_API     = "/api/v1/silences"
-	GET_SILENCE      = "/api/v1/silence/"
-	ALERTSPATH       = "/api/v1/alerts"
-	ALERTSGROUSPPATH = "/api/v1/alerts/groups"
-	ALERTSSTATUSPATH = "/api/v1/status"
+	// SilencesAPI api path
+	SilencesAPI = "/api/v1/silences"
+	// GetSilence get silence api path
+	GetSilence = "/api/v1/silence/"
+	// AlertsPath alerts api path
+	AlertsPath = "/api/v1/alerts"
+	// AlertsGroupsPath alert group api path
+	AlertsGroupsPath = "/api/v1/alerts/groups"
+	// AlertsStatusPath alert status api path
+	AlertsStatusPath = "/api/v1/status"
 )
 
 // AlertManager define the query info of AlertManager
@@ -68,7 +73,7 @@ func (am *AlertManager) GetSilences() ([]interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	u.Path = SILENCES_API
+	u.Path = SilencesAPI
 	resp, err := am.HTTPClient.Get(u.String())
 	if err != nil {
 		return nil, err
@@ -95,7 +100,7 @@ func (am *AlertManager) CreateSilence(silence map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	u.Path = SILENCES_API
+	u.Path = SilencesAPI
 
 	data, _ := json.Marshal(silence)
 	_, err = am.HTTPClient.Post(u.String(), "application/json", bytes.NewBuffer(data))
@@ -109,7 +114,7 @@ func (am *AlertManager) GetSilence(id string) (map[string]interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	u.Path = GET_SILENCE + id
+	u.Path = GetSilence + id
 	resp, err := am.HTTPClient.Get(u.String())
 	if err != nil {
 		return nil, err
@@ -132,7 +137,7 @@ func (am *AlertManager) DeleteSilence(id string) error {
 	if err != nil {
 		return err
 	}
-	u.Path = GET_SILENCE + id
+	u.Path = GetSilence + id
 	req, err := http.NewRequest("DELETE", u.String(), nil)
 	if err != nil {
 		return err

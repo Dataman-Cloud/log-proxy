@@ -40,13 +40,13 @@ func (m *Monitor) Query(ctx *gin.Context) {
 		Expr:      ctx.Query("expr"),
 	}
 	if param.Metric != "" && param.Expr != "" {
-		err := fmt.Errorf("The paramter confict between metric and expr!")
+		err := fmt.Errorf("The paramter confict between metric and expr")
 		utils.ErrorResponse(ctx, err)
 		return
 	}
 
 	if param.Metric == "" && param.Expr == "" {
-		err := fmt.Errorf("The paramter of metric or expr required!")
+		err := fmt.Errorf("The paramter of metric or expr required")
 		utils.ErrorResponse(ctx, err)
 		return
 	}
@@ -54,7 +54,7 @@ func (m *Monitor) Query(ctx *gin.Context) {
 	if param.Expr != "" {
 		query := &backends.Query{
 			HTTPClient:     http.DefaultClient,
-			PromServer:     config.GetConfig().PROMETHEUS_URL,
+			PromServer:     config.GetConfig().PrometheusURL,
 			Path:           backends.QUERYRANGEPATH,
 			QueryParameter: param,
 		}
@@ -70,7 +70,7 @@ func (m *Monitor) Query(ctx *gin.Context) {
 	if param.Metric != "" {
 		query := &backends.Query{
 			HTTPClient:     http.DefaultClient,
-			PromServer:     config.GetConfig().PROMETHEUS_URL,
+			PromServer:     config.GetConfig().PrometheusURL,
 			Path:           backends.QUERYRANGEPATH,
 			QueryParameter: param,
 		}
@@ -92,13 +92,13 @@ func (m *Monitor) QueryInfo(ctx *gin.Context) {
 	}
 	query := &backends.Query{
 		HTTPClient:     http.DefaultClient,
-		PromServer:     config.GetConfig().PROMETHEUS_URL,
+		PromServer:     config.GetConfig().PrometheusURL,
 		Path:           backends.QUERYPATH,
 		QueryParameter: param,
 	}
 
 	if query.ClusterID != "" && query.AppID != "" {
-		err := fmt.Errorf("The paramter confict between clusterid and appid!")
+		err := fmt.Errorf("The paramter confict between clusterid and appid")
 		utils.ErrorResponse(ctx, err)
 		return
 	}
@@ -120,7 +120,7 @@ func (m *Monitor) QueryNodes(ctx *gin.Context) {
 	}
 	query := &backends.Query{
 		HTTPClient:     http.DefaultClient,
-		PromServer:     config.GetConfig().PROMETHEUS_URL,
+		PromServer:     config.GetConfig().PrometheusURL,
 		Path:           backends.QUERYRANGEPATH,
 		QueryParameter: param,
 	}
@@ -138,8 +138,8 @@ func (m *Monitor) QueryNodes(ctx *gin.Context) {
 func (m *Monitor) GetAlerts(ctx *gin.Context) {
 	query := &backends.AlertManager{
 		HTTPClient: http.DefaultClient,
-		Server:     config.GetConfig().ALERTMANAGER_URL,
-		Path:       backends.ALERTSPATH,
+		Server:     config.GetConfig().AlertManagerURL,
+		Path:       backends.AlertsPath,
 	}
 	data, err := query.GetAlertManagerResponse()
 	if err != nil {
@@ -153,8 +153,8 @@ func (m *Monitor) GetAlerts(ctx *gin.Context) {
 func (m *Monitor) GetAlertsGroups(ctx *gin.Context) {
 	query := &backends.AlertManager{
 		HTTPClient: http.DefaultClient,
-		Server:     config.GetConfig().ALERTMANAGER_URL,
-		Path:       backends.ALERTSGROUSPPATH,
+		Server:     config.GetConfig().AlertManagerURL,
+		Path:       backends.AlertsGroupsPath,
 	}
 
 	data, err := query.GetAlertManagerResponse()
@@ -169,8 +169,8 @@ func (m *Monitor) GetAlertsGroups(ctx *gin.Context) {
 func (m *Monitor) GetAlertsStatus(ctx *gin.Context) {
 	query := &backends.AlertManager{
 		HTTPClient: http.DefaultClient,
-		Server:     config.GetConfig().ALERTMANAGER_URL,
-		Path:       backends.ALERTSSTATUSPATH,
+		Server:     config.GetConfig().AlertManagerURL,
+		Path:       backends.AlertsStatusPath,
 	}
 
 	data, err := query.GetAlertManagerResponse()

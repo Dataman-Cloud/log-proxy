@@ -64,7 +64,7 @@ func (m *Metric) GetQueryMetric(query *backends.Query) error {
 	case fsWrite:
 		m.Filesystem.Write = data.Data.Result
 	default:
-		return errors.New("No this kind of metric.")
+		return errors.New("No this kind of metric")
 	}
 	return nil
 }

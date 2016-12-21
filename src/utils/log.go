@@ -47,6 +47,7 @@ func GetLogger(ctx context.Context) *logrus.Entry {
 	return logger.(*logrus.Entry)
 }
 
+// Ginrus gin logger
 func Ginrus(logger *logrus.Logger, timeFormat string, utc bool) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		logrus.SetFormatter(&logrus.TextFormatter{

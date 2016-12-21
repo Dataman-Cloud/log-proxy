@@ -9,7 +9,7 @@ import (
 
 func TestCreateAlert(t *testing.T) {
 	config.InitConfig("../../env_file.template")
-	service := NewEsService([]string{baseUrl})
+	service := NewEsService([]string{baseURL})
 	if service.CreateAlert(new(models.Alert)) == nil {
 		t.Log("success")
 	} else {
@@ -19,7 +19,7 @@ func TestCreateAlert(t *testing.T) {
 
 func TestGetAlerts(t *testing.T) {
 	config.InitConfig("../../env_file.template")
-	service := NewEsService([]string{baseUrl})
+	service := NewEsService([]string{baseURL})
 	if _, err := service.GetAlerts(models.Page{}); err == nil {
 		t.Log("success")
 	} else {
@@ -29,7 +29,7 @@ func TestGetAlerts(t *testing.T) {
 
 func TestGetAlert(t *testing.T) {
 	config.InitConfig("../../env_file.template")
-	service := NewEsService([]string{baseUrl})
+	service := NewEsService([]string{baseURL})
 	if _, err := service.GetAlert("test"); err == nil {
 		t.Log("success")
 	} else {
@@ -39,7 +39,7 @@ func TestGetAlert(t *testing.T) {
 
 func TestDeleteAlert(t *testing.T) {
 	config.InitConfig("../../env_file.template")
-	service := NewEsService([]string{baseUrl})
+	service := NewEsService([]string{baseURL})
 	if service.DeleteAlert("test") == nil {
 		t.Log("success")
 	} else {
@@ -49,7 +49,7 @@ func TestDeleteAlert(t *testing.T) {
 
 func TestUpdateAlert(t *testing.T) {
 	config.InitConfig("../../env_file.template")
-	service := NewEsService([]string{baseUrl})
+	service := NewEsService([]string{baseURL})
 	if service.UpdateAlert(new(models.Alert)) == nil {
 		t.Log("success")
 	} else {

@@ -11,15 +11,16 @@ import (
 )
 
 const (
-	SILENCE_PARAM_ERROR = "503-12000"
+	// SilenceParamError silence error response code
+	SilenceParamError = "503-12000"
 )
 
 // GetSilences return the silences list
 func (m *Monitor) GetSilences(ctx *gin.Context) {
 	query := &backends.AlertManager{
 		HTTPClient: http.DefaultClient,
-		Server:     config.GetConfig().ALERTMANAGER_URL,
-		Path:       backends.ALERTSPATH,
+		Server:     config.GetConfig().AlertManagerURL,
+		Path:       backends.AlertsPath,
 	}
 
 	data, err := query.GetSilences()
@@ -34,8 +35,8 @@ func (m *Monitor) GetSilences(ctx *gin.Context) {
 func (m *Monitor) CreateSilence(ctx *gin.Context) {
 	query := &backends.AlertManager{
 		HTTPClient: http.DefaultClient,
-		Server:     config.GetConfig().ALERTMANAGER_URL,
-		Path:       backends.ALERTSPATH,
+		Server:     config.GetConfig().AlertManagerURL,
+		Path:       backends.AlertsPath,
 	}
 
 	var silence map[string]interface{}
@@ -56,8 +57,8 @@ func (m *Monitor) CreateSilence(ctx *gin.Context) {
 func (m *Monitor) GetSilence(ctx *gin.Context) {
 	query := &backends.AlertManager{
 		HTTPClient: http.DefaultClient,
-		Server:     config.GetConfig().ALERTMANAGER_URL,
-		Path:       backends.ALERTSPATH,
+		Server:     config.GetConfig().AlertManagerURL,
+		Path:       backends.AlertsPath,
 	}
 
 	data, err := query.GetSilence(ctx.Param("id"))
@@ -72,8 +73,8 @@ func (m *Monitor) GetSilence(ctx *gin.Context) {
 func (m *Monitor) DeleteSilence(ctx *gin.Context) {
 	query := &backends.AlertManager{
 		HTTPClient: http.DefaultClient,
-		Server:     config.GetConfig().ALERTMANAGER_URL,
-		Path:       backends.ALERTSPATH,
+		Server:     config.GetConfig().AlertManagerURL,
+		Path:       backends.AlertsPath,
 	}
 
 	err := query.DeleteSilence(ctx.Param("id"))
@@ -88,8 +89,8 @@ func (m *Monitor) DeleteSilence(ctx *gin.Context) {
 func (m *Monitor) UpdateSilence(ctx *gin.Context) {
 	query := &backends.AlertManager{
 		HTTPClient: http.DefaultClient,
-		Server:     config.GetConfig().ALERTMANAGER_URL,
-		Path:       backends.ALERTSPATH,
+		Server:     config.GetConfig().AlertManagerURL,
+		Path:       backends.AlertsPath,
 	}
 
 	var silence map[string]interface{}

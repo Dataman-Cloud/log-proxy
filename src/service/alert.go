@@ -11,41 +11,48 @@ import (
 )
 
 const (
-	ALERT_INDEX = ".dataman-alerts"
-	ALERT_TYPE  = "dataman-alerts"
+	// AlertIndex alert es index
+	AlertIndex = ".dataman-alerts"
+	// AlertType alert es type
+	AlertType = "dataman-alerts"
 
-	ALERT_HISTORY_INDEX = ".dataman-keyword-history"
-	ALERT_HISTORY_TYPE  = "dataman-keyword-history"
+	// AlertHistoryIndex alert history es index
+	AlertHistoryIndex = ".dataman-keyword-history"
+	// AlertHistoryType alert type es type
+	AlertHistoryType = "dataman-keyword-history"
 )
 
+// CreateAlert create alert
 func (s *SearchService) CreateAlert(alert *models.Alert) error {
 	alert.CreateTime = time.Now().Format(time.RFC3339Nano)
 	_, err := s.ESClient.Index().
-		Index(ALERT_INDEX).
-		Type(ALERT_TYPE).
+		Index(AlertIndex).
+		Type(AlertType).
 		BodyJson(alert).
 		Do()
 	s.ESClient.Flush()
 	return err
 }
 
+// DeleteAlert delete alert by id
 func (s *SearchService) DeleteAlert(id string) error {
 	_, err := s.ESClient.Delete().
-		Index(ALERT_INDEX).
-		Type(ALERT_TYPE).
+		Index(AlertIndex).
+		Type(AlertType).
 		Id(id).
 		Do()
 	s.ESClient.Flush()
 	return err
 }
 
+// GetAlerts get all alerts
 func (s *SearchService) GetAlerts(page models.Page) (map[string]interface{}, error) {
 	m := make(map[string]interface{})
 	var results []models.Alert
 
 	result, err := s.ESClient.Search().
-		Index(ALERT_INDEX).
-		Type(ALERT_TYPE).
+		Index(AlertIndex).
+		Type(AlertType).
 		From(page.PageFrom).
 		Size(page.PageSize).
 		Sort("createtime.timestamp", true).
@@ -62,7 +69,7 @@ func (s *SearchService) GetAlerts(page models.Page) (map[string]interface{}, err
 
 	for _, hit := range result.Hits.Hits {
 		data := models.Alert{
-			Id: hit.Id,
+			ID: hit.Id,
 		}
 
 		json.Unmarshal(*hit.Source, &data)
@@ -75,12 +82,13 @@ func (s *SearchService) GetAlerts(page models.Page) (map[string]interface{}, err
 	return m, nil
 }
 
+// GetAlert get alert by id
 func (s *SearchService) GetAlert(id string) (models.Alert, error) {
 	var alert models.Alert
 
 	result, err := s.ESClient.Get().
-		Index(ALERT_INDEX).
-		Type(ALERT_TYPE).
+		Index(AlertIndex).
+		Type(AlertType).
 		Id(id).
 		Do()
 
@@ -96,16 +104,17 @@ func (s *SearchService) GetAlert(id string) (models.Alert, error) {
 	if err != nil {
 		return alert, err
 	}
-	alert.Id = result.Id
+	alert.ID = result.Id
 
 	return alert, nil
 }
 
+// UpdateAlert update alert
 func (s *SearchService) UpdateAlert(alert *models.Alert) error {
 	_, err := s.ESClient.Update().
-		Index(ALERT_INDEX).
-		Type(ALERT_TYPE).
-		Id(alert.Id).
+		Index(AlertIndex).
+		Type(AlertType).
+		Id(alert.ID).
 		Doc(alert).
 		Do()
 	s.ESClient.Flush()
