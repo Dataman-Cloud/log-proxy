@@ -21,14 +21,14 @@
                             <label class="requirement">监控指标</label>
                             <md-select id="monitoringIndicators" placeholder="监控指标" ng-model="vm.form.metric"
                                        aria-label="metric" ng-required="!vm.queryTabIndex">
-                                <md-option value="cpu">cpu</md-option>
-                                <md-option value="memory">memory</md-option>
-                                <md-option value="memory_usage">memory_usage</md-option>
-                                <md-option value="memory_total">memory_total</md-option>
-                                <md-option value="network_rx">network_rx</md-option>
-                                <md-option value="network_tx">network_tx</md-option>
-                                <md-option value="fs_read">fs_read</md-option>
-                                <md-option value="fs_write">fs_write</md-option>
+                                <md-option id="monitoringIndicators0"  value="cpu">cpu</md-option>
+                                <md-option id="monitoringIndicators1"  value="memory">memory</md-option>
+                                <md-option id="monitoringIndicators2"  value="memory_usage">memory_usage</md-option>
+                                <md-option id="monitoringIndicators3"  value="memory_total">memory_total</md-option>
+                                <md-option id="monitoringIndicators4"  value="network_rx">network_rx</md-option>
+                                <md-option id="monitoringIndicators5"  value="network_tx">network_tx</md-option>
+                                <md-option id="monitoringIndicators6"  value="fs_read">fs_read</md-option>
+                                <md-option id="monitoringIndicators7"  value="fs_write">fs_write</md-option>
                             </md-select>
                         </div>
                     </md-content>
@@ -48,41 +48,41 @@
 
 
             <md-tabs id="timeTabs" layout="column" md-dynamic-height md-border-bottom md-selected="vm.selectedTabIndex">
-                <md-tab label="最近">
+                <md-tab id="recentlyTab" label="最近">
                     <md-content>
                         <div flex class="form-item">
-                            <md-select aria-label="role" ng-model="vm.timePeriod">
-                                <md-option ng-value="30">最近三十分钟</md-option>
-                                <md-option ng-value="120">最近两小时</md-option>
-                                <md-option ng-value="360">最近六小时</md-option>
-                                <md-option ng-value="720">最近12小时</md-option>
-                                <md-option ng-value="1440">最近一天</md-option>
+                            <md-select id="times" aria-label="role" ng-model="vm.timePeriod">
+                                <md-option id="times0" ng-value="30">最近三十分钟</md-option>
+                                <md-option id="times1" ng-value="120">最近两小时</md-option>
+                                <md-option id="times2" ng-value="360">最近六小时</md-option>
+                                <md-option id="times3" ng-value="720">最近12小时</md-option>
+                                <md-option id="times4" ng-value="1440">最近一天</md-option>
                             </md-select>
                         </div>
                     </md-content>
                 </md-tab>
-                <md-tab label="起止">
+                <md-tab id="startToTopTab" label="起止">
                     <md-content>
                         <div flex class="form-item">
                             <div flex class="form-item">
-                                <input type="datetime-local" placeholder="开始时间" ng-model="vm.startTime"
+                                <input id="monitorStartTime" type="datetime-local" placeholder="开始时间" ng-model="vm.startTime"
                                        ng-max="vm.endTime" name="startTime" ng-required="vm.selectedTabIndex">
-                                <input type="datetime-local" placeholder="结束时间" ng-model="vm.endTime"
+                                <p data-ng-show="staticForm.startTime.$error.max && !staticForm.startTime.$pristine">
+                                    起始时间大于结束时间</p>
+                                <span ng-show="staticForm.startTime.$error.datetimelocal">请填写正确时间格式</span>
+                                <input id="monitorEndTime" type="datetime-local" placeholder="结束时间" ng-model="vm.endTime"
                                        ng-min="vm.startTime" name="endTime" ng-required="vm.selectedTabIndex">
+                                <p data-ng-show="staticForm.endTime.$error.min && !staticForm.endTime.$pristine">
+                                    结束时间小于起始时间</p>
+                                <span ng-show="staticForm.endTime.$error.datetimelocal">请填写正确时间格式</span>
                             </div>
-                            <p data-ng-show="staticForm.startTime.$error.max && !staticForm.startTime.$pristine">
-                                起始时间大于结束时间</p>
-                            <p data-ng-show="staticForm.endTime.$error.min && !staticForm.endTime.$pristine">
-                                结束时间小于起始时间</p>
-                            <span ng-show="staticForm.startTime.$error.datetimelocal">请填写正确时间格式</span>
-                            <span ng-show="staticForm.endTime.$error.datetimelocal">请填写正确时间格式</span>
                         </div>
                     </md-content>
                 </md-tab>
             </md-tabs>
 
             <div flex class="form-item" layout="column">
-                <md-button class="md-raised md-primary" ng-click="vm.search()" ng-disabled="staticForm.$invalid">查询
+                <md-button id="monitorCheck" class="md-raised md-primary" ng-click="vm.search()" ng-disabled="staticForm.$invalid">查询
                 </md-button>
             </div>
         </form>
