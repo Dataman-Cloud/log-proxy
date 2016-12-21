@@ -1,0 +1,38 @@
+*** Settings ***  
+Library          Collections 
+Library          RequestsLibrary  
+Library          String  
+Library          XML
+Library          json
+
+*** Variables ***
+${SERVER}        http://192.168.1.75:5098
+
+*** Keywords ***
+
+Monitor Metric
+	[Arguments]  ${metric}  ${appid}=${EMPTY}  ${taskid}=${EMPTY}  ${start}=${EMPTY}  ${end}=${EMPTY}  ${step}=${EMPTY}
+	Create Session   Mola   ${SERVER}
+	${path} =   Evaluate   '/v1/monitor/query?metric=' + '${metric}'
+	Set Suite Variable      ${path}
+	Run Keyword If  '${appid}'<>'${EMPTY}'   Add Path  appid  ${appid}
+	Run Keyword If  '${taskid}'<>'${EMPTY}'  Add Path  taskid  ${taskid}
+	Run Keyword If  '${start}'<>'${EMPTY}'   Add Path  start  ${start}
+	Run Keyword If  '${end}'<>'${EMPTY}'     Add Path  end  ${end}
+	Run Keyword If  '${step}'<>'${EMPTY}'    Add Path  step  ${step}
+	${resp}=    Get Request  Mola  ${path}
+	[Return]    ${resp}
+
+Monitor Expr
+	[Arguments]  ${expr}
+	Create Session   Mola   ${SERVER}
+	${path} =   Evaluate   '/v1/monitor/query?expr=' + '${expr}'
+	${resp}=    Get Request  Mola  ${path}
+	[Return]    ${resp}
+
+#---------------------------
+
+Add Path
+	[Arguments]  ${variable}  ${value}
+	${path} =  Evaluate  '${path}' + '&' + '${variable}' + '=' +'${value}'
+	Set Suite Variable   ${path}

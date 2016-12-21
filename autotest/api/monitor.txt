@@ -1,0 +1,10 @@
+*** Settings ***
+
+Documentation   监控
+Resource        all_api.txt
+
+*** Test Cases ***
+
+监控-快捷查询-根据应用查询
+	${resp} =   Monitor Metric  cpu  appid=work-nginx
+	Should Be Equal As Strings  ${resp.status_code}  200
