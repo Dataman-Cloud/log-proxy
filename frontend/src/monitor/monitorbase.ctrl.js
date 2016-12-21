@@ -38,7 +38,8 @@
                     self.form.start = self.startTime.getTime() / 1000;
                 }
             }
-            self.form.step = Math.ceil((self.form.end - self.form.start) / 400);
+            // 180 is the max number of points in Chart
+            self.form.step = Math.ceil((self.form.end - self.form.start) / 180);
         }
 
         function search() {
