@@ -4,7 +4,26 @@ Documentation   监控
 Resource        all_api.txt
 
 *** Test Cases ***
+监控-Dashboard-查询全部集群信息
+	${resp} =   Monitor Info
+	Should Be Equal As Strings  ${resp.status_code}  200
+
+监控-Dashboard-查询单个集群信息
+	${resp} =   Monitor Info    clusterid=work
+	Should Be Equal As Strings  ${resp.status_code}  200
+
+监控-Dashboard-查询单个应用信息
+	${resp} =   Monitor Info    appid=work-nginx
+	Should Be Equal As Strings  ${resp.status_code}  200
+
+监控-Dashboard-查询主机列表信息
+	${resp} =   Monitor Info Nodes
+	Should Be Equal As Strings  ${resp.status_code}  200
 
 监控-快捷查询-根据应用查询
 	${resp} =   Monitor Metric  cpu  appid=work-nginx
+	Should Be Equal As Strings  ${resp.status_code}  200
+
+监控-高级查询-根据表达式查询
+	${resp} =   Monitor Expr  container_tasks_state
 	Should Be Equal As Strings  ${resp.status_code}  200

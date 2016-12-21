@@ -36,7 +36,7 @@ http://127.0.0.1:5098/v1/monitor/query?start=2016-12-02T00:00:01.781Z&end=2016-1
 
 ```GET /v1/monitor/info```
 
-- path: /v1/monitor/applications
+- path: /v1/monitor/info
 - HTTP Method: GET
 - URL Params: Null
 - Query Params: clusterid, appid
@@ -264,7 +264,7 @@ return
 
 POST /v1/search/keyword -d '{"period":1,"appid":"test","keyword":"keyword","condition":1,"enable":true}'
 
-return 
+return
 
 ```
 {"code":0,"data":"create success"}
@@ -274,7 +274,7 @@ return
 PUT /v1/search/keyword -d '{"id":"x","period":1,"appid":"test","keyword":"keyword","condition":1,"enable":true}'
 
 return
- 
+
 ```
 {"code":0,"data":"update success"}
 ```
