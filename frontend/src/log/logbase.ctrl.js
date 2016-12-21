@@ -45,7 +45,26 @@
 
         function loadApps() {
             logBackend.listApp().get(function (data) {
-                self.apps = data.data;
+                self.apps = {};
+                angular.forEach(data.data, function (value, key) {
+                    var doPush = true;
+                    var bIdx = key.lastIndexOf("bamboo");
+                    var hIdx = key.lastIndexOf("haproxy");
+                    if (bIdx > 0) {
+                        var bNumber = key.substring(bIdx + "bamboo".length);
+                        if (!isNaN(parseInt(bNumber))) {
+                            doPush = false;
+                        }
+                    } else if (hIdx > 0) {
+                        var hNumber = key.substring(hIdx + "haproxy".length);
+                        if (!isNaN(parseInt(hNumber))) {
+                            doPush = false;
+                        }
+                    }
+                    if (doPush) {
+                        self.apps[key] = value;
+                    }
+                });
             })
         }
 
