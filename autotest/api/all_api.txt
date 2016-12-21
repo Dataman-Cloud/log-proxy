@@ -1,11 +1,12 @@
+<<<<<<< HEAD
 *** Settings ***
-Library          Collections
+Library          Collections 
 Library          RequestsLibrary
 Library          String
-Library          XML
 Library          json
 
 *** Variables ***
+
 ${SERVER}        http://192.168.1.75:5098
 
 *** Keywords ***
