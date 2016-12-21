@@ -64,6 +64,7 @@ func (s *SearchService) Applications(page models.Page) (map[string]int64, error)
 		Aggregation("apps", elastic.
 			NewTermsAggregation().
 			Field("appid").
+			Size(0).
 			OrderByCountDesc()).
 		Pretty(true).
 		Do()
@@ -104,6 +105,7 @@ func (s *SearchService) Tasks(appName string, page models.Page) (map[string]int6
 		Aggregation("tasks", elastic.
 			NewTermsAggregation().
 			Field("taskid").
+			Size(0).
 			OrderByCountDesc()).
 		Pretty(true).
 		Do()
@@ -149,6 +151,7 @@ func (s *SearchService) Paths(appName, taskID string, page models.Page) (map[str
 		Aggregation("paths", elastic.
 			NewTermsAggregation().
 			Field("path").
+			Size(0).
 			OrderByCountDesc()).
 		Pretty(true).
 		Do()
