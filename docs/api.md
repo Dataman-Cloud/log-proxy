@@ -316,8 +316,6 @@ return
 
 ```
 
-GET /v1/search/mointor
-
 GET /v1/monitor/alerts/groups
 
 GET /v1/monitor/silences
