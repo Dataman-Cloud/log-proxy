@@ -10,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// CreateAlert create keyword filter
 func (s *Search) CreateAlert(ctx *gin.Context) {
 	alert := new(models.Alert)
 	if err := ctx.BindJSON(alert); err != nil {
@@ -40,6 +41,7 @@ func (s *Search) CreateAlert(ctx *gin.Context) {
 	utils.Ok(ctx, "create success")
 }
 
+// DeleteAlert delete keyword filter
 func (s *Search) DeleteAlert(ctx *gin.Context) {
 
 	alert, err := s.Service.GetAlert(ctx.Param("id"))
@@ -67,6 +69,7 @@ func (s *Search) DeleteAlert(ctx *gin.Context) {
 	utils.Ok(ctx, "delete success")
 }
 
+// GetAlerts get all keyword filter
 func (s *Search) GetAlerts(ctx *gin.Context) {
 	results, err := s.Service.GetAlerts(ctx.MustGet("page").(models.Page))
 	if err != nil {
@@ -77,6 +80,7 @@ func (s *Search) GetAlerts(ctx *gin.Context) {
 	utils.Ok(ctx, results)
 }
 
+// GetAlert get keyword filter by id
 func (s *Search) GetAlert(ctx *gin.Context) {
 	result, err := s.Service.GetAlert(ctx.Param("id"))
 	if err != nil {
@@ -87,6 +91,7 @@ func (s *Search) GetAlert(ctx *gin.Context) {
 	utils.Ok(ctx, result)
 }
 
+// UpdateAlert update keyword filter
 func (s *Search) UpdateAlert(ctx *gin.Context) {
 	alert := new(models.Alert)
 	if err := ctx.BindJSON(alert); err != nil {

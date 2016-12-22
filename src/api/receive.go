@@ -12,6 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Receiver recive prometheus alert event
 func (s *Search) Receiver(ctx *gin.Context) {
 	data, err := utils.ReadRequestBody(ctx.Request)
 	if err != nil {
@@ -56,6 +57,7 @@ func (s *Search) Receiver(ctx *gin.Context) {
 	utils.Ok(ctx, map[string]string{"status": "success"})
 }
 
+// ReceiverLog recive log
 func (s *Search) ReceiverLog(ctx *gin.Context) {
 	data, err := utils.ReadRequestBody(ctx.Request)
 	if err != nil {
@@ -131,6 +133,7 @@ func (s *Search) ReceiverLog(ctx *gin.Context) {
 	return
 }
 
+// GetPrometheus get all prometheus
 func (s *Search) GetPrometheus(ctx *gin.Context) {
 	result, err := s.Service.GetPrometheus(ctx.MustGet("page").(models.Page))
 	if err != nil {
@@ -141,6 +144,7 @@ func (s *Search) GetPrometheus(ctx *gin.Context) {
 	utils.Ok(ctx, result)
 }
 
+// GetPrometheu get prometheus by id
 func (s *Search) GetPrometheu(ctx *gin.Context) {
 	result, err := s.Service.GetPrometheu(ctx.Param("id"))
 	if err != nil {
