@@ -164,7 +164,6 @@ curl -XGET http://localhost:5098/v1/search/paths/appid
 ```
 
 - URL Params: appid
- - appid=test
  - taskid=taskid
 - Query Params:from, to
  - from=1478769333000
