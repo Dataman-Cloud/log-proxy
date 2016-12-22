@@ -1,5 +1,5 @@
 *** Settings ***
-Library          Collections 
+Library          Collections
 Library          RequestsLibrary
 Library          String
 Library          json
@@ -15,24 +15,16 @@ ${message}       simple
 *** Keywords ***
 
 #-----------监控-----------
-Monitor Metric
-	[Arguments]  ${metric}  ${appid}=${EMPTY}  ${taskid}=${EMPTY}  ${start}=${EMPTY}  ${end}=${EMPTY}  ${step}=${EMPTY}
+Monitor Query
+	[Arguments]  ${metric}=${EMPTY}  ${expr}=${EMPTY}  ${clusterid}=${EMPTY}  ${appid}=${EMPTY}  ${taskid}=${EMPTY}  ${start}=${EMPTY}  ${end}=${EMPTY}  ${step}=${EMPTY}
 	Create Session   Mola   ${SERVER}
-	${path} =   Evaluate   '/v1/monitor/query?metric=' + '${metric}'
+	${path} =   Evaluate   '/v1/monitor/query?'
 	Set Suite Variable      ${path}
+	Run Keyword If  '${metric}'<>'${EMPTY}'   Add Path  metric  ${metric}
+	Run Keyword If  '${expr}'<>'${EMPTY}'   Add Path  expr  ${expr}
+	Run Keyword If  '${clusterid}'<>'${EMPTY}'   Add Path  clusterid  ${clusterid}
 	Run Keyword If  '${appid}'<>'${EMPTY}'   Add Path  appid  ${appid}
 	Run Keyword If  '${taskid}'<>'${EMPTY}'  Add Path  taskid  ${taskid}
-	Run Keyword If  '${start}'<>'${EMPTY}'   Add Path  start  ${start}
-	Run Keyword If  '${end}'<>'${EMPTY}'     Add Path  end  ${end}
-	Run Keyword If  '${step}'<>'${EMPTY}'    Add Path  step  ${step}
-	${resp}=    Get Request  Mola  ${path}
-	[Return]    ${resp}
-
-Monitor Expr
-	[Arguments]  ${expr}  ${start}=${EMPTY}  ${end}=${EMPTY}  ${step}=${EMPTY}
-	Create Session   Mola   ${SERVER}
-	${path} =   Evaluate   '/v1/monitor/query?expr=' + '${expr}'
-	Set Suite Variable      ${path}
 	Run Keyword If  '${start}'<>'${EMPTY}'   Add Path  start  ${start}
 	Run Keyword If  '${end}'<>'${EMPTY}'     Add Path  end  ${end}
 	Run Keyword If  '${step}'<>'${EMPTY}'    Add Path  step  ${step}
@@ -57,6 +49,32 @@ Monitor Info Nodes
 	Run Keyword If  '${nodeid}'<>'${EMPTY}'   Add Path  nodeid  ${nodeid}
 	${resp}=    Get Request  Mola  ${path}
 	[Return]    ${resp}
+
+AlertManager Alerts
+  [Arguments]
+  Create Session   Mola   ${SERVER}
+  ${path} =   Evaluate   '/v1/monitor/alerts'
+  Set Suite Variable      ${path}
+  ${resp}=    Get Request  Mola  ${path}
+  [Return]    ${resp}
+
+AlertManager Alerts Groups
+  [Arguments]
+  Create Session   Mola   ${SERVER}
+  ${path} =   Evaluate   '/v1/monitor/alerts/groups'
+  Set Suite Variable      ${path}
+  ${resp}=    Get Request  Mola  ${path}
+  [Return]    ${resp}
+
+AlertManager Alerts Status
+  [Arguments]
+  Create Session   Mola   ${SERVER}
+  ${path} =   Evaluate   '/v1/monitor/alerts/status'
+  Set Suite Variable      ${path}
+  ${resp}=    Get Request  Mola  ${path}
+  [Return]    ${resp}
+
+#---------------------------
 
 Add Path
 	[Arguments]  ${variable}  ${value}
@@ -219,4 +237,3 @@ Delete Silence
 	${path} =   Evaluate   '/v1/search/silence' + '${id}'
 	${resp}=    Delete Request  Mola  ${path}
 	[Return]    ${resp}
-

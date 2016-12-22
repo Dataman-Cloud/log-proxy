@@ -20,10 +20,47 @@ Resource        all_api.txt
 	${resp} =   Monitor Info Nodes
 	Should Be Equal As Strings  ${resp.status_code}  200
 
+监控-Dashboard-查询单个主机信息
+	${resp} =   Monitor Info Nodes  nodeid=192.168.1.102
+	Should Be Equal As Strings  ${resp.status_code}  200
+
 监控-快捷查询-根据应用查询
-	${resp} =   Monitor Metric  cpu  appid=work-nginx
+	${resp} =   Monitor Query  metric=cpu  appid=work-nginx
+	Should Be Equal As Strings  ${resp.status_code}  200
+
+监控-快捷查询-根据实例查询
+	${resp} =   Monitor Query  metric=cpu  taskid=4f84929cb252ed0c0f2d987f2f29f133395c1b26166f99562d76e64e0af6c80c
 	Should Be Equal As Strings  ${resp.status_code}  200
 
 监控-高级查询-根据表达式查询
-	${resp} =   Monitor Expr  container_tasks_state
+	${resp} =   Monitor Query  expr=container_tasks_state
 	Should Be Equal As Strings  ${resp.status_code}  200
+
+监控-AlertManager-查询报警消息
+	${resp} =   AlertManager Alerts
+	Should Be Equal As Strings  ${resp.status_code}  200
+
+监控-AlertManager-查询报警组消息
+	${resp} =   AlertManager Alerts Groups
+	Should Be Equal As Strings  ${resp.status_code}  200
+
+监控-AlertManager-查询报警消息状态
+	${resp} =   AlertManager Alerts Status
+	Should Be Equal As Strings  ${resp.status_code}  200
+
+#----------异常---------
+监控-Dashboard-异常-冲突字段clusterid和appid
+	${resp} =   Monitor Info    clusterid=work  appid=work-nginx
+	Should Be Equal As Strings  ${resp.status_code}  503
+
+监控-快捷查询-异常-查询错误的metric字段
+  ${resp} =   Monitor Query  metric=err  appid=work-nginx
+  Should Be Equal As Strings  ${resp.status_code}  503
+
+监控-快捷查询-异常-缺少字段metric和expr
+  ${resp} =   Monitor Query
+  Should Be Equal As Strings  ${resp.status_code}  503
+
+监控-快捷查询-异常-冲突字段metric和expr
+  ${resp} =   Monitor Query  metric=cpu expr=container_tasks_state
+  Should Be Equal As Strings  ${resp.status_code}  503
