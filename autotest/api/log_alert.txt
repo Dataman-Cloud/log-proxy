@@ -1,0 +1,42 @@
+*** Settings ***
+
+Documentation   日志
+Resource        all_api.txt
+Library         OperatingSystem
+
+*** Test Cases ***
+MLA-23日志-根据时间查询|MLA-24日志-组合查询-应用名-关键字
+	${Current} =  Get Current Date
+	${Before} =   Subtract Time From Date  ${Current}  02:00:00:0
+	${resp}=      Log Index  appid=${MOLA APP}  keyword=${message}  from=${Before}  to=${Current}
+	Should Be Equal As Strings  ${resp.status_code}  200
+	Should Be Equal As Strings  ${resp.json()['data']['count']}  60
+	Log  ${resp.text}
+
+MLA-25日志-组合查询-应用名-实例ID-日志来源
+	${Current} =  Get Current Date
+	${Before} =   Subtract Time From Date  ${Current}  00:30:00:0
+	${resp}=      Log Index  appid=${MOLA APP}  taskid=${MOLA TASK}  from=${Before}  to=${Current}
+	Should Be Equal As Strings  ${resp.status_code}  200
+	Log  ${resp.text}
+
+MLA-27告警-告警历史-查看详细
+	${resp}=      Get Alerts
+	Should Be Equal As Strings  ${resp.status_code}  200
+	${resp}=      Get Alert     ${resp.json()['data']['results'][0]['id']}
+	Should Be Equal As Strings  ${resp.status_code}  200
+	Log  ${resp.text} 
+
+MLA-41告警-静默管理-新建静默
+	${data}=   Get Binary File  ${CURDIR}${/}json/create_silence.json
+	${resp}=   Create Filter    ${data}
+	Should Be Equal As Strings  ${resp.status_code}  200
+	Log  ${resp.text}
+
+MLA-42告警-日志过滤关键字-更新
+	${resp}=   Get Filters
+	Log  ${resp.text}
+	${data}=   Get Binary File  ${CURDIR}${/}json/update_silence.json
+	${resp}=   Update Filter    ${data}
+	#Should Be Equal As Strings  ${resp.status_code}  200
+	Log  ${resp.text}

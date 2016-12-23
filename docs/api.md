@@ -36,7 +36,7 @@ http://127.0.0.1:5098/v1/monitor/query?start=2016-12-02T00:00:01.781Z&end=2016-1
 
 ```GET /v1/monitor/info```
 
-- path: /v1/monitor/applications
+- path: /v1/monitor/info
 - HTTP Method: GET
 - URL Params: Null
 - Query Params: clusterid, appid
@@ -88,18 +88,6 @@ http://127.0.0.1:5098/v1/monitor/nodes?nodeid=192.168.1.101
 #### 获取AlertManager的状态信息
 `GET /v1/monitor/alerts/status`
 
-#### 获取配置的报警规则
-`GET /v1/monitor/alerts/rules`
-```
-curl -XGET http://127.0.0.1:5098/v1/monitor/alerts/rules
-{
-    "data":[
-        "ALERT cpu_usage IF irate(container_cpu_usage_seconds_total{id=~"/docker/.*",name=~"mesos.*"}[5m]) * 100 > 80 FOR 1m LABELS {severity="critical"} ANNOTATIONS {description="High CPU usage on {{ $labels.name }} of App {{ $labels.container_label_APP_ID }}", summary="CPU Usage on {{ $labels.name }} of App {{ $labels.container_label_APP_ID }}"}",
-        "ALERT mem_usage IF container_memory_usage_bytes{id=~"/docker/.*",name=~"mesos.*"} / container_spec_memory_limit_bytes{id=~"/docker.*",name=~"mesos.*"} * 100 > 80 FOR 1m LABELS {severity="critical"} ANNOTATIONS {description="High Mem usage on {{ $labels.name }} of App {{ $labels.container_label_APP_ID }}", summary="Mem Usage on {{ $labels.name }} of App {{ $labels.container_label_APP_ID }}"}",
-        "ALERT InstanceDown IF up == 0 FOR 5m LABELS {severity="page"} ANNOTATIONS {description="{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 5 minutes.", summary="Instance {{ $labels.instance }} down"}"
-    ],
-    "status":"success"
-}
 ```
 
 ## 日志
@@ -164,7 +152,6 @@ curl -XGET http://localhost:5098/v1/search/paths/appid
 ```
 
 - URL Params: appid
- - appid=test
  - taskid=taskid
 - Query Params:from, to
  - from=1478769333000
@@ -264,7 +251,7 @@ return
 
 POST /v1/search/keyword -d '{"period":1,"appid":"test","keyword":"keyword","condition":1,"enable":true}'
 
-return 
+return
 
 ```
 {"code":0,"data":"create success"}
@@ -274,7 +261,7 @@ return
 PUT /v1/search/keyword -d '{"id":"x","period":1,"appid":"test","keyword":"keyword","condition":1,"enable":true}'
 
 return
- 
+
 ```
 {"code":0,"data":"update success"}
 ```
@@ -315,8 +302,6 @@ return
 {"code":0,"data":{"alertname":"DatamanServiceDown","annotations":{"description":"mesos-master of node srymaster1 has been down for more than 1 minutes.","summary":"DatamanService mesos-master down"},"createtime":"2016-12-20T11:14:38.095324531+08:00","endsAt":"2016-12-20T11:13:52.807+08:00","generatorURL":"http://srymaster2:9090/graph#%5B%7B%22expr%22%3A%22consul_catalog_service_node_healthy%7Bservice%21%3D%5C%22alertmanager-vip%5C%22%2Cservice%21%3D%5C%22mysql-vip%5C%22%7D%20%3D%3D%200%22%2C%22tab%22%3A0%7D%5D","labels":"{\"alertname\":\"DatamanServiceDown\",\"instance\":\"192.168.1.92:9107\",\"job\":\"consul\",\"node\":\"srymaster1\",\"service\":\"mesos-master\",\"severity\":\"Warning\"}","startsAt":"2016-12-20T11:11:22.807+08:00","status":"resolved"}}
 
 ```
-
-GET /v1/search/mointor
 
 GET /v1/monitor/alerts/groups
 
