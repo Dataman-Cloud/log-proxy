@@ -5,20 +5,39 @@ Resource        all_api.txt
 Library         OperatingSystem
 
 *** Test Cases ***
-MLA-23日志-根据时间查询|MLA-24日志-组合查询-应用名-关键字
+App PullDown
+	${resp}=      Log App
+	Should Be Equal As Strings  ${resp.status_code}  200
+	Log  ${resp.text}
+
+Task PullDown
+	${resp}=      Log Task      ${MOLA APP}
+	Should Be Equal As Strings  ${resp.status_code}  200
+	Log  ${resp.text}
+
+Path PullDown
+	${resp}=      Log Path      ${MOLA APP}
+	Should Be Equal As Strings  ${resp.status_code}  200
+	Log  ${resp.text}
+
+MLA-23日志-根据时间查询|MLA-24日志-组合查询-应用名-关键字|MLA-25日志-组合查询-查询结果
 	${Current} =  Get Current Date
 	${Before} =   Subtract Time From Date  ${Current}  02:00:00:0
 	${resp}=      Log Index  appid=${MOLA APP}  keyword=${message}  from=${Before}  to=${Current}
 	Should Be Equal As Strings  ${resp.status_code}  200
-	Should Be Equal As Strings  ${resp.json()['data']['count']}  60
+	${resp}=      Log Context   ${resp.json()['data']['results'][0]['appid']}  ${resp.json()['data']['results'][0]['taskid']}
+	              ...  ${resp.json()['data']['results'][0]['path']}  ${resp.json()['data']['results'][0]['offset']}
+	Should Be Equal As Strings  ${resp.status_code}  200
 	Log  ${resp.text}
 
-MLA-25日志-组合查询-应用名-实例ID-日志来源
-	${Current} =  Get Current Date
-	${Before} =   Subtract Time From Date  ${Current}  00:30:00:0
+MLA-23日志-根据时间查询|MLA-26日志-组合查询-应用名-实例ID-日志来源
+	${Current}=   Get Current Date
+	${Before}=    Subtract Time From Date  ${Current}  00:30:00:0
 	${resp}=      Log Index  appid=${MOLA APP}  taskid=${MOLA TASK}  from=${Before}  to=${Current}
 	Should Be Equal As Strings  ${resp.status_code}  200
 	Log  ${resp.text}
+
+
 
 MLA-27告警-告警历史-查看详细
 	${resp}=      Get Alerts
@@ -27,16 +46,59 @@ MLA-27告警-告警历史-查看详细
 	Should Be Equal As Strings  ${resp.status_code}  200
 	Log  ${resp.text} 
 
-MLA-41告警-静默管理-新建静默
-	${data}=   Get Binary File  ${CURDIR}${/}json/create_silence.json
+
+
+MLA-41告警-日志过滤关键字-新建
+	${data}=   Get Binary File  ${CURDIR}${/}json/keyword_create.json
 	${resp}=   Create Filter    ${data}
 	Should Be Equal As Strings  ${resp.status_code}  200
 	Log  ${resp.text}
 
 MLA-42告警-日志过滤关键字-更新
+	Sleep  1
 	${resp}=   Get Filters
-	Log  ${resp.text}
-	${data}=   Get Binary File  ${CURDIR}${/}json/update_silence.json
+	${length}  Get Length  ${resp.json()['data']['results']}
+    : FOR  ${idx}  IN RANGE  ${length}
+    \  Run Keyword If  '${resp.json()['data']['results'][${idx}]['appid']}'=='${MOLA APP}' and '${resp.json()['data']['results'][${idx}]['keyword']}'=='GET'
+    \  ...     Run Keywords     Set Suite Variable  ${filterid}  ${resp.json()['data']['results'][${idx}]['id']}  AND  Exit For Loop
+	${json}=   Get Binary File  ${CURDIR}${/}json/keyword_update.json
+	${data}=   Replace String   ${json}  alertid  ${filterid}
 	${resp}=   Update Filter    ${data}
-	#Should Be Equal As Strings  ${resp.status_code}  200
+	Should Be Equal As Strings  ${resp.status_code}  200
+	${resp}=   Get Filter       ${filterid}
+	Should Be Equal As Strings  ${resp.status_code}  200
 	Log  ${resp.text}
+
+MLA-44告警-日志过滤关键字-删除
+	${resp}=   Delete Filter    ${filterid}
+	Should Be Equal As Strings  ${resp.status_code}  200
+	Log  ${resp.text}
+
+
+
+MLA-33告警-静默管理-新建静默
+	${data}=   Get Binary File  ${CURDIR}${/}json/silence_create.json
+	${resp}=   Create Silence   ${data}
+	Should Be Equal As Strings  ${resp.status_code}  200
+	Log  ${resp.text}
+
+MLA-34告警-静默管理-更新
+	${resp}=   Get Silences
+	${length}  Get Length  ${resp.json()['data']}
+	: FOR  ${idx}  IN RANGE  ${length}
+	\  Run Keyword If  '${resp.json()['data'][${idx}]['comment']}'=='dataman' and '${resp.json()['data'][${idx}]['createdBy']}'=='dataman@dataman'
+    \  ...     Run Keywords     Set Suite Variable  ${silenceid}  ${resp.json()['data'][${idx}]['id']}  AND  Exit For Loop
+    ${data}=   Get Binary File  ${CURDIR}${/}json/silence_update.json
+	${resp}=   Update Silence   ${silenceid}  ${data}
+	Should Be Equal As Strings  ${resp.status_code}  200
+    ${sid}=    Evaluate  ${silenceid} + ${1}	
+	${resp}=   Get Silence      ${sid}
+	Should Be Equal As Strings  ${resp.status_code}  200
+	Log  ${resp.text}
+
+MLA-44告警-静默管理-删除
+    ${sid}=    Evaluate  ${silenceid} + ${1}
+	${resp}=   Delete Silence   ${sid}
+	Should Be Equal As Strings  ${resp.status_code}  200
+	Log  ${resp.text}
+
