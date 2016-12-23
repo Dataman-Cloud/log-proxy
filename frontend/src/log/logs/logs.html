@@ -29,7 +29,7 @@
             ng-repeat-start="log in vm.logs track by $index">
             <td md-cell>
                 <a ng-click="vm.logDisplaySet[$index] = !vm.logDisplaySet[$index]">
-                    <i class="fa"
+                    <i id="logDetails{/$index/}" class="fa"
                        ng-class="{'fa-chevron-down':vm.logDisplaySet[$index], 'fa-chevron-right':!vm.logDisplaySet[$index]}"></i>
                 </a>
             </td>
@@ -40,7 +40,7 @@
                 <div ng-bind-html="log.message"></div>
             </td>
             <td md-cell>
-                <a ui-sref="home.logbase.logcontext({appid: log.appid, taskid: log.taskid, path: log.path, offset: log.offset})">上下文</a>
+                <a id="logContext{/$index/}" ui-sref="home.logbase.logcontext({appid: log.appid, taskid: log.taskid, path: log.path, offset: log.offset})">上下文</a>
             </td>
         </tr>
         <tr ng-repeat-end ng-hide="!vm.logDisplaySet[$index]">

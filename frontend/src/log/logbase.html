@@ -3,43 +3,47 @@
         <form layout="column" name="staticForm">
             <div flex class="form-item">
                 <label class="requirement">应用名</label>
-                <md-select placeholder="选择应用" ng-model="vm.form.appid" md-on-open="vm.loadApps()"
+                <md-select id="addName" placeholder="选择应用" ng-model="vm.form.appid" md-on-open="vm.loadApps()"
                            ng-change="vm.selectAppChange(vm.form.appid)" data-required="required">
-                    <md-option ng-value="key" ng-repeat="(key, value) in vm.apps">{/key/}</md-option>
+                    <md-option id="addName1" ng-value="key" ng-repeat="(key, value) in vm.apps">{/key/}</md-option>
                 </md-select>
             </div>
             <div flex class="form-item">
                 <label>实例 ID</label>
-                <md-select placeholder="选择实例" ng-model="vm.form.taskid" md-on-open="vm.loadTasks()"
+                <md-select id="chooseInstance" placeholder="选择实例" ng-model="vm.form.taskid" md-on-open="vm.loadTasks()"
                            ng-required="!vm.form.keyword"
                            ng-disabled="!vm.form.appid">
                     <md-option value="">未选</md-option>
-                    <md-option ng-value="key" ng-repeat="(key, value) in vm.tasks">{/key/}</md-option>
+                    <md-option id="chooseInstance1" ng-value="key" ng-repeat="(key, value) in vm.tasks">{/key/}</md-option>
                 </md-select>
             </div>
             <div flex class="form-item">
                 <label>日志来源</label>
-                <md-select placeholder="选择来源" ng-model="vm.form.path" md-on-open="vm.loadPaths()"
+                <md-select id="chooseSource" placeholder="选择来源" ng-model="vm.form.path" md-on-open="vm.loadPaths()"
                            ng-required="!vm.form.keyword"
                            ng-disabled="!vm.form.appid">
                     <md-option value="">未选</md-option>
-                    <md-option ng-value="key" ng-repeat="(key, value) in vm.paths">{/key/}</md-option>
+                    <md-option id="chooseSource1" ng-value="key" ng-repeat="(key, value) in vm.paths">{/key/}</md-option>
                 </md-select>
             </div>
             <div flex class="form-item">
                 <label>关键字</label>
-                <input type="text"  id="logKeyW" placeholder="关键字" ng-model="vm.form.keyword">
+                <input type="text" ng-maxlength="4096"  id="logKeyW" name="logKeyW" placeholder="关键字" ng-model="vm.form.keyword">
+                <div layout="row" class="form-item">
+                    <p flex class="error-info help-info-bottom"
+                       data-ng-show="staticForm.logKeyW.$error.maxlength && !staticForm.logKeyW.$pristine">关键字最大长度为4096！</p>
+                </div>
             </div>
-            <md-tabs md-dynamic-height md-border-bottom md-selected="vm.selectedTabIndex">
+            <md-tabs id="logRecentlyTab" md-dynamic-height md-border-bottom md-selected="vm.selectedTabIndex">
                 <md-tab label="最近">
                     <md-content>
                         <div flex class="form-item">
-                            <md-select placeholder="最近时间" ng-model="vm.timePeriod">
-                                <md-option ng-value="30">最近三十分钟</md-option>
-                                <md-option ng-value="120">最近两小时</md-option>
-                                <md-option ng-value="360">最近六小时</md-option>
-                                <md-option ng-value="720">最近12小时</md-option>
-                                <md-option ng-value="1440">最近一天</md-option>
+                            <md-select id="logRecently" placeholder="最近时间" ng-model="vm.timePeriod">
+                                <md-option id="logRecently0" ng-value="30">最近三十分钟</md-option>
+                                <md-option id="logRecently1" ng-value="120">最近两小时</md-option>
+                                <md-option id="logRecently2" ng-value="360">最近六小时</md-option>
+                                <md-option id="logRecently3" ng-value="720">最近12小时</md-option>
+                                <md-option id="logRecently4" ng-value="1440">最近一天</md-option>
                             </md-select>
                         </div>
                     </md-content>
@@ -47,21 +51,22 @@
                 <md-tab label="起始">
                     <md-content>
                         <div flex class="form-item">
-                            <input type="datetime-local" placeholder="开始时间" ng-model="vm.startTime" ng-max="vm.endTime"
+                            <input id="logStartTime" type="datetime-local" placeholder="开始时间" ng-model="vm.startTime" ng-max="vm.endTime"
                                    name="startTime" ng-required="vm.selectedTabIndex === 1">
-                            <input type="datetime-local" placeholder="结束时间" ng-model="vm.endTime" ng-min="vm.startTime"
+                            <p data-ng-show="staticForm.startTime.$error.max && !staticForm.startTime.$pristine">
+                                起始时间大于结束时间
+                            </p>
+                            <span ng-show="staticForm.startTime.$error.datetimelocal">请填写正确时间格式</span>
+                            <input id="logEndTime" type="datetime-local" placeholder="结束时间" ng-model="vm.endTime" ng-min="vm.startTime"
                                    name="endTime" ng-required="vm.selectedTabIndex === 1">
+                            <p data-ng-show="staticForm.endTime.$error.min && !staticForm.endTime.$pristine">结束时间小于起始时间</p>
+                            <span ng-show="staticForm.endTime.$error.datetimelocal">请填写正确时间格式</span>
                         </div>
-                        <p data-ng-show="staticForm.startTime.$error.max && !staticForm.startTime.$pristine">
-                            起始时间大于结束时间</p>
-                        <p data-ng-show="staticForm.endTime.$error.min && !staticForm.endTime.$pristine">结束时间小于起始时间</p>
-                        <span ng-show="staticForm.startTime.$error.datetimelocal">请填写正确时间格式</span>
-                        <span ng-show="staticForm.endTime.$error.datetimelocal">请填写正确时间格式</span>
                     </md-content>
                 </md-tab>
             </md-tabs>
             <div class="form-buttons-footer" layout="column">
-                <md-button class="md-raised md-primary" ng-click="vm.searchLog()" ng-disabled="staticForm.$invalid">查询
+                <md-button id="logQuery" class="md-raised md-primary" ng-click="vm.searchLog()" ng-disabled="staticForm.$invalid">查询
                 </md-button>
             </div>
         </form>

@@ -3,23 +3,27 @@
         <form layout="column" name="staticForm">
             <div flex class="form-item">
                 <label class="requirement">应用名称</label>
-                <input type="text" ng-model="vm.form.appid" data-required="required">
+                <input id="appN" name="appN" type="text" ng-model="vm.form.appid" data-required="required">
+                <p class="error-info help-info-bottom"
+                   data-ng-show="staticForm.appN.$error.required && !staticForm.appN.$pristine">应用名称不能为空</p>
             </div>
             <div flex class="form-item">
                 <label class="requirement">关键字</label>
-                <input type="text" ng-model="vm.form.keyword" data-required="required">
+                <input id="keyW" name="keyW" type="text" ng-model="vm.form.keyword" data-required="required">
+                <p class="error-info help-info-bottom"
+                   data-ng-show="staticForm.keyW.$error.required && !staticForm.keyW.$pristine">关键字不能为空</p>
             </div>
             <div flex class="form-item">
                 <label>来源</label>
-                <input type="text" ng-model="vm.form.path">
+                <input id="source" type="text" ng-model="vm.form.path">
             </div>
             <div class="form-buttons-footer" layout="column">
-                <md-button class="md-raised md-primary" style="width: 100px;"
+                <md-button id="createW" class="md-raised md-primary" style="width: 100px;"
                            ng-disabled="staticForm.$invalid" ng-show="vm.target === 'create'"
                            ng-click="vm.create()">
                     创建
                 </md-button>
-                <md-button class="md-raised md-primary" style="width: 100px;"
+                <md-button id="upDateW" class="md-raised md-primary" style="width: 100px;"
                            ng-disabled="staticForm.$invalid" ng-show="vm.target === 'update'"
                            ng-click="vm.update()">
                     更新

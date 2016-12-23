@@ -19,7 +19,7 @@
             </div>
             <div flex="40" class="form-item">
                 <label class="requirement">创建者</label>
-                <input type="email" name="creator" placeholder="邮箱地址" ng-model="vm.form.createdBy" data-required="required">
+                <input id="creator" type="email" name="creator" placeholder="邮箱地址" ng-model="vm.form.createdBy" data-required="required">
                 <p class="error-info help-info-bottom"
                    data-ng-show="staticForm.creator.$error.required && !staticForm.creator.$pristine">邮箱地址不能为空</p>
                 <p class="error-info help-info-bottom"
@@ -27,7 +27,7 @@
             </div>
             <div flex="40" flex-offset="5" class="form-item">
                 <label class="requirement">注释</label>
-                <input type="text" name="comment" ng-model="vm.form.comment" data-required="required">
+                <input id="annotation" type="text" name="comment" ng-model="vm.form.comment" data-required="required">
                 <p class="error-info help-info-bottom"
                    data-ng-show="staticForm.comment.$error.required && !staticForm.comment.$pristine">注释不能为空</p>
             </div>
@@ -72,12 +72,12 @@
 
 
             <div class="form-buttons-footer">
-                <md-button class="md-raised md-primary" flex="40"
+                <md-button id="createSilent" class="md-raised md-primary" flex="40"
                            ng-disabled="staticForm.$invalid" ng-show="vm.target === 'create'"
                            ng-click="vm.create()">
                     创建
                 </md-button>
-                <md-button class="md-raised md-primary"
+                <md-button id="updateSilent" class="md-raised md-primary"
                            ng-disabled="staticForm.$invalid" ng-show="vm.target === 'update'"
                            ng-click="vm.update()">
                     更新

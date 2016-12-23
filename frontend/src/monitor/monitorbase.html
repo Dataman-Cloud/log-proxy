@@ -69,12 +69,12 @@
                                        ng-max="vm.endTime" name="startTime" ng-required="vm.selectedTabIndex">
                                 <p data-ng-show="staticForm.startTime.$error.max && !staticForm.startTime.$pristine">
                                     起始时间大于结束时间</p>
-                                <span ng-show="staticForm.startTime.$error.datetimelocal">请填写正确时间格式</span>
+                                <span ng-show="staticForm.startTime.$error.datetimelocal">请填写正确时间格式:年-月-日T时:分:秒</span>
                                 <input id="monitorEndTime" type="datetime-local" placeholder="结束时间" ng-model="vm.endTime"
                                        ng-min="vm.startTime" name="endTime" ng-required="vm.selectedTabIndex">
                                 <p data-ng-show="staticForm.endTime.$error.min && !staticForm.endTime.$pristine">
                                     结束时间小于起始时间</p>
-                                <span ng-show="staticForm.endTime.$error.datetimelocal">请填写正确时间格式</span>
+                                <span ng-show="staticForm.endTime.$error.datetimelocal">请填写正确时间格式:年-月-日T时:分:秒</span>
                             </div>
                         </div>
                     </md-content>
