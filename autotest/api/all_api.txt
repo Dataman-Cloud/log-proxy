@@ -20,14 +20,14 @@ Monitor Query
 	Create Session   Mola   ${SERVER}
 	${path} =   Evaluate   '/v1/monitor/query?'
 	Set Suite Variable      ${path}
-	Run Keyword If  '${metric}'<>'${EMPTY}'   Add Path  metric  ${metric}
-	Run Keyword If  '${expr}'<>'${EMPTY}'   Add Path  expr  ${expr}
-	Run Keyword If  '${clusterid}'<>'${EMPTY}'   Add Path  clusterid  ${clusterid}
-	Run Keyword If  '${appid}'<>'${EMPTY}'   Add Path  appid  ${appid}
-	Run Keyword If  '${taskid}'<>'${EMPTY}'  Add Path  taskid  ${taskid}
-	Run Keyword If  '${start}'<>'${EMPTY}'   Add Path  start  ${start}
-	Run Keyword If  '${end}'<>'${EMPTY}'     Add Path  end  ${end}
-	Run Keyword If  '${step}'<>'${EMPTY}'    Add Path  step  ${step}
+	Run Keyword If  '${metric}'<>'${EMPTY}'     Add Path  metric  ${metric}
+	Run Keyword If  '${expr}'<>'${EMPTY}'       Add Path  expr  ${expr}
+	Run Keyword If  '${clusterid}'<>'${EMPTY}'  Add Path  clusterid  ${clusterid}
+	Run Keyword If  '${appid}'<>'${EMPTY}'      Add Path  appid  ${appid}
+	Run Keyword If  '${taskid}'<>'${EMPTY}'     Add Path  taskid  ${taskid}
+	Run Keyword If  '${start}'<>'${EMPTY}'      Add Path  start  ${start}
+	Run Keyword If  '${end}'<>'${EMPTY}'        Add Path  end  ${end}
+	Run Keyword If  '${step}'<>'${EMPTY}'       Add Path  step  ${step}
 	${resp}=    Get Request  Mola  ${path}
 	[Return]    ${resp}
 
@@ -36,8 +36,8 @@ Monitor Info
 	Create Session   Mola   ${SERVER}
 	${path} =   Evaluate   '/v1/monitor/info?'
 	Set Suite Variable      ${path}
-	Run Keyword If  '${clusterid}'<>'${EMPTY}'   Add Path  clusterid  ${clusterid}
-	Run Keyword If  '${appid}'<>'${EMPTY}'  Add Path  appid  ${appid}
+	Run Keyword If  '${clusterid}'<>'${EMPTY}'  Add Path  clusterid  ${clusterid}
+	Run Keyword If  '${appid}'<>'${EMPTY}'      Add Path  appid  ${appid}
 	${resp}=    Get Request  Mola  ${path}
 	[Return]    ${resp}
 
