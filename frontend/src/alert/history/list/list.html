@@ -19,7 +19,7 @@
                 <tr md-row ng-repeat-start="history in vm.histories track by $index">
                     <td md-cell>
                         <a ng-click="vm.historyDisplaySet[$index] = !vm.historyDisplaySet[$index]">
-                            <i class="fa"
+                            <i id="alertHistory{/$index/}" class="fa"
                                ng-class="{'fa-chevron-down':vm.historyDisplaySet[$index], 'fa-chevron-right':!vm.historyDisplaySet[$index]}"></i>
                         </a>
                     </td>
@@ -37,7 +37,7 @@
                     </td>
                     <td md-cell>
                         <div class="action" layout="row">
-                            <md-button aria-label="update" class="md-raised"
+                            <md-button id="silencesBtn{/$index/}" aria-label="update" class="md-raised"
                                        ui-sref="home.alertSilencesCreate({fromByHistory: history.id})">
                                 静默
                             </md-button>

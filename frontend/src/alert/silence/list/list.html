@@ -2,7 +2,7 @@
     <h2>静默管理</h2>
     <div class="panel">
         <div layout="row" layout-align="end start">
-            <md-button class="md-raised md-primary" ui-sref="home.alertSilencesCreate">
+            <md-button id="newSilent" class="md-raised md-primary" ui-sref="home.alertSilencesCreate">
                 新建
             </md-button>
         </div>
@@ -38,11 +38,11 @@
                     </td>
                     <td md-cell>
                         <div class="action" layout="row">
-                            <md-button aria-label="delete" class="md-raised"
+                            <md-button id="removeSilent{/$index/}" aria-label="delete" class="md-raised"
                                        data-ng-click="vm.deleteSilence(silence.id)">
                                 删除
                             </md-button>
-                            <md-button aria-label="update" class="md-raised"
+                            <md-button id="editorSilent{/$index/}" aria-label="update" class="md-raised"
                                        ui-sref="home.alertSilencesUpdate({id: silence.id, from: 'silence'})">编辑
                             </md-button>
                         </div>
