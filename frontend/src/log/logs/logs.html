@@ -45,7 +45,7 @@
         </tr>
         <tr ng-repeat-end ng-hide="!vm.logDisplaySet[$index]">
             <td colspan="3">
-                <div class="json-detail">
+                <div id="json-detail" class="json-detail">
                     <dl layout="row" ng-repeat="(key, value) in log track by $index">
                         <dt>{/key/}</dt>
                         <dd ng-bind-html="value"></dd>

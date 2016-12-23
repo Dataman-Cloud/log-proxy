@@ -5,7 +5,7 @@
                 <label class="requirement">应用名</label>
                 <md-select id="addName" placeholder="选择应用" ng-model="vm.form.appid" md-on-open="vm.loadApps()"
                            ng-change="vm.selectAppChange(vm.form.appid)" data-required="required">
-                    <md-option id="addName1" ng-value="key" ng-repeat="(key, value) in vm.apps">{/key/}</md-option>
+                    <md-option id="addName{/$index/}" ng-value="key" ng-repeat="(key, value) in vm.apps">{/key/}</md-option>
                 </md-select>
             </div>
             <div flex class="form-item">
@@ -14,7 +14,7 @@
                            ng-required="!vm.form.keyword"
                            ng-disabled="!vm.form.appid">
                     <md-option value="">未选</md-option>
-                    <md-option id="chooseInstance1" ng-value="key" ng-repeat="(key, value) in vm.tasks">{/key/}</md-option>
+                    <md-option id="chooseInstance{/$index/}" ng-value="key" ng-repeat="(key, value) in vm.tasks">{/key/}</md-option>
                 </md-select>
             </div>
             <div flex class="form-item">
@@ -23,14 +23,14 @@
                            ng-required="!vm.form.keyword"
                            ng-disabled="!vm.form.appid">
                     <md-option value="">未选</md-option>
-                    <md-option id="chooseSource1" ng-value="key" ng-repeat="(key, value) in vm.paths">{/key/}</md-option>
+                    <md-option id="chooseSource{/$index/}" ng-value="key" ng-repeat="(key, value) in vm.paths">{/key/}</md-option>
                 </md-select>
             </div>
             <div flex class="form-item">
                 <label>关键字</label>
                 <input type="text" ng-maxlength="4096"  id="logKeyW" name="logKeyW" placeholder="关键字" ng-model="vm.form.keyword">
                 <div layout="row" class="form-item">
-                    <p flex class="error-info help-info-bottom"
+                    <p flex id="lengthError" class="error-info help-info-bottom"
                        data-ng-show="staticForm.logKeyW.$error.maxlength && !staticForm.logKeyW.$pristine">关键字最大长度为4096！</p>
                 </div>
             </div>
@@ -53,14 +53,14 @@
                         <div flex class="form-item">
                             <input id="logStartTime" type="datetime-local" placeholder="开始时间" ng-model="vm.startTime" ng-max="vm.endTime"
                                    name="startTime" ng-required="vm.selectedTabIndex === 1">
-                            <p data-ng-show="staticForm.startTime.$error.max && !staticForm.startTime.$pristine">
+                            <p id="more" data-ng-show="staticForm.startTime.$error.max && !staticForm.startTime.$pristine">
                                 起始时间大于结束时间
                             </p>
-                            <span ng-show="staticForm.startTime.$error.datetimelocal">请填写正确时间格式</span>
+                            <span id="sNoRight" ng-show="staticForm.startTime.$error.datetimelocal">请填写正确时间格式:yyyy-mm-ddThh:mm:ss!</span>
                             <input id="logEndTime" type="datetime-local" placeholder="结束时间" ng-model="vm.endTime" ng-min="vm.startTime"
                                    name="endTime" ng-required="vm.selectedTabIndex === 1">
-                            <p data-ng-show="staticForm.endTime.$error.min && !staticForm.endTime.$pristine">结束时间小于起始时间</p>
-                            <span ng-show="staticForm.endTime.$error.datetimelocal">请填写正确时间格式</span>
+                            <p id="less" data-ng-show="staticForm.endTime.$error.min && !staticForm.endTime.$pristine">结束时间小于起始时间</p>
+                            <span id="eNoRight" ng-show="staticForm.endTime.$error.datetimelocal">请填写正确时间格式:yyyy-mm-ddThh:mm:ss!</span>
                         </div>
                     </md-content>
                 </md-tab>

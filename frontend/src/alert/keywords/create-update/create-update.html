@@ -4,13 +4,13 @@
             <div flex class="form-item">
                 <label class="requirement">应用名称</label>
                 <input id="appN" name="appN" type="text" ng-model="vm.form.appid" data-required="required">
-                <p class="error-info help-info-bottom"
+                <p id="appNameError" class="error-info help-info-bottom"
                    data-ng-show="staticForm.appN.$error.required && !staticForm.appN.$pristine">应用名称不能为空</p>
             </div>
             <div flex class="form-item">
                 <label class="requirement">关键字</label>
                 <input id="keyW" name="keyW" type="text" ng-model="vm.form.keyword" data-required="required">
-                <p class="error-info help-info-bottom"
+                <p id="keyWordError" class="error-info help-info-bottom"
                    data-ng-show="staticForm.keyW.$error.required && !staticForm.keyW.$pristine">关键字不能为空</p>
             </div>
             <div flex class="form-item">
