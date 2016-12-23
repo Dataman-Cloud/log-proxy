@@ -94,11 +94,57 @@ func TestCreateSilence(t *testing.T) {
 		t.Errorf("Expect get status code 400, got %v", req.StatusCode)
 	}
 
-	silence := initSlience()
-	data, _ := json.Marshal(silence)
-	resp, _ = http.NewRequest("POST", path, bytes.NewBuffer(data))
+	//silence := initSlience()
+	//data, _ := json.Marshal(silence)
+	str := `{"createdBy":"12@123.com","comment":"asdfasdf","endsAt":"2016-12-27T08:21:42.000Z","startsAt":"2016-12-27T06:21:42.000Z","matchers":[{"name":"asf","value":"asdf"}]}`
+	resp, _ = http.NewRequest("POST", path, bytes.NewBuffer([]byte(str)))
 	req, err = http.DefaultClient.Do(resp)
 	if err == nil && req.StatusCode == 200 {
+		t.Log("success")
+	} else {
+		t.Errorf("Expect get status code 200, got %v", req.StatusCode)
+	}
+
+	str = `{"comment":"asdfasdf","endsAt":"2016-12-27T08:21:42.000Z","startsAt":"2016-12-27T06:21:42.000Z","matchers":[{"name":"asf","value":"asdf"}]}`
+	resp, _ = http.NewRequest("POST", path, bytes.NewBuffer([]byte(str)))
+	req, err = http.DefaultClient.Do(resp)
+	if err == nil && req.StatusCode == 503 {
+		t.Log("success")
+	} else {
+		t.Errorf("Expect get status code 200, got %v", req.StatusCode)
+	}
+
+	str = `{"createdBy":"12@123.com","endsAt":"2016-12-27T08:21:42.000Z","startsAt":"2016-12-27T06:21:42.000Z","matchers":[{"name":"asf","value":"asdf"}]}`
+	resp, _ = http.NewRequest("POST", path, bytes.NewBuffer([]byte(str)))
+	req, err = http.DefaultClient.Do(resp)
+	if err == nil && req.StatusCode == 503 {
+		t.Log("success")
+	} else {
+		t.Errorf("Expect get status code 200, got %v", req.StatusCode)
+	}
+
+	str = `{"createdBy":"12@123.com","comment":"asdfasdf","startsAt":"2016-12-27T06:21:42.000Z","matchers":[{"name":"asf","value":"asdf"}]}`
+	resp, _ = http.NewRequest("POST", path, bytes.NewBuffer([]byte(str)))
+	req, err = http.DefaultClient.Do(resp)
+	if err == nil && req.StatusCode == 503 {
+		t.Log("success")
+	} else {
+		t.Errorf("Expect get status code 200, got %v", req.StatusCode)
+	}
+
+	str = `{"createdBy":"12@123.com","comment":"asdfasdf","endsAt":"2016-12-27T08:21:42.000Z","matchers":[{"name":"asf","value":"asdf"}]}`
+	resp, _ = http.NewRequest("POST", path, bytes.NewBuffer([]byte(str)))
+	req, err = http.DefaultClient.Do(resp)
+	if err == nil && req.StatusCode == 503 {
+		t.Log("success")
+	} else {
+		t.Errorf("Expect get status code 200, got %v", req.StatusCode)
+	}
+
+	str = `{"createdBy":"12@123.com","comment":"asdfasdf","endsAt":"2016-12-27T08:21:42.000Z","startsAt":"2016-12-27T06:21:42.000Z"}`
+	resp, _ = http.NewRequest("POST", path, bytes.NewBuffer([]byte(str)))
+	req, err = http.DefaultClient.Do(resp)
+	if err == nil && req.StatusCode == 503 {
 		t.Log("success")
 	} else {
 		t.Errorf("Expect get status code 200, got %v", req.StatusCode)
@@ -120,6 +166,51 @@ func TestUpdateSilence(t *testing.T) {
 	resp, _ = http.NewRequest("PUT", path, bytes.NewBuffer(data))
 	req, err = http.DefaultClient.Do(resp)
 	if err == nil && req.StatusCode == 200 {
+		t.Log("success")
+	} else {
+		t.Errorf("Expect get status code 200, got %v", req.StatusCode)
+	}
+
+	str := `{"comment":"asdfasdf","endsAt":"2016-12-27T08:21:42.000Z","startsAt":"2016-12-27T06:21:42.000Z","matchers":[{"name":"asf","value":"asdf"}]}`
+	resp, _ = http.NewRequest("PUT", path, bytes.NewBuffer([]byte(str)))
+	req, err = http.DefaultClient.Do(resp)
+	if err == nil && req.StatusCode == 503 {
+		t.Log("success")
+	} else {
+		t.Errorf("Expect get status code 200, got %v", req.StatusCode)
+	}
+
+	str = `{"createdBy":"12@123.com","endsAt":"2016-12-27T08:21:42.000Z","startsAt":"2016-12-27T06:21:42.000Z","matchers":[{"name":"asf","value":"asdf"}]}`
+	resp, _ = http.NewRequest("PUT", path, bytes.NewBuffer([]byte(str)))
+	req, err = http.DefaultClient.Do(resp)
+	if err == nil && req.StatusCode == 503 {
+		t.Log("success")
+	} else {
+		t.Errorf("Expect get status code 200, got %v", req.StatusCode)
+	}
+
+	str = `{"createdBy":"12@123.com","comment":"asdfasdf","startsAt":"2016-12-27T06:21:42.000Z","matchers":[{"name":"asf","value":"asdf"}]}`
+	resp, _ = http.NewRequest("PUT", path, bytes.NewBuffer([]byte(str)))
+	req, err = http.DefaultClient.Do(resp)
+	if err == nil && req.StatusCode == 503 {
+		t.Log("success")
+	} else {
+		t.Errorf("Expect get status code 200, got %v", req.StatusCode)
+	}
+
+	str = `{"createdBy":"12@123.com","comment":"asdfasdf","endsAt":"2016-12-27T08:21:42.000Z","matchers":[{"name":"asf","value":"asdf"}]}`
+	resp, _ = http.NewRequest("PUT", path, bytes.NewBuffer([]byte(str)))
+	req, err = http.DefaultClient.Do(resp)
+	if err == nil && req.StatusCode == 503 {
+		t.Log("success")
+	} else {
+		t.Errorf("Expect get status code 200, got %v", req.StatusCode)
+	}
+
+	str = `{"createdBy":"12@123.com","comment":"asdfasdf","endsAt":"2016-12-27T08:21:42.000Z","startsAt":"2016-12-27T06:21:42.000Z"}`
+	resp, _ = http.NewRequest("PUT", path, bytes.NewBuffer([]byte(str)))
+	req, err = http.DefaultClient.Do(resp)
+	if err == nil && req.StatusCode == 503 {
 		t.Log("success")
 	} else {
 		t.Errorf("Expect get status code 200, got %v", req.StatusCode)

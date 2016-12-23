@@ -73,3 +73,27 @@ func TestReadResponseBody(t *testing.T) {
 	}
 
 }
+
+func TestAlertNotification(t *testing.T) {
+	if AlertNotification(fmt.Sprintf("http://%s:%s/notification", "localhost", "80"), "test") != nil {
+		t.Log("success")
+	} else {
+		t.Error("faild")
+	}
+
+	if AlertNotification(fmt.Sprintf("http://%s:%s/notification", "localhost", "80"), `{"test":"value"}`) != nil {
+		t.Log("success")
+	} else {
+		t.Error("faild")
+	}
+
+	mockServer := ms.NewServer()
+	defer mockServer.Close()
+
+	mockServer.AddRouter("/notification", "post").RGroup().Reply(200).WBodyString(`{"status": "success"}`)
+	if AlertNotification(fmt.Sprintf("http://%s:%s/notification", mockServer.Addr, mockServer.Port), `{"test":"value"}`) == nil {
+		t.Log("success")
+	} else {
+		t.Error("faild")
+	}
+}
