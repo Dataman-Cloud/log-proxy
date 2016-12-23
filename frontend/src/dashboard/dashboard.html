@@ -21,7 +21,7 @@
         <table md-table id="cluster-list">
             <thead md-head>
             <tr md-row>
-                <th id="clusters" md-column style="width:150px;">集群</th>
+                <th id="clusters" md-column style="width:200px;">集群</th>
                 <th id="apps" md-column style="width:200px;">应用</th>
                 <th id="instances" md-column>实例</th>
                 <th id="hosts" md-column style="width:150px;">主机</th>
@@ -33,10 +33,14 @@
                     <a ui-sref="home.dashboardMonitor.detail({clusterId: key, appId: keys(value.applications)[0]})">{/key/}</a>
                 </td>
                 <td md-cell>
-                    <p ng-repeat="(appKey, appValue) in value.applications track by $index">{/appKey/}</p>
+                    <div class="limit-td-height">
+                        <p ng-repeat="(appKey, appValue) in value.applications track by $index">{/appKey/}</p>
+                    </div>
                 </td>
                 <td md-cell>
-                    <p ng-repeat="task in value.tasks | orderBy: task track by $index">{/task/}</p>
+                    <div class="limit-td-height">
+                        <p ng-repeat="task in value.tasks | orderBy: task track by $index">{/task/}</p>
+                    </div>
                 </td>
                 <td md-cell>
                     <p ng-repeat="node in value.nodes track by $index">{/node/}</p>

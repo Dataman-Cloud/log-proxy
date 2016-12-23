@@ -156,6 +156,10 @@ table.md-table td.md-cell p {
     margin-bottom: 0;
 }
 
+table.md-table td.md-cell p:first-child {
+    margin-top: 0px;
+}
+
 table.md-table td.md-cell ul li {
     margin-bottom: 5px;
 }
@@ -431,4 +435,8 @@ textarea {
 #logKeyW{
     opacity: 0.6;
     font-weight: 400;
+}
+.limit-td-height {
+    max-height: 100px;
+    overflow-y: auto;
 }
