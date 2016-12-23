@@ -1,0 +1,10 @@
+mola:
+  image: demoregistry.dataman-inc.com/shurenyun/centos7-mola:v0.2-e68703
+  environment:
+   - ES_URL=http://192.168.1.75:9200
+   - PROMETHEUS_URL=http://192.168.1.91:9090
+   - ALERTMANAGER_URL=http://192.168.1.91:9093
+   - SEARCH_DEBUG=true
+  ports:
+   - 5098:5098
+  restart: always
