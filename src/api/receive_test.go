@@ -29,7 +29,7 @@ func TestReciver(t *testing.T) {
 	if s == nil {
 		s = GetSearch()
 	}
-	req, _ := http.NewRequest("POST", apiURL+"/v1/recive/prometheus", nil)
+	req, _ := http.NewRequest("POST", apiURL+"/v1/receive/prometheus", nil)
 	resp, err := http.DefaultClient.Do(req)
 	if err == nil && resp.StatusCode == 503 {
 		t.Log("success")
@@ -50,7 +50,7 @@ func TestReciver(t *testing.T) {
 
 	data, _ := json.Marshal(m)
 
-	req, _ = http.NewRequest("POST", apiURL+"/v1/recive/prometheus", bytes.NewBuffer(data))
+	req, _ = http.NewRequest("POST", apiURL+"/v1/receive/prometheus", bytes.NewBuffer(data))
 	resp, err = http.DefaultClient.Do(req)
 	if err == nil && resp.StatusCode == 200 {
 		t.Log("success")
@@ -67,7 +67,7 @@ func TestReciverLog(t *testing.T) {
 	m := make(map[string]interface{})
 	data, _ := json.Marshal(m)
 
-	req, _ := http.NewRequest("POST", apiURL+"/v1/recive/log", bytes.NewBuffer(data))
+	req, _ := http.NewRequest("POST", apiURL+"/v1/receive/log", bytes.NewBuffer(data))
 	resp, err := http.DefaultClient.Do(req)
 	if err == nil && resp.StatusCode == 503 {
 		t.Log("success")
@@ -80,7 +80,7 @@ func TestReciverLog(t *testing.T) {
 	}
 
 	data, _ = json.Marshal(m)
-	req, _ = http.NewRequest("POST", apiURL+"/v1/recive/log", bytes.NewBuffer(data))
+	req, _ = http.NewRequest("POST", apiURL+"/v1/receive/log", bytes.NewBuffer(data))
 	resp, err = http.DefaultClient.Do(req)
 	if err == nil && resp.StatusCode == 503 {
 		t.Log("success")
@@ -94,7 +94,7 @@ func TestReciverLog(t *testing.T) {
 	}
 
 	data, _ = json.Marshal(m)
-	req, _ = http.NewRequest("POST", apiURL+"/v1/recive/log", bytes.NewBuffer(data))
+	req, _ = http.NewRequest("POST", apiURL+"/v1/receive/log", bytes.NewBuffer(data))
 	resp, err = http.DefaultClient.Do(req)
 	if err == nil && resp.StatusCode == 503 {
 		t.Log("success")
@@ -109,7 +109,7 @@ func TestReciverLog(t *testing.T) {
 	}
 
 	data, _ = json.Marshal(m)
-	req, _ = http.NewRequest("POST", apiURL+"/v1/recive/log", bytes.NewBuffer(data))
+	req, _ = http.NewRequest("POST", apiURL+"/v1/receive/log", bytes.NewBuffer(data))
 	resp, err = http.DefaultClient.Do(req)
 	if err == nil && resp.StatusCode == 503 {
 		t.Log("success")
@@ -125,7 +125,7 @@ func TestReciverLog(t *testing.T) {
 	}
 
 	data, _ = json.Marshal(m)
-	req, _ = http.NewRequest("POST", apiURL+"/v1/recive/log", bytes.NewBuffer(data))
+	req, _ = http.NewRequest("POST", apiURL+"/v1/receive/log", bytes.NewBuffer(data))
 	resp, err = http.DefaultClient.Do(req)
 	if err == nil && resp.StatusCode == 503 {
 		t.Log("success")
@@ -142,7 +142,7 @@ func TestReciverLog(t *testing.T) {
 	}
 
 	data, _ = json.Marshal(m)
-	req, _ = http.NewRequest("POST", apiURL+"/v1/recive/log", bytes.NewBuffer(data))
+	req, _ = http.NewRequest("POST", apiURL+"/v1/receive/log", bytes.NewBuffer(data))
 	resp, err = http.DefaultClient.Do(req)
 	if err == nil && resp.StatusCode == 503 {
 		t.Log("success")
@@ -160,7 +160,7 @@ func TestReciverLog(t *testing.T) {
 	}
 
 	data, _ = json.Marshal(m)
-	req, _ = http.NewRequest("POST", apiURL+"/v1/recive/log", bytes.NewBuffer(data))
+	req, _ = http.NewRequest("POST", apiURL+"/v1/receive/log", bytes.NewBuffer(data))
 	resp, err = http.DefaultClient.Do(req)
 	if err == nil && resp.StatusCode == 503 {
 		t.Log("success")
@@ -179,7 +179,7 @@ func TestReciverLog(t *testing.T) {
 	}
 
 	data, _ = json.Marshal(m)
-	req, _ = http.NewRequest("POST", apiURL+"/v1/recive/log", bytes.NewBuffer(data))
+	req, _ = http.NewRequest("POST", apiURL+"/v1/receive/log", bytes.NewBuffer(data))
 	resp, err = http.DefaultClient.Do(req)
 	if err == nil && resp.StatusCode == 200 {
 		t.Log("success")
@@ -199,7 +199,7 @@ func TestReciverLog(t *testing.T) {
 	s.KeywordFilter["testtest"] = []string{"get"}
 
 	data, _ = json.Marshal(m)
-	req, _ = http.NewRequest("POST", apiURL+"/v1/recive/log", bytes.NewBuffer(data))
+	req, _ = http.NewRequest("POST", apiURL+"/v1/receive/log", bytes.NewBuffer(data))
 	resp, err = http.DefaultClient.Do(req)
 	if err == nil && resp.StatusCode == 200 {
 		t.Log("success")

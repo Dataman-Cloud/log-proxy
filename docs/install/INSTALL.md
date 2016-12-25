@@ -14,7 +14,7 @@ receivers:
 在后面新增内容
 ```
     - send_resolved: true
-      url: 'http://192.168.1.75:5098/v1/recive/prometheus'
+      url: 'http://192.168.1.75:5098/v1/receive/prometheus'
 ```
 重启alertmanager
 ```
@@ -112,4 +112,13 @@ docker-compose -p log up -d
 "key": "label",
 "value": "VCLUSTER=work"
 }
+```
+
+## 5. 启动es以后执行命令建立mapping 文件在docs/json_sample里面
+```
+curl -XPUT localhost:9200/_template/event -d @event.json
+curl -XPUT localhost:9200/_template/dataman -d @log.json
+curl -XPUT localhost:9200/_template/alert -d @alert.json
+curl -XPUT localhost:9200/_template/keyword -d @alert-keyword.json
+curl -XPUT localhost:9200/_template/prometheus -d @prometheus.json
 ```
