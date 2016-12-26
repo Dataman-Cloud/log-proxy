@@ -181,6 +181,7 @@ func (s *SearchService) Paths(appName, taskID string, page models.Page) (map[str
 func (s *SearchService) Search(appid, taskid, source, keyword string, page models.Page) (map[string]interface{}, error) {
 	data := make(map[string]interface{})
 
+	sort := false
 	var querys []elastic.Query
 	if taskid != "" {
 		querys = append(querys, elastic.NewTermsQuery("taskid", strings.Split(taskid, ",")))
@@ -189,6 +190,7 @@ func (s *SearchService) Search(appid, taskid, source, keyword string, page model
 		querys = append(querys, elastic.NewTermsQuery("path", strings.Split(source, ",")))
 	}
 	if keyword != "" {
+		sort = true
 		querys = append(querys, elastic.NewQueryStringQuery("message:"+keyword).AnalyzeWildcard(true))
 	}
 
@@ -197,9 +199,10 @@ func (s *SearchService) Search(appid, taskid, source, keyword string, page model
 		Must(querys...)
 
 	result, err := s.ESClient.Search().
-		Index("dataman-" + strings.Split(appid, "-")[0] + "-" + utils.ParseDate(page.RangeFrom, page.RangeTo)).
-		Type("dataman-" + appid).
+		Index("dataman-"+strings.Split(appid, "-")[0]+"-"+utils.ParseDate(page.RangeFrom, page.RangeTo)).
+		Type("dataman-"+appid).
 		Query(bquery).
+		Sort("logtime.sort", sort).
 		Highlight(elastic.NewHighlight().Field("message").PreTags(`@dataman-highlighted-field@`).PostTags(`@/dataman-highlighted-field@`)).
 		From(page.PageFrom).Size(page.PageSize).Pretty(true).IgnoreUnavailable(true).Do()
 

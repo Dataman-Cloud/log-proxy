@@ -14,6 +14,9 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
+// registry prometheus registry counter
+var registry bool
+
 const (
 	// GetAppsError get application error
 	GetAppsError = "503-11000"
@@ -61,24 +64,15 @@ func GetSearch() *Search {
 		),
 		Kmutex: new(sync.Mutex),
 	}
-	prometheus.MustRegister(s.Counter)
 
-	if s.Service == nil {
-		return s
+	if !registry {
+		prometheus.MustRegister(s.Counter)
+		registry = true
 	}
 
 	alerts, err := s.Service.GetAlerts(models.Page{
 		PageFrom: 0,
-		PageSize: 0,
-	})
-
-	if err != nil || alerts == nil {
-		return s
-	}
-
-	alerts, err = s.Service.GetAlerts(models.Page{
-		PageFrom: 0,
-		PageSize: int(alerts["count"].(int64)),
+		PageSize: 1000,
 	})
 
 	if err != nil {
@@ -87,8 +81,12 @@ func GetSearch() *Search {
 
 	s.Kmutex.Lock()
 	defer s.Kmutex.Unlock()
+	if alerts == nil {
+		return s
+	}
 	for _, alert := range alerts["results"].([]models.Alert) {
-		s.KeywordFilter[alert.AppID+alert.Path] = append(s.KeywordFilter[alert.AppID+alert.Path], alert.Keyword)
+		s.KeywordFilter[alert.AppID+alert.Path] =
+			append(s.KeywordFilter[alert.AppID+alert.Path], alert.Keyword)
 	}
 
 	return s
