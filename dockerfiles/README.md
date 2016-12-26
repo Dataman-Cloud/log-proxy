@@ -7,14 +7,14 @@
 1. build mola binaray file on CentOS 7 and Go 1.7.
 ```
 # cd log-proxy
-# make build
+# docker run -it --rm --name buildmola -v "$PWD":/go/src/github.com/Dataman-Cloud/log-proxy -w /go/src/github.com/Dataman-Cloud/log-proxy golang:1.7.4-onbuild make build
 # ls bin/mola
 ```
 
-2. compress the UI files, npm required
+2. compress the UI files
 ```
 # cd frotend
-# ./compress.sh
+# docker run -it --rm --name buildmola -v "$PWD":/usr/src/app -w /usr/src/app node:4.7.0-onbuild ./compress.sh
 ```
 
 3. build the image  
