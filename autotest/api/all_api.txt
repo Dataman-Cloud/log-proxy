@@ -1,0 +1,242 @@
+*** Settings ***
+Library          Collections
+Library          RequestsLibrary
+Library          String
+Library          json
+Library          DateTime
+
+*** Variables ***
+
+${SERVER}        http://192.168.1.75:5098
+${MOLA APP}      work-mola
+${MOLA TASK}     work-mola.b8f53b9d-c8af-11e6-b087-3e5bca0d4e78
+${OneHour}       01:00:00:0
+${HalfAnHour}    00:30:00:0
+${message}       simple
+
+*** Keywords ***
+
+#-----------监控-----------
+Monitor Query
+	[Arguments]  ${metric}=${EMPTY}  ${expr}=${EMPTY}  ${clusterid}=${EMPTY}  ${appid}=${EMPTY}  ${taskid}=${EMPTY}  ${start}=${EMPTY}  ${end}=${EMPTY}  ${step}=${EMPTY}
+	Create Session   Mola   ${SERVER}
+	${path} =   Evaluate   '/v1/monitor/query?'
+	Set Suite Variable      ${path}
+	Run Keyword If  '${metric}'<>'${EMPTY}'     Add Path  metric  ${metric}
+	Run Keyword If  '${expr}'<>'${EMPTY}'       Add Path  expr  ${expr}
+	Run Keyword If  '${clusterid}'<>'${EMPTY}'  Add Path  clusterid  ${clusterid}
+	Run Keyword If  '${appid}'<>'${EMPTY}'      Add Path  appid  ${appid}
+	Run Keyword If  '${taskid}'<>'${EMPTY}'     Add Path  taskid  ${taskid}
+	Run Keyword If  '${start}'<>'${EMPTY}'      Add Path  start  ${start}
+	Run Keyword If  '${end}'<>'${EMPTY}'        Add Path  end  ${end}
+	Run Keyword If  '${step}'<>'${EMPTY}'       Add Path  step  ${step}
+	${resp}=    Get Request  Mola  ${path}
+	[Return]    ${resp}
+
+Monitor Info
+	[Arguments]  ${clusterid}=${EMPTY}  ${appid}=${EMPTY}
+	Create Session   Mola   ${SERVER}
+	${path} =   Evaluate   '/v1/monitor/info?'
+	Set Suite Variable      ${path}
+	Run Keyword If  '${clusterid}'<>'${EMPTY}'  Add Path  clusterid  ${clusterid}
+	Run Keyword If  '${appid}'<>'${EMPTY}'      Add Path  appid  ${appid}
+	${resp}=    Get Request  Mola  ${path}
+	[Return]    ${resp}
+
+Monitor Info Nodes
+	[Arguments]  ${nodeid}=${EMPTY}
+	Create Session   Mola   ${SERVER}
+	${path} =   Evaluate   '/v1/monitor/nodes?'
+	Set Suite Variable      ${path}
+	Run Keyword If  '${nodeid}'<>'${EMPTY}'   Add Path  nodeid  ${nodeid}
+	${resp}=    Get Request  Mola  ${path}
+	[Return]    ${resp}
+
+AlertManager Alerts
+  [Arguments]
+  Create Session   Mola   ${SERVER}
+  ${path} =   Evaluate   '/v1/monitor/alerts'
+  Set Suite Variable      ${path}
+  ${resp}=    Get Request  Mola  ${path}
+  [Return]    ${resp}
+
+AlertManager Alerts Groups
+  [Arguments]
+  Create Session   Mola   ${SERVER}
+  ${path} =   Evaluate   '/v1/monitor/alerts/groups'
+  Set Suite Variable      ${path}
+  ${resp}=    Get Request  Mola  ${path}
+  [Return]    ${resp}
+
+AlertManager Alerts Status
+  [Arguments]
+  Create Session   Mola   ${SERVER}
+  ${path} =   Evaluate   '/v1/monitor/alerts/status'
+  Set Suite Variable      ${path}
+  ${resp}=    Get Request  Mola  ${path}
+  [Return]    ${resp}
+
+#--------------------------
+
+Add Path
+	[Arguments]  ${variable}  ${value}
+	${path} =  Evaluate  '${path}' + '&' + '${variable}' + '=' +'${value}'
+	Set Suite Variable   ${path}
+
+Add Epoch Time
+	[Arguments]  ${variable}  ${date}
+	Log  ${date}
+	${epoch} =   Convert Date  ${date}  epoch
+	${num} =     Convert To Integer     ${epoch}
+	${time} =    Evaluate   ${num}*1000
+	${path} =    Evaluate  '${path}' + '&' + '${variable}' + '=' +'${time}'
+	Set Suite Variable   ${path}
+
+#-----------日志-----------
+Log App
+	[Arguments]  ${from}=${EMPTY}  ${to}=${EMPTY}
+	Create Session   Mola   ${SERVER}
+	${path} =   Evaluate   '/v1/search/applications?'
+	Set Suite Variable      ${path}
+	Run Keyword If  '${from}'<>'${EMPTY}'  Add Epoch Time  from  ${from}
+	Run Keyword If  '${to}'<>'${EMPTY}'    Add Epoch Time  to  ${to}
+	${resp}=    Get Request  Mola  ${path}
+	[Return]    ${resp}
+
+Log Task
+	[Arguments]  ${appid}  ${from}=${EMPTY}  ${to}=${EMPTY}
+	Create Session   Mola   ${SERVER}
+	${path} =   Evaluate   '/v1/search/tasks/' + '${appid}' + '?'
+	Set Suite Variable      ${path}
+	Run Keyword If  '${from}'<>'${EMPTY}'  Add Epoch Time  from  ${from}
+	Run Keyword If  '${to}'<>'${EMPTY}'    Add Epoch Time  to  ${to}
+	${resp}=    Get Request  Mola  ${path}
+	[Return]    ${resp}
+
+Log Path
+	[Arguments]  ${appid}  ${from}=${EMPTY}  ${to}=${EMPTY}
+	Create Session   Mola   ${SERVER}
+	${path} =   Evaluate   '/v1/search/paths/' + '${appid}' + '?'
+	Set Suite Variable      ${path}
+	Run Keyword If  '${from}'<>'${EMPTY}'  Add Epoch Time  from  ${from}
+	Run Keyword If  '${to}'<>'${EMPTY}'    Add Epoch Time  to  ${to}
+	${resp}=    Get Request  Mola  ${path}
+	[Return]    ${resp}
+
+Log Index
+	[Arguments]  ${appid}  ${taskid}=${EMPTY}  ${logpath}=${EMPTY}  ${keyword}=${EMPTY}
+	...          ${from}=${EMPTY}  ${to}=${EMPTY}  ${page}=${EMPTY}
+	Create Session   Mola   ${SERVER}
+	${path} =   Evaluate   '/v1/search/index?appid=' + '${appid}'
+	Set Suite Variable      ${path}
+	Run Keyword If  '${taskid}'<>'${EMPTY}'   Add Path  taskid  ${taskid}
+	Run Keyword If  '${logpath}'<>'${EMPTY}'  Add Path  path  ${logpath}
+	Run Keyword If  '${keyword}'<>'${EMPTY}'  Add Path  keyword  ${keyword}
+	Run Keyword If  '${from}'<>'${EMPTY}'  Add Epoch Time  from  ${from}
+	Run Keyword If  '${to}'<>'${EMPTY}'    Add Epoch Time  to  ${to}
+	Run Keyword If  '${page}'<>'${EMPTY}'  Add Path  page  ${page}
+	Log  ${path}
+	${resp}=    Get Request  Mola  ${path}
+	[Return]    ${resp}
+
+Log Context
+	[Arguments]  ${appid}  ${taskid}  ${logpath}  ${offset}
+	Create Session   Mola   ${SERVER}
+	${path} =   Evaluate   '/v1/search/context?appid=' + '${appid}' + '&taskid=' + '${taskid}' + '&path='+ '${logpath}'
+	Set Suite Variable      ${path}
+	${offstring} =   Convert To String  ${offset}
+	${left} =   Fetch From Left   ${offstring}  e
+	${right} =  Fetch From Right  ${offstring}  +
+	${num} =    Get Length  ${left}
+	${length} =    Evaluate  ${right} - ${num} + ${2}
+    : FOR  ${idx}  IN RANGE  ${length}
+    \  ${left} =   Evaluate  '${left}' + '0'
+    ${offnum} =    Remove String  ${left}  .
+    Add Path    offset  ${offnum}
+	${resp}=    Get Request  Mola  ${path}
+	[Return]    ${resp}
+
+#-----------告警-----------
+Get Alerts
+	Create Session   Mola   ${SERVER}
+	${path} =   Evaluate   '/v1/search/prometheus'
+	${resp}=    Get Request  Mola  ${path}
+	[Return]    ${resp}
+
+Get Alert
+	[Arguments]  ${id}
+	Create Session   Mola   ${SERVER}
+	${path} =   Evaluate   '/v1/search/prometheus/' + '${id}'
+	${resp}=    Get Request  Mola  ${path}
+	[Return]    ${resp}	
+
+#-----------日志过滤关键字-----------
+Get Filters
+	Create Session   Mola   ${SERVER}
+	${path} =   Evaluate   '/v1/search/keyword'
+	${resp}=    Get Request  Mola  ${path}
+	[Return]    ${resp}
+
+Get Filter
+	[Arguments]  ${id}
+	Create Session   Mola   ${SERVER}
+	${path} =   Evaluate   '/v1/search/keyword/' + '${id}'
+	${resp}=    Get Request  Mola  ${path}
+	[Return]    ${resp}
+
+Create Filter
+	[Arguments]  ${data}
+	Create Session   Mola   ${SERVER}
+	${path} =   Evaluate   '/v1/search/keyword'
+	${resp}=    Post Request  Mola  ${path}  data=${data}
+	[Return]    ${resp}
+
+Update Filter
+	[Arguments]  ${data}
+	Create Session   Mola   ${SERVER}
+	${path} =   Evaluate   '/v1/search/keyword'
+	${resp}=    Put Request  Mola  ${path}  data=${data}
+	[Return]    ${resp}
+
+Delete Filter
+	[Arguments]  ${id}
+	Create Session   Mola   ${SERVER}
+	${path} =   Evaluate   '/v1/search/keyword/' + '${id}'
+	${resp}=    Delete Request  Mola  ${path}
+	[Return]    ${resp}
+
+#-----------静默-----------
+Get Silences
+	Create Session   Mola   ${SERVER}
+	${path} =   Evaluate   '/v1/monitor/silences'
+	${resp}=    Get Request  Mola  ${path}
+	[Return]    ${resp}
+
+Get Silence
+	[Arguments]  ${id}
+	Create Session   Mola   ${SERVER}
+	${path} =   Evaluate   '/v1/monitor/silence/' + '${id}'
+	${resp}=    Get Request  Mola  ${path}
+	[Return]    ${resp}
+
+Create Silence
+	[Arguments]  ${data}
+	Create Session   Mola   ${SERVER}
+	${path} =   Evaluate   '/v1/monitor/silences'
+	${resp}=    Post Request  Mola  ${path}  data=${data}
+	[Return]    ${resp}
+
+Update Silence
+	[Arguments]  ${id}  ${data}
+	Create Session   Mola   ${SERVER}
+	${path} =   Evaluate   '/v1/monitor/silence/' + '${id}'
+	Log  ${path}
+	${resp}=    Put Request  Mola  ${path}  data=${data}
+	[Return]    ${resp}
+
+Delete Silence
+	[Arguments]  ${id}
+	Create Session   Mola   ${SERVER}
+	${path} =   Evaluate   '/v1/monitor/silence/' + '${id}'
+	${resp}=    Delete Request  Mola  ${path}
+	[Return]    ${resp}

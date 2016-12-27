@@ -2,3 +2,9 @@ env_file
 data/
 bin/
 go_code_check*
+autotest/api/output.xml
+autotest/api/log.html
+autotest/api/report.html
+coverage-all.out
+coverage.html
+coverage.out

@@ -1,0 +1,359 @@
+*** Settings ***
+
+Documentation     日志报警
+Resource          all_api.txt
+Library           OperatingSystem
+Suite Teardown    Delete All Sessions
+
+*** Test Cases ***
+
+#-----------日志（下拉菜单）----------
+获取所用应用QueryFrom时间晚于当前时间
+	[Tags]  获取所用应用
+	${Current} =  Get Current Date
+	${Future} =   Add Time To Date  ${Current}  ${OneHour}
+	${resp}=      Log App  form=${Future}
+	Log  ${resp.text}
+	Should Not Be Equal As Strings  ${resp.status_code}  200
+
+获取所用应用QueryFrom时间晚于To时间
+	[Tags]  获取所用应用
+	${Current} =  Get Current Date
+	${Before} =   Subtract Time From Date  ${Current}  ${OneHour}
+	${resp} =     Log App  form=${Current}  to=${Before}
+	Log  ${resp.text}
+	Should Not Be Equal As Strings  ${resp.status_code}  200
+
+获取所用应用QueryFrom为异常值
+	[Tags]  获取所用应用
+	Create Session   Mola      ${SERVER}
+	${path} =     Evaluate     '/v1/search/applications?form=xxx'
+	${resp} =     Get Request  Mola  ${path}
+	Log  ${resp.text}
+	Should Not Be Equal As Strings  ${resp.status_code}  200
+
+根据应用获取所有实例QueryFrom时间晚于当前时间
+	[Tags]  根据应用获取所有实例
+	${Current} =  Get Current Date
+	${Future} =   Add Time To Date  ${Current}  ${OneHour}
+	${resp}=      Log Task  ${MOLA APP}  from=${Future}
+	Log  ${resp.text}
+	Should Not Be Equal As Strings  ${resp.status_code}  200
+
+根据应用获取所有实例QueryFrom时间晚于To时间
+	[Tags]  根据应用获取所有实例
+	${Current} =  Get Current Date
+	${Future} =   Add Time To Date  ${Current}  ${OneHour}
+	${resp}=      Log Task  ${MOLA APP}  from=${Future}  to=${Current}
+	Log  ${resp.text}
+	Should Not Be Equal As Strings  ${resp.status_code}  200
+
+根据应用获取所有实例QueryFrom为异常值
+	[Tags]  根据应用获取所有实例
+	Create Session   Mola   ${SERVER}
+	${path} =     Evaluate  '/v1/search/tasks/' + '${MOLA APP}' + '?form=xxx'
+	${resp} =     Get Request  Mola  ${path}
+	Log  ${resp.text}
+	Should Not Be Equal As Strings   ${resp.status_code}  200
+
+根据应用获取所有实例appid不存在
+	[Tags]  根据应用获取所有实例
+	${resp}=      Log Task  xxx
+	Log  ${resp.text}
+	Should Not Be Equal As Strings  ${resp.status_code}  200
+
+根据应用获取所有日志来源QueryFrom时间晚于当前时间
+	[Tags]  根据应用获取所有日志来源
+	${Current} =  Get Current Date
+	${Future} =   Add Time To Date  ${Current}  ${OneHour}
+	${resp}=      Log Path  ${MOLA APP}  from=${Future}
+	Log  ${resp.text}
+	Should Not Be Equal As Strings  ${resp.status_code}  200
+
+根据应用获取所有日志来源QueryFrom时间晚于to时间
+	[Tags]  根据应用获取所有日志来源
+	${Current} =  Get Current Date
+	${Future} =   Add Time To Date  ${Current}  ${OneHour}
+	${resp}=      Log Path  ${MOLA APP}  from=${Future}  to=${Current}
+	Log  ${resp.text}
+	Should Not Be Equal As Strings  ${resp.status_code}  200
+
+根据应用获取所有日志来源appid不存在
+	[Tags]  根据应用获取所有日志来源
+	${resp}=      Log Path  xxx
+	Log  ${resp.text}
+	Should Not Be Equal As Strings  ${resp.status_code}  200
+
+#-----------日志----------
+日志搜索QueryAppid为不存在的值
+	[Tags]  日志搜索
+	${resp}=      Log Index  xxx
+	Log  ${resp.text}
+	Should Not Be Equal As Strings  ${resp.status_code}  200
+
+日志搜索QueryTaskid为不存在的值
+	[Tags]  日志搜索
+	${resp}=      Log Index  ${MOLA APP}  taskid=xxx
+	Log  ${resp.text}
+	Should Not Be Equal As Strings  ${resp.status_code}  200
+
+日志搜索QueryPath为不存在的值
+	[Tags]  日志搜索
+	${resp}=      Log Index  ${MOLA APP}  path=xxx
+	Log  ${resp.text}
+	Should Not Be Equal As Strings  ${resp.status_code}  200
+
+日志搜索QueryKeyword为不存在的值
+	[Tags]  日志搜索
+	${resp}=      Log Index  ${MOLA APP}  keyword=xxx
+	Log  ${resp.text}
+	Should Not Be Equal As Strings  ${resp.status_code}  200
+	
+日志搜索QueryFromTo为异常值
+	[Tags]  日志搜索
+	Create Session   Mola    ${SERVER}
+	${path} =   Evaluate    '/v1/search/index?appid=' + '${MOLA APP}' +'&tfrom=xxx'
+	${resp}=    Get Request  Mola  ${path}
+	Log  ${resp.text}
+	Should Not Be Equal As Strings  ${resp.status_code}  200
+	
+日志搜索QueryFrom时间晚于to时间
+	[Tags]  日志搜索
+	${Current} =  Get Current Date
+	${Future} =   Add Time To Date  ${Current}  ${OneHour}
+	${resp}=      Log Index   ${MOLA APP}  from=${Future}  to=${Current}
+	Log  ${resp.text}
+	Should Not Be Equal As Strings  ${resp.status_code}  200
+
+日志搜索QueryOffset为不存在的值
+	[Tags]  日志搜索
+	${resp}=      Log Context  ${MOLA APP}  ${MOLA TASK}  stdout  1
+	Log  ${resp.text}
+	Should Not Be Equal As Strings  ${resp.status_code}  200
+
+日志搜索QueryAppid为不存在的值
+	[Tags]  日志搜索
+	${Current} =  Get Current Date
+	${Before} =   Subtract Time From Date  ${Current}  ${OneHour}
+	${resp}=      Log Index     ${MOLA APP}  keyword=${message}  from=${Before}  to=${Current}
+	${resp}=      Log Context   xxx  ${resp.json()['data']['results'][0]['taskid']}
+	              ...  ${resp.json()['data']['results'][0]['path']}  ${resp.json()['data']['results'][0]['offset']}
+	Log  ${resp.text}
+	Should Not Be Equal As Strings  ${resp.status_code}  200
+
+#-----------报警----------
+报警历史id为不存在的值
+    [Tags]  报警历史
+    ${resp}=      Get Alert  xxx
+	Log  ${resp.text}
+	Should Not Be Equal As Strings  ${resp.status_code}  200
+
+#-----------日志过滤关键字----------
+日志过滤关键字-新建没带data
+	[Tags]  日志过滤关键字
+	Create Session   Mola       ${SERVER}
+	${path} =   Evaluate        '/v1/search/keyword'
+	${resp}=    Post Request    Mola  ${path}
+	Should Be Equal As Strings  ${resp.status_code}  400
+	Should Be Equal As Strings  ${resp.json()['data']}  request body param error
+
+日志过滤关键字-新建Appid不填
+	[Tags]  日志过滤关键字
+	${json}=   Get Binary File  ${CURDIR}${/}json/keyword_create.json
+	${data}=   Replace String   ${json}  "appid":"work-mola",  ${EMPTY}
+	${resp}=   Create Filter    ${data}
+	Should Be Equal As Strings  ${resp.status_code}  400
+	Should Be Equal As Strings  ${resp.json()['data']}  appid can't be empty
+
+日志过滤关键字-新建Keyword不填
+	[Tags]  日志过滤关键字
+	${json}=   Get Binary File  ${CURDIR}${/}json/keyword_create.json
+	${data}=   Replace String   ${json}  "keyword":"GET",  ${EMPTY}
+	${resp}=   Create Filter    ${data}
+	Should Be Equal As Strings  ${resp.status_code}  400
+	Should Be Equal As Strings  ${resp.json()['data']}  keyword can't be empty
+
+日志过滤关键字-更新没带data
+	[Tags]  日志过滤关键字
+	Create Session   Mola       ${SERVER}
+	${path} =   Evaluate        '/v1/search/keyword'
+	${resp}=    Put Request  Mola  ${path}
+	Should Be Equal As Strings  ${resp.status_code}  400
+	Should Be Equal As Strings  ${resp.json()['data']}  request body param error
+
+日志过滤关键字-更新id不存在
+	[Tags]  日志过滤关键字
+	${data}=   Get Binary File  ${CURDIR}${/}json/keyword_update.json
+	${resp}=   Update Filter    ${data}
+	Should Be Equal As Strings  ${resp.status_code}  503
+	Log  ${resp.text}
+	Should Contain              ${resp.json()['data']}  elastic: Error 404
+
+日志过滤关键字-更新Appid不填
+	[Tags]  日志过滤关键字
+	${resp} =      Get Filters
+	Should Be Equal As Strings  ${resp.status_code}  200
+	Set Suite Variable          ${filterid}  ${resp.json()['data']['results'][0]['id']}
+	${json}=   Get Binary File  ${CURDIR}${/}json/keyword_update.json
+	${json}=   Replace String   ${json}  alertid  ${filterid}
+	${data}=   Replace String   ${json}  "appid":"work-mola",  ${EMPTY}
+	${resp}=   Update Filter    ${data}
+	Should Be Equal As Strings  ${resp.status_code}  400
+	Should Be Equal As Strings  ${resp.json()['data']}  appid can't be empty
+
+日志过滤关键字-更新Keyword不填
+	[Tags]  日志过滤关键字
+	${json}=   Get Binary File  ${CURDIR}${/}json/keyword_update.json
+	${json}=   Replace String   ${json}  alertid  ${filterid}
+	${data}=   Replace String   ${json}  "keyword":"GET",  ${EMPTY}
+	${resp}=   Update Filter    ${data}
+	Should Be Equal As Strings  ${resp.status_code}  400
+	Should Be Equal As Strings  ${resp.json()['data']}  keyword can't be empty
+
+日志过滤关键字-获取id不存在
+	[Tags]  日志过滤关键字
+	${resp}=   Get Filter       xxx
+	Log  ${resp.text}
+	Should Be Equal As Strings  ${resp.status_code}  400
+
+日志过滤关键字-删除不带id
+	[Tags]  日志过滤关键字
+	Create Session   Mola       ${SERVER}
+	${path} =   Evaluate        '/v1/search/keyword'
+	${resp}=    Delete Request  Mola  ${path}
+	Should Be Equal As Strings  ${resp.status_code}  404
+
+日志过滤关键字-删除id不存在
+	[Tags]  日志过滤关键字
+	${resp}=   Delete Filter    xxx
+	Should Be Equal As Strings  ${resp.status_code}  503
+	Should Contain              ${resp.json()['data']}  elastic: Error 404
+
+#-----------静默管理----------
+静默管理-新建没带data
+	[Tags]  静默管理
+	Create Session   Mola       ${SERVER}
+	${path} =   Evaluate        '/v1/monitor/silences'
+	${resp}=    Post Request    Mola  ${path}
+	Should Be Equal As Strings  ${resp.status_code}  400
+	Should Be Equal As Strings  ${resp.json()['data']}  EOF
+
+静默管理-新建CreatedBy不填
+	[Tags]  静默管理
+	${json}=   Get Binary File  ${CURDIR}${/}json/keyword_create.json
+	${data}=   Replace String   ${json}  "createdBy":"dataman@dataman",  ${EMPTY}
+	${resp}=   Create Filter    ${data}
+	Log  ${resp.text}
+	Should Not Be Equal As Strings  ${resp.status_code}  200
+
+静默管理-新建Comment不填
+	[Tags]  静默管理
+	${json}=   Get Binary File  ${CURDIR}${/}json/keyword_create.json
+	${data}=   Replace String   ${json}  "comment":"dataman",  ${EMPTY}
+	${resp}=   Create Filter    ${data}
+	Log  ${resp.text}
+	Should Not Be Equal As Strings  ${resp.status_code}  200
+
+静默管理-新建EndsAt不填
+	[Tags]  静默管理
+	${json}=   Get Binary File  ${CURDIR}${/}json/keyword_create.json
+	${data}=   Replace String   ${json}  "endsAt":"2016-12-23T08:24:25.000Z",  ${EMPTY}
+	${resp}=   Create Filter    ${data}
+	Log  ${resp.text}
+	Should Not Be Equal As Strings  ${resp.status_code}  200
+
+静默管理-新建StartsAt不填
+	[Tags]  静默管理
+	${json}=   Get Binary File  ${CURDIR}${/}json/keyword_create.json
+	${data}=   Replace String   ${json}  "startsAt":"2016-12-23T06:24:25.000Z",  ${EMPTY}
+	${resp}=   Create Filter    ${data}
+	Log  ${resp.text}
+	Should Not Be Equal As Strings  ${resp.status_code}  200
+
+静默管理-新建Matchers不填
+	[Tags]  静默管理
+	${json}=   Get Binary File  ${CURDIR}${/}json/keyword_create.json
+	${data}=   Replace String   ${json}  ,"matchers":[{"name":"team","value":"dataman"}]  ${EMPTY}
+	${resp}=   Create Filter    ${data}
+	Log  ${resp.text}
+	Should Not Be Equal As Strings  ${resp.status_code}  200
+
+静默管理-更新没带data
+	[Tags]  静默管理
+	${resp}=   Get Silences
+	Set Suite Variable          ${silenceid}  ${resp.json()['data'][0]['id']}
+	Log  ${silenceid}
+	Create Session   Mola       ${SERVER}	
+	${path} =   Evaluate        '/v1/monitor/silence/' + '${silenceid}'
+	${resp}=    Put Request     Mola  ${path}
+	Should Be Equal As Strings  ${resp.status_code}  400
+	Should Be Equal As Strings  ${resp.json()['data']}  EOF
+
+静默管理-更新id不填
+	[Tags]  静默管理
+    ${data}=   Get Binary File  ${CURDIR}${/}json/silence_update.json
+    Create Session   Mola       ${SERVER}	
+	${path} =   Evaluate        '/v1/monitor/silence'
+	${resp}=    Put Request     Mola  ${path}  data=${data}
+	Should Be Equal As Strings  ${resp.status_code}  404
+
+静默管理-更新CreatedBy不填
+	[Tags]  静默管理
+	${json}=   Get Binary File  ${CURDIR}${/}json/silence_update.json
+	${data}=   Replace String   ${json}  "createdBy":"mmj@dataman",  ${EMPTY}
+	Log  ${data}
+	${resp}=   Update Silence   ${silenceid}  ${data}
+	Log  ${resp.text}
+	Should Not Be Equal As Strings  ${resp.status_code}  200
+
+静默管理-更新Comment不填
+	[Tags]  静默管理
+	${json}=   Get Binary File  ${CURDIR}${/}json/silence_update.json
+	${data}=   Replace String   ${json}  "comment":"mmj",  ${EMPTY}
+	${resp}=   Update Silence   ${silenceid}  ${data}
+	Log  ${resp.text}
+	Should Not Be Equal As Strings  ${resp.status_code}  200
+
+静默管理-更新EndsAt不填
+	[Tags]  静默管理
+	${json}=   Get Binary File  ${CURDIR}${/}json/silence_update.json
+	${data}=   Replace String   ${json}  "endsAt":"2016-12-23T08:24:25.000Z",  ${EMPTY}
+	${resp}=   Update Silence   ${silenceid}  ${data}
+	Log  ${resp.text}
+	Should Not Be Equal As Strings  ${resp.status_code}  200
+
+静默管理-更新StartsAt不填
+	[Tags]  静默管理
+	${json}=   Get Binary File  ${CURDIR}${/}json/silence_update.json
+	${data}=   Replace String   ${json}  "startsAt":"2016-12-23T06:24:25.000Z",  ${EMPTY}
+	${resp}=   Update Silence   ${silenceid}  ${data}
+	Log  ${resp.text}
+	Should Not Be Equal As Strings  ${resp.status_code}  200
+
+静默管理-更新Matchers不填
+	[Tags]  静默管理
+	${json}=   Get Binary File  ${CURDIR}${/}json/silence_update.json
+	${data}=   Replace String   ${json}  ,"matchers":[{"name":"user","value":"mmj"}]  ${EMPTY}
+	${resp}=   Update Silence   ${silenceid}  ${data}
+	Log  ${resp.text}
+	Should Not Be Equal As Strings  ${resp.status_code}  200
+
+静默管理-获取id不存在
+	[Tags]  静默管理
+	${resp}=   Get Silence  xxx
+	Log  ${resp.text}
+	Should Not Be Equal As Strings  ${resp.status_code}  200
+
+静默管理-删除id不存在
+	[Tags]  静默管理
+	${resp}=   Delete Silence  xxx
+	Log  ${resp.text}
+	Should Not Be Equal As Strings  ${resp.status_code}  200
+
+静默管理-删除不带id
+	[Tags]  静默管理
+	Create Session   Mola   ${SERVER}
+	${path} =   Evaluate    '/v1/monitor/silence'
+	${resp}=    Delete Request  Mola  ${path}
+	Should Be Equal As Strings  ${resp.status_code}  404
+

@@ -1,0 +1,226 @@
+*** Settings ***
+
+Documentation     日志报警
+Resource          all_api.txt
+Library           OperatingSystem
+Suite Teardown    Delete All Sessions
+
+*** Test Cases ***
+获取所用应用NoQuery
+	[Tags]  获取所用应用
+	${resp}=      Log App
+	Should Be Equal As Strings  ${resp.status_code}  200
+	Log  ${resp.text}
+
+获取所用应用QueryFrom
+	[Tags]  获取所用应用
+	${Current} =  Get Current Date
+	${Before} =   Subtract Time From Date  ${Current}  ${OneHour}
+	${resp}=      Log App  form=${Before}
+	Should Be Equal As Strings  ${resp.status_code}  200
+	Log  ${resp.text}
+
+获取所用应用QueryTo
+	[Tags]  获取所用应用
+	${Current} =  Get Current Date
+	${resp}=      Log App  to=${Current}
+	Should Be Equal As Strings  ${resp.status_code}  200
+	Log  ${resp.text}
+
+获取所用应用QueryFromTo
+	[Tags]  获取所用应用
+	${Current} =  Get Current Date
+	${Before} =   Subtract Time From Date  ${Current}  ${OneHour}
+	${resp}=      Log App  form=${Before}  to=${Current}
+	Should Be Equal As Strings  ${resp.status_code}  200
+	Log  ${resp.text}
+
+根据应用获取所有实例NoQuery
+	[Tags]  根据应用获取所有实例
+	${resp}=      Log Task      ${MOLA APP}
+	Should Be Equal As Strings  ${resp.status_code}  200
+	Log  ${resp.text}
+
+根据应用获取所有实例QueryFrom
+	[Tags]  根据应用获取所有实例
+	${Current} =  Get Current Date
+	${Before} =   Subtract Time From Date  ${Current}  ${OneHour}
+	${resp}=      Log Task      ${MOLA APP}  from=${Before}
+	Should Be Equal As Strings  ${resp.status_code}  200
+	Log  ${resp.text}
+
+根据应用获取所有实例QueryTo
+	[Tags]  根据应用获取所有实例
+	${Current} =  Get Current Date
+	${resp}=      Log Task      ${MOLA APP}  to=${Current}
+	Should Be Equal As Strings  ${resp.status_code}  200
+	Log  ${resp.text}
+
+根据应用获取所有实例QueryFromTo
+	[Tags]  根据应用获取所有实例
+	${Current} =  Get Current Date
+	${Before} =   Subtract Time From Date  ${Current}  ${OneHour}
+	${resp}=      Log Task      ${MOLA APP}  from=${Before}  to=${Current}
+	Should Be Equal As Strings  ${resp.status_code}  200
+	Log  ${resp.text}
+
+根据应用获取所有日志来源NoQuery
+	[Tags]  根据应用获取所有日志来源
+	${resp}=      Log Path      ${MOLA APP}
+	Should Be Equal As Strings  ${resp.status_code}  200
+	Log  ${resp.text}
+
+根据应用获取所有日志来源QueryFrom
+	[Tags]  根据应用获取所有日志来源
+	${Current} =  Get Current Date
+	${Before} =   Subtract Time From Date  ${Current}  ${OneHour}
+	${resp}=      Log Path      ${MOLA APP}  from=${Before}
+	Should Be Equal As Strings  ${resp.status_code}  200
+	Log  ${resp.text}
+
+根据应用获取所有日志来源QueryTo
+	[Tags]  根据应用获取所有日志来源
+	${Current} =  Get Current Date
+	${resp}=      Log Path      ${MOLA APP}  to=${Current}
+	Should Be Equal As Strings  ${resp.status_code}  200
+	Log  ${resp.text}
+
+根据应用获取所有日志来源QueryFromTo
+	[Tags]  根据应用获取所有日志来源
+	${Current} =  Get Current Date
+	${Before} =   Subtract Time From Date  ${Current}  ${OneHour}
+	${resp}=      Log Path      ${MOLA APP}  from=${Before}  to=${Current}
+	Should Be Equal As Strings  ${resp.status_code}  200
+	Log  ${resp.text}
+
+日志搜索QueryAppid
+	[Tags]  日志搜索
+	${resp}=      Log Index     ${MOLA APP}
+	Should Be Equal As Strings  ${resp.status_code}  200
+	Log  ${resp.text}
+
+日志搜索QueryTaskid
+	[Tags]  日志搜索
+	${resp}=      Log Index     ${MOLA APP}  taskid=${MOLA TASK}
+	Should Be Equal As Strings  ${resp.status_code}  200
+	Log  ${resp.text}
+
+日志搜索QueryPath
+	[Tags]  日志搜索
+	${resp}=      Log Index     ${MOLA APP}  path=stdout
+	Should Be Equal As Strings  ${resp.status_code}  200
+	Log  ${resp.text}
+
+日志搜索QueryKeyword
+	[Tags]  日志搜索
+	${resp}=      Log Index     ${MOLA APP}  keyword=${Message}
+	Should Be Equal As Strings  ${resp.status_code}  200
+	Log  ${resp.text}
+
+日志搜索QueryFromTo
+	[Tags]  日志搜索
+	${Current} =  Get Current Date
+	${Before} =   Subtract Time From Date  ${Current}  ${OneHour}
+	${resp}=      Log Index     ${MOLA APP}  from=${Before}  to=${Current}
+	Should Be Equal As Strings  ${resp.status_code}  200
+	Log  ${resp.text}
+
+MLA-24日志-组合查询-应用名-关键字|MLA-25日志-组合查询-查询结果
+	[Tags]  日志搜索
+	${Current} =  Get Current Date
+	${Before} =   Subtract Time From Date  ${Current}  ${OneHour}
+	${resp}=      Log Index     ${MOLA APP}  keyword=${message}  from=${Before}  to=${Current}
+	Should Be Equal As Strings  ${resp.status_code}  200
+	${resp}=      Log Context   ${resp.json()['data']['results'][0]['appid']}  ${resp.json()['data']['results'][0]['taskid']}
+	              ...  ${resp.json()['data']['results'][0]['path']}  ${resp.json()['data']['results'][0]['offset']}
+	Should Be Equal As Strings  ${resp.status_code}  200
+	Log  ${resp.text}
+
+MLA-26日志-组合查询-应用名-实例ID-日志来源
+	[Tags]  日志搜索
+	${Current}=   Get Current Date
+	${Before}=    Subtract Time From Date  ${Current}  ${HalfAnHour}
+	${resp}=      Log Index     ${MOLA APP}  taskid=${MOLA TASK}  from=${Before}  to=${Current}
+	Should Be Equal As Strings  ${resp.status_code}  200
+	Log  ${resp.text}
+
+报警历史
+    [Tags]  报警历史
+	${resp}=      Get Alerts
+	Should Be Equal As Strings  ${resp.status_code}  200
+	${resp}=      Get Alert     ${resp.json()['data']['results'][0]['id']}
+	Should Be Equal As Strings  ${resp.status_code}  200
+	Log  ${resp.text}
+
+日志过滤关键字-新建
+	[Tags]  日志过滤关键字
+	${data}=   Get Binary File  ${CURDIR}${/}json/keyword_create.json
+	${resp}=   Create Filter    ${data}
+	Should Be Equal As Strings  ${resp.status_code}  200
+	Log  ${resp.text}
+
+日志过滤关键字-获取
+	[Tags]  日志过滤关键字
+	Sleep  1
+	${resp} =      Get Filters
+	Should Be Equal As Strings  ${resp.status_code}  200
+	${length} =    Get Length   ${resp.json()['data']['results']}
+    : FOR  ${idx}  IN RANGE     ${length}
+    \  Run Keyword If  '${resp.json()['data']['results'][${idx}]['appid']}'=='${MOLA APP}' and '${resp.json()['data']['results'][${idx}]['keyword']}'=='GET'
+    \  ...     Run Keywords     Set Suite Variable  ${filterid}  ${resp.json()['data']['results'][${idx}]['id']}  AND  Exit For Loop
+	
+日志过滤关键字-更新
+	[Tags]  日志过滤关键字
+	${json}=   Get Binary File  ${CURDIR}${/}json/keyword_update.json
+	${data}=   Replace String   ${json}  alertid  ${filterid}
+	${resp}=   Update Filter    ${data}
+	Should Be Equal As Strings  ${resp.status_code}  200
+
+日志过滤关键字-获取id
+	[Tags]  日志过滤关键字
+	${resp}=   Get Filter       ${filterid}
+	Should Be Equal As Strings  ${resp.status_code}  200
+	Log  ${resp.text}
+
+日志过滤关键字-删除id
+	[Tags]  日志过滤关键字
+	${resp}=   Delete Filter    ${filterid}
+	Should Be Equal As Strings  ${resp.status_code}  200
+	Should Be Equal As Strings  ${resp.json()['data']}  delete success
+
+静默管理-新建
+	[Tags]  静默管理
+	${data}=   Get Binary File  ${CURDIR}${/}json/silence_create.json
+	${resp}=   Create Silence   ${data}
+	Should Be Equal As Strings  ${resp.status_code}     200
+	Should Be Equal As Strings  ${resp.json()['data']}  success
+
+静默管理-获取
+	[Tags]  静默管理
+	${resp}=   Get Silences
+	Should Be Equal As Strings  ${resp.status_code}     200
+	${length}  Get Length       ${resp.json()['data']}
+	: FOR   ${idx}   IN RANGE   ${length}
+	\  Run Keyword If  '${resp.json()['data'][${idx}]['comment']}'=='dataman' and '${resp.json()['data'][${idx}]['createdBy']}'=='dataman@dataman'
+    \  ...     Run Keywords     Set Suite Variable  ${silenceid}  ${resp.json()['data'][${idx}]['id']}  AND  Exit For Loop
+
+静默管理-更新
+	[Tags]  静默管理
+    ${data}=   Get Binary File  ${CURDIR}${/}json/silence_update.json
+	${resp}=   Update Silence   ${silenceid}  ${data}
+	Should Be Equal As Strings  ${resp.status_code}     200
+	Should Be Equal As Strings  ${resp.json()['data']}  success
+
+静默管理-获取id
+	[Tags]  静默管理
+    ${sid}=    Evaluate         ${silenceid} + ${1}	
+	${resp}=   Get Silence      ${silenceid}
+	Should Be Equal As Strings  ${resp.status_code}     200
+
+静默管理-删除
+	[Tags]  静默管理
+    ${sid}=    Evaluate         ${silenceid} + ${1}	
+	${resp}=   Delete Silence   ${sid}
+	Should Be Equal As Strings  ${resp.status_code}     200
+	Should Be Equal As Strings  ${resp.json()['data']}  success
+
