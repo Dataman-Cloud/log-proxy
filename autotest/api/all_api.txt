@@ -8,11 +8,12 @@ Library          DateTime
 *** Variables ***
 
 ${SERVER}        http://192.168.1.75:5098
-${MOLA APP}      work-mola
-${MOLA TASK}     work-mola.b8f53b9d-c8af-11e6-b087-3e5bca0d4e78
+${MOLA APP}      work-molala
 ${OneHour}       01:00:00:0
 ${HalfAnHour}    00:30:00:0
 ${message}       simple
+${Stdout}        stdout
+${Stderr}        stderr
 
 *** Keywords ***
 

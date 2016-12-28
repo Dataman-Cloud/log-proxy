@@ -1,25 +1,37 @@
 *** Settings ***
 
-Documentation     日志报警
+Documentation     日志报警-异常情况
 Resource          all_api.txt
 Library           OperatingSystem
+Suite Setup       Run Keywords  Get Mola Task  Get Times
 Suite Teardown    Delete All Sessions
+
+*** Keywords ***
+
+Get Mola Task
+	${resp} =    Log Task  ${MOLA APP}
+	${data} =    Get Dictionary Keys  ${resp.json()['data']} 
+	Set Suite Variable  ${MOLA TASK}  ${data[0]}
+
+Get Times
+	${Current} =  Get Current Date
+	${Before} =   Subtract Time From Date  ${Current}  ${OneHour}
+	${Future} =   Add Time To Date  ${Current}  ${OneHour}
+	Set Suite Variable  ${Current}
+	Set Suite Variable  ${Before}
+	Set Suite Variable  ${Future}
 
 *** Test Cases ***
 
 #-----------日志（下拉菜单）----------
 获取所用应用QueryFrom时间晚于当前时间
 	[Tags]  获取所用应用
-	${Current} =  Get Current Date
-	${Future} =   Add Time To Date  ${Current}  ${OneHour}
 	${resp}=      Log App  form=${Future}
 	Log  ${resp.text}
 	Should Not Be Equal As Strings  ${resp.status_code}  200
 
 获取所用应用QueryFrom时间晚于To时间
 	[Tags]  获取所用应用
-	${Current} =  Get Current Date
-	${Before} =   Subtract Time From Date  ${Current}  ${OneHour}
 	${resp} =     Log App  form=${Current}  to=${Before}
 	Log  ${resp.text}
 	Should Not Be Equal As Strings  ${resp.status_code}  200
@@ -34,16 +46,12 @@ Suite Teardown    Delete All Sessions
 
 根据应用获取所有实例QueryFrom时间晚于当前时间
 	[Tags]  根据应用获取所有实例
-	${Current} =  Get Current Date
-	${Future} =   Add Time To Date  ${Current}  ${OneHour}
 	${resp}=      Log Task  ${MOLA APP}  from=${Future}
 	Log  ${resp.text}
 	Should Not Be Equal As Strings  ${resp.status_code}  200
 
 根据应用获取所有实例QueryFrom时间晚于To时间
 	[Tags]  根据应用获取所有实例
-	${Current} =  Get Current Date
-	${Future} =   Add Time To Date  ${Current}  ${OneHour}
 	${resp}=      Log Task  ${MOLA APP}  from=${Future}  to=${Current}
 	Log  ${resp.text}
 	Should Not Be Equal As Strings  ${resp.status_code}  200
@@ -64,16 +72,12 @@ Suite Teardown    Delete All Sessions
 
 根据应用获取所有日志来源QueryFrom时间晚于当前时间
 	[Tags]  根据应用获取所有日志来源
-	${Current} =  Get Current Date
-	${Future} =   Add Time To Date  ${Current}  ${OneHour}
 	${resp}=      Log Path  ${MOLA APP}  from=${Future}
 	Log  ${resp.text}
 	Should Not Be Equal As Strings  ${resp.status_code}  200
 
 根据应用获取所有日志来源QueryFrom时间晚于to时间
 	[Tags]  根据应用获取所有日志来源
-	${Current} =  Get Current Date
-	${Future} =   Add Time To Date  ${Current}  ${OneHour}
 	${resp}=      Log Path  ${MOLA APP}  from=${Future}  to=${Current}
 	Log  ${resp.text}
 	Should Not Be Equal As Strings  ${resp.status_code}  200
@@ -119,22 +123,18 @@ Suite Teardown    Delete All Sessions
 	
 日志搜索QueryFrom时间晚于to时间
 	[Tags]  日志搜索
-	${Current} =  Get Current Date
-	${Future} =   Add Time To Date  ${Current}  ${OneHour}
 	${resp}=      Log Index   ${MOLA APP}  from=${Future}  to=${Current}
 	Log  ${resp.text}
 	Should Not Be Equal As Strings  ${resp.status_code}  200
 
 日志搜索QueryOffset为不存在的值
 	[Tags]  日志搜索
-	${resp}=      Log Context  ${MOLA APP}  ${MOLA TASK}  stdout  1
+	${resp}=      Log Context  ${MOLA APP}  ${MOLA TASK}  ${Stdout}  1
 	Log  ${resp.text}
 	Should Not Be Equal As Strings  ${resp.status_code}  200
 
-日志搜索QueryAppid为不存在的值
+日志搜索上下文QueryAppid为不存在的值
 	[Tags]  日志搜索
-	${Current} =  Get Current Date
-	${Before} =   Subtract Time From Date  ${Current}  ${OneHour}
 	${resp}=      Log Index     ${MOLA APP}  keyword=${message}  from=${Before}  to=${Current}
 	${resp}=      Log Context   xxx  ${resp.json()['data']['results'][0]['taskid']}
 	              ...  ${resp.json()['data']['results'][0]['path']}  ${resp.json()['data']['results'][0]['offset']}
@@ -282,7 +282,6 @@ Suite Teardown    Delete All Sessions
 	[Tags]  静默管理
 	${resp}=   Get Silences
 	Set Suite Variable          ${silenceid}  ${resp.json()['data'][0]['id']}
-	Log  ${silenceid}
 	Create Session   Mola       ${SERVER}	
 	${path} =   Evaluate        '/v1/monitor/silence/' + '${silenceid}'
 	${resp}=    Put Request     Mola  ${path}
@@ -301,7 +300,6 @@ Suite Teardown    Delete All Sessions
 	[Tags]  静默管理
 	${json}=   Get Binary File  ${CURDIR}${/}json/silence_update.json
 	${data}=   Replace String   ${json}  "createdBy":"mmj@dataman",  ${EMPTY}
-	Log  ${data}
 	${resp}=   Update Silence   ${silenceid}  ${data}
 	Log  ${resp.text}
 	Should Not Be Equal As Strings  ${resp.status_code}  200
