@@ -1,6 +1,7 @@
 package api
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/Dataman-Cloud/log-proxy/src/backends"
@@ -42,6 +43,31 @@ func (m *Monitor) CreateSilence(ctx *gin.Context) {
 	var silence map[string]interface{}
 	if err := ctx.BindJSON(&silence); err != nil {
 		utils.ErrorResponse(ctx, err)
+		return
+	}
+
+	if v := silence["createdBy"]; v == nil {
+		utils.ErrorResponse(ctx, errors.New("not found createdBy"))
+		return
+	}
+
+	if v := silence["comment"]; v == nil {
+		utils.ErrorResponse(ctx, errors.New("not found comment"))
+		return
+	}
+
+	if v := silence["endsAt"]; v == nil {
+		utils.ErrorResponse(ctx, errors.New("not found endsAt"))
+		return
+	}
+
+	if v := silence["startsAt"]; v == nil {
+		utils.ErrorResponse(ctx, errors.New("not found startsAt"))
+		return
+	}
+
+	if v := silence["matchers"]; v == nil {
+		utils.ErrorResponse(ctx, errors.New("not found matchers"))
 		return
 	}
 
@@ -96,6 +122,31 @@ func (m *Monitor) UpdateSilence(ctx *gin.Context) {
 	var silence map[string]interface{}
 	if err := ctx.BindJSON(&silence); err != nil {
 		utils.ErrorResponse(ctx, err)
+		return
+	}
+
+	if v := silence["createdBy"]; v == nil {
+		utils.ErrorResponse(ctx, errors.New("not found createdBy"))
+		return
+	}
+
+	if v := silence["comment"]; v == nil {
+		utils.ErrorResponse(ctx, errors.New("not found comment"))
+		return
+	}
+
+	if v := silence["endsAt"]; v == nil {
+		utils.ErrorResponse(ctx, errors.New("not found endsAt"))
+		return
+	}
+
+	if v := silence["startsAt"]; v == nil {
+		utils.ErrorResponse(ctx, errors.New("not found startsAt"))
+		return
+	}
+
+	if v := silence["matchers"]; v == nil {
+		utils.ErrorResponse(ctx, errors.New("not found matchers"))
 		return
 	}
 
