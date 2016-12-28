@@ -1,4 +1,4 @@
-api/json/keyword_update.json*** Settings ***
+*** Settings ***
 
 Documentation     日志报警-正常情况
 Resource          all_api.txt
@@ -11,8 +11,8 @@ Suite Teardown    Delete All Sessions
 Similar Number
 	[Arguments]  ${num1}  ${num2}
 	${sub} =  Evaluate  ${num2}-${num1}
-	Should Be True   ${sub}<3
-	Should Be True   ${sub}>-3
+	Should Be True   ${sub}<6
+	Should Be True   ${sub}>-6
 
 Get Mola Task
 	${resp} =    Log Task  ${MOLA APP}
@@ -108,7 +108,6 @@ Get Times
 	${resp}=      Log Index     ${MOLA APP}
 	Should Be Equal As Strings  ${resp.status_code}  200
 	Should Be Equal As Strings  ${resp.json()['data']['results'][0]['appid']}    ${MOLA APP}
-	Should Be Equal As Strings  ${resp.json()['data']['results'][0]['message']}  ${message}${\n}
 
 日志搜索QueryTaskid
 	[Tags]  日志搜索
@@ -116,14 +115,12 @@ Get Times
 	Should Be Equal As Strings  ${resp.status_code}  200
 	Should Be Equal As Strings  ${resp.json()['data']['results'][0]['appid']}    ${MOLA APP}
 	Should Be Equal As Strings  ${resp.json()['data']['results'][0]['taskid']}   ${MOLA TASK}
-	Should Be Equal As Strings  ${resp.json()['data']['results'][0]['message']}  ${message}${\n}
 
 日志搜索QueryPath
 	[Tags]  日志搜索
 	${resp}=      Log Index     ${MOLA APP}  logpath=${Stdout}
 	Should Be Equal As Strings  ${resp.status_code}  200
 	Should Be Equal As Strings  ${resp.json()['data']['results'][0]['appid']}    ${MOLA APP}
-	Should Be Equal As Strings  ${resp.json()['data']['results'][0]['message']}  ${message}${\n}
 	Should Be Equal As Strings  ${resp.json()['data']['results'][0]['path']}     ${Stdout}
 
 日志搜索QueryKeyword
@@ -174,7 +171,6 @@ MLA-26日志-组合查询-应用名-实例ID-日志来源
 	${resp}=        Get Alerts
 	Should Be Equal As Strings  ${resp.status_code}  200
 	${length} =     Get Length  ${resp.json()['data']['results']}
-	Log  ${length}
     : FOR  ${idx}   IN RANGE    ${length}
     \  ${status}=   Run Keyword And Return Status  Should Contain  ${resp.json()['data']['results'][${idx}]['annotations']['description']}  ${MOLA APP}
     \  Run Keyword If  ${status}  
@@ -199,6 +195,7 @@ MLA-26日志-组合查询-应用名-实例ID-日志来源
 	${resp} =       Get Filters
 	Should Be Equal As Strings  ${resp.status_code}  200
 	${length} =     Get Length  ${resp.json()['data']['results']}
+	Log    ${length}
     : FOR  ${idx}   IN RANGE    ${length}
     \  Run Keyword If          '${resp.json()['data']['results'][${idx}]['appid']}'=='${MOLA APP}' and '${resp.json()['data']['results'][${idx}]['keyword']}'=='GET'
     \  ...          Run Keywords  Set Suite Variable  ${filterid}  ${resp.json()['data']['results'][${idx}]['id']}  AND  Exit For Loop
