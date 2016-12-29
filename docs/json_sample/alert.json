@@ -21,10 +21,6 @@
                     }
                 }
             ],
-            "_ttl": {
-                "enabled": true,
-                "default": "7d"
-            },
             "properties": {
                 "id": {
                     "type": "string",
