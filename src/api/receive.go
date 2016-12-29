@@ -12,7 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Receiver recive prometheus alert event
+// Receiver receive prometheus alert event
 func (s *Search) Receiver(ctx *gin.Context) {
 	data, err := utils.ReadRequestBody(ctx.Request)
 	if err != nil {
@@ -57,7 +57,7 @@ func (s *Search) Receiver(ctx *gin.Context) {
 	utils.Ok(ctx, map[string]string{"status": "success"})
 }
 
-// ReceiverLog recive log
+// ReceiverLog receive log
 func (s *Search) ReceiverLog(ctx *gin.Context) {
 	data, err := utils.ReadRequestBody(ctx.Request)
 	if err != nil {

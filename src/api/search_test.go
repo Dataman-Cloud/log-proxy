@@ -37,7 +37,7 @@ func startAPIServer() *httptest.Server {
 		v1.GET("/context", func(ctx *gin.Context) { s.Context(ctx) })
 	}
 
-	vr := router.Group("/v1/recive")
+	vr := router.Group("/v1/receive")
 	{
 		vr.POST("/prometheus", receiver)
 		vr.POST("/log", receiverlog)

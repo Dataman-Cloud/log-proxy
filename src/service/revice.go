@@ -17,7 +17,7 @@ const (
 	PrometheusType = "dataman-prometheus"
 )
 
-// SavePrometheus recive prometheus event and save to es
+// SavePrometheus receive prometheus event and save to es
 func (s *SearchService) SavePrometheus(pro map[string]interface{}) error {
 	//pro.CreateTime = time.Now().Format(time.RFC3339Nano)
 	pro["createtime"] = time.Now().Format(time.RFC3339Nano)
