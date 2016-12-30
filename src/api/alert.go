@@ -28,6 +28,13 @@ func (s *Search) CreateAlert(ctx *gin.Context) {
 		return
 	}
 
+	for _, v := range s.KeywordFilter[alert.AppID+alert.Path] {
+		if v == alert.Keyword {
+			utils.ErrorResponse(ctx, utils.NewError(CreateAlertError, errors.New("keyword exist")))
+			return
+		}
+	}
+
 	err := s.Service.CreateAlert(alert)
 	if err != nil {
 		utils.ErrorResponse(ctx, utils.NewError(CreateAlertError, err))
@@ -130,13 +137,10 @@ func (s *Search) UpdateAlert(ctx *gin.Context) {
 	s.Kmutex.Lock()
 	defer s.Kmutex.Unlock()
 	for i, v := range s.KeywordFilter[result.AppID+result.Path] {
-		if v == alert.Keyword {
-			s.KeywordFilter[result.AppID+result.Path] = append(s.KeywordFilter[result.AppID+result.Path][:i],
-				s.KeywordFilter[result.AppID+result.Path][i+1:]...)
-			break
+		if v == result.Keyword {
+			s.KeywordFilter[result.AppID+result.Path][i] = alert.Keyword
 		}
 	}
-	s.KeywordFilter[result.AppID+result.Path] = append(s.KeywordFilter[result.AppID+result.Path], alert.Keyword)
 
 	utils.Ok(ctx, "update success")
 }
