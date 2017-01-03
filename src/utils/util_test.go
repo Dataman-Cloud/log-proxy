@@ -75,13 +75,13 @@ func TestReadResponseBody(t *testing.T) {
 }
 
 func TestAlertNotification(t *testing.T) {
-	if AlertNotification(fmt.Sprintf("http://%s:%s/notification", "localhost", "80"), "test") != nil {
+	if AlertNotification(fmt.Sprintf("http://%s:%s/notification", "localhost", "30859"), "test") != nil {
 		t.Log("success")
 	} else {
 		t.Error("faild")
 	}
 
-	if AlertNotification(fmt.Sprintf("http://%s:%s/notification", "localhost", "80"), `{"test":"value"}`) != nil {
+	if AlertNotification(fmt.Sprintf("http://%s:%s/notification", "localhost", "30859"), `{"test":"value"}`) != nil {
 		t.Log("success")
 	} else {
 		t.Error("faild")

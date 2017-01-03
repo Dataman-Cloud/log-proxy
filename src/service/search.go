@@ -98,7 +98,7 @@ func (s *SearchService) Tasks(appName string, page models.Page) (map[string]int6
 	//Index("dataman-*").
 	tasks := make(map[string]int64)
 	result, err := s.ESClient.Search().
-		Index("dataman-"+strings.Split(appName, "-")[0]+"-"+utils.ParseDate(page.RangeFrom, page.RangeTo)).
+		Index("dataman-*-"+utils.ParseDate(page.RangeFrom, page.RangeTo)).
 		Type("dataman-"+appName).
 		Query(bquery).
 		SearchType("count").
@@ -144,7 +144,7 @@ func (s *SearchService) Paths(appName, taskID string, page models.Page) (map[str
 		Must(querys...)
 
 	result, err := s.ESClient.Search().
-		Index("dataman-"+strings.Split(appName, "-")[0]+"-"+utils.ParseDate(page.RangeFrom, page.RangeTo)).
+		Index("dataman-*-"+utils.ParseDate(page.RangeFrom, page.RangeTo)).
 		Type("dataman-"+appName).
 		Query(bquery).
 		SearchType("count").
