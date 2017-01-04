@@ -110,10 +110,10 @@ func TestPath(t *testing.T) {
 
 func TestSearch(t *testing.T) {
 	service := NewEsService([]string{baseURL})
-	service.Search("test-web", "test-web.ac4616e4-c02b-11e6-9030-024245dc84c8", "stdout", "GET", models.Page{})
+	service.Search("userid", "clusterid", "test-web", "test-web.ac4616e4-c02b-11e6-9030-024245dc84c8", "stdout", "GET", models.Page{})
 }
 
 func TestContext(t *testing.T) {
 	service := NewEsService([]string{baseURL})
-	service.Context("test-web", "test-web.ac4616e4-c02b-11e6-9030-024245dc84c8", "stdout", "1481650415421815800", models.Page{})
+	service.Context("userid", "clusertid", "test-web", "test-web.ac4616e4-c02b-11e6-9030-024245dc84c8", "stdout", "1481650415421815800", models.Page{})
 }

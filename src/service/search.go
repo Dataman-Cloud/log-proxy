@@ -178,13 +178,15 @@ func (s *SearchService) Paths(appName, taskID string, page models.Page) (map[str
 }
 
 // Search search log by condition
-func (s *SearchService) Search(appid, taskid, source, keyword string, page models.Page) (map[string]interface{}, error) {
+func (s *SearchService) Search(clusterid, userid, appid, taskid, source, keyword string, page models.Page) (map[string]interface{}, error) {
 	data := make(map[string]interface{})
 
 	sort := false
 	var querys []elastic.Query
+	querys = append(querys, elastic.NewTermQuery("clusterid", clusterid))
+	querys = append(querys, elastic.NewTermQuery("userid", userid))
 	if taskid != "" {
-		querys = append(querys, elastic.NewTermsQuery("taskid", strings.Split(taskid, ",")))
+		querys = append(querys, elastic.NewTermsQuery("taskid", utils.ParseTask(taskid)))
 	}
 	if source != "" {
 		querys = append(querys, elastic.NewTermsQuery("path", strings.Split(source, ",")))
@@ -199,7 +201,7 @@ func (s *SearchService) Search(appid, taskid, source, keyword string, page model
 		Must(querys...)
 
 	result, err := s.ESClient.Search().
-		Index("dataman-*-"+utils.ParseDate(page.RangeFrom, page.RangeTo)).
+		Index("dataman-"+clusterid+"-"+utils.ParseDate(page.RangeFrom, page.RangeTo)).
 		Type("dataman-"+appid).
 		Query(bquery).
 		Sort("logtime.sort", sort).
@@ -233,7 +235,7 @@ func (s *SearchService) Search(appid, taskid, source, keyword string, page model
 }
 
 // Context search log context
-func (s *SearchService) Context(appid, taskid, source, timestamp string, page models.Page) ([]map[string]interface{}, error) {
+func (s *SearchService) Context(clusterid, userid, appid, taskid, source, timestamp string, page models.Page) ([]map[string]interface{}, error) {
 	offset, err := strconv.ParseInt(timestamp, 10, 64)
 	if err != nil {
 		return nil, err
@@ -243,10 +245,16 @@ func (s *SearchService) Context(appid, taskid, source, timestamp string, page mo
 	if page.PageFrom == 0 {
 		bquery := elastic.NewBoolQuery().
 			Filter(elastic.NewRangeQuery("offset").Lt(offset)).
-			Must(elastic.NewTermQuery("appid", appid), elastic.NewTermQuery("taskid", taskid), elastic.NewTermQuery("path", source))
+			Must(
+				elastic.NewTermQuery("clusterid", clusterid),
+				elastic.NewTermQuery("userid", userid),
+				elastic.NewTermQuery("appid", appid),
+				elastic.NewTermQuery("taskid", taskid),
+				elastic.NewTermQuery("path", source),
+			)
 
 		result, err := s.ESClient.Search().
-			Index("dataman-*-"+time.Unix(offset/1e9, 0).Format("2006-01-02")).
+			Index("dataman-"+clusterid+"-"+time.Unix(offset/1e9, 0).Format("2006-01-02")).
 			Type("dataman-"+appid).
 			Query(bquery).
 			Sort("logtime.sort", false).
