@@ -4,6 +4,7 @@
 
 ## 1. 修改alertmanager的配置
 在运行alertmanager的服务器上修改配置文件`/data/config/alertmanager/alertmanager.yml`
+
 ```
 receivers:
   - name: 'alert_webhook'
@@ -11,12 +12,16 @@ receivers:
     - send_resolved: true
       url: 'http://172.16.0.20:8080/api/webhooks/prometheus'
 ```
+
 在后面新增内容
+
 ```
     - send_resolved: true
       url: 'http://192.168.1.75:5098/v1/receive/prometheus'
 ```
+
 重启alertmanager
+
 ```
 # docker restart dataman-monitor-alertmanager
 ```
@@ -24,6 +29,7 @@ receivers:
 ## 2. 修改prometheus的配置
 在prometheus的服务器上修改配置文件`/data/config/prometheus/prometheus.yml`,
 增加target mola，为关键字报警采集数据用。
+
 ```
 - job_name: 'mola'
   # Override the global default and scrape targets from this job every 5 seconds.
@@ -32,7 +38,9 @@ receivers:
   static_configs:
     - targets: ['192.168.1.75:5098']
 ```
+
 修改配置文件`/data/config/prometheus/alert.rules`, 增加报警规则。
+
 ```
 ALERT LogKeyword
   IF ceil(increase(log_keyword{id=~'.*'}[2m])) > 3
@@ -43,6 +51,7 @@ ALERT LogKeyword
     description = "Application {{ $labels.appid }} taskid {{ $labels.taskid }} Log keyword filter {{ $labels.keyword }} trigger times {{ $value }}",
   }
 ```
+
 规则描述：
 * ALERT LogKeyword 是规则名
 * IF increase(log_keyword{id=~'.*'}[2m]) > 3 告警触发条件, 2m是时间，两分钟，3是触发次数阈值。
@@ -51,6 +60,7 @@ ALERT LogKeyword
 * ANNOTATIONS 报警消息的内容设定。
 
 重启prometheus
+
 ```
 # docker restart dataman-monitor-prometheus
 ```
@@ -67,19 +77,25 @@ ALERT LogKeyword
 进入目录mola,根据实际情况,  修改[mola/docker-compose.yml](mola/docker-compose.yml)中的环境变量
 
 * ES_URL: Elasticsearch地址
+
 ```
    - ES_URL=http://192.168.1.75:9200
 ```
+
 * PROMETHEUS_URL：Prometheus地址
+
 ```
    - PROMETHEUS_URL=http://192.168.1.75:9090
 ```
+
 * ALERTMANAGER_URL：ALERTMANAGER_URL地址
+
 ```
    - ALERTMANAGER_URL=http://192.168.1.75:9093
 ```
 
 运行mola
+
 ```
 docker-compose -p mola up -d
 ```
@@ -91,17 +107,20 @@ docker-compose -p mola up -d
 
 修改文件[log-agent/docker-compose.yml](log-agent/docker-compose.yml), 根据实际情况，替换变量。
 * OUTPUT: Logstash的地址
+
 ```
    - OUTPUT=tcp://192.168.1.74:5044
 ```
 
 运行log-agent
+
 ```
 docker-compose -p log up -d
 ```
 
 ## 5. 更新应用（选作）
 为了从监控数据中取到集群信息，需要在3.0更新应用，手动支持新加的lable VCLUSTER。
+
 ```
 "parameters": [
 {

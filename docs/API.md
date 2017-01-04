@@ -88,20 +88,6 @@ http://127.0.0.1:5098/v1/monitor/nodes?nodeid=192.168.1.101
 #### 获取AlertManager的状态信息
 `GET /v1/monitor/alerts/status`
 
-#### 获取配置的报警规则
-`GET /v1/monitor/alerts/rules`
-```
-curl -XGET http://127.0.0.1:5098/v1/monitor/alerts/rules
-{
-    "data":[
-        "ALERT cpu_usage IF irate(container_cpu_usage_seconds_total{id=~"/docker/.*",name=~"mesos.*"}[5m]) * 100 > 80 FOR 1m LABELS {severity="critical"} ANNOTATIONS {description="High CPU usage on {{ $labels.name }} of App {{ $labels.container_label_APP_ID }}", summary="CPU Usage on {{ $labels.name }} of App {{ $labels.container_label_APP_ID }}"}",
-        "ALERT mem_usage IF container_memory_usage_bytes{id=~"/docker/.*",name=~"mesos.*"} / container_spec_memory_limit_bytes{id=~"/docker.*",name=~"mesos.*"} * 100 > 80 FOR 1m LABELS {severity="critical"} ANNOTATIONS {description="High Mem usage on {{ $labels.name }} of App {{ $labels.container_label_APP_ID }}", summary="Mem Usage on {{ $labels.name }} of App {{ $labels.container_label_APP_ID }}"}",
-        "ALERT InstanceDown IF up == 0 FOR 5m LABELS {severity="page"} ANNOTATIONS {description="{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 5 minutes.", summary="Instance {{ $labels.instance }} down"}"
-    ],
-    "status":"success"
-}
-```
-
 ## 日志
 
 ### 获取所有应用
@@ -264,7 +250,7 @@ return
 
 POST /v1/search/keyword -d '{"period":1,"appid":"test","keyword":"keyword","condition":1,"enable":true}'
 
-return 
+return
 
 ```
 {"code":0,"data":"create success"}
@@ -274,7 +260,7 @@ return
 PUT /v1/search/keyword -d '{"id":"x","period":1,"appid":"test","keyword":"keyword","condition":1,"enable":true}'
 
 return
- 
+
 ```
 {"code":0,"data":"update success"}
 ```

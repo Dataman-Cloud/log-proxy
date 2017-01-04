@@ -4,63 +4,46 @@ Documentation   监控
 Resource        all_api.txt
 
 *** Test Cases ***
-监控-Dashboard-查询全部集群信息
+获取全部集群信息 GET /v1/monitor/info
 	${resp} =   Monitor Info
 	Should Be Equal As Strings  ${resp.status_code}  200
 
-监控-Dashboard-查询单个集群信息
+获取单个集群信息 GET /v1/monitor/info?clusterid=work
 	${resp} =   Monitor Info    clusterid=work
 	Should Be Equal As Strings  ${resp.status_code}  200
 
-监控-Dashboard-查询单个应用信息
+获取单个应用信息 GET /v1/monitor/info?appid=work-nginx
 	${resp} =   Monitor Info    appid=work-nginx
 	Should Be Equal As Strings  ${resp.status_code}  200
 
-监控-Dashboard-查询主机列表信息
+获取主机列表信息 GET /v1/monitor/nodes
 	${resp} =   Monitor Info Nodes
 	Should Be Equal As Strings  ${resp.status_code}  200
 
-监控-Dashboard-查询单个主机信息
+获取单个主机信息 GET /v1/monitor/nodes?nodeid=192.168.1.102
 	${resp} =   Monitor Info Nodes  nodeid=192.168.1.102
 	Should Be Equal As Strings  ${resp.status_code}  200
 
-监控-快捷查询-根据应用查询
+根据应用指标查询 GET /v1/monitor/query?metric=cpu&appid=work-nginx
 	${resp} =   Monitor Query  metric=cpu  appid=work-nginx
 	Should Be Equal As Strings  ${resp.status_code}  200
 
-监控-快捷查询-根据实例查询
+根据实例查询 GET /v1/monitor/query?metric=cpu&taskid=4f84928
 	${resp} =   Monitor Query  metric=cpu  taskid=4f84929cb252ed0c0f2d987f2f29f133395c1b26166f99562d76e64e0af6c80c
 	Should Be Equal As Strings  ${resp.status_code}  200
 
-监控-高级查询-根据表达式查询
+根据表达式查询 GET /v1/monitor/query?expr=container_tasks_state
 	${resp} =   Monitor Query  expr=container_tasks_state
 	Should Be Equal As Strings  ${resp.status_code}  200
 
-监控-AlertManager-查询报警消息
+查询报警消息 GET /v1/monitor/alerts
 	${resp} =   AlertManager Alerts
 	Should Be Equal As Strings  ${resp.status_code}  200
 
-监控-AlertManager-查询报警组消息
+查询报警组消息 GET /v1/monitor/alerts/groups
 	${resp} =   AlertManager Alerts Groups
 	Should Be Equal As Strings  ${resp.status_code}  200
 
-监控-AlertManager-查询报警消息状态
+查询报警消息状态 GET /v1/monitor/alerts/status
 	${resp} =   AlertManager Alerts Status
 	Should Be Equal As Strings  ${resp.status_code}  200
-
-#----------异常---------
-监控-Dashboard-异常-冲突字段clusterid和appid
-	${resp} =   Monitor Info    clusterid=work  appid=work-nginx
-	Should Be Equal As Strings  ${resp.status_code}  503
-
-监控-快捷查询-异常-查询错误的metric字段
-  ${resp} =   Monitor Query  metric=err  appid=work-nginx
-  Should Be Equal As Strings  ${resp.status_code}  503
-
-监控-快捷查询-异常-缺少字段metric和expr
-  ${resp} =   Monitor Query
-  Should Be Equal As Strings  ${resp.status_code}  503
-
-监控-快捷查询-异常-冲突字段metric和expr
-  ${resp} =   Monitor Query  metric=cpu expr=container_tasks_state
-  Should Be Equal As Strings  ${resp.status_code}  503
