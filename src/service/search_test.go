@@ -105,7 +105,7 @@ func TestTasks(t *testing.T) {
 
 func TestPath(t *testing.T) {
 	service := NewEsService([]string{baseURL})
-	service.Paths("test-web", "test-web.ac4616e4-c02b-11e6-9030-024245dc84c8", models.Page{})
+	service.Paths("clusterid", "userid", "test-web", "test-web.ac4616e4-c02b-11e6-9030-024245dc84c8", models.Page{})
 }
 
 func TestSearch(t *testing.T) {
