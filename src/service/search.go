@@ -199,7 +199,7 @@ func (s *SearchService) Search(appid, taskid, source, keyword string, page model
 		Must(querys...)
 
 	result, err := s.ESClient.Search().
-		Index("dataman-"+strings.Split(appid, "-")[0]+"-"+utils.ParseDate(page.RangeFrom, page.RangeTo)).
+		Index("dataman-*-"+utils.ParseDate(page.RangeFrom, page.RangeTo)).
 		Type("dataman-"+appid).
 		Query(bquery).
 		Sort("logtime.sort", sort).
@@ -246,7 +246,7 @@ func (s *SearchService) Context(appid, taskid, source, timestamp string, page mo
 			Must(elastic.NewTermQuery("appid", appid), elastic.NewTermQuery("taskid", taskid), elastic.NewTermQuery("path", source))
 
 		result, err := s.ESClient.Search().
-			Index("dataman-"+strings.Split(appid, "-")[0]+"-"+time.Unix(offset/1e9, 0).Format("2006-01-02")).
+			Index("dataman-*-"+time.Unix(offset/1e9, 0).Format("2006-01-02")).
 			Type("dataman-"+appid).
 			Query(bquery).
 			Sort("logtime.sort", false).
