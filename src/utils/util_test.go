@@ -97,3 +97,29 @@ func TestAlertNotification(t *testing.T) {
 		t.Error("faild")
 	}
 }
+
+func TestParseTask(t *testing.T) {
+	if len(ParseTask("1")) == 1 {
+		t.Log("success")
+	} else {
+		t.Error("faild")
+	}
+
+	if len(ParseTask("s-1")) == 1 {
+		t.Log("success")
+	} else {
+		t.Error("faild")
+	}
+
+	if len(ParseTask("1-s")) == 1 {
+		t.Log("success")
+	} else {
+		t.Error("faild")
+	}
+
+	if len(ParseTask("3-5")) == 3 {
+		t.Log("success")
+	} else {
+		t.Error("faild")
+	}
+}

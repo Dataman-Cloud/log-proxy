@@ -136,7 +136,10 @@ func (s *Search) Index(ctx *gin.Context) {
 		return
 	}
 
-	results, err := s.Service.Search(ctx.Query("appid"),
+	results, err := s.Service.Search(
+		ctx.Query("clusterid"),
+		ctx.Query("userid"),
+		ctx.Query("appid"),
 		ctx.Query("taskid"),
 		ctx.Query("path"),
 		ctx.Query("keyword"),
@@ -171,7 +174,10 @@ func (s *Search) Context(ctx *gin.Context) {
 		return
 	}
 
-	results, err := s.Service.Context(ctx.Query("appid"),
+	results, err := s.Service.Context(
+		ctx.Query("clusterid"),
+		ctx.Query("userid"),
+		ctx.Query("appid"),
 		ctx.Query("taskid"),
 		ctx.Query("path"),
 		ctx.Query("offset"),

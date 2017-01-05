@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 	"unsafe"
 )
@@ -63,4 +64,27 @@ func AlertNotification(url string, msg interface{}) error {
 	}
 	_, err = http.DefaultClient.Do(req)
 	return err
+}
+
+func ParseTask(taskid string) []string {
+	if !strings.Contains(taskid, "-") || len(strings.Split(taskid, "-")) != 2 {
+		return strings.Split(taskid, ",")
+	}
+
+	taskRange := strings.Split(taskid, "-")
+	lower, err := strconv.Atoi(taskRange[0])
+	if err != nil {
+		return strings.Split(taskid, ",")
+	}
+	upper, err := strconv.Atoi(taskRange[1])
+	if err != nil {
+		return strings.Split(taskid, ",")
+	}
+
+	var tasks []string
+	for lower <= upper {
+		tasks = append(tasks, strconv.Itoa(lower))
+		lower++
+	}
+	return tasks
 }
