@@ -131,16 +131,21 @@ func (s *SearchService) Tasks(appName string, page models.Page) (map[string]int6
 }
 
 // Paths get application paths
-func (s *SearchService) Paths(appName, taskID string, page models.Page) (map[string]int64, error) {
+func (s *SearchService) Paths(clusterid, userid, appName, taskID string, page models.Page) (map[string]int64, error) {
 	paths := make(map[string]int64)
 	var querys []elastic.Query
+	querys = append(querys, elastic.NewTermQuery("clusterid", clusterid))
+	querys = append(querys, elastic.NewTermQuery("userid", userid))
 	querys = append(querys, elastic.NewTermQuery("appid", appName))
 	if taskID != "" {
 		querys = append(querys, elastic.NewTermQuery("taskid", taskID))
 	}
 
 	bquery := elastic.NewBoolQuery().
-		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte(page.RangeFrom).Lte(page.RangeTo).Format("epoch_millis")).
+		Filter(
+			elastic.NewRangeQuery("logtime.timestamp").
+				Gte(page.RangeFrom).
+				Lte(page.RangeTo).Format("epoch_millis")).
 		Must(querys...)
 
 	result, err := s.ESClient.Search().

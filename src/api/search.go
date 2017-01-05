@@ -120,8 +120,13 @@ func (s *Search) Tasks(ctx *gin.Context) {
 
 // Paths search applications paths
 func (s *Search) Paths(ctx *gin.Context) {
-
-	paths, err := s.Service.Paths(ctx.Param("appid"), ctx.Query("taskid"), ctx.MustGet("page").(models.Page))
+	paths, err := s.Service.Paths(
+		ctx.Query("clusterid"),
+		ctx.Query("userid"),
+		ctx.Param("appid"),
+		ctx.Query("taskid"),
+		ctx.MustGet("page").(models.Page),
+	)
 	if err != nil {
 		utils.ErrorResponse(ctx, utils.NewError(GetTaskError, err))
 		return
