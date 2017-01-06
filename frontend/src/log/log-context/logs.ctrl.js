@@ -7,6 +7,8 @@
         var self = this;
 
         self.contextQueryObj = {
+            clusterid: $stateParams.clusterid || '',
+            userid: $stateParams.userid || '',
             appid: $stateParams.appid,
             taskid: $stateParams.taskid,
             path: $stateParams.path,

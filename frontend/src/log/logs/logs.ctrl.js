@@ -5,6 +5,8 @@
     /* @ngInject */
     function LogsCtrl(logBackend, $stateParams) {
         var tempLogQuery = {
+            clusterid: $stateParams.clusterid || '',
+            userid: $stateParams.userid || '',
             from: $stateParams.from,
             to: $stateParams.to,
             appid: $stateParams.appid,
@@ -47,6 +49,8 @@
         function onPaginate(page, limit) {
             self.logDisplaySet = {};
             logBackend.searchLogs({
+                clusterid: tempLogQuery.clusterid || '',
+                userid: tempLogQuery.userid || '',
                 from: tempLogQuery.from,
                 to: tempLogQuery.to,
                 appid: tempLogQuery.appid,
