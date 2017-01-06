@@ -7,6 +7,8 @@
         var self = this;
 
         self.query = {
+            clusterid: $stateParams.clusterid,
+            userid: $stateParams.userid,
             metric: $stateParams.metric,
             appid: $stateParams.appid,
             taskid: $stateParams.taskid,

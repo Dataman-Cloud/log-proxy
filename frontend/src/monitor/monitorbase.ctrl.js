@@ -10,6 +10,8 @@
         self.queryTabIndex = $stateParams.expr ? 1 : 0;
 
         self.form = {
+            clusterid: $stateParams.clusterid,
+            userid: $stateParams.userid,
             metric: $stateParams.metric,
             appid: $stateParams.appid,
             taskid: $stateParams.taskid,
@@ -55,6 +57,8 @@
                 };
             } else {
                 form = {
+                    clusterid: self.form.clusterid,
+                    userid: self.form.userid,
                     metric: self.form.metric,
                     appid: self.form.appid,
                     taskid: self.form.taskid,

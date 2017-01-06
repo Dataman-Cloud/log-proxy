@@ -5,6 +5,32 @@
                 <md-tab label="快捷查询">
                     <md-content>
                         <div flex class="form-item">
+                            <label class="requirement">集群</label>
+                            <input type="text" ng-maxlength="4096"  id="clusterName" name="clusterid" placeholder="集群" ng-model="vm.form.clusterid"
+                                   data-required="required">
+
+                            <div layout="row" class="form-item">
+                                <p flex class="error-info help-info-bottom"
+                                   data-ng-show="staticForm.clusterid.$error.maxlength && !staticForm.clusterid.$pristine">集群名称最大长度为4096</p>
+                                <p flex class="error-info help-info-bottom"
+                                   data-ng-show="staticForm.clusterid.$error.required && !staticForm.clusterid.$pristine">集群名称不能为空</p>
+                            </div>
+                        </div>
+
+                        <div flex class="form-item">
+                            <label class="requirement">用户</label>
+                            <input type="text" ng-maxlength="4096"  id="userName" name="userid" placeholder="用户" ng-model="vm.form.userid"
+                                   data-required="required">
+
+                            <div layout="row" class="form-item">
+                                <p flex class="error-info help-info-bottom"
+                                   data-ng-show="staticForm.userid.$error.maxlength && !staticForm.userid.$pristine">用户名称最大长度为4096</p>
+                                <p flex class="error-info help-info-bottom"
+                                   data-ng-show="staticForm.userid.$error.required && !staticForm.userid.$pristine">用户名称不能为空</p>
+                            </div>
+                        </div>
+
+                        <div flex class="form-item">
                             <label class="requirement">应用</label>
                             <input id="app" type="text" placeholder="应用" ng-model="vm.form.appid" name="appid"
                                    ng-required="!vm.queryTabIndex">
