@@ -55,7 +55,7 @@ func TestQueryExpr(t *testing.T) {
 
 	data, err := query.QueryExpr()
 	if data == nil {
-		t.Errorf("Expect dat is not nil, got %v", data)
+		t.Errorf("Expect data is not nil, got %v", data)
 	}
 	if err != nil {
 		t.Errorf("Expect err is not nil, got %v", err)
@@ -229,9 +229,10 @@ func TestTimeRange(t *testing.T) {
 }
 
 func TestGetQueryMetricExpr(t *testing.T) {
-	level := "id"
-	expr := testGetTaskExpr()
+	level := "task"
+	expr := expectGetTaskExpr()
 	query := initQueryMetric()
+
 	metrics := []string{"cpu", "memory", "memory_usage", "memory_total", "network_rx", "network_tx", "fs_read", "fs_write"}
 	for _, metric := range metrics {
 		query.Metric = metric
@@ -242,38 +243,23 @@ func TestGetQueryMetricExpr(t *testing.T) {
 			if expr.CPU.Usage != newExpr {
 				t.Errorf("Expect %v, got wrong expr %v", expr.CPU.Usage, newExpr)
 			}
-		case "memory":
-			if expr.Memory.Percentage != newExpr {
-				t.Errorf("Expect %v, got wrong expr %v", expr.Memory.Percentage, newExpr)
-			}
 		case "memory_usage":
 			if expr.Memory.Usage != newExpr {
 				t.Errorf("Expect %v, got wrong expr %v", expr.Memory.Usage, newExpr)
-			}
-		case "memory_total":
-			if expr.Memory.Total != newExpr {
-				t.Errorf("Expect %v, got wrong expr %v", expr.Memory.Total, newExpr)
 			}
 		case "network_rx":
 			if expr.Network.Receive != newExpr {
 				t.Errorf("Expect %v, got wrong expr %v", expr.Network.Receive, newExpr)
 			}
-		case "network_tx":
-			if expr.Network.Transmit != newExpr {
-				t.Errorf("Expect %v, got wrong expr %v", expr.Network.Transmit, newExpr)
-			}
 		case "fs_read":
 			if expr.Filesystem.Read != newExpr {
 				t.Errorf("Expect %v, got wrong expr %v", expr.Filesystem.Read, newExpr)
 			}
-		case "fs_write":
-			if expr.Filesystem.Write != newExpr {
-				t.Errorf("Expect %v, got wrong expr %v", expr.Filesystem.Write, newExpr)
-			}
 		}
 	}
+
 	level = "cluster"
-	expr = testGetClusterExpr(query.NodeID)
+	expr = expectGetClusterExpr(query.NodeID)
 	query = initQueryMetric()
 	metrics = []string{"fs_usage", "fs_limit"}
 	for _, metric := range metrics {
@@ -314,6 +300,8 @@ func TestQueryInfo(t *testing.T) {
 	}
 
 	query.ClusterID = ""
+	query.AppID = ""
+	query.UserID = ""
 	data, err = query.QueryInfo()
 	if data.Status != "success" {
 		t.Errorf("Expect status is success, got %v", data.Status)
@@ -322,8 +310,17 @@ func TestQueryInfo(t *testing.T) {
 		t.Errorf("Expect err is nil, got %v", err)
 	}
 
-	query.ClusterID = ""
-	query.AppID = ""
+	query.ClusterID = "work"
+	data, err = query.QueryInfo()
+	if data.Status != "success" {
+		t.Errorf("Expect status is success, got %v", data.Status)
+	}
+	if err != nil {
+		t.Errorf("Expect err is nil, got %v", err)
+	}
+
+	query.ClusterID = "work"
+	query.UserID = "user1"
 	data, err = query.QueryInfo()
 	if data.Status != "success" {
 		t.Errorf("Expect status is success, got %v", data.Status)

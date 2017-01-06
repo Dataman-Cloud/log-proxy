@@ -48,7 +48,8 @@ func initQueryMetric() *backends.Query {
 		Metric:    "cpu",
 		ClusterID: "",
 		AppID:     "",
-		TaskID:    "",
+		SlotID:    "",
+		UserID:    "user1",
 		Start:     "1481767298",
 		End:       "1481767298",
 		Step:      "100s",
@@ -159,15 +160,24 @@ func TestGetQueryInfo(t *testing.T) {
 	})
 	data := NewInfo()
 	err := data.GetQueryInfo(query)
-	if data.Applications[0] != "work-nginx" {
-		t.Errorf("Expect data.Applications[0] is work-nginx, got %v", data.Applications[0])
+	for ClusterName, ClusterValue := range data.Clusters {
+		if ClusterName == "work" {
+			for name := range ClusterValue.Users {
+				if name == "user1" {
+					break
+				}
+				t.Errorf("Expect user user1 in list, but missing")
+			}
+			break
+		}
+		t.Errorf("Expect cluster work and user user1 in list, but missing")
 	}
 	if err != nil {
 		t.Errorf("Expect err is not nil, got %v", err)
 	}
 }
 
-func TestGetQueryInfoCluster(t *testing.T) {
+func TestGetQueryAppInfo(t *testing.T) {
 	server := setup()
 	defer teardown()
 	query := initQueryMetric()
@@ -178,10 +188,22 @@ func TestGetQueryInfoCluster(t *testing.T) {
 		fmt.Fprint(w, string(c))
 	})
 	query.ClusterID = "work"
+	query.AppID = "work-nginx"
+	query.UserID = "user1"
 	data := NewInfo()
 	err := data.GetQueryInfo(query)
-	if data.Applications[0] != "work-nginx" {
-		t.Errorf("Expect data.Applications[0] is work-nginx, got %v", data.Applications[0])
+	for ClusterName, ClusterValue := range data.Clusters {
+		if ClusterName == "work" {
+			for userName, userValue := range ClusterValue.Users {
+				if userName == "user1" {
+					for _, value := range userValue.Applications {
+						if value.CPU.Usage == nil {
+							t.Errorf("Expect value.CPU.Usage is not nil, got %v", value.CPU.Usage)
+						}
+					}
+				}
+			}
+		}
 	}
 	if err != nil {
 		t.Errorf("Expect err is nil, got %v", err)
@@ -227,8 +249,6 @@ func TestGetQueryNodesInfo(t *testing.T) {
 	if err != nil {
 		t.Errorf("Expect err is nil, got %v", err)
 	}
-	fmt.Printf("%v\n", data)
-	fmt.Printf("%v\n", err)
 }
 
 func TestGetQueryNodesInfoError(t *testing.T) {

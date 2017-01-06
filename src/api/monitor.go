@@ -32,13 +32,15 @@ func (m *Monitor) Query(ctx *gin.Context) {
 		Metric:    ctx.Query("metric"),
 		ClusterID: ctx.Query("clusterid"),
 		AppID:     ctx.Query("appid"),
-		TaskID:    ctx.Query("taskid"),
+		SlotID:    ctx.Query("taskid"),
+		UserID:    ctx.Query("userid"),
 		Start:     ctx.Query("start"),
 		End:       ctx.Query("end"),
 		Step:      ctx.Query("step"),
 		Period:    ctx.Query("period"),
 		Expr:      ctx.Query("expr"),
 	}
+
 	if param.Metric != "" && param.Expr != "" {
 		err := fmt.Errorf("The paramter confict between metric and expr")
 		utils.ErrorResponse(ctx, err)
@@ -46,7 +48,19 @@ func (m *Monitor) Query(ctx *gin.Context) {
 	}
 
 	if param.Metric == "" && param.Expr == "" {
-		err := fmt.Errorf("The paramter of metric or expr required")
+		err := fmt.Errorf("The paramter metric or expr required")
+		utils.ErrorResponse(ctx, err)
+		return
+	}
+
+	if param.Metric != "" && param.ClusterID == "" {
+		err := fmt.Errorf("The paramter metric and clusterid required")
+		utils.ErrorResponse(ctx, err)
+		return
+	}
+
+	if param.Metric != "" && param.ClusterID != "" && param.UserID == "" {
+		err := fmt.Errorf("The paramter userid required")
 		utils.ErrorResponse(ctx, err)
 		return
 	}
@@ -66,7 +80,6 @@ func (m *Monitor) Query(ctx *gin.Context) {
 		}
 		ctx.JSON(http.StatusOK, data)
 	}
-
 	if param.Metric != "" {
 		query := &backends.Query{
 			HTTPClient:     http.DefaultClient,
@@ -88,6 +101,7 @@ func (m *Monitor) Query(ctx *gin.Context) {
 func (m *Monitor) QueryInfo(ctx *gin.Context) {
 	param := &backends.QueryParameter{
 		ClusterID: ctx.Query("clusterid"),
+		UserID:    ctx.Query("userid"),
 		AppID:     ctx.Query("appid"),
 	}
 	query := &backends.Query{
@@ -95,12 +109,6 @@ func (m *Monitor) QueryInfo(ctx *gin.Context) {
 		PromServer:     config.GetConfig().PrometheusURL,
 		Path:           backends.QUERYPATH,
 		QueryParameter: param,
-	}
-
-	if query.ClusterID != "" && query.AppID != "" {
-		err := fmt.Errorf("The paramter confict between clusterid and appid")
-		utils.ErrorResponse(ctx, err)
-		return
 	}
 
 	data := service.NewInfo()
