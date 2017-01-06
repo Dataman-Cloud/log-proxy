@@ -1,6 +1,6 @@
 <div layout="row" layout-align="space-between start">
     <div flex class="panel">
-        <form name="staticForm" layout="row" layout-wrap layout-align="start start">
+        <form id="silentCont" name="staticForm" layout="row" layout-wrap layout-align="start start">
             <div flex="40" class="form-item">
                 <label class="requirement">起始时间</label>
                 <input type="datetime-local" placeholder="开始时间" ng-model="vm.form.startsAt" ng-max="vm.form.endsAt"
@@ -20,15 +20,15 @@
             <div flex="40" class="form-item">
                 <label class="requirement">创建者</label>
                 <input id="creator" type="email" name="creator" placeholder="邮箱地址" ng-model="vm.form.createdBy" data-required="required">
-                <p class="error-info help-info-bottom"
+                <p id="emailError" class="error-info help-info-bottom"
                    data-ng-show="staticForm.creator.$error.required && !staticForm.creator.$pristine">邮箱地址不能为空</p>
-                <p class="error-info help-info-bottom"
+                <p id="emailEmpty" class="error-info help-info-bottom"
                    data-ng-show="staticForm.creator.$error.email && !staticForm.creator.$pristine">邮箱格式不正确</p>
             </div>
             <div flex="40" flex-offset="5" class="form-item">
                 <label class="requirement">注释</label>
                 <input id="annotation" type="text" name="comment" ng-model="vm.form.comment" data-required="required">
-                <p class="error-info help-info-bottom"
+                <p id="annotationError" class="error-info help-info-bottom"
                    data-ng-show="staticForm.comment.$error.required && !staticForm.comment.$pristine">注释不能为空</p>
             </div>
 

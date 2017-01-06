@@ -8,7 +8,7 @@
                             <label class="requirement">应用</label>
                             <input id="app" type="text" placeholder="应用" ng-model="vm.form.appid" name="appid"
                                    ng-required="!vm.queryTabIndex">
-                            <p data-ng-show="staticForm.appid.$error.required && !staticForm.appid.$pristine">
+                            <p id="appMassage" data-ng-show="staticForm.appid.$error.required && !staticForm.appid.$pristine">
                                 应用名称不能为空</p>
                         </div>
                         <div flex class="form-item">
@@ -67,14 +67,14 @@
                             <div flex class="form-item">
                                 <input id="monitorStartTime" type="datetime-local" placeholder="开始时间" ng-model="vm.startTime"
                                        ng-max="vm.endTime" name="startTime" ng-required="vm.selectedTabIndex">
-                                <p data-ng-show="staticForm.startTime.$error.max && !staticForm.startTime.$pristine">
+                                <p id="startError" data-ng-show="staticForm.startTime.$error.max && !staticForm.startTime.$pristine">
                                     起始时间大于结束时间</p>
-                                <span ng-show="staticForm.startTime.$error.datetimelocal">请填写正确时间格式:年-月-日T时:分:秒</span>
+                                <span id="sTimeFormat" ng-show="staticForm.startTime.$error.datetimelocal">请填写正确时间格式:年-月-日T时:分:秒</span>
                                 <input id="monitorEndTime" type="datetime-local" placeholder="结束时间" ng-model="vm.endTime"
                                        ng-min="vm.startTime" name="endTime" ng-required="vm.selectedTabIndex">
-                                <p data-ng-show="staticForm.endTime.$error.min && !staticForm.endTime.$pristine">
+                                <p id="endError" data-ng-show="staticForm.endTime.$error.min && !staticForm.endTime.$pristine">
                                     结束时间小于起始时间</p>
-                                <span ng-show="staticForm.endTime.$error.datetimelocal">请填写正确时间格式:年-月-日T时:分:秒</span>
+                                <span id="eTimeFormat" ng-show="staticForm.endTime.$error.datetimelocal">请填写正确时间格式:年-月-日T时:分:秒</span>
                             </div>
                         </div>
                     </md-content>
