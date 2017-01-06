@@ -43,7 +43,7 @@
 
             //about monitor
             .state('home.monitor', {
-                url: '/monitor?metric&appid&taskid&start&end&step&expr',
+                url: '/monitor?clusterid&userid&metric&appid&taskid&start&end&step&expr',
                 templateUrl: '/src/monitor/monitorbase.html',
                 controller: 'MonitorBaseCtrl as vm'
             })

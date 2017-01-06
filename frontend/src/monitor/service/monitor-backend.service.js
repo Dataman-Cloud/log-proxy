@@ -11,6 +11,8 @@
         function monitor(data) {
             var paramObj = data || {};
             return $resource(BACKEND_URL_BASE.defaultBase + '/v1/monitor/query', {
+                clusterid: paramObj.clusterid,
+                userid: paramObj.userid,
                 metric: paramObj.metric,
                 appid: paramObj.appid,
                 taskid: paramObj.taskid,
