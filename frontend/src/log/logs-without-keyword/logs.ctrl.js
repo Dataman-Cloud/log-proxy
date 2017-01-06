@@ -5,6 +5,8 @@
     /* @ngInject */
     function LogWithoutKeyCtrl(logBackend, $stateParams) {
         var tempLogQuery = {
+            clusterid: $stateParams.clusterid || '',
+            userid: $stateParams.userid || '',
             from: $stateParams.from,
             to: $stateParams.to,
             appid: $stateParams.appid,

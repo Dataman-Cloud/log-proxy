@@ -5,33 +5,16 @@
     /* @ngInject */
     function logBackend($resource) {
         return {
-            listApp: listApp,
-            listTask: listTask,
             listPath: listPath,
             searchLogs: searchLogs,
             logContext: logContext
         };
 
-        function listApp(data) {
-            var paramObj = data || {};
-            return $resource(BACKEND_URL_BASE.defaultBase + '/v1/search/applications', {
-                from: paramObj.from,
-                to: paramObj.to
-            });
-        }
-
-        function listTask(data) {
-            var paramObj = data || {};
-            return $resource(BACKEND_URL_BASE.defaultBase + '/v1/search/tasks/:appid', {
-                appid: paramObj.appid,
-                from: paramObj.from,
-                to: paramObj.to
-            });
-        }
-
         function listPath(data) {
             var paramObj = data || {};
             return $resource(BACKEND_URL_BASE.defaultBase + '/v1/search/paths/:appid', {
+                clusterid: paramObj.clusterid,
+                userid: paramObj.userid,
                 appid: paramObj.appid,
                 taskid: paramObj.taskid,
                 from: paramObj.from,
@@ -42,6 +25,8 @@
         function searchLogs(data) {
             var paramObj = data || {};
             return $resource(BACKEND_URL_BASE.defaultBase + '/v1/search/index', {
+                clusterid: paramObj.clusterid,
+                userid: paramObj.userid,
                 appid: paramObj.appid,
                 taskid: paramObj.taskid,
                 path: paramObj.path,
@@ -56,6 +41,8 @@
         function logContext(data) {
             var paramObj = data || {};
             return $resource(BACKEND_URL_BASE.defaultBase + '/v1/search/context', {
+                clusterid: paramObj.clusterid,
+                userid: paramObj.userid,
                 appid: paramObj.appid,
                 taskid: paramObj.taskid,
                 path: paramObj.path,

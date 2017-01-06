@@ -7,14 +7,14 @@
         var self = this;
 
         self.form = {
+            clusterid: $stateParams.clusterid || '',
+            userid: $stateParams.userid || '',
             appid: $stateParams.appid || '',
             taskid: $stateParams.taskid || '',
             path: $stateParams.path || '',
             keyword: $stateParams.keyword || ''
         };
 
-        self.apps = [];
-        self.tasks = [];
         self.paths = [];
 
         self.startTime = new Date(parseInt($stateParams.from));
@@ -23,9 +23,6 @@
         self.timePeriod = 120;
         self.selectedTabIndex = ($stateParams.from && $stateParams.to) ? 1 : 0;
 
-        self.selectAppChange = selectAppChange;
-        self.loadApps = loadApps;
-        self.loadTasks = loadTasks;
         self.loadPaths = loadPaths;
 
         self.searchLog = searchLog;
@@ -34,34 +31,13 @@
 
         function activate() {
             loadPaths();
-            loadApps();
-            loadTasks();
-        }
-
-        function selectAppChange(app) {
-            self.form.taskid = '';
-            self.form.path = '';
-        }
-
-        function loadApps() {
-            logBackend.listApp().get(function (data) {
-                self.apps = data.data;
-            })
-        }
-
-        function loadTasks() {
-            if (self.form.appid) {
-                logBackend.listTask({
-                    appid: self.form.appid
-                }).get(function (data) {
-                    self.tasks = data.data;
-                })
-            }
         }
 
         function loadPaths() {
             if (self.form.appid) {
                 logBackend.listPath({
+                    clusterid: self.form.clusterid,
+                    userid: self.form.userid,
                     appid: self.form.appid,
                     taskid: self.form.taskid
                 }).get(function (data) {
