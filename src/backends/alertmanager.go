@@ -3,6 +3,7 @@ package backends
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -103,7 +104,11 @@ func (am *AlertManager) CreateSilence(silence map[string]interface{}) error {
 	u.Path = SilencesAPI
 
 	data, _ := json.Marshal(silence)
-	_, err = am.HTTPClient.Post(u.String(), "application/json", bytes.NewBuffer(data))
+	resp, err := am.HTTPClient.Post(u.String(), "application/json", bytes.NewBuffer(data))
+	if resp.StatusCode != http.StatusOK {
+		body, _ := utils.ReadResponseBody(resp)
+		return errors.New(string(body))
+	}
 
 	return err
 }
