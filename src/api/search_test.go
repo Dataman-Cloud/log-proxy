@@ -166,7 +166,6 @@ func queryResult(ctx *gin.Context) {
 	data := `{"code":0,"data":{"cpu":{"usage":null},"memory":{"usage":[{"metric":{"container_label_APP_ID":"work-web","container_label_VCLUSTER":"work","id":"/docker/4f84929cb252ed0c0f2d987f2f29f133395c1b26166f99562d76e64e0af6c80c","image":"192.168.1.75/library/nginx-stress:1.10","instance":"192.168.1.102:5014","job":"cadvisor","name":"mesos-05da0395-c3c4-4a76-bd6c-bfe8454f7244-S2.104a009e-c354-4bd3-8497-8e4d3212e3cf"},"values":[[1.481853425e+09,"0.02099609375"]]}],"usage_bytes":null,"total_bytes":null},"network":{"receive":null,"transmit":null},"filesystem":{"read":null,"write":null}}}`
 	var result map[string]interface{}
 	json.Unmarshal([]byte(data), &result)
-	fmt.Printf("%v\n", result)
 	ctx.JSON(http.StatusOK, result)
 }
 

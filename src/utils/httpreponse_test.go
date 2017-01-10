@@ -2,6 +2,7 @@ package utils
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -18,7 +19,8 @@ var (
 
 func TestNewError(t *testing.T) {
 	err := NewError("503-10000", errors.New("error"))
-	err.Error()
+	fmt.Println(err.Error())
+
 }
 
 func startHTTPServer() *httptest.Server {

@@ -39,8 +39,10 @@ func TestQueryMetric(t *testing.T) {
 	u.Path = strings.TrimRight(u.Path, "/") + "/api/v1/monitor/query"
 	q := u.Query()
 	q.Set("metric", "memory")
+	q.Set("clusterid", "work")
 	q.Set("appid", "work-web")
-	q.Set("taskid", "4f84")
+	q.Set("taskid", "0")
+	q.Set("userid", "user1")
 	q.Set("start", "1481853425")
 	q.Set("end", "1481853425")
 	q.Set("step", "30s")
@@ -105,6 +107,42 @@ func TestQueryParamMissing(t *testing.T) {
 		t.Errorf("Expect query param metric is %v, got %v", expectResult, resp.StatusCode)
 	}
 }
+
+func TestQueryParamMissingCluster(t *testing.T) {
+	expectResult := 503
+	httpClient := http.DefaultClient
+	u, _ := url.Parse(apiURL)
+	u.Path = strings.TrimRight(u.Path, "/") + "/api/v1/monitor/query"
+	q := u.Query()
+	q.Set("metric", "memory")
+	q.Set("start", "1481853425")
+	q.Set("end", "1481853425")
+	q.Set("step", "30s")
+	u.RawQuery = q.Encode()
+	resp, _ := httpClient.Get(u.String())
+	if resp.StatusCode != expectResult {
+		t.Errorf("Expect query param metric is %v, got %v", expectResult, resp.StatusCode)
+	}
+}
+
+func TestQueryParamMissingUser(t *testing.T) {
+	expectResult := 503
+	httpClient := http.DefaultClient
+	u, _ := url.Parse(apiURL)
+	u.Path = strings.TrimRight(u.Path, "/") + "/api/v1/monitor/query"
+	q := u.Query()
+	q.Set("metric", "memory")
+	q.Set("clusterid", "work")
+	q.Set("start", "1481853425")
+	q.Set("end", "1481853425")
+	q.Set("step", "30s")
+	u.RawQuery = q.Encode()
+	resp, _ := httpClient.Get(u.String())
+	if resp.StatusCode != expectResult {
+		t.Errorf("Expect query param metric is %v, got %v", expectResult, resp.StatusCode)
+	}
+}
+
 func TestQueryInfo(t *testing.T) {
 	httpClient := http.DefaultClient
 	u, _ := url.Parse(apiURL)

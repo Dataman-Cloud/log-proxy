@@ -11,10 +11,12 @@
 - path: /v1/monitor/query
 - HTTP Method: GET
 - URL Params: Null
-- Query Params: metric, clusterid, appid, taskid, start, end, step, expr
+- Query Params: metric, clusterid, userid, appid, taskid, start, end, step, expr
   - metric=[cpu/memory/memory_usage/memory_total/network_rx/network_tx/fs_read/fs_write]: the metric string.
+  - clusterid=<string>: the name of cluster.
+  - userid=<string>: the name of user.
   - appid=<string>: the name of application.
-  - taskid=<string>: the id string of the docker instance.
+  - taskid=<number>: the id string of the task instance, support format as "1,2,3" and "1-3"
   - start=<2016-12-02T00:00:01.781Z>: the start time of the query range.
   - end=<2016-12-02T00:00:01.781Z>: the end time of the query range.
   - step=<duration>: Query resolution step width.
@@ -29,7 +31,7 @@ http://127.0.0.1:5098/v1/monitor/query?expr=avg(irate(container_cpu_usage_second
 
 Get the metrics by URL
 ```
-http://127.0.0.1:5098/v1/monitor/query?start=2016-12-02T00:00:01.781Z&end=2016-12-02T00:01:00.781Z&step=30s&metric=memory_total&appid=work-web
+http://127.0.0.1:5098/v1/monitor/query?start=1483942403&end=1483942403&step=30s&metric=memory&appid=nginx0051-xcm-datamanmesos&clusterid=datamanmesos&userid=xcm&taskid=1-3
 ```
 
 #### Get the info of clusters, cluster, application
@@ -41,6 +43,7 @@ http://127.0.0.1:5098/v1/monitor/query?start=2016-12-02T00:00:01.781Z&end=2016-1
 - URL Params: Null
 - Query Params: clusterid, appid
   - clusterid=<string>: the name of cluster.
+  - userid=<string>: the name of user.
   - appid=<string>: the name of application.
 
 For example:
@@ -54,7 +57,7 @@ http://127.0.0.1:5098/v1/monitor/info?clusterid=work
 ```
 Get the info of application
 ```
-http://127.0.0.1:5098/v1/monitor/info?appid=work-web
+http://127.0.0.1:5098/v1/monitor/info?clusterid=datamanmesos&userid=xcm&appid=nginx0051-xcm-datamanmesos
 ```
 
 #### Get the metric data of nodes

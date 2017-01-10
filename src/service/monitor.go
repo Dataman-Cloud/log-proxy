@@ -71,32 +71,38 @@ func (m *Metric) GetQueryMetric(query *backends.Query) error {
 
 // Info defines the JSON format of information in clusters/cluster/apps/nodes
 type Info struct {
-	Clusters     map[string]*ClusterInfo `json:"clusters"`
-	Applications []string                `json:"applications"`
-	Tasks        []string                `json:"tasks"`
-	Nodes        []string                `json:"nodes"`
+	Clusters map[string]*ClusterInfo `json:"clusters"`
 }
 
 // NewInfo init struct Info
 func NewInfo() *Info {
 	return &Info{
-		Clusters:     make(map[string]*ClusterInfo),
-		Applications: []string{},
-		Tasks:        []string{},
-		Nodes:        []string{},
+		Clusters: make(map[string]*ClusterInfo),
 	}
 }
 
-// ClusterInfo defines the JSON format of information in cluster
+// ClusterInfo defines the JSON format of information in Cluster
 type ClusterInfo struct {
-	Applications map[string]*AppInfo `json:"applications"`
-	Nodes        []string            `json:"nodes"`
-	Tasks        []string            `json:"tasks"`
+	Users map[string]*UserInfo `json:"users"`
 }
 
-// NewClusterinfo init the struct ClusterInfo
-func NewClusterinfo() *ClusterInfo {
+// NewClusterInfo init struct ClusterInfo
+func NewClusterInfo() *ClusterInfo {
 	return &ClusterInfo{
+		Users: make(map[string]*UserInfo),
+	}
+}
+
+// UserInfo defines the JSON format of information in User
+type UserInfo struct {
+	Applications map[string]*AppInfo `json:"applications"`
+	Tasks        []string            `json:"tasks"`
+	Nodes        []string            `json:"nodes"`
+}
+
+// NewUserInfo init the struct UserInfo
+func NewUserInfo() *UserInfo {
+	return &UserInfo{
 		Applications: make(map[string]*AppInfo),
 		Tasks:        []string{},
 		Nodes:        []string{},
@@ -125,6 +131,7 @@ func NewAppInfo() *AppInfo {
 
 // TaskInfo defines the JSON format of information in task(container)
 type TaskInfo struct {
+	SlotID     string                         `json:"slot"`
 	Node       string                         `json:"node"`
 	CPU        *models.InfoCPU                `json:"cpu"`
 	Memory     *models.InfoMemory             `json:"memory"`
@@ -142,157 +149,205 @@ func NewTaskInfo() *TaskInfo {
 	}
 }
 
-// GetQueryInfo get result by calling QueryInfo
-// then set the vaules of fileds in Info
+// GetQueryInfo get the info of Cluster, User, App, Task from Query Result
 func (info *Info) GetQueryInfo(query *backends.Query) error {
 	data, err := query.QueryInfo()
 	if err != nil {
 		return err
 	}
+	info.GetClustersInfo(query, data)
 
-	// Fill the info of Clusters
-	if len(info.Clusters) == 0 {
-		for _, originData := range data.Data.Result {
-			name := originData.Metric.ContainerLabelVCLUSTER
-			app := originData.Metric.ContainerLabelAPPID
-			task := originData.Metric.ID
-			node := strings.Split(originData.Metric.Instance, ":")[0]
-			info.Clusters[name] = NewClusterinfo()
-			if !isInArray(info.Applications, app) {
-				info.Applications = append(info.Applications, app)
-			}
-			if !isInArray(info.Tasks, task) {
-				info.Tasks = append(info.Tasks, task)
-			}
-			if !isInArray(info.Nodes, node) {
-				info.Nodes = append(info.Nodes, node)
-			}
+	if query.ClusterID != "" && query.UserID != "" && query.AppID != "" {
+		info.GetAppInfo(query, data)
+		err = info.GetAppInfoMetric(query)
+		if err != nil {
+			return err
+		}
+		err = info.GetTaskInfoMetric(query)
+		if err != nil {
+			return err
 		}
 	}
-	// Fill the info of cluster
+
+	return nil
+}
+
+// GetClustersInfo get the info of Clusters from Query Result
+func (info *Info) GetClustersInfo(query *backends.Query, data *models.QueryRangeResult) {
+	// Set the cluster into list
 	for _, originData := range data.Data.Result {
-		cluster := originData.Metric.ContainerLabelVCLUSTER
-		app := originData.Metric.ContainerLabelAPPID
-		task := originData.Metric.ID
-		node := strings.Split(originData.Metric.Instance, ":")[0]
+		cluster := originData.Metric.ContainerLabelClusterID
+		info.Clusters[cluster] = NewClusterInfo()
+	}
+
+	for _, originData := range data.Data.Result {
+		cluster := originData.Metric.ContainerLabelClusterID
+		user := originData.Metric.ContainerLabelUserID
+
 		for name, value := range info.Clusters {
 			if cluster == name {
-				value.Applications[app] = NewAppInfo()
-				if !isInArray(value.Tasks, task) {
-					value.Tasks = append(value.Tasks, task)
-				}
-				if !isInArray(value.Nodes, node) {
-					value.Nodes = append(value.Nodes, node)
-				}
+				value.Users[user] = NewUserInfo()
 			}
 		}
 	}
-
-	// Fill the info of app
 	for _, originData := range data.Data.Result {
-		app := originData.Metric.ContainerLabelAPPID
+		cluster := originData.Metric.ContainerLabelClusterID
+		user := originData.Metric.ContainerLabelUserID
+		app := originData.Metric.ContainerLabelAppID
 		task := originData.Metric.ID
-		for _, cluster := range info.Clusters {
-			for name, value := range cluster.Applications {
-				if app == name {
-					value.Tasks[task] = NewTaskInfo()
+		node := strings.Split(originData.Metric.Instance, ":")[0]
+		for clusterName, ClusterValue := range info.Clusters {
+			if cluster == clusterName {
+				for name, value := range ClusterValue.Users {
+					if user == name {
+						value.Applications[app] = NewAppInfo()
+						if !isInArray(value.Tasks, task) {
+							value.Tasks = append(value.Tasks, task)
+						}
+						if !isInArray(value.Nodes, node) {
+							value.Nodes = append(value.Nodes, node)
+						}
+					}
 				}
 			}
 		}
 	}
+}
 
-	// Fill the metric of app
-	if query.ClusterID != "" || query.AppID != "" {
-		metrics := []string{cpuUsage, memPercentage, networkRX, networkTX, fsRead, fsWrite}
-		for _, metric := range metrics {
-			query.Metric = metric
-			query.Path = backends.QUERYRANGEPATH
-			data, err := query.QueryAppMetric()
-			if err != nil {
-				return err
-			}
-			for _, originData := range data.Data.Result {
-				app := originData.Metric.ContainerLabelAPPID
-				value := originData.Values[0]
-				for _, cluster := range info.Clusters {
-					for name, v := range cluster.Applications {
-						if app == name {
-							switch query.Metric {
-							case cpuUsage:
-								v.CPU.Usage = value
-							case memPercentage:
-								v.Memory.Percetange = value
-							case networkRX:
-								v.Network.Receive = value
-							case networkTX:
-								v.Network.Transmit = value
-							case fsRead:
-								v.Filesystem.Read = value
-							case fsWrite:
-								v.Filesystem.Write = value
+// GetAppInfo get the info of application from Query Result
+func (info *Info) GetAppInfo(query *backends.Query, data *models.QueryRangeResult) {
+	// Fill the info of container in application
+	for _, originData := range data.Data.Result {
+		cluster := originData.Metric.ContainerLabelClusterID
+		user := originData.Metric.ContainerLabelUserID
+		app := originData.Metric.ContainerLabelAppID
+		task := originData.Metric.ID
+		slotid := originData.Metric.ContainerLabelSlotID
+		node := strings.Split(originData.Metric.Instance, ":")[0]
+		for clusterName, ClusterValue := range info.Clusters {
+			if cluster == clusterName {
+				for userName, userValue := range ClusterValue.Users {
+					if user == userName {
+						for name, value := range userValue.Applications {
+							if app == name {
+								value.Tasks[task] = NewTaskInfo()
+								value.Tasks[task].SlotID = slotid
+								value.Tasks[task].Node = node
 							}
 						}
 					}
 				}
 			}
 		}
+	}
+}
 
-		//Fill the metric of tasks
-		metrics = []string{cpuUsage, memUsage, memTotal, networkRX, networkTX, fsRead, fsWrite}
-		for _, metric := range metrics {
-			query.Metric = metric
-			data, err := query.QueryMetric()
-			if err != nil {
-				return err
-			}
-
-			if metric == networkRX || metric == networkTX {
-				for _, cluster := range info.Clusters {
-					for _, app := range cluster.Applications {
-						for _, task := range app.Tasks {
-							if len(task.Network) == 0 {
-								for _, originData := range data.Data.Result {
-									nic := originData.Metric.Interface
-									task.Network[nic] = models.NewInfoNetwork()
+// GetAppInfoMetric get the metric data from Query Result
+func (info *Info) GetAppInfoMetric(query *backends.Query) error {
+	metrics := []string{cpuUsage, memPercentage, networkRX, networkTX, fsRead, fsWrite}
+	for _, metric := range metrics {
+		query.Metric = metric
+		query.Path = backends.QUERYRANGEPATH
+		data, err := query.QueryAppMetric()
+		if err != nil {
+			return err
+		}
+		for _, originData := range data.Data.Result {
+			cluster := originData.Metric.ContainerLabelClusterID
+			user := originData.Metric.ContainerLabelUserID
+			app := originData.Metric.ContainerLabelAppID
+			metricValue := originData.Values[0]
+			for clusterName, ClusterValue := range info.Clusters {
+				if cluster == clusterName {
+					for userName, userValue := range ClusterValue.Users {
+						if user == userName {
+							for name, value := range userValue.Applications {
+								if app == name {
+									switch query.Metric {
+									case cpuUsage:
+										value.CPU.Usage = metricValue
+									case memPercentage:
+										value.Memory.Percetange = metricValue
+									case networkRX:
+										value.Network.Receive = metricValue
+									case networkTX:
+										value.Network.Transmit = metricValue
+									case fsRead:
+										value.Filesystem.Read = metricValue
+									case fsWrite:
+										value.Filesystem.Write = metricValue
+									}
 								}
 							}
 						}
 					}
 				}
 			}
-			for _, originData := range data.Data.Result {
-				task := originData.Metric.ID
-				nic := originData.Metric.Interface
-				node := strings.Split(originData.Metric.Instance, ":")[0]
-				value := originData.Values[0]
-				for _, cluster := range info.Clusters {
-					for _, app := range cluster.Applications {
-						for name, v := range app.Tasks {
+		}
+	}
+	return nil
+}
+
+// GetTaskInfoMetric get the metric data from Query Result
+func (info *Info) GetTaskInfoMetric(query *backends.Query) error {
+	metrics := []string{cpuUsage, memUsage, memTotal, networkRX, networkTX, fsRead, fsWrite}
+	for _, metric := range metrics {
+		query.Metric = metric
+		data, err := query.QueryMetric()
+		if err != nil {
+			return nil
+		}
+
+		if metric == networkRX || metric == networkTX {
+			for _, clusterValue := range info.Clusters {
+				for _, userValue := range clusterValue.Users {
+					for _, appValue := range userValue.Applications {
+						for _, value := range appValue.Tasks {
+							if len(value.Network) == 0 {
+								for _, originData := range data.Data.Result {
+									nic := originData.Metric.Interface
+									value.Network[nic] = models.NewInfoNetwork()
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		for _, originData := range data.Data.Result {
+			task := originData.Metric.ID
+			metricValue := originData.Values[0]
+			nic := originData.Metric.Interface
+
+			for _, clusterValue := range info.Clusters {
+				for _, userValue := range clusterValue.Users {
+					for _, appValue := range userValue.Applications {
+						for name, value := range appValue.Tasks {
 							if task == name {
-								v.Node = node
 								switch query.Metric {
 								case cpuUsage:
-									v.CPU.Usage = value
+									value.CPU.Usage = metricValue
 								case memUsage:
-									v.Memory.Usage = value
+									value.Memory.Usage = metricValue
 								case memTotal:
-									v.Memory.Total = value
+									value.Memory.Total = metricValue
 								case networkRX:
-									for nicK, nicV := range v.Network {
+									for nicK, nicV := range value.Network {
 										if nic == nicK {
-											nicV.Receive = value
+											nicV.Receive = metricValue
 										}
 									}
 								case networkTX:
-									for nicK, nicV := range v.Network {
+									for nicK, nicV := range value.Network {
 										if nic == nicK {
-											nicV.Transmit = value
+											nicV.Transmit = metricValue
 										}
 									}
 								case fsRead:
-									v.Filesystem.Read = value
+									value.Filesystem.Read = metricValue
 								case fsWrite:
-									v.Filesystem.Write = value
+									value.Filesystem.Write = metricValue
 								}
 							}
 						}
@@ -424,7 +479,6 @@ func (ni *NodesInfo) GetQueryNodesInfo(query *backends.Query) error {
 				}
 			}
 		}
-
 	}
 	return nil
 }

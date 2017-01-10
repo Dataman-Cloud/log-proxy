@@ -9,8 +9,9 @@ func initQueryMetric() *Query {
 	param := &QueryParameter{
 		Metric:    "cpu",
 		ClusterID: "work",
-		AppID:     "work-web",
-		TaskID:    "abcdefg",
+		AppID:     "web",
+		SlotID:    "0-1",
+		UserID:    "user1",
 		Start:     "1481612202",
 		End:       "1481612212",
 		Step:      "100s",
@@ -26,40 +27,51 @@ func initQueryMetric() *Query {
 	return query
 }
 
-func testGetTaskExpr() *MetricExpr {
+func expectGetTaskExpr() *MetricExpr {
 	expr := NewMetricExpr()
-	expr.CPU.Usage = "avg(irate(container_cpu_usage_seconds_total{container_label_APP_ID='work-web',id=~'/docker/abcdefg.*', name=~'mesos.*'}[5m])) by (container_label_VCLUSTER, container_label_APP_ID, group, id, image, instance, job, name, interface, device)"
-	expr.Memory.Percentage = "sum(container_memory_usage_bytes{container_label_APP_ID='work-web',id=~'/docker/abcdefg.*', name=~'mesos.*'}) by (container_label_VCLUSTER, container_label_APP_ID, group, id, image, instance, job, name, interface, device) / sum(container_spec_memory_limit_bytes{container_label_APP_ID='work-web',id=~'/docker/abcdefg.*', name=~'mesos.*'}) by (container_label_VCLUSTER, container_label_APP_ID, group, id, image, instance, job, name, interface, device)"
-	expr.Memory.Usage = "sum(container_memory_usage_bytes{container_label_APP_ID='work-web',id=~'/docker/abcdefg.*', name=~'mesos.*'}) by (container_label_VCLUSTER, container_label_APP_ID, group, id, image, instance, job, name, interface, device)"
-	expr.Memory.Total = "sum(container_spec_memory_limit_bytes{container_label_APP_ID='work-web',id=~'/docker/abcdefg.*', name=~'mesos.*'}) by (container_label_VCLUSTER, container_label_APP_ID, group, id, image, instance, job, name, interface, device)"
-	expr.Network.Receive = "sum(irate(container_network_receive_bytes_total{container_label_APP_ID='work-web',id=~'/docker/abcdefg.*', name=~'mesos.*'}[5m])) by (container_label_VCLUSTER, container_label_APP_ID, group, id, image, instance, job, name, interface, device)"
-	expr.Network.Transmit = "sum(irate(container_network_transmit_bytes_total{container_label_APP_ID='work-web',id=~'/docker/abcdefg.*', name=~'mesos.*'}[5m])) by (container_label_VCLUSTER, container_label_APP_ID, group, id, image, instance, job, name, interface, device)"
-	expr.Filesystem.Read = "sum(irate(container_fs_reads_total{container_label_APP_ID='work-web',id=~'/docker/abcdefg.*', name=~'mesos.*'}[5m])) by (container_label_VCLUSTER, container_label_APP_ID, group, id, image, instance, job, name, interface, device)"
-	expr.Filesystem.Write = "sum(irate(container_fs_writes_total{container_label_APP_ID='work-web',id=~'/docker/abcdefg.*', name=~'mesos.*'}[5m])) by (container_label_VCLUSTER, container_label_APP_ID, group, id, image, instance, job, name, interface, device)"
+	expr.CPU.Usage = "avg(irate(container_cpu_usage_seconds_total{container_label_CLUSTER_ID='work'," +
+		"container_label_APP_ID='web',container_label_SLOT_ID=~'[0-1]',container_label_USER_ID='user1'," +
+		"id=~'/docker/.*',name=~'mesos.*'}[5m])) by (container_label_CLUSTER_ID,container_label_APP_ID," +
+		"container_label_SLOT_ID,container_label_TASK_ID,container_label_USER_ID," +
+		"group,id,image,instance,job,name,interface,device)"
+	expr.Memory.Usage = "sum(container_memory_usage_bytes{container_label_CLUSTER_ID='work'," +
+		"container_label_APP_ID='web',container_label_SLOT_ID=~'[0-1]',container_label_USER_ID='user1'," +
+		"id=~'/docker/.*',name=~'mesos.*'}) by (container_label_CLUSTER_ID,container_label_APP_ID," +
+		"container_label_SLOT_ID,container_label_TASK_ID,container_label_USER_ID," +
+		"group,id,image,instance,job,name,interface,device)"
+	expr.Network.Receive = "sum(irate(container_network_receive_bytes_total{container_label_CLUSTER_ID='work'," +
+		"container_label_APP_ID='web',container_label_SLOT_ID=~'[0-1]',container_label_USER_ID='user1'," +
+		"id=~'/docker/.*',name=~'mesos.*'}[5m])) by (container_label_CLUSTER_ID,container_label_APP_ID," +
+		"container_label_SLOT_ID,container_label_TASK_ID,container_label_USER_ID," +
+		"group,id,image,instance,job,name,interface,device)"
+	expr.Filesystem.Read = "sum(irate(container_fs_reads_total{container_label_CLUSTER_ID='work'," +
+		"container_label_APP_ID='web',container_label_SLOT_ID=~'[0-1]',container_label_USER_ID='user1'," +
+		"id=~'/docker/.*',name=~'mesos.*'}[5m])) by (container_label_CLUSTER_ID,container_label_APP_ID," +
+		"container_label_SLOT_ID,container_label_TASK_ID,container_label_USER_ID," +
+		"group,id,image,instance,job,name,interface,device)"
 	return expr
 }
 
-func testGetAppExpr(appid string) *MetricExpr {
+func expectGetAppExpr(appid string) *MetricExpr {
 	expr := NewMetricExpr()
-	if appid == "" {
-		expr.CPU.Usage = "avg(irate(container_cpu_usage_seconds_total{container_label_APP_ID=~'.*',id=~'/docker/abcdefg.*', name=~'mesos.*'}[5m])) by (container_label_VCLUSTER, container_label_APP_ID)"
-		expr.Memory.Usage = "sum(container_memory_usage_bytes{container_label_APP_ID=~'.*',id=~'/docker/abcdefg.*', name=~'mesos.*'}) by (container_label_VCLUSTER, container_label_APP_ID)"
-		expr.Network.Receive = "sum(irate(container_network_receive_bytes_total{container_label_APP_ID=~'.*',id=~'/docker/abcdefg.*', name=~'mesos.*'}[5m])) by (container_label_VCLUSTER, container_label_APP_ID)"
-		expr.Network.Transmit = "sum(irate(container_network_transmit_bytes_total{container_label_APP_ID=~'.*',id=~'/docker/abcdefg.*', name=~'mesos.*'}[5m])) by (container_label_VCLUSTER, container_label_APP_ID)"
-		expr.Filesystem.Read = "sum(irate(container_fs_reads_total{container_label_APP_ID=~'.*',id=~'/docker/abcdefg.*', name=~'mesos.*'}[5m])) by (container_label_VCLUSTER, container_label_APP_ID)"
-		expr.Filesystem.Write = "sum(irate(container_fs_writes_total{container_label_APP_ID=~'.*',id=~'/docker/abcdefg.*', name=~'mesos.*'}[5m])) by (container_label_VCLUSTER, container_label_APP_ID)"
-		return expr
-	}
-	expr.CPU.Usage = "avg(irate(container_cpu_usage_seconds_total{container_label_APP_ID='work-web',id=~'/docker/abcdefg.*', name=~'mesos.*'}[5m])) by (container_label_VCLUSTER, container_label_APP_ID)"
-	expr.Memory.Usage = "sum(container_memory_usage_bytes{container_label_APP_ID='work-web',id=~'/docker/abcdefg.*', name=~'mesos.*'}) by (container_label_VCLUSTER, container_label_APP_ID)"
-	expr.Network.Receive = "sum(irate(container_network_receive_bytes_total{container_label_APP_ID='work-web',id=~'/docker/abcdefg.*', name=~'mesos.*'}[5m])) by (container_label_VCLUSTER, container_label_APP_ID)"
-	expr.Network.Transmit = "sum(irate(container_network_transmit_bytes_total{container_label_APP_ID='work-web',id=~'/docker/abcdefg.*', name=~'mesos.*'}[5m])) by (container_label_VCLUSTER, container_label_APP_ID)"
-	expr.Filesystem.Read = "sum(irate(container_fs_reads_total{container_label_APP_ID='work-web',id=~'/docker/abcdefg.*', name=~'mesos.*'}[5m])) by (container_label_VCLUSTER, container_label_APP_ID)"
-	expr.Filesystem.Write = "sum(irate(container_fs_writes_total{container_label_APP_ID='work-web',id=~'/docker/abcdefg.*', name=~'mesos.*'}[5m])) by (container_label_VCLUSTER, container_label_APP_ID)"
+	expr.CPU.Usage = "avg(irate(container_cpu_usage_seconds_total{container_label_CLUSTER_ID='work',container_label_APP_ID='web',container_label_SLOT_ID=~'[0-1]',container_label_USER_ID='user1',id=~'/docker/.*',name=~'mesos.*'}[5m])) by (container_label_CLUSTER_ID,container_label_APP_ID,container_label_USER_ID)"
+	expr.Memory.Usage = "sum(container_memory_usage_bytes{container_label_CLUSTER_ID='work'," +
+		"container_label_APP_ID='web',container_label_SLOT_ID=~'[0-1]',container_label_USER_ID='user1'," +
+		"id=~'/docker/.*',name=~'mesos.*'}) by (container_label_CLUSTER_ID,container_label_APP_ID," +
+		"container_label_USER_ID)"
+	expr.Network.Receive = "sum(irate(container_network_receive_bytes_total{container_label_CLUSTER_ID='work'," +
+		"container_label_APP_ID='web',container_label_SLOT_ID=~'[0-1]',container_label_USER_ID='user1'," +
+		"id=~'/docker/.*',name=~'mesos.*'}[5m])) by (container_label_CLUSTER_ID,container_label_APP_ID," +
+		"container_label_USER_ID)"
+	expr.Filesystem.Read = "sum(irate(container_fs_reads_total{container_label_CLUSTER_ID='work'," +
+		"container_label_APP_ID='web',container_label_SLOT_ID=~'[0-1]',container_label_USER_ID='user1'," +
+		"id=~'/docker/.*',name=~'mesos.*'}[5m])) by (container_label_CLUSTER_ID,container_label_APP_ID," +
+		"container_label_USER_ID)"
+
 	return expr
 }
 
-func testGetClusterExpr(nodeid string) *MetricExpr {
+func expectGetClusterExpr(nodeid string) *MetricExpr {
 	expr := NewMetricExpr()
 	if nodeid == "" {
 		expr.CPU.Usage = "avg(irate(container_cpu_usage_seconds_total{id='/'}[5m])) by (instance)"
@@ -81,76 +93,49 @@ func testGetClusterExpr(nodeid string) *MetricExpr {
 	return expr
 }
 
-func TestGetCPUExpr(t *testing.T) {
+func TestGetExpr(t *testing.T) {
 	query := initQueryMetric()
-	level := "id"
-	expr := testGetTaskExpr()
+	level := "task"
+	expr := expectGetTaskExpr()
 
 	newExpr := GetExpr(query, level)
 	if expr.CPU.Usage != newExpr.CPU.Usage {
-		t.Errorf("Expect %v, got wrong expr %v", expr.CPU.Usage, newExpr.CPU.Usage)
+		t.Errorf("Expect %v\n, got wrong expr %v", expr.CPU.Usage, newExpr.CPU.Usage)
 	}
+
 	if expr.Memory.Usage != newExpr.Memory.Usage {
-		t.Errorf("Expect %v, got wrong expr %v", expr.Memory.Usage, newExpr.Memory.Usage)
+		t.Errorf("Expect %v\n, got wrong expr %v", expr.Memory.Usage, newExpr.Memory.Usage)
 	}
+
 	if expr.Network.Receive != newExpr.Network.Receive {
 		t.Errorf("Expect %v, got wrong expr %v", expr.Network.Receive, newExpr.Network.Receive)
 	}
-	if expr.Network.Transmit != newExpr.Network.Transmit {
-		t.Errorf("Expect %v, got wrong expr %v", expr.Network.Transmit, newExpr.Network.Transmit)
-	}
+
 	if expr.Filesystem.Read != newExpr.Filesystem.Read {
 		t.Errorf("Expect %v, got wrong expr %v", expr.Filesystem.Read, newExpr.Filesystem.Read)
-	}
-	if expr.Filesystem.Write != newExpr.Filesystem.Write {
-		t.Errorf("Expect %v, got wrong expr %v", expr.Filesystem.Write, newExpr.Filesystem.Write)
 	}
 
 	level = "app"
-	expr = testGetAppExpr(query.AppID)
+	expr = expectGetAppExpr(query.AppID)
 	newExpr = GetExpr(query, level)
 	if expr.CPU.Usage != newExpr.CPU.Usage {
-		t.Errorf("Expect %v, got wrong expr %v", expr.CPU.Usage, newExpr.CPU.Usage)
+		t.Errorf("Expect %v\n, got wrong expr %v", expr.CPU.Usage, newExpr.CPU.Usage)
 	}
+
 	if expr.Memory.Usage != newExpr.Memory.Usage {
 		t.Errorf("Expect %v, got wrong expr %v", expr.Memory.Usage, newExpr.Memory.Usage)
 	}
+
 	if expr.Network.Receive != newExpr.Network.Receive {
 		t.Errorf("Expect %v, got wrong expr %v", expr.Network.Receive, newExpr.Network.Receive)
 	}
-	if expr.Network.Transmit != newExpr.Network.Transmit {
-		t.Errorf("Expect %v, got wrong expr %v", expr.Network.Transmit, newExpr.Network.Transmit)
-	}
+
 	if expr.Filesystem.Read != newExpr.Filesystem.Read {
 		t.Errorf("Expect %v, got wrong expr %v", expr.Filesystem.Read, newExpr.Filesystem.Read)
-	}
-	if expr.Filesystem.Write != newExpr.Filesystem.Write {
-		t.Errorf("Expect %v, got wrong expr %v", expr.Filesystem.Write, newExpr.Filesystem.Write)
-	}
-	query.AppID = ""
-	expr = testGetAppExpr(query.AppID)
-	newExpr = GetExpr(query, level)
-	if expr.CPU.Usage != newExpr.CPU.Usage {
-		t.Errorf("Expect %v, got wrong expr %v", expr.CPU.Usage, newExpr.CPU.Usage)
-	}
-	if expr.Memory.Usage != newExpr.Memory.Usage {
-		t.Errorf("Expect %v, got wrong expr %v", expr.Memory.Usage, newExpr.Memory.Usage)
-	}
-	if expr.Network.Receive != newExpr.Network.Receive {
-		t.Errorf("Expect %v, got wrong expr %v", expr.Network.Receive, newExpr.Network.Receive)
-	}
-	if expr.Network.Transmit != newExpr.Network.Transmit {
-		t.Errorf("Expect %v, got wrong expr %v", expr.Network.Transmit, newExpr.Network.Transmit)
-	}
-	if expr.Filesystem.Read != newExpr.Filesystem.Read {
-		t.Errorf("Expect %v, got wrong expr %v", expr.Filesystem.Read, newExpr.Filesystem.Read)
-	}
-	if expr.Filesystem.Write != newExpr.Filesystem.Write {
-		t.Errorf("Expect %v, got wrong expr %v", expr.Filesystem.Write, newExpr.Filesystem.Write)
 	}
 
 	level = "cluster"
-	expr = testGetClusterExpr(query.NodeID)
+	expr = expectGetClusterExpr(query.NodeID)
 	newExpr = GetExpr(query, level)
 	if expr.CPU.Usage != newExpr.CPU.Usage {
 		t.Errorf("Expect %v, got wrong expr %v", expr.CPU.Usage, newExpr.CPU.Usage)
@@ -171,7 +156,7 @@ func TestGetCPUExpr(t *testing.T) {
 		t.Errorf("Expect %v, got wrong expr %v", expr.Filesystem.Write, newExpr.Filesystem.Write)
 	}
 	query.NodeID = "192.168.1.1"
-	expr = testGetClusterExpr(query.NodeID)
+	expr = expectGetClusterExpr(query.NodeID)
 	newExpr = GetExpr(query, level)
 	if expr.CPU.Usage != newExpr.CPU.Usage {
 		t.Errorf("Expect %v, got wrong expr %v", expr.CPU.Usage, newExpr.CPU.Usage)
@@ -198,18 +183,19 @@ func TestInfoExpr(t *testing.T) {
 	infoExpr := NewInfoExpr()
 	infoExpr.GetInfoExpr(query)
 
-	appexpr := "container_tasks_state{id=~'/docker/.*', name=~'mesos.*', state='running',container_label_APP_ID='work-web'}"
+	appexpr := "container_tasks_state{container_label_TASK_ID=~'[0-9]-.*',id=~'/docker/.*',name=~'mesos.*', state='running',container_label_CLUSTER_ID='work', container_label_USER_ID='user1', container_label_APP_ID='web'}"
 	if appexpr != infoExpr.Application {
 		t.Errorf("newExpr is Not right. Expect %s, got wrong expr %s", appexpr, infoExpr.Application)
 	}
 
-	clusterexpr := "container_tasks_state{id=~'/docker/.*', name=~'mesos.*', state='running',container_label_VCLUSTER='work'}"
+	clusterexpr := "container_tasks_state{container_label_TASK_ID=~'[0-9]-.*',id=~'/docker/.*',name=~'mesos.*',state='running',container_label_CLUSTER_ID='work'}"
 	if clusterexpr != infoExpr.Cluster {
 		t.Errorf("newExpr is Not right. Expect %s, got wrong expr %s", clusterexpr, infoExpr.Cluster)
 	}
 
-	clustersexpr := "container_tasks_state{id=~'/docker/.*', name=~'mesos.*', state='running'}"
+	clustersexpr := "container_tasks_state{container_label_TASK_ID=~'[0-9]-.*',id=~'/docker/.*',name=~'mesos.*',state='running'}"
 	if clustersexpr != infoExpr.Clusters {
 		t.Errorf("newExpr is Not right. Expect %s, got wrong expr %s", clustersexpr, infoExpr.Clusters)
 	}
+
 }
