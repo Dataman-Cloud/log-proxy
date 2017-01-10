@@ -3,9 +3,10 @@
     angular.module('app')
         .controller('DashboardListAppCtrl', DashboardListAppCtrl);
     /* @ngInject */
-    function DashboardListAppCtrl(info) {
+    function DashboardListAppCtrl(info, $stateParams) {
         var self = this;
-        self.clusterInfo = info.data;
+
+        self.clusterInfo = info.data.clusters[$stateParams.clusterId];
 
         activate();
 

@@ -59,7 +59,7 @@
         <tbody md-body>
         <tr md-row ng-repeat="(key, value) in vm.tasks track by $index">
             <td md-cell>
-                <a ui-sref="home.dashboardInstanceMonitor({clusterId: $stateParams.clusterId, appId: $stateParams.appId, taskId: key.substring(8)})">{/key/}</a>
+                <a ui-sref="home.dashboardInstanceMonitor({clusterId: $stateParams.clusterId, userId: $stateParams.userId,appId: $stateParams.appId, taskId: value.slot})">{/key/}</a>
             </td>
             <td md-cell>
                 {/value.node/}

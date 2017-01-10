@@ -1,13 +1,15 @@
 <div class="monitor-tab" layout="row" layout-align="space-between start">
     <div class="tab panel" flex="none">
         <ul>
-            <li ng-repeat="(key, value) in vm.clusterInfo.clusters[$stateParams.clusterId].applications">
+            <li ng-repeat="(key, value) in vm.clusterInfo.users[$stateParams.userId].applications">
                 <a ui-sref-active="active" ui-sref=".detail({appId: key})">
                     <h3>{/key/}</h3>
                     <div class="statistic">
-                        <div flex="none"><i class="fa fa-cube">
-                            <md-tooltip md-direction="left">实例数</md-tooltip>
-                        </i>{/keys(vm.clusterInfo.clusters[$stateParams.clusterId].applications[key].tasks).length/}
+                        <div flex="none">
+                            <i class="fa fa-cube">
+                                <md-tooltip md-direction="left">实例数</md-tooltip>
+                            </i>
+                            {/keys(vm.clusterInfo.users[$stateParams.userId].applications[key].tasks).length/}
                         </div>
                     </div>
                 </a>
