@@ -3,7 +3,7 @@
     angular.module('app')
         .controller('DashboardCtrl', DashboardCtrl);
     /* @ngInject */
-    function DashboardCtrl(dashboardBackend, $stateParams, $scope, $timeout, $q) {
+    function DashboardCtrl(dashboardBackend, $scope, $timeout, $q) {
         var timeoutResult;
         var reloadInterval = 10000;
 
@@ -15,7 +15,6 @@
             tasks: [],
             nodes: []
         };
-
 
         activate();
 

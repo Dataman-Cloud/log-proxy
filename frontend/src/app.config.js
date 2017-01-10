@@ -14,32 +14,32 @@
                 abstract: true
             })
 
-            // //about dashboard
-            // .state('home.dashboard', {
-            //     url: '/dashboard',
-            //     templateUrl: '/src/dashboard/dashboard.html',
-            //     controller: 'DashboardCtrl as vm'
-            // })
-            // .state('home.dashboardMonitor', {
-            //     url: '/dashboardMonitor/:clusterId',
-            //     templateUrl: '/src/dashboard/monitor/app/list.html',
-            //     controller: 'DashboardListAppCtrl as vm',
-            //     abstract: true,
-            //     resolve: {
-            //         info: getInfo
-            //     }
-            // })
-            // .state('home.dashboardMonitor.detail', {
-            //     url: '/:appId',
-            //     templateUrl: '/src/dashboard/monitor/app/detail.html',
-            //     controller: 'DashboardAppDetailCtrl as vm'
-            // })
-            // .state('home.dashboardInstanceMonitor', {
-            //     url: '/dashboardMonitor/:clusterId/:appId/instances/:taskId',
-            //     templateUrl: '/src/dashboard/monitor/instance/detail.html',
-            //     controller: 'DashboardInstanceCtrl as vm'
-            // })
-            // //end dashboard
+            //about dashboard
+            .state('home.dashboard', {
+                url: '/dashboard',
+                templateUrl: '/src/dashboard/dashboard.html',
+                controller: 'DashboardCtrl as vm'
+            })
+            .state('home.dashboardMonitor', {
+                url: '/dashboardMonitor/:clusterId/:userId',
+                templateUrl: '/src/dashboard/monitor/app/list.html',
+                controller: 'DashboardListAppCtrl as vm',
+                abstract: true,
+                resolve: {
+                    info: getInfo
+                }
+            })
+            .state('home.dashboardMonitor.detail', {
+                url: '/:appId',
+                templateUrl: '/src/dashboard/monitor/app/detail.html',
+                controller: 'DashboardAppDetailCtrl as vm'
+            })
+            .state('home.dashboardInstanceMonitor', {
+                url: '/dashboardMonitor/:clusterId/:userId/:appId/instances/:taskId',
+                templateUrl: '/src/dashboard/monitor/instance/detail.html',
+                controller: 'DashboardInstanceCtrl as vm'
+            })
+            //end dashboard
 
             //about monitor
             .state('home.monitor', {
@@ -144,7 +144,7 @@
 
         /* @ngInject */
         function getInfo(dashboardBackend, $stateParams) {
-            return dashboardBackend.info({clusterid: $stateParams.clusterId}).get().$promise
+            return dashboardBackend.info({clusterid: $stateParams.clusterId, userid: $stateParams.userId}).get().$promise
         }
 
         /* @ngInject */
@@ -165,7 +165,7 @@
         //warning: otherwise(url) will be redirect loop on state with errored resolve
         $urlRouterProvider.otherwise(function ($injector) {
             var $state = $injector.get('$state');
-            $state.go('home.monitor');
+            $state.go('home.dashboard');
         });
         $interpolateProvider.startSymbol('{/');
         $interpolateProvider.endSymbol('/}');
