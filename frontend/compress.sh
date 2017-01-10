@@ -4,5 +4,6 @@ rm -rf build/*
 npm config set registry https://registry.npm.taobao.org
 npm install --global gulp
 npm install
-bower install --allow-root
+npm install bower
+/usr/src/app/node_modules/bower/bin/bower install --allow-root
 gulp
