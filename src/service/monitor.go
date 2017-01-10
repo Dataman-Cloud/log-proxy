@@ -75,6 +75,7 @@ type Info struct {
 	Clusters     map[string]*ClusterInfo `json:"clusters"`
 	Users        []string                `json:"users"`
 	Applications []string                `json:"applications"`
+	Nodes        []string                `json:"nodes"`
 }
 
 // NewInfo init struct Info
@@ -83,6 +84,7 @@ func NewInfo() *Info {
 		Clusters:     make(map[string]*ClusterInfo),
 		Users:        []string{},
 		Applications: []string{},
+		Nodes:        []string{},
 	}
 }
 
@@ -218,6 +220,9 @@ func (info *Info) GetClustersInfo(query *backends.Query, data *models.QueryRange
 						appUID := fmt.Sprintf("%s.%s.%s", cluster, user, app)
 						if !isInArray(info.Applications, appUID) {
 							info.Applications = append(info.Applications, appUID)
+						}
+						if !isInArray(info.Nodes, node) {
+							info.Nodes = append(info.Nodes, node)
 						}
 					}
 				}
