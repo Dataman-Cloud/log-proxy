@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/Dataman-Cloud/log-proxy/src/backends"
@@ -71,13 +72,17 @@ func (m *Metric) GetQueryMetric(query *backends.Query) error {
 
 // Info defines the JSON format of information in clusters/cluster/apps/nodes
 type Info struct {
-	Clusters map[string]*ClusterInfo `json:"clusters"`
+	Clusters     map[string]*ClusterInfo `json:"clusters"`
+	Users        []string                `json:"users"`
+	Applications []string                `json:"applications"`
 }
 
 // NewInfo init struct Info
 func NewInfo() *Info {
 	return &Info{
-		Clusters: make(map[string]*ClusterInfo),
+		Clusters:     make(map[string]*ClusterInfo),
+		Users:        []string{},
+		Applications: []string{},
 	}
 }
 
@@ -187,6 +192,9 @@ func (info *Info) GetClustersInfo(query *backends.Query, data *models.QueryRange
 		for name, value := range info.Clusters {
 			if cluster == name {
 				value.Users[user] = NewUserInfo()
+				if !isInArray(info.Users, user) {
+					info.Users = append(info.Users, user)
+				}
 			}
 		}
 	}
@@ -206,6 +214,10 @@ func (info *Info) GetClustersInfo(query *backends.Query, data *models.QueryRange
 						}
 						if !isInArray(value.Nodes, node) {
 							value.Nodes = append(value.Nodes, node)
+						}
+						appUID := fmt.Sprintf("%s.%s.%s", cluster, user, app)
+						if !isInArray(info.Applications, appUID) {
+							info.Applications = append(info.Applications, appUID)
 						}
 					}
 				}
