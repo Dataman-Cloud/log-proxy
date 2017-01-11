@@ -16,40 +16,43 @@
         <em id="nodeNumb">{/vm.info.nodes.length/}</em>
     </div>
 </div>
-<div class="panel" ng-repeat="(cluster, clusterValue ) in vm.info.clusters track by $index">
-    <span>{/cluster/}</span>
-    <md-table-container>
-        <table md-table id="cluster-list">
-            <thead md-head>
-            <tr md-row>
-                <th id="clusters" md-column style="width:200px;">用户</th>
-                <th id="apps" md-column style="width:200px;">应用</th>
-                <th id="instances" md-column>实例(个)</th>
-                <th id="hosts" md-column>主机</th>
-            </tr>
-            </thead>
-            <tbody md-body>
-            <tr md-row ng-repeat="(key, value) in clusterValue.users track by $index">
-                <td md-cell>
-                    <a ui-sref="home.dashboardMonitor.detail({clusterId: cluster, userId: key, appId: keys(value.applications)[0]})">{/key/}</a>
-                </td>
-                <td md-cell>
-                    <div class="limit-td-height">
-                        <p ng-repeat="(appKey, appValue) in value.applications track by $index">{/appKey/}</p>
-                    </div>
-                </td>
-                <td md-cell>
-                    <div class="limit-td-height">
-                        <span>{/keys(value.tasks).length/}</span>
-                    </div>
-                </td>
-                <td md-cell>
-                    <p ng-repeat="node in value.nodes track by $index">{/node/}</p>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-    </md-table-container>
+<div class="panel">
+    <div ng-repeat="(cluster, clusterValue ) in vm.info.clusters track by $index">
+        <h3 ng-show="cluster" class="table-title">集群名：{/cluster/}</h3>
+        <h3 ng-hide="cluster" class="table-title">集群名：暂无</h3>
+        <md-table-container>
+            <table md-table id="cluster-list">
+                <thead md-head>
+                <tr md-row>
+                    <th id="clusters" md-column style="width:200px;">用户</th>
+                    <th id="apps" md-column>应用</th>
+                    <th id="instances" md-column style="width:200px;">实例<small>个</small></th>
+                    <th id="hosts" md-column style="width:200px;">主机</th>
+                </tr>
+                </thead>
+                <tbody md-body>
+                <tr md-row ng-repeat="(key, value) in clusterValue.users track by $index">
+                    <td md-cell>
+                        <a ui-sref="home.dashboardMonitor.detail({clusterId: cluster, userId: key, appId: keys(value.applications)[0]})">{/key/}</a>
+                    </td>
+                    <td md-cell>
+                        <div class="limit-td-height">
+                            <p ng-repeat="(appKey, appValue) in value.applications track by $index">{/appKey/}</p>
+                        </div>
+                    </td>
+                    <td md-cell>
+                        <div class="limit-td-height">
+                            <span>{/keys(value.tasks).length/}</span>
+                        </div>
+                    </td>
+                    <td md-cell>
+                        <p ng-repeat="node in value.nodes track by $index">{/node/}</p>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </md-table-container>
+    </div>
 </div>
 <div class="panel">
     <md-table-container>
@@ -95,4 +98,5 @@
             </tbody>
         </table>
     </md-table-container>
+    <div ng-show="!keys(vm.nodes).length" class="panel-noinfo">暂无数据</div>
 </div>

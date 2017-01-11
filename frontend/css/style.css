@@ -2,7 +2,7 @@ body,
 html {
     font-family: 'Helvetica Neue', 'Helvetica', 'PingHei', 'PingFang SC', 'STHeitiSC-Light', 'Arial', sans-serif;
     font-size: 14px;
-    font-weight: 300;
+    font-weight: 400;
     height: 100%;
     color: #000;
     background-color: rgba(241, 241, 241, 1);
@@ -23,7 +23,12 @@ html {
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
-
+a {
+    color: rgba(0, 189, 218, 1);
+}
+a:hover {
+    text-decoration: none;
+}
 ul,
 ol,
 li,
@@ -82,9 +87,13 @@ md-table-container {
     max-width: 100%;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    margin-bottom: 30px;
 }
 
 /* ******* table style ******* */
+.table-title {
+    margin-bottom: 10px;
+}
 table.md-table {
     table-layout: fixed;
     word-wrap: break-word;
@@ -97,10 +106,11 @@ table.md-table tfoot.md-foot > tr.md-row {
 
 table.md-table thead.md-head > tr.md-row {
     height: 32px;
+    background-color: rgba(0, 0, 0, 0.024);
 }
 
-table.md-table tbody.md-body tr:nth-child(2n+1) td.md-cell {
-    background-color: rgba(0, 0, 0, 0.05);
+table.md-table tbody.md-body tr:nth-child(2n) td.md-cell {
+    background-color: rgba(0, 0, 0, 0.024);
 }
 
 table.md-table td.md-cell:last-child,
@@ -302,14 +312,9 @@ textarea {
 .monitor-tab .content {
 }
 
-.statistic {
-
-}
-
 .statistic-panel {
-    border: 1px solid rgba(0, 0, 0, 0.025);
     border-radius: 4px;
-    background-color: rgba(0, 0, 0, 0.025);
+    background-color: rgba(0, 189, 218, 1);
     padding: 12px;
     text-align: center;
     width: 18%;
@@ -318,7 +323,7 @@ textarea {
 .statistic-panel h3 {
     font-size: 14px;
     font-weight: 400;
-    color: #888;
+    color: rgba(0,0,0,0.55);
     height: 20px;
     display: block;
 }
@@ -328,6 +333,7 @@ textarea {
     font-weight: 600;
     font-style: normal;
     display: block;
+    color: #FFF;
 }
 
 .statistic-panel em i {
@@ -375,10 +381,11 @@ textarea {
 }
 .json-detail {
     padding: 20px 60px;
-    background: -ms-linear-gradient(top, #fff,  #0000ff);
-    background:-moz-linear-gradient(top,#b8c4cb,#f6f6f8);
-    background:-webkit-gradient(linear, 0% 0%, 0% 90%, from(rgba(0,0,0,0.05)), to(#FFF));
-    background: -o-linear-gradient(top, #fff, #0000ff);
+    background: -ms-linear-gradient(top, #fff, rgba(0, 0, 0, 0.1));
+    background: -moz-linear-gradient(top, #fff, rgba(0, 0, 0, 0.1));
+    background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#FFF), to(rgba(0, 0, 0, 0.1)));
+    background: -o-linear-gradient(top, #fff, rgba(0, 0, 0, 0.1));
+    border-bottom: 1px solid rgba(0, 0, 0, 0.15);
 }
 .json-detail dl {
     margin-bottom: 8px;
@@ -439,4 +446,9 @@ textarea {
 .limit-td-height {
     max-height: 100px;
     overflow-y: auto;
+}
+.panel-noinfo {
+    text-align: center;
+    padding-top: 40px;
+    padding-bottom: 50px;
 }
