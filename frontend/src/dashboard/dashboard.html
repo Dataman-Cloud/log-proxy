@@ -32,7 +32,7 @@
                 </thead>
                 <tbody md-body>
                 <tr md-row ng-repeat="(key, value) in clusterValue.users track by $index">
-                    <td md-cell>
+                    <td md-cell style="font-size:16px">
                         <a ui-sref="home.dashboardMonitor.detail({clusterId: cluster, userId: key, appId: keys(value.applications)[0]})">{/key/}</a>
                     </td>
                     <td md-cell>

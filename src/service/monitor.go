@@ -163,9 +163,11 @@ func (info *Info) GetQueryInfo(query *backends.Query) error {
 		return err
 	}
 	info.GetClustersInfo(query, data)
+	if query.ClusterID != "" && query.UserID != "" {
+		info.GetAppInfo(query, data)
+	}
 
 	if query.ClusterID != "" && query.UserID != "" && query.AppID != "" {
-		info.GetAppInfo(query, data)
 		err = info.GetAppInfoMetric(query)
 		if err != nil {
 			return err
