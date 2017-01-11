@@ -5,7 +5,7 @@
     /* @ngInject */
     function DashboardAppDetailCtrl(dashboardBackend, monitorBackend, $q, $timeout, $scope, $stateParams, moment, monitorChart) {
         var timeoutResult;
-        var reloadInterval = 10000;
+        var reloadInterval = 15000;
         var monitorData = {
             network: {receive: [], transmit: []},
             filesystem: {read: [], write: []}

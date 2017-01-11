@@ -1,64 +1,68 @@
-##日志监控报警
+##日志监控报警 mola for swan
 
 
 ###访问界面
 
 通过访问部署服务的主机的`5098`端口
-  
+
 
 ###功能
 
 ####Dashboard
 
- 统计集群信息：包括应用数、实例数、主机数。
- 
+ 统计集群信息：包括集群数、用户数、应用数、主机数
+
+ 集群列表：一个集群一个列表，显示运行在这个集群中的应用的统计信息。
+
  ![dashboard](images/dashboard.png)
- 
- 点击相应的集群名称，可以查看集群的实例的资源使用情况。
- 
- - CPU ：取多实例实时占用分配的cpu资源的均值
- 
- - 内存 ：取多实例实时占用分配的CPU资源的均值
- 
- - 网络IO ：取多实例的IO实时的汇总值
- 
- - 磁盘IO  ：取多实例的IO实时的汇总值
- 
- ![dashboard](images/cluster_info.png)
- 
- 统计主机信息：主机的CPU、内存、网络IO
- 
+
+
+ 统计主机信息: 显示主机的实时性能指标
+
  ![dashboard](images/node_info.png)
- 
- 
+
+ 点击集群列表里的用户名称，可以进入某个用户在这个集群中发布的应用列表页。
+
+ - CPU ：取多实例实时占用分配的cpu资源的均值
+
+ - 内存 ：取多实例实时占用分配的CPU资源的均值
+
+ - 网络IO ：取多实例的IO实时的汇总值
+
+ - 磁盘IO  ：取多实例的IO实时的汇总值
+
+ ![dashboard](images/apps_info.png)
+
+
+
 ####监控
 
 - 快捷查询
- 
-  通过输入应用名称，查询一段时间内某项指标的折线图，实例名只录入前四位即可定位。
-  
+
+  输入集群名称，用户名称，应用名称，查询一段时间内某项指标的折线图，实例名可以输入范围查询，如“1-5”或者，”1,2,3,5,8“，置空时默认查全部。
+
   ![快捷查询](images/app_quicksc.png)
 
-  
+
    监控指标包括：
-   
+
    - cpu : cpu 使用率
-  
+
    - memory ：内存使用率
-   
+
    - memory_usage ：内存使用量
-   
+
    - memory_total： 内存总用量
 
    - network_rx ： 网络接收率
 
    - network_tx ：网络发送速率
-   
+
    - fs_read ： 磁盘读取速率
 
    - fs_write ：磁盘写入速率
 
-  
+
 
 
 - 高级查询
@@ -87,9 +91,9 @@ irate(container_cpu_usage_seconds_total{id=~"/docker/.*", name=~"mesos.*",contai
 应用名、实例ID、日志来源为必填项，支持下拉选择。
 
 
- 
+
 ![日志查询](images/logs_search.png)
- 
+
 
 ####告警
 #####告警规则
@@ -121,12 +125,10 @@ irate(container_cpu_usage_seconds_total{id=~"/docker/.*", name=~"mesos.*",contai
   - 创建者：创建者邮箱
   - 注释：静默原因
   - 匹配项目：根据告警规则取得的匹配项目，根据告警规则匹配的项目而定。
-  
-  
-  
+
+
+
 已经建立的静默规则，可以`删除`或`编辑`。
 
 
  ![告警静默](images/manage_silent.png)
- 
- 
