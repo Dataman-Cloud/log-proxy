@@ -88,3 +88,33 @@ func ParseTask(taskid string) []string {
 	}
 	return tasks
 }
+
+// ParseMonitorTaskID convert the taskID to string as "1|2|3" for Prometheus Query
+func ParseMonitorTaskID(taskID string) (string, error) {
+	if taskID == "" {
+		return ".*", nil
+	}
+
+	if strings.Contains(taskID, ",") {
+		return strings.Replace(taskID, ",", "|", -1), nil
+	}
+
+	if strings.Contains(taskID, "-") && len(strings.Split(taskID, "-")) == 2 {
+		taskRange := strings.Split(taskID, "-")
+		lower, err := strconv.Atoi(taskRange[0])
+		if err != nil {
+			return "", err
+		}
+		upper, err := strconv.Atoi(taskRange[1])
+		if err != nil {
+			return "", err
+		}
+		var tasks []string
+		for lower <= upper {
+			tasks = append(tasks, strconv.Itoa(lower))
+			lower++
+		}
+		return strings.Join(tasks, "|"), nil
+	}
+	return taskID, nil
+}
