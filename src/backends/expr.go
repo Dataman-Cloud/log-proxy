@@ -75,38 +75,35 @@ func (expr *MetricExpr) setMetricExpr(query *Query, byItems string) {
 	appid := query.AppID
 	userid := query.UserID
 	slotid := query.SlotID
-	if slotid == "" {
-		slotid = "0-9"
-	}
 
 	expr.CPU.Usage = fmt.Sprintf("avg(irate(container_cpu_usage_seconds_total{container_label_CLUSTER_ID='%s',"+
-		"container_label_APP_ID='%s',container_label_SLOT_ID=~'[%s]',container_label_USER_ID='%s',"+
+		"container_label_APP_ID='%s',container_label_SLOT_ID=~'%s',container_label_USER_ID='%s',"+
 		"id=~'/docker/.*',name=~'mesos.*'}[5m])) by (%s)", clusterid, appid, slotid, userid, byItems)
 
 	expr.Memory.Usage = fmt.Sprintf("sum(container_memory_usage_bytes{container_label_CLUSTER_ID='%s',"+
-		"container_label_APP_ID='%s',container_label_SLOT_ID=~'[%s]',container_label_USER_ID='%s',"+
+		"container_label_APP_ID='%s',container_label_SLOT_ID=~'%s',container_label_USER_ID='%s',"+
 		"id=~'/docker/.*',name=~'mesos.*'}) by (%s)", clusterid, appid, slotid, userid, byItems)
 
 	expr.Memory.Total = fmt.Sprintf("sum(container_spec_memory_limit_bytes{container_label_CLUSTER_ID='%s',"+
-		"container_label_APP_ID='%s',container_label_SLOT_ID=~'[%s]',container_label_USER_ID='%s',"+
+		"container_label_APP_ID='%s',container_label_SLOT_ID=~'%s',container_label_USER_ID='%s',"+
 		"id=~'/docker/.*',name=~'mesos.*'}) by (%s)", clusterid, appid, slotid, userid, byItems)
 
 	expr.Memory.Percentage = fmt.Sprintf("%s / %s", expr.Memory.Usage, expr.Memory.Total)
 
 	expr.Network.Receive = fmt.Sprintf("sum(irate(container_network_receive_bytes_total{container_label_CLUSTER_ID='%s',"+
-		"container_label_APP_ID='%s',container_label_SLOT_ID=~'[%s]',container_label_USER_ID='%s',"+
+		"container_label_APP_ID='%s',container_label_SLOT_ID=~'%s',container_label_USER_ID='%s',"+
 		"id=~'/docker/.*',name=~'mesos.*'}[5m])) by (%s)", clusterid, appid, slotid, userid, byItems)
 
 	expr.Network.Transmit = fmt.Sprintf("sum(irate(container_network_transmit_bytes_total{container_label_CLUSTER_ID='%s',"+
-		"container_label_APP_ID='%s', container_label_SLOT_ID=~'[%s]',container_label_USER_ID='%s',"+
+		"container_label_APP_ID='%s', container_label_SLOT_ID=~'%s',container_label_USER_ID='%s',"+
 		"id=~'/docker/.*',name=~'mesos.*'}[5m])) by (%s)", clusterid, appid, slotid, userid, byItems)
 
 	expr.Filesystem.Read = fmt.Sprintf("sum(irate(container_fs_reads_total{container_label_CLUSTER_ID='%s',"+
-		"container_label_APP_ID='%s',container_label_SLOT_ID=~'[%s]',container_label_USER_ID='%s',"+
+		"container_label_APP_ID='%s',container_label_SLOT_ID=~'%s',container_label_USER_ID='%s',"+
 		"id=~'/docker/.*',name=~'mesos.*'}[5m])) by (%s)", clusterid, appid, slotid, userid, byItems)
 
 	expr.Filesystem.Write = fmt.Sprintf("sum(irate(container_fs_writes_total{container_label_CLUSTER_ID='%s',"+
-		"container_label_APP_ID='%s',container_label_SLOT_ID=~'[%s]',container_label_USER_ID='%s',"+
+		"container_label_APP_ID='%s',container_label_SLOT_ID=~'%s',container_label_USER_ID='%s',"+
 		"id=~'/docker/.*',name=~'mesos.*'}[5m])) by (%s)", clusterid, appid, slotid, userid, byItems)
 }
 

@@ -30,22 +30,22 @@ func initQueryMetric() *Query {
 func expectGetTaskExpr() *MetricExpr {
 	expr := NewMetricExpr()
 	expr.CPU.Usage = "avg(irate(container_cpu_usage_seconds_total{container_label_CLUSTER_ID='work'," +
-		"container_label_APP_ID='web',container_label_SLOT_ID=~'[0-1]',container_label_USER_ID='user1'," +
+		"container_label_APP_ID='web',container_label_SLOT_ID=~'0-1',container_label_USER_ID='user1'," +
 		"id=~'/docker/.*',name=~'mesos.*'}[5m])) by (container_label_CLUSTER_ID,container_label_APP_ID," +
 		"container_label_SLOT_ID,container_label_TASK_ID,container_label_USER_ID," +
 		"group,id,image,instance,job,name,interface,device)"
 	expr.Memory.Usage = "sum(container_memory_usage_bytes{container_label_CLUSTER_ID='work'," +
-		"container_label_APP_ID='web',container_label_SLOT_ID=~'[0-1]',container_label_USER_ID='user1'," +
+		"container_label_APP_ID='web',container_label_SLOT_ID=~'0-1',container_label_USER_ID='user1'," +
 		"id=~'/docker/.*',name=~'mesos.*'}) by (container_label_CLUSTER_ID,container_label_APP_ID," +
 		"container_label_SLOT_ID,container_label_TASK_ID,container_label_USER_ID," +
 		"group,id,image,instance,job,name,interface,device)"
 	expr.Network.Receive = "sum(irate(container_network_receive_bytes_total{container_label_CLUSTER_ID='work'," +
-		"container_label_APP_ID='web',container_label_SLOT_ID=~'[0-1]',container_label_USER_ID='user1'," +
+		"container_label_APP_ID='web',container_label_SLOT_ID=~'0-1',container_label_USER_ID='user1'," +
 		"id=~'/docker/.*',name=~'mesos.*'}[5m])) by (container_label_CLUSTER_ID,container_label_APP_ID," +
 		"container_label_SLOT_ID,container_label_TASK_ID,container_label_USER_ID," +
 		"group,id,image,instance,job,name,interface,device)"
 	expr.Filesystem.Read = "sum(irate(container_fs_reads_total{container_label_CLUSTER_ID='work'," +
-		"container_label_APP_ID='web',container_label_SLOT_ID=~'[0-1]',container_label_USER_ID='user1'," +
+		"container_label_APP_ID='web',container_label_SLOT_ID=~'0-1',container_label_USER_ID='user1'," +
 		"id=~'/docker/.*',name=~'mesos.*'}[5m])) by (container_label_CLUSTER_ID,container_label_APP_ID," +
 		"container_label_SLOT_ID,container_label_TASK_ID,container_label_USER_ID," +
 		"group,id,image,instance,job,name,interface,device)"
@@ -54,17 +54,17 @@ func expectGetTaskExpr() *MetricExpr {
 
 func expectGetAppExpr(appid string) *MetricExpr {
 	expr := NewMetricExpr()
-	expr.CPU.Usage = "avg(irate(container_cpu_usage_seconds_total{container_label_CLUSTER_ID='work',container_label_APP_ID='web',container_label_SLOT_ID=~'[0-1]',container_label_USER_ID='user1',id=~'/docker/.*',name=~'mesos.*'}[5m])) by (container_label_CLUSTER_ID,container_label_APP_ID,container_label_USER_ID)"
+	expr.CPU.Usage = "avg(irate(container_cpu_usage_seconds_total{container_label_CLUSTER_ID='work',container_label_APP_ID='web',container_label_SLOT_ID=~'0-1',container_label_USER_ID='user1',id=~'/docker/.*',name=~'mesos.*'}[5m])) by (container_label_CLUSTER_ID,container_label_APP_ID,container_label_USER_ID)"
 	expr.Memory.Usage = "sum(container_memory_usage_bytes{container_label_CLUSTER_ID='work'," +
-		"container_label_APP_ID='web',container_label_SLOT_ID=~'[0-1]',container_label_USER_ID='user1'," +
+		"container_label_APP_ID='web',container_label_SLOT_ID=~'0-1',container_label_USER_ID='user1'," +
 		"id=~'/docker/.*',name=~'mesos.*'}) by (container_label_CLUSTER_ID,container_label_APP_ID," +
 		"container_label_USER_ID)"
 	expr.Network.Receive = "sum(irate(container_network_receive_bytes_total{container_label_CLUSTER_ID='work'," +
-		"container_label_APP_ID='web',container_label_SLOT_ID=~'[0-1]',container_label_USER_ID='user1'," +
+		"container_label_APP_ID='web',container_label_SLOT_ID=~'0-1',container_label_USER_ID='user1'," +
 		"id=~'/docker/.*',name=~'mesos.*'}[5m])) by (container_label_CLUSTER_ID,container_label_APP_ID," +
 		"container_label_USER_ID)"
 	expr.Filesystem.Read = "sum(irate(container_fs_reads_total{container_label_CLUSTER_ID='work'," +
-		"container_label_APP_ID='web',container_label_SLOT_ID=~'[0-1]',container_label_USER_ID='user1'," +
+		"container_label_APP_ID='web',container_label_SLOT_ID=~'0-1',container_label_USER_ID='user1'," +
 		"id=~'/docker/.*',name=~'mesos.*'}[5m])) by (container_label_CLUSTER_ID,container_label_APP_ID," +
 		"container_label_USER_ID)"
 

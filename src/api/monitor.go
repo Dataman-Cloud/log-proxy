@@ -32,7 +32,7 @@ func (m *Monitor) Query(ctx *gin.Context) {
 		Metric:    ctx.Query("metric"),
 		ClusterID: ctx.Query("clusterid"),
 		AppID:     ctx.Query("appid"),
-		SlotID:    ctx.Query("taskid"),
+		SlotID:    ctx.Query("taskid"), //SlotID is the swan's application field.
 		UserID:    ctx.Query("userid"),
 		Start:     ctx.Query("start"),
 		End:       ctx.Query("end"),
@@ -61,6 +61,13 @@ func (m *Monitor) Query(ctx *gin.Context) {
 
 	if param.Metric != "" && param.ClusterID != "" && param.UserID == "" {
 		err := fmt.Errorf("The paramter userid required")
+		utils.ErrorResponse(ctx, err)
+		return
+	}
+
+	var err error
+	param.SlotID, err = utils.ParseMonitorTaskID(param.SlotID)
+	if err != nil {
 		utils.ErrorResponse(ctx, err)
 		return
 	}
