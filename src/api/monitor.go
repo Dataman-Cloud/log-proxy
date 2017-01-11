@@ -110,7 +110,16 @@ func (m *Monitor) QueryInfo(ctx *gin.Context) {
 		ClusterID: ctx.Query("clusterid"),
 		UserID:    ctx.Query("userid"),
 		AppID:     ctx.Query("appid"),
+		SlotID:    ctx.Query("taskid"), //SlotID is the swan's application field.
 	}
+
+	var err error
+	param.SlotID, err = utils.ParseMonitorTaskID(param.SlotID)
+	if err != nil {
+		utils.ErrorResponse(ctx, err)
+		return
+	}
+
 	query := &backends.Query{
 		HTTPClient:     http.DefaultClient,
 		PromServer:     config.GetConfig().PrometheusURL,
@@ -119,7 +128,7 @@ func (m *Monitor) QueryInfo(ctx *gin.Context) {
 	}
 
 	data := service.NewInfo()
-	err := data.GetQueryInfo(query)
+	err = data.GetQueryInfo(query)
 	if err != nil {
 		utils.ErrorResponse(ctx, err)
 		return
