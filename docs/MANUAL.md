@@ -89,6 +89,8 @@ irate(container_cpu_usage_seconds_total{id=~"/docker/.*", name=~"mesos.*",contai
 
 
 应用名、实例ID、日志来源为必填项，支持下拉选择。
+实例支持0、0,1、0-2等多种方式查询
+来源api支持stdout,stderr,...方式查询
 
 
 
