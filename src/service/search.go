@@ -138,7 +138,7 @@ func (s *SearchService) Paths(clusterid, userid, appName, taskID string, page mo
 	querys = append(querys, elastic.NewTermQuery("userid", userid))
 	querys = append(querys, elastic.NewTermQuery("appid", appName))
 	if taskID != "" {
-		querys = append(querys, elastic.NewTermQuery("taskid", taskID))
+		querys = append(querys, elastic.NewTermsQuery("taskid", utils.ParseTask(taskID)))
 	}
 
 	bquery := elastic.NewBoolQuery().
