@@ -288,7 +288,7 @@ func (s *SearchService) Context(clusterid, userid, appid, taskid, source, timest
 		Must(elastic.NewTermQuery("appid", appid), elastic.NewTermQuery("taskid", taskid), elastic.NewTermQuery("path", source))
 
 	result, err := s.ESClient.Search().
-		Index("dataman-"+strings.Split(appid, "-")[0]+"-"+time.Unix(offset/1e9, 0).Format("2006-01-02")).
+		Index("dataman-"+clusterid+"-"+time.Unix(offset/1e9, 0).Format("2006-01-02")).
 		Type("dataman-"+appid).
 		Query(bquery).
 		Sort("logtime.sort", true).
