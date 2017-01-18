@@ -22,20 +22,20 @@ type Result struct {
 
 // Metric is the sub in Result
 type Metric struct {
-	ContainerLabelAppID     string `json:"container_label_APP_ID"`
-	ContainerLabelClusterID string `json:"container_label_CLUSTER_ID"`
-	ContainerLabelSlotID    string `json:"container_label_SLOT_ID"`
-	ContainerLabelTaskID    string `json:"container_label_TASK_ID"`
-	ContainerLabelUserID    string `json:"container_label_USER_ID"`
-	ContainerLabelVcluster  string `json:"container_label_VCLUSTER"`
-	ID                      string `json:"id"`
-	Image                   string `json:"image"`
-	Instance                string `json:"instance"`
-	Job                     string `json:"job"`
-	Name                    string `json:"name"`
-	Group                   string `json:"group,omitempty"`
-	Interface               string `json:"interface,omitempty"`
-	Device                  string `json:"device,omitempty"`
+	ContainerLabelApp      string `json:"container_label_APP"`
+	ContainerLabelCluster  string `json:"container_label_CLUSTER"`
+	ContainerLabelSlot     string `json:"container_label_SLOT"`
+	ContainerLabelTask     string `json:"container_label_TASK"`
+	ContainerLabelUser     string `json:"container_label_USER"`
+	ContainerLabelVcluster string `json:"container_label_VCLUSTER"`
+	ID                     string `json:"id"`
+	Image                  string `json:"image"`
+	Instance               string `json:"instance"`
+	Job                    string `json:"job"`
+	Name                   string `json:"name"`
+	Group                  string `json:"group,omitempty"`
+	Interface              string `json:"interface,omitempty"`
+	Device                 string `json:"device,omitempty"`
 }
 
 // MetricCPU defines the CPU metric to contain the Results

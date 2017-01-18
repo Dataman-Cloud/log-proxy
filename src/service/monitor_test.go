@@ -45,14 +45,14 @@ func getContentOfFile(fileName string) []byte {
 
 func initQueryMetric() *backends.Query {
 	param := &backends.QueryParameter{
-		Metric:    "cpu",
-		ClusterID: "",
-		AppID:     "",
-		SlotID:    "",
-		UserID:    "user1",
-		Start:     "1481767298",
-		End:       "1481767298",
-		Step:      "100s",
+		Metric:  "cpu",
+		Cluster: "",
+		App:     "",
+		Slot:    "",
+		User:    "user1",
+		Start:   "1481767298",
+		End:     "1481767298",
+		Step:    "100s",
 	}
 
 	query := &backends.Query{
@@ -187,9 +187,9 @@ func TestGetQueryAppInfo(t *testing.T) {
 		c := getContentOfFile("tests/query.default.response.json")
 		fmt.Fprint(w, string(c))
 	})
-	query.ClusterID = "work"
-	query.AppID = "work-nginx"
-	query.UserID = "user1"
+	query.Cluster = "work"
+	query.App = "work-nginx"
+	query.User = "user1"
 	data := NewInfo()
 	err := data.GetQueryInfo(query)
 	for ClusterName, ClusterValue := range data.Clusters {

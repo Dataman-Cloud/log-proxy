@@ -124,31 +124,31 @@ func TestParseTask(t *testing.T) {
 	}
 }
 
-func TestParseMonitorTaskID(t *testing.T) {
-	taskID := "1-5"
+func TestParseMonitorTask(t *testing.T) {
+	task := "1-5"
 	expectString := "1|2|3|4|5"
-	taskString, _ := ParseMonitorTaskID(taskID)
+	taskString, _ := ParseMonitorTask(task)
 	if taskString != expectString {
 		t.Errorf("Expect task string is %s, got %v", expectString, taskString)
 	}
 
-	taskID = ""
+	task = ""
 	expectString = ".*"
-	taskString, _ = ParseMonitorTaskID(taskID)
+	taskString, _ = ParseMonitorTask(task)
 	if taskString != expectString {
 		t.Errorf("Expect task string is %s, got %v", expectString, taskString)
 	}
 
-	taskID = "1,2,3,4,5"
+	task = "1,2,3,4,5"
 	expectString = "1|2|3|4|5"
-	taskString, _ = ParseMonitorTaskID(taskID)
+	taskString, _ = ParseMonitorTask(task)
 	if taskString != expectString {
 		t.Errorf("Expect task string is %s, got %v", expectString, taskString)
 	}
 
-	taskID = "1"
+	task = "1"
 	expectString = "1"
-	taskString, _ = ParseMonitorTaskID(taskID)
+	taskString, _ = ParseMonitorTask(task)
 	if taskString != expectString {
 		t.Errorf("Expect task string is %s, got %v", expectString, taskString)
 	}

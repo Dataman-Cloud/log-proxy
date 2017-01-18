@@ -29,16 +29,16 @@ func (m *Monitor) Ping(ctx *gin.Context) {
 // Query return the result of metric query or expr query
 func (m *Monitor) Query(ctx *gin.Context) {
 	param := &backends.QueryParameter{
-		Metric:    ctx.Query("metric"),
-		ClusterID: ctx.Query("clusterid"),
-		AppID:     ctx.Query("appid"),
-		SlotID:    ctx.Query("taskid"), //SlotID is the swan's application field.
-		UserID:    ctx.Query("userid"),
-		Start:     ctx.Query("start"),
-		End:       ctx.Query("end"),
-		Step:      ctx.Query("step"),
-		Period:    ctx.Query("period"),
-		Expr:      ctx.Query("expr"),
+		Metric:  ctx.Query("metric"),
+		Cluster: ctx.Query("cluster"),
+		App:     ctx.Query("app"),
+		Slot:    ctx.Query("task"), //Slot is the swan's application field.
+		User:    ctx.Query("user"),
+		Start:   ctx.Query("start"),
+		End:     ctx.Query("end"),
+		Step:    ctx.Query("step"),
+		Period:  ctx.Query("period"),
+		Expr:    ctx.Query("expr"),
 	}
 
 	if param.Metric != "" && param.Expr != "" {
@@ -53,20 +53,20 @@ func (m *Monitor) Query(ctx *gin.Context) {
 		return
 	}
 
-	if param.Metric != "" && param.ClusterID == "" {
-		err := fmt.Errorf("The paramter metric and clusterid required")
+	if param.Metric != "" && param.Cluster == "" {
+		err := fmt.Errorf("The paramter metric and cluster required")
 		utils.ErrorResponse(ctx, err)
 		return
 	}
 
-	if param.Metric != "" && param.ClusterID != "" && param.UserID == "" {
-		err := fmt.Errorf("The paramter userid required")
+	if param.Metric != "" && param.Cluster != "" && param.User == "" {
+		err := fmt.Errorf("The paramter user required")
 		utils.ErrorResponse(ctx, err)
 		return
 	}
 
 	var err error
-	param.SlotID, err = utils.ParseMonitorTaskID(param.SlotID)
+	param.Slot, err = utils.ParseMonitorTask(param.Slot)
 	if err != nil {
 		utils.ErrorResponse(ctx, err)
 		return
@@ -107,14 +107,14 @@ func (m *Monitor) Query(ctx *gin.Context) {
 // QueryInfo return the info of clusters/cluster/app/node info
 func (m *Monitor) QueryInfo(ctx *gin.Context) {
 	param := &backends.QueryParameter{
-		ClusterID: ctx.Query("clusterid"),
-		UserID:    ctx.Query("userid"),
-		AppID:     ctx.Query("appid"),
-		SlotID:    ctx.Query("taskid"), //SlotID is the swan's application field.
+		Cluster: ctx.Query("cluster"),
+		User:    ctx.Query("user"),
+		App:     ctx.Query("app"),
+		Slot:    ctx.Query("task"), //Slot is the swan's application field.
 	}
 
 	var err error
-	param.SlotID, err = utils.ParseMonitorTaskID(param.SlotID)
+	param.Slot, err = utils.ParseMonitorTask(param.Slot)
 	if err != nil {
 		utils.ErrorResponse(ctx, err)
 		return
@@ -139,8 +139,8 @@ func (m *Monitor) QueryInfo(ctx *gin.Context) {
 // QueryNodes return the metric data of nodes
 func (m *Monitor) QueryNodes(ctx *gin.Context) {
 	param := &backends.QueryParameter{
-		ClusterID: ctx.Query("clusterid"),
-		NodeID:    ctx.Query("nodeid"),
+		Cluster: ctx.Query("cluster"),
+		Node:    ctx.Query("node"),
 	}
 	query := &backends.Query{
 		HTTPClient:     http.DefaultClient,

@@ -64,58 +64,58 @@ func GetExpr(query *Query, level string) *MetricExpr {
 
 // GetMetricExpr return expr by the Tasks labels
 func (expr *MetricExpr) GetMetricExpr(query *Query) {
-	byItems := "container_label_CLUSTER_ID,container_label_APP_ID," +
-		"container_label_SLOT_ID,container_label_TASK_ID,container_label_USER_ID," +
+	byItems := "container_label_CLUSTER,container_label_APP," +
+		"container_label_SLOT,container_label_USER," +
 		"group,id,image,instance,job,name,interface,device"
 	expr.setMetricExpr(query, byItems)
 }
 
 func (expr *MetricExpr) setMetricExpr(query *Query, byItems string) {
-	clusterid := query.ClusterID
-	appid := query.AppID
-	userid := query.UserID
-	slotid := query.SlotID
+	cluster := query.Cluster
+	app := query.App
+	user := query.User
+	slot := query.Slot
 
-	expr.CPU.Usage = fmt.Sprintf("avg(irate(container_cpu_usage_seconds_total{container_label_CLUSTER_ID='%s',"+
-		"container_label_APP_ID='%s',container_label_SLOT_ID=~'%s',container_label_USER_ID='%s',"+
-		"id=~'/docker/.*',name=~'mesos.*'}[5m])) by (%s)", clusterid, appid, slotid, userid, byItems)
+	expr.CPU.Usage = fmt.Sprintf("avg(irate(container_cpu_usage_seconds_total{container_label_CLUSTER='%s',"+
+		"container_label_APP='%s',container_label_SLOT=~'%s',container_label_USER='%s',"+
+		"id=~'/docker/.*',name=~'mesos.*'}[5m])) by (%s)", cluster, app, slot, user, byItems)
 
-	expr.Memory.Usage = fmt.Sprintf("sum(container_memory_usage_bytes{container_label_CLUSTER_ID='%s',"+
-		"container_label_APP_ID='%s',container_label_SLOT_ID=~'%s',container_label_USER_ID='%s',"+
-		"id=~'/docker/.*',name=~'mesos.*'}) by (%s)", clusterid, appid, slotid, userid, byItems)
+	expr.Memory.Usage = fmt.Sprintf("sum(container_memory_usage_bytes{container_label_CLUSTER='%s',"+
+		"container_label_APP='%s',container_label_SLOT=~'%s',container_label_USER='%s',"+
+		"id=~'/docker/.*',name=~'mesos.*'}) by (%s)", cluster, app, slot, user, byItems)
 
-	expr.Memory.Total = fmt.Sprintf("sum(container_spec_memory_limit_bytes{container_label_CLUSTER_ID='%s',"+
-		"container_label_APP_ID='%s',container_label_SLOT_ID=~'%s',container_label_USER_ID='%s',"+
-		"id=~'/docker/.*',name=~'mesos.*'}) by (%s)", clusterid, appid, slotid, userid, byItems)
+	expr.Memory.Total = fmt.Sprintf("sum(container_spec_memory_limit_bytes{container_label_CLUSTER='%s',"+
+		"container_label_APP='%s',container_label_SLOT=~'%s',container_label_USER='%s',"+
+		"id=~'/docker/.*',name=~'mesos.*'}) by (%s)", cluster, app, slot, user, byItems)
 
 	expr.Memory.Percentage = fmt.Sprintf("%s / %s", expr.Memory.Usage, expr.Memory.Total)
 
-	expr.Network.Receive = fmt.Sprintf("sum(irate(container_network_receive_bytes_total{container_label_CLUSTER_ID='%s',"+
-		"container_label_APP_ID='%s',container_label_SLOT_ID=~'%s',container_label_USER_ID='%s',"+
-		"id=~'/docker/.*',name=~'mesos.*'}[5m])) by (%s)", clusterid, appid, slotid, userid, byItems)
+	expr.Network.Receive = fmt.Sprintf("sum(irate(container_network_receive_bytes_total{container_label_CLUSTER='%s',"+
+		"container_label_APP='%s',container_label_SLOT=~'%s',container_label_USER='%s',"+
+		"id=~'/docker/.*',name=~'mesos.*'}[5m])) by (%s)", cluster, app, slot, user, byItems)
 
-	expr.Network.Transmit = fmt.Sprintf("sum(irate(container_network_transmit_bytes_total{container_label_CLUSTER_ID='%s',"+
-		"container_label_APP_ID='%s', container_label_SLOT_ID=~'%s',container_label_USER_ID='%s',"+
-		"id=~'/docker/.*',name=~'mesos.*'}[5m])) by (%s)", clusterid, appid, slotid, userid, byItems)
+	expr.Network.Transmit = fmt.Sprintf("sum(irate(container_network_transmit_bytes_total{container_label_CLUSTER='%s',"+
+		"container_label_APP='%s', container_label_SLOT=~'%s',container_label_USER='%s',"+
+		"id=~'/docker/.*',name=~'mesos.*'}[5m])) by (%s)", cluster, app, slot, user, byItems)
 
-	expr.Filesystem.Read = fmt.Sprintf("sum(irate(container_fs_reads_total{container_label_CLUSTER_ID='%s',"+
-		"container_label_APP_ID='%s',container_label_SLOT_ID=~'%s',container_label_USER_ID='%s',"+
-		"id=~'/docker/.*',name=~'mesos.*'}[5m])) by (%s)", clusterid, appid, slotid, userid, byItems)
+	expr.Filesystem.Read = fmt.Sprintf("sum(irate(container_fs_reads_total{container_label_CLUSTER='%s',"+
+		"container_label_APP='%s',container_label_SLOT=~'%s',container_label_USER='%s',"+
+		"id=~'/docker/.*',name=~'mesos.*'}[5m])) by (%s)", cluster, app, slot, user, byItems)
 
-	expr.Filesystem.Write = fmt.Sprintf("sum(irate(container_fs_writes_total{container_label_CLUSTER_ID='%s',"+
-		"container_label_APP_ID='%s',container_label_SLOT_ID=~'%s',container_label_USER_ID='%s',"+
-		"id=~'/docker/.*',name=~'mesos.*'}[5m])) by (%s)", clusterid, appid, slotid, userid, byItems)
+	expr.Filesystem.Write = fmt.Sprintf("sum(irate(container_fs_writes_total{container_label_CLUSTER='%s',"+
+		"container_label_APP='%s',container_label_SLOT=~'%s',container_label_USER='%s',"+
+		"id=~'/docker/.*',name=~'mesos.*'}[5m])) by (%s)", cluster, app, slot, user, byItems)
 }
 
 // GetAppExpr return the expr by the App labels
 func (expr *MetricExpr) GetAppExpr(query *Query) {
-	byItems := "container_label_CLUSTER_ID,container_label_APP_ID,container_label_USER_ID"
+	byItems := "container_label_CLUSTER,container_label_APP,container_label_USER"
 	expr.setMetricExpr(query, byItems)
 }
 
 // GetNodeExpr return the struct MetricExpr with the expr strings of nodes
 func (expr *MetricExpr) GetNodeExpr(query *Query) {
-	node := query.NodeID
+	node := query.Node
 	if node != "" {
 		expr.CPU.Usage = fmt.Sprintf("avg(irate(container_cpu_usage_seconds_total{id='/',instance='%s:5014'}[5m])) by (instance)", node)
 		expr.Memory.Usage = fmt.Sprintf("sum(container_memory_usage_bytes{id='/',instance='%s:5014'}) by (instance)", node)
@@ -151,8 +151,8 @@ func NewInfoExpr() *InfoExpr {
 
 // GetInfoExpr set the value for InfoExpr fileds
 func (expr *InfoExpr) GetInfoExpr(query *Query) {
-	expr.Clusters = fmt.Sprintf("container_tasks_state{container_label_TASK_ID=~'[0-9]-.*',id=~'/docker/.*',name=~'mesos.*',state='running'}")
-	expr.Cluster = fmt.Sprintf("container_tasks_state{container_label_TASK_ID=~'[0-9]-.*',id=~'/docker/.*',name=~'mesos.*',state='running',container_label_CLUSTER_ID='%s'}", query.ClusterID)
-	expr.User = fmt.Sprintf("container_tasks_state{container_label_TASK_ID=~'[0-9]-.*',id=~'/docker/.*',name=~'mesos.*',state='running',container_label_CLUSTER_ID='%s', container_label_USER_ID='%s'}", query.ClusterID, query.UserID)
-	expr.Application = fmt.Sprintf("container_tasks_state{container_label_TASK_ID=~'[0-9]-.*',id=~'/docker/.*',name=~'mesos.*', state='running',container_label_CLUSTER_ID='%s', container_label_USER_ID='%s', container_label_APP_ID='%s'}", query.ClusterID, query.UserID, query.AppID)
+	expr.Clusters = fmt.Sprintf("container_tasks_state{container_label_license!='GPLv2',id=~'/docker/.*',name=~'mesos.*',state='running'}")
+	expr.Cluster = fmt.Sprintf("container_tasks_state{container_label_license!='GPLv2',id=~'/docker/.*',name=~'mesos.*',state='running',container_label_CLUSTER='%s'}", query.Cluster)
+	expr.User = fmt.Sprintf("container_tasks_state{container_label_license!='GPLv2',id=~'/docker/.*',name=~'mesos.*',state='running',container_label_CLUSTER='%s', container_label_USER='%s'}", query.Cluster, query.User)
+	expr.Application = fmt.Sprintf("container_tasks_state{container_label_license!='GPLv2',id=~'/docker/.*',name=~'mesos.*', state='running',container_label_CLUSTER='%s', container_label_USER='%s', container_label_APP='%s'}", query.Cluster, query.User, query.App)
 }

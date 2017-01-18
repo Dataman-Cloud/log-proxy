@@ -89,18 +89,18 @@ func ParseTask(taskid string) []string {
 	return tasks
 }
 
-// ParseMonitorTaskID convert the taskID to string as "1|2|3" for Prometheus Query
-func ParseMonitorTaskID(taskID string) (string, error) {
-	if taskID == "" {
+// ParseMonitorTask convert the slot to string as "1|2|3" for Prometheus Query
+func ParseMonitorTask(task string) (string, error) {
+	if task == "" {
 		return ".*", nil
 	}
 
-	if strings.Contains(taskID, ",") {
-		return strings.Replace(taskID, ",", "|", -1), nil
+	if strings.Contains(task, ",") {
+		return strings.Replace(task, ",", "|", -1), nil
 	}
 
-	if strings.Contains(taskID, "-") && len(strings.Split(taskID, "-")) == 2 {
-		taskRange := strings.Split(taskID, "-")
+	if strings.Contains(task, "-") && len(strings.Split(task, "-")) == 2 {
+		taskRange := strings.Split(task, "-")
 		lower, err := strconv.Atoi(taskRange[0])
 		if err != nil {
 			return "", err
@@ -116,5 +116,5 @@ func ParseMonitorTaskID(taskID string) (string, error) {
 		}
 		return strings.Join(tasks, "|"), nil
 	}
-	return taskID, nil
+	return task, nil
 }
