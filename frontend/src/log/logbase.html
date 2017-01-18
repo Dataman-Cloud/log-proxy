@@ -41,8 +41,7 @@
             </div>
             <div flex class="form-item">
                 <label>实例 ID</label>
-                <input type="text" ng-maxlength="4096"  id="chooseInstance" name="task" placeholder="实例" ng-model="vm.form.task"
-                       ng-required="!vm.form.keyword">
+                <input type="text" ng-maxlength="4096"  id="chooseInstance" name="task" placeholder="实例" ng-model="vm.form.task">
 
                 <div layout="row" class="form-item">
                     <p flex class="error-info help-info-bottom"
@@ -52,11 +51,9 @@
                 </div>
             </div>
             <div flex class="form-item">
-                <label>日志来源</label>
+                <label class="requirement">日志来源</label>
                 <md-select id="chooseSource" placeholder="选择来源" ng-model="vm.form.path" md-on-open="vm.loadPaths()"
-                           ng-required="!vm.form.keyword"
-                           ng-disabled="!vm.form.app">
-                    <md-option value="">未选</md-option>
+                           data-required="required" ng-disabled="!vm.form.app">
                     <md-option id="chooseSource1" ng-value="key" ng-repeat="(key, value) in vm.paths">{/key/}</md-option>
                 </md-select>
             </div>
