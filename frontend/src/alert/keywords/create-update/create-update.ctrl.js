@@ -10,7 +10,7 @@
 
         self.target = target;
         self.form = {
-            appid: alert.appid,
+            app: alert.app,
             keyword: alert.keyword || '',
             path: alert.path || ''
         };

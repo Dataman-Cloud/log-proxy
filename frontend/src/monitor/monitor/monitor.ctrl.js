@@ -7,11 +7,11 @@
         var self = this;
 
         self.query = {
-            clusterid: $stateParams.clusterid,
-            userid: $stateParams.userid,
+            cluster: $stateParams.cluster,
+            user: $stateParams.user,
             metric: $stateParams.metric,
-            appid: $stateParams.appid,
-            taskid: $stateParams.taskid,
+            app: $stateParams.app,
+            task: $stateParams.task,
             start: $stateParams.start,
             end: $stateParams.end,
             step: $stateParams.step,

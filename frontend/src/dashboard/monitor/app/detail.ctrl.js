@@ -31,49 +31,49 @@
         function activate() {
 
             $q.all([monitorBackend.monitor({
-                clusterid: $stateParams.clusterId,
-                userid: $stateParams.userId,
-                appid: $stateParams.appId,
+                cluster: $stateParams.cluster,
+                user: $stateParams.user,
+                app: $stateParams.app,
                 metric: 'cpu',
                 start: self.fromTimestamp,
                 end: self.curTimestamp
             }).get().$promise,
                 monitorBackend.monitor({
-                    clusterid: $stateParams.clusterId,
-                    userid: $stateParams.userId,
-                    appid: $stateParams.appId,
+                    cluster: $stateParams.cluster,
+                    user: $stateParams.user,
+                    app: $stateParams.app,
                     metric: 'memory',
                     start: self.fromTimestamp,
                     end: self.curTimestamp
                 }).get().$promise,
                 monitorBackend.monitor({
-                    clusterid: $stateParams.clusterId,
-                    userid: $stateParams.userId,
-                    appid: $stateParams.appId,
+                    cluster: $stateParams.cluster,
+                    user: $stateParams.user,
+                    app: $stateParams.app,
                     metric: 'network_rx',
                     start: self.fromTimestamp,
                     end: self.curTimestamp
                 }).get().$promise,
                 monitorBackend.monitor({
-                    clusterid: $stateParams.clusterId,
-                    userid: $stateParams.userId,
-                    appid: $stateParams.appId,
+                    cluster: $stateParams.cluster,
+                    user: $stateParams.user,
+                    app: $stateParams.app,
                     metric: 'network_tx',
                     start: self.fromTimestamp,
                     end: self.curTimestamp
                 }).get().$promise,
                 monitorBackend.monitor({
-                    clusterid: $stateParams.clusterId,
-                    userid: $stateParams.userId,
-                    appid: $stateParams.appId,
+                    cluster: $stateParams.cluster,
+                    user: $stateParams.user,
+                    app: $stateParams.app,
                     metric: 'fs_read',
                     start: self.fromTimestamp,
                     end: self.curTimestamp
                 }).get().$promise,
                 monitorBackend.monitor({
-                    clusterid: $stateParams.clusterId,
-                    userid: $stateParams.userId,
-                    appid: $stateParams.appId,
+                    cluster: $stateParams.cluster,
+                    user: $stateParams.user,
+                    app: $stateParams.app,
                     metric: 'fs_write',
                     start: self.fromTimestamp,
                     end: self.curTimestamp
@@ -120,49 +120,49 @@
         function tick() {
             $q.all([
                 monitorBackend.monitor({
-                    clusterid: $stateParams.clusterId,
-                    userid: $stateParams.userId,
-                    appid: $stateParams.appId,
+                    cluster: $stateParams.cluster,
+                    user: $stateParams.user,
+                    app: $stateParams.app,
                     metric: 'cpu',
                     start: moment().subtract(10, 'seconds').unix(),
                     end: moment().unix()
                 }).get().$promise,
                 monitorBackend.monitor({
-                    clusterid: $stateParams.clusterId,
-                    userid: $stateParams.userId,
-                    appid: $stateParams.appId,
+                    cluster: $stateParams.cluster,
+                    user: $stateParams.user,
+                    app: $stateParams.app,
                     metric: 'memory',
                     start: moment().subtract(10, 'seconds').unix(),
                     end: moment().unix()
                 }).get().$promise,
                 monitorBackend.monitor({
-                    clusterid: $stateParams.clusterId,
-                    userid: $stateParams.userId,
-                    appid: $stateParams.appId,
+                    cluster: $stateParams.cluster,
+                    user: $stateParams.user,
+                    app: $stateParams.app,
                     metric: 'network_rx',
                     start: moment().subtract(10, 'seconds').unix(),
                     end: moment().unix()
                 }).get().$promise,
                 monitorBackend.monitor({
-                    clusterid: $stateParams.clusterId,
-                    userid: $stateParams.userId,
-                    appid: $stateParams.appId,
+                    cluster: $stateParams.cluster,
+                    user: $stateParams.user,
+                    app: $stateParams.app,
                     metric: 'network_tx',
                     start: moment().subtract(10, 'seconds').unix(),
                     end: moment().unix()
                 }).get().$promise,
                 monitorBackend.monitor({
-                    clusterid: $stateParams.clusterId,
-                    userid: $stateParams.userId,
-                    appid: $stateParams.appId,
+                    cluster: $stateParams.cluster,
+                    user: $stateParams.user,
+                    app: $stateParams.app,
                     metric: 'fs_read',
                     start: moment().subtract(10, 'seconds').unix(),
                     end: moment().unix()
                 }).get().$promise,
                 monitorBackend.monitor({
-                    clusterid: $stateParams.clusterId,
-                    userid: $stateParams.userId,
-                    appid: $stateParams.appId,
+                    cluster: $stateParams.cluster,
+                    user: $stateParams.user,
+                    app: $stateParams.app,
                     metric: 'fs_write',
                     start: moment().subtract(10, 'seconds').unix(),
                     end: moment().unix()
@@ -175,8 +175,8 @@
                 timeoutResult = $timeout(tick, reloadInterval);
             });
 
-            dashboardBackend.info({clusterid: $stateParams.clusterId, userid: $stateParams.userId ,appid: $stateParams.appId}).get(function (data) {
-                self.appInfo = data.data.clusters[$stateParams.clusterId].users[$stateParams.userId].applications[$stateParams.appId];
+            dashboardBackend.info({cluster: $stateParams.cluster, user: $stateParams.user ,app: $stateParams.app}).get(function (data) {
+                self.appInfo = data.data.clusters[$stateParams.cluster].users[$stateParams.user].applications[$stateParams.app];
 
                 self.realTimeData.cpuPercent = parseFloat(self.appInfo.cpu.usage[1]) * 100;
                 self.realTimeData.memUsage = parseFloat(self.appInfo.memory.usage[1]) * 100;

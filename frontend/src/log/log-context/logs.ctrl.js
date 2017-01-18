@@ -7,10 +7,10 @@
         var self = this;
 
         self.contextQueryObj = {
-            clusterid: $stateParams.clusterid || '',
-            userid: $stateParams.userid || '',
-            appid: $stateParams.appid,
-            taskid: $stateParams.taskid,
+            cluster: $stateParams.cluster || '',
+            user: $stateParams.user || '',
+            app: $stateParams.app,
+            task: $stateParams.task,
             path: $stateParams.path,
             offset: parseInt($stateParams.offset),
             page: 1,

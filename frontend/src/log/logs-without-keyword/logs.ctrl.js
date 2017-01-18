@@ -5,12 +5,12 @@
     /* @ngInject */
     function LogWithoutKeyCtrl(logBackend, $stateParams) {
         var tempLogQuery = {
-            clusterid: $stateParams.clusterid || '',
-            userid: $stateParams.userid || '',
+            cluster: $stateParams.cluster || '',
+            user: $stateParams.user || '',
             from: $stateParams.from,
             to: $stateParams.to,
-            appid: $stateParams.appid,
-            taskid: $stateParams.taskid,
+            app: $stateParams.app,
+            task: $stateParams.task,
             path: $stateParams.path,
             page: 1,
             size: 50

@@ -1,8 +1,8 @@
 <div class="search-keyword">
-    <p ng-show="$stateParams.clusterid">集群: <em>{/$stateParams.clusterid/}</em></p>
-    <p ng-show="$stateParams.userid">用户: <em>{/$stateParams.userid/}</em></p>
-    <p ng-show="$stateParams.appid">应用: <em>{/$stateParams.appid/}</em></p>
-    <p ng-show="$stateParams.taskid">实例: <em>{/$stateParams.taskid/}</em></p>
+    <p ng-show="$stateParams.cluster">集群: <em>{/$stateParams.cluster/}</em></p>
+    <p ng-show="$stateParams.user">用户: <em>{/$stateParams.user/}</em></p>
+    <p ng-show="$stateParams.app">应用: <em>{/$stateParams.app/}</em></p>
+    <p ng-show="$stateParams.task">实例: <em>{/$stateParams.task/}</em></p>
     <p ng-show="$stateParams.path">来源: <em>{/$stateParams.path/}</em></p>
     <p ng-show="$stateParams.keyword">关键词: <em>{/$stateParams.keyword/}</em></p>
     <p ng-show="$stateParams.from">起始时间: <em>{/$stateParams.from | date: 'yyyy-MM-dd HH:mm'/}</em></p>
@@ -42,7 +42,7 @@
                 <div ng-bind-html="log.message"></div>
             </td>
             <td md-cell>
-                <a id="logContext{/$index/}" ui-sref="home.logbase.logcontext({appid: log.appid, taskid: log.taskid, path: log.path, offset: log.offset})">上下文</a>
+                <a id="logContext{/$index/}" ui-sref="home.logbase.logcontext({app: log.app, task: log.task, path: log.path, offset: log.offset})">上下文</a>
             </td>
         </tr>
         <tr ng-repeat-end ng-hide="!vm.logDisplaySet[$index]">

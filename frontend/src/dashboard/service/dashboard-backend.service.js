@@ -12,9 +12,9 @@
         function info(data) {
             var paramObj = data || {};
             return $resource(BACKEND_URL_BASE.defaultBase + '/v1/monitor/info', {
-                clusterid: paramObj.clusterid,
-                userid: paramObj.userid,
-                appid: paramObj.appid
+                cluster: paramObj.cluster,
+                user: paramObj.user,
+                app: paramObj.app
             });
         }
 

@@ -21,7 +21,7 @@
                 controller: 'DashboardCtrl as vm'
             })
             .state('home.dashboardMonitor', {
-                url: '/dashboardMonitor/:clusterId/:userId',
+                url: '/dashboardMonitor/:cluster/:user',
                 templateUrl: '/src/dashboard/monitor/app/list.html',
                 controller: 'DashboardListAppCtrl as vm',
                 abstract: true,
@@ -30,12 +30,12 @@
                 }
             })
             .state('home.dashboardMonitor.detail', {
-                url: '/:appId',
+                url: '/:app',
                 templateUrl: '/src/dashboard/monitor/app/detail.html',
                 controller: 'DashboardAppDetailCtrl as vm'
             })
             .state('home.dashboardInstanceMonitor', {
-                url: '/dashboardMonitor/:clusterId/:userId/:appId/instances/:taskId',
+                url: '/dashboardMonitor/:cluster/:user/:app/instances/:task',
                 templateUrl: '/src/dashboard/monitor/instance/detail.html',
                 controller: 'DashboardInstanceCtrl as vm'
             })
@@ -43,7 +43,7 @@
 
             //about monitor
             .state('home.monitor', {
-                url: '/monitor?clusterid&userid&metric&appid&taskid&start&end&step&expr',
+                url: '/monitor?cluster&user&metric&app&task&start&end&step&expr',
                 templateUrl: '/src/monitor/monitorbase.html',
                 controller: 'MonitorBaseCtrl as vm'
             })
@@ -56,7 +56,7 @@
 
             //about log
             .state('home.logbase', {
-                url: '/logbase?clusterid&userid&appid&taskid&path&from&to&keyword',
+                url: '/logbase?cluster&user&app&task&path&from&to&keyword',
                 templateUrl: '/src/log/logbase.html',
                 controller: 'LogBaseCtrl as vm'
             })
@@ -144,7 +144,7 @@
 
         /* @ngInject */
         function getInfo(dashboardBackend, $stateParams) {
-            return dashboardBackend.info({clusterid: $stateParams.clusterId, userid: $stateParams.userId}).get().$promise
+            return dashboardBackend.info({cluster: $stateParams.cluster, user: $stateParams.user}).get().$promise
         }
 
         /* @ngInject */
