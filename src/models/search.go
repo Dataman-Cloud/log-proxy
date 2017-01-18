@@ -17,7 +17,7 @@ type Log struct {
 // Alert keyword filter struct
 type Alert struct {
 	ID         string `json:"id,omitempty"`
-	AppID      string `json:"appid"`
+	AppID      string `json:"app"`
 	Keyword    string `json:"keyword"`
 	Path       string `json:"path"`
 	CreateTime string `json:"createtime"`
