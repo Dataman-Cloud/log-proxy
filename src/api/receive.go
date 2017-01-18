@@ -72,15 +72,15 @@ func (s *Search) ReceiverLog(ctx *gin.Context) {
 		return
 	}
 
-	appid, ok := m["appid"]
+	app, ok := m["app"]
 	if !ok {
-		utils.ErrorResponse(ctx, utils.NewError(GetLogError, "not found appid"))
+		utils.ErrorResponse(ctx, utils.NewError(GetLogError, "not found app"))
 		return
 	}
 
-	taskid, ok := m["taskid"]
+	task, ok := m["task"]
 	if !ok {
-		utils.ErrorResponse(ctx, utils.NewError(GetLogError, "not found taskid"))
+		utils.ErrorResponse(ctx, utils.NewError(GetLogError, "not found task"))
 		return
 	}
 
@@ -90,15 +90,15 @@ func (s *Search) ReceiverLog(ctx *gin.Context) {
 		return
 	}
 
-	userid, ok := m["userid"]
+	user, ok := m["user"]
 	if !ok {
-		utils.ErrorResponse(ctx, utils.NewError(GetLogError, "not found userid"))
+		utils.ErrorResponse(ctx, utils.NewError(GetLogError, "not found user"))
 		return
 	}
 
-	clusterid, ok := m["clusterid"]
+	cluster, ok := m["cluster"]
 	if !ok {
-		utils.ErrorResponse(ctx, utils.NewError(GetLogError, "not found clusterid"))
+		utils.ErrorResponse(ctx, utils.NewError(GetLogError, "not found cluster"))
 		return
 	}
 
@@ -108,7 +108,7 @@ func (s *Search) ReceiverLog(ctx *gin.Context) {
 		return
 	}
 
-	keywords, ok := s.KeywordFilter[appid.(string)+path.(string)]
+	keywords, ok := s.KeywordFilter[app.(string)+path.(string)]
 	if !ok {
 		utils.Ok(ctx, "ok")
 		return
@@ -120,12 +120,12 @@ func (s *Search) ReceiverLog(ctx *gin.Context) {
 		}
 
 		s.Counter.WithLabelValues(
-			appid.(string),
-			taskid.(string),
+			app.(string),
+			task.(string),
 			path.(string),
 			keyword,
-			userid.(string),
-			clusterid.(string),
+			user.(string),
+			cluster.(string),
 		).Inc()
 	}
 

@@ -42,7 +42,7 @@ func TestReciver(t *testing.T) {
 			map[string]interface{}{
 				"labels": map[string]interface{}{
 					"alertname": "test",
-					"taskid":    "value",
+					"task":      "value",
 				},
 			},
 		},
@@ -76,7 +76,7 @@ func TestReciverLog(t *testing.T) {
 	}
 
 	m = map[string]interface{}{
-		"appid": "test",
+		"app": "test",
 	}
 
 	data, _ = json.Marshal(m)
@@ -89,8 +89,8 @@ func TestReciverLog(t *testing.T) {
 	}
 
 	m = map[string]interface{}{
-		"appid":  "test",
-		"taskid": "test",
+		"app":  "test",
+		"task": "test",
 	}
 
 	data, _ = json.Marshal(m)
@@ -103,9 +103,9 @@ func TestReciverLog(t *testing.T) {
 	}
 
 	m = map[string]interface{}{
-		"appid":  "test",
-		"taskid": "test",
-		"path":   "test",
+		"app":  "test",
+		"task": "test",
+		"path": "test",
 	}
 
 	data, _ = json.Marshal(m)
@@ -118,10 +118,10 @@ func TestReciverLog(t *testing.T) {
 	}
 
 	m = map[string]interface{}{
-		"appid":  "test",
-		"taskid": "test",
-		"path":   "test",
-		"userid": "test",
+		"app":  "test",
+		"task": "test",
+		"path": "test",
+		"user": "test",
 	}
 
 	data, _ = json.Marshal(m)
@@ -134,11 +134,11 @@ func TestReciverLog(t *testing.T) {
 	}
 
 	m = map[string]interface{}{
-		"appid":     "test",
-		"taskid":    "test",
-		"path":      "test",
-		"userid":    "test",
-		"clusterid": "test",
+		"app":     "test",
+		"task":    "test",
+		"path":    "test",
+		"user":    "test",
+		"cluster": "test",
 	}
 
 	data, _ = json.Marshal(m)
@@ -151,12 +151,12 @@ func TestReciverLog(t *testing.T) {
 	}
 
 	m = map[string]interface{}{
-		"appid":     "test",
-		"taskid":    "test",
-		"path":      "test",
-		"userid":    "test",
-		"clusterid": "test",
-		"offset":    111,
+		"app":     "test",
+		"task":    "test",
+		"path":    "test",
+		"user":    "test",
+		"cluster": "test",
+		"offset":  111,
 	}
 
 	data, _ = json.Marshal(m)
@@ -169,13 +169,13 @@ func TestReciverLog(t *testing.T) {
 	}
 
 	m = map[string]interface{}{
-		"appid":     "test",
-		"taskid":    "test",
-		"path":      "test",
-		"userid":    "test",
-		"clusterid": "test",
-		"offset":    111,
-		"message":   "get",
+		"app":     "test",
+		"task":    "test",
+		"path":    "test",
+		"user":    "test",
+		"cluster": "test",
+		"offset":  111,
+		"message": "get",
 	}
 
 	data, _ = json.Marshal(m)
@@ -188,13 +188,13 @@ func TestReciverLog(t *testing.T) {
 	}
 
 	m = map[string]interface{}{
-		"appid":     "test",
-		"taskid":    "test",
-		"path":      "test",
-		"userid":    "test",
-		"clusterid": "test",
-		"offset":    111,
-		"message":   "get",
+		"app":     "test",
+		"task":    "test",
+		"path":    "test",
+		"user":    "test",
+		"cluster": "test",
+		"offset":  111,
+		"message": "get",
 	}
 	s.KeywordFilter["testtest"] = []string{"get"}
 
