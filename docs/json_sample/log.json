@@ -55,23 +55,23 @@
                     "type": "long",
                     "index": "not_analyzed"
                 },
-                "appid": {
+                "app": {
                     "type": "string",
                     "index": "not_analyzed"
                 },
-                "userid": {
+                "user": {
                     "type": "string",
                     "index": "not_analyzed"
                 },
-                "taskid": {
+                "task": {
                     "type": "string",
                     "index": "not_analyzed"
                 },
-                "groupid": {
+                "group": {
                     "type": "string",
                     "index": "not_analyzed"
                 },
-                "clusterid": {
+                "cluster": {
                     "type": "string",
                     "index": "not_analyzed"
                 }
