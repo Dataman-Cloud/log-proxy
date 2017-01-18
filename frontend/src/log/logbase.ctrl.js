@@ -20,7 +20,7 @@
         self.startTime = new Date(parseInt($stateParams.from));
         self.endTime = new Date(parseInt($stateParams.to));
 
-        self.timePeriod = 120;
+        self.timePeriod = 60;
         self.selectedTabIndex = ($stateParams.from && $stateParams.to) ? 1 : 0;
 
         self.loadPaths = loadPaths;

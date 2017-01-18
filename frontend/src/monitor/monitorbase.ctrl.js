@@ -5,7 +5,7 @@
     /* @ngInject */
     function MonitorBaseCtrl($state, $stateParams, moment) {
         var self = this;
-        self.timePeriod = 120;
+        self.timePeriod = 60;
         self.selectedTabIndex = ($stateParams.start || $stateParams.end) ? 1 : 0;
         self.queryTabIndex = $stateParams.expr ? 1 : 0;
 
