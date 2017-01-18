@@ -259,7 +259,7 @@ func TestGetQueryMetricExpr(t *testing.T) {
 	}
 
 	level = "cluster"
-	expr = expectGetClusterExpr(query.NodeID)
+	expr = expectGetClusterExpr(query.Node)
 	query = initQueryMetric()
 	metrics = []string{"fs_usage", "fs_limit"}
 	for _, metric := range metrics {
@@ -299,9 +299,9 @@ func TestQueryInfo(t *testing.T) {
 		t.Errorf("Expect err is nil, got %v", err)
 	}
 
-	query.ClusterID = ""
-	query.AppID = ""
-	query.UserID = ""
+	query.Cluster = ""
+	query.App = ""
+	query.User = ""
 	data, err = query.QueryInfo()
 	if data.Status != "success" {
 		t.Errorf("Expect status is success, got %v", data.Status)
@@ -310,7 +310,7 @@ func TestQueryInfo(t *testing.T) {
 		t.Errorf("Expect err is nil, got %v", err)
 	}
 
-	query.ClusterID = "work"
+	query.Cluster = "work"
 	data, err = query.QueryInfo()
 	if data.Status != "success" {
 		t.Errorf("Expect status is success, got %v", data.Status)
@@ -319,8 +319,8 @@ func TestQueryInfo(t *testing.T) {
 		t.Errorf("Expect err is nil, got %v", err)
 	}
 
-	query.ClusterID = "work"
-	query.UserID = "user1"
+	query.Cluster = "work"
+	query.User = "user1"
 	data, err = query.QueryInfo()
 	if data.Status != "success" {
 		t.Errorf("Expect status is success, got %v", data.Status)

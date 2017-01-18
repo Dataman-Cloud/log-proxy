@@ -39,10 +39,10 @@ func TestQueryMetric(t *testing.T) {
 	u.Path = strings.TrimRight(u.Path, "/") + "/api/v1/monitor/query"
 	q := u.Query()
 	q.Set("metric", "memory")
-	q.Set("clusterid", "work")
-	q.Set("appid", "work-web")
-	q.Set("taskid", "0")
-	q.Set("userid", "user1")
+	q.Set("cluster", "work")
+	q.Set("app", "work-web")
+	q.Set("task", "0")
+	q.Set("user", "user1")
 	q.Set("start", "1481853425")
 	q.Set("end", "1481853425")
 	q.Set("step", "30s")
@@ -132,7 +132,7 @@ func TestQueryParamMissingUser(t *testing.T) {
 	u.Path = strings.TrimRight(u.Path, "/") + "/api/v1/monitor/query"
 	q := u.Query()
 	q.Set("metric", "memory")
-	q.Set("clusterid", "work")
+	q.Set("cluster", "work")
 	q.Set("start", "1481853425")
 	q.Set("end", "1481853425")
 	q.Set("step", "30s")
@@ -148,11 +148,11 @@ func TestQueryInfo(t *testing.T) {
 	u, _ := url.Parse(apiURL)
 	u.Path = strings.TrimRight(u.Path, "/") + "/api/v1/monitor/info"
 	q := u.Query()
-	q.Set("clusterid", "work")
+	q.Set("cluster", "work")
 	u.RawQuery = q.Encode()
 	resp, _ := httpClient.Get(u.String())
-	if resp.Request.FormValue("clusterid") != "work" {
-		t.Errorf("Expect query param metric is work, got %s", resp.Request.FormValue("clusterid"))
+	if resp.Request.FormValue("cluster") != "work" {
+		t.Errorf("Expect query param metric is work, got %s", resp.Request.FormValue("cluster"))
 	}
 }
 
@@ -162,8 +162,8 @@ func TestQueryInfoConflict(t *testing.T) {
 	u, _ := url.Parse(apiURL)
 	u.Path = strings.TrimRight(u.Path, "/") + "/api/v1/monitor/info"
 	q := u.Query()
-	q.Set("clusterid", "work")
-	q.Set("appid", "work-web")
+	q.Set("cluster", "work")
+	q.Set("app", "work-web")
 	u.RawQuery = q.Encode()
 	resp, _ := httpClient.Get(u.String())
 	if resp.StatusCode != expectResult {
@@ -176,11 +176,11 @@ func TestQueryNodes(t *testing.T) {
 	u, _ := url.Parse(apiURL)
 	u.Path = strings.TrimRight(u.Path, "/") + "/api/v1/monitor/nodes"
 	q := u.Query()
-	q.Set("clusterid", "work")
+	q.Set("cluster", "work")
 	u.RawQuery = q.Encode()
 	resp, _ := httpClient.Get(u.String())
-	if resp.Request.FormValue("clusterid") != "work" {
-		t.Errorf("Expect query param metric is work, got %s", resp.Request.FormValue("clusterid"))
+	if resp.Request.FormValue("cluster") != "work" {
+		t.Errorf("Expect query param metric is work, got %s", resp.Request.FormValue("cluster"))
 	}
 }
 

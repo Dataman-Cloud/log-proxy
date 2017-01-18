@@ -138,7 +138,7 @@ func NewAppInfo() *AppInfo {
 
 // TaskInfo defines the JSON format of information in task(container)
 type TaskInfo struct {
-	SlotID     string                         `json:"slot"`
+	Slot       string                         `json:"slot"`
 	Node       string                         `json:"node"`
 	CPU        *models.InfoCPU                `json:"cpu"`
 	Memory     *models.InfoMemory             `json:"memory"`
@@ -163,11 +163,11 @@ func (info *Info) GetQueryInfo(query *backends.Query) error {
 		return err
 	}
 	info.GetClustersInfo(query, data)
-	if query.ClusterID != "" && query.UserID != "" {
+	if query.Cluster != "" && query.User != "" {
 		info.GetAppInfo(query, data)
 	}
 
-	if query.ClusterID != "" && query.UserID != "" && query.AppID != "" {
+	if query.Cluster != "" && query.User != "" && query.App != "" {
 		err = info.GetAppInfoMetric(query)
 		if err != nil {
 			return err
@@ -185,13 +185,13 @@ func (info *Info) GetQueryInfo(query *backends.Query) error {
 func (info *Info) GetClustersInfo(query *backends.Query, data *models.QueryRangeResult) {
 	// Set the cluster into list
 	for _, originData := range data.Data.Result {
-		cluster := originData.Metric.ContainerLabelClusterID
+		cluster := originData.Metric.ContainerLabelCluster
 		info.Clusters[cluster] = NewClusterInfo()
 	}
 
 	for _, originData := range data.Data.Result {
-		cluster := originData.Metric.ContainerLabelClusterID
-		user := originData.Metric.ContainerLabelUserID
+		cluster := originData.Metric.ContainerLabelCluster
+		user := originData.Metric.ContainerLabelUser
 
 		for name, value := range info.Clusters {
 			if cluster == name {
@@ -203,9 +203,9 @@ func (info *Info) GetClustersInfo(query *backends.Query, data *models.QueryRange
 		}
 	}
 	for _, originData := range data.Data.Result {
-		cluster := originData.Metric.ContainerLabelClusterID
-		user := originData.Metric.ContainerLabelUserID
-		app := originData.Metric.ContainerLabelAppID
+		cluster := originData.Metric.ContainerLabelCluster
+		user := originData.Metric.ContainerLabelUser
+		app := originData.Metric.ContainerLabelApp
 		task := originData.Metric.ID
 		node := strings.Split(originData.Metric.Instance, ":")[0]
 		for clusterName, ClusterValue := range info.Clusters {
@@ -237,11 +237,11 @@ func (info *Info) GetClustersInfo(query *backends.Query, data *models.QueryRange
 func (info *Info) GetAppInfo(query *backends.Query, data *models.QueryRangeResult) {
 	// Fill the info of container in application
 	for _, originData := range data.Data.Result {
-		cluster := originData.Metric.ContainerLabelClusterID
-		user := originData.Metric.ContainerLabelUserID
-		app := originData.Metric.ContainerLabelAppID
+		cluster := originData.Metric.ContainerLabelCluster
+		user := originData.Metric.ContainerLabelUser
+		app := originData.Metric.ContainerLabelApp
 		task := originData.Metric.ID
-		slotid := originData.Metric.ContainerLabelSlotID
+		slot := originData.Metric.ContainerLabelSlot
 		node := strings.Split(originData.Metric.Instance, ":")[0]
 		for clusterName, ClusterValue := range info.Clusters {
 			if cluster == clusterName {
@@ -250,7 +250,7 @@ func (info *Info) GetAppInfo(query *backends.Query, data *models.QueryRangeResul
 						for name, value := range userValue.Applications {
 							if app == name {
 								value.Tasks[task] = NewTaskInfo()
-								value.Tasks[task].SlotID = slotid
+								value.Tasks[task].Slot = slot
 								value.Tasks[task].Node = node
 							}
 						}
@@ -272,9 +272,9 @@ func (info *Info) GetAppInfoMetric(query *backends.Query) error {
 			return err
 		}
 		for _, originData := range data.Data.Result {
-			cluster := originData.Metric.ContainerLabelClusterID
-			user := originData.Metric.ContainerLabelUserID
-			app := originData.Metric.ContainerLabelAppID
+			cluster := originData.Metric.ContainerLabelCluster
+			user := originData.Metric.ContainerLabelUser
+			app := originData.Metric.ContainerLabelApp
 			metricValue := originData.Values[0]
 			for clusterName, ClusterValue := range info.Clusters {
 				if cluster == clusterName {

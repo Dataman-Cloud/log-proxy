@@ -34,18 +34,18 @@ type Query struct {
 
 // QueryParameter define the fields of query paramter
 type QueryParameter struct {
-	Metric    string
-	ClusterID string
-	AppID     string
-	TaskID    string
-	SlotID    string
-	UserID    string
-	NodeID    string
-	Start     string
-	End       string
-	Step      string
-	Period    string
-	Expr      string
+	Metric  string
+	Cluster string
+	App     string
+	Task    string
+	Slot    string
+	User    string
+	Node    string
+	Start   string
+	End     string
+	Step    string
+	Period  string
+	Expr    string
 }
 
 // QueryExpr return the result by calling function getExprResponse
@@ -155,6 +155,8 @@ func (query *Query) getQueryMetricExpr(level string) (expr string) {
 	case "fs_limit":
 		expr = me.Filesystem.Limit
 	}
+
+	//fmt.Printf("expr: %s", expr)
 	return expr
 }
 
@@ -185,19 +187,19 @@ func timeOffset(t time.Time, offset string) time.Time {
 func (query *Query) QueryInfo() (*models.QueryRangeResult, error) {
 	infoExpr := NewInfoExpr()
 	infoExpr.GetInfoExpr(query)
-	if query.ClusterID == "" && query.AppID == "" && query.UserID == "" {
+	if query.Cluster == "" && query.App == "" && query.User == "" {
 		query.Expr = infoExpr.Clusters
 	}
 
-	if query.ClusterID != "" && query.UserID == "" && query.AppID == "" {
+	if query.Cluster != "" && query.User == "" && query.App == "" {
 		query.Expr = infoExpr.Cluster
 	}
 
-	if query.ClusterID != "" && query.UserID != "" && query.AppID == "" {
+	if query.Cluster != "" && query.User != "" && query.App == "" {
 		query.Expr = infoExpr.User
 	}
 
-	if query.ClusterID != "" && query.UserID != "" && query.AppID != "" {
+	if query.Cluster != "" && query.User != "" && query.App != "" {
 		query.Expr = infoExpr.Application
 	}
 
