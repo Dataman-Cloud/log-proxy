@@ -1,6 +1,7 @@
 package api
 
 import (
+	"container/list"
 	"errors"
 	"strings"
 	"sync"
@@ -45,7 +46,7 @@ const (
 // Search search client struct
 type Search struct {
 	Service       *service.SearchService
-	KeywordFilter map[string][]string
+	KeywordFilter map[string]*list.List
 	Counter       *prometheus.CounterVec
 	Kmutex        *sync.Mutex
 }
@@ -54,7 +55,7 @@ type Search struct {
 func GetSearch() *Search {
 	s := &Search{
 		Service:       service.NewEsService(strings.Split(config.GetConfig().EsURL, ",")),
-		KeywordFilter: make(map[string][]string),
+		KeywordFilter: make(map[string]*list.List),
 		Counter: prometheus.NewCounterVec(
 			prometheus.CounterOpts{
 				Name: "log_keyword",
@@ -85,8 +86,10 @@ func GetSearch() *Search {
 		return s
 	}
 	for _, alert := range alerts["results"].([]models.Alert) {
-		s.KeywordFilter[alert.AppID+alert.Path] =
-			append(s.KeywordFilter[alert.AppID+alert.Path], alert.Keyword)
+		if s.KeywordFilter[alert.AppID+alert.Path] == nil {
+			s.KeywordFilter[alert.AppID+alert.Path] = list.New()
+		}
+		s.KeywordFilter[alert.AppID+alert.Path].PushBack(alert.Keyword)
 	}
 
 	return s
