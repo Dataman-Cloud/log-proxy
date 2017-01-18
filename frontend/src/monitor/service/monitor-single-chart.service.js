@@ -237,10 +237,10 @@
                             });
                             serialKey = serialKeyBuilder(serialKey);
                         } else {
-                            serialKey = serialKeyBuilder(item.metric.container_label_SLOT_ID + '-' + item.metric.id);
+                            serialKey = serialKeyBuilder(item.metric.container_label_SLOT + '-' + item.metric.id);
                         }
                     } else {
-                        serialKey = item.metric.container_label_SLOT_ID + '-' + item.metric.id;
+                        serialKey = item.metric.container_label_SLOT + '-' + item.metric.id;
                     }
                     angular.forEach(item.values, function (value) {
                         chartUtil.pushData(target, serialKey, {
