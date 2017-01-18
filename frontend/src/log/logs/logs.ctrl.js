@@ -5,12 +5,12 @@
     /* @ngInject */
     function LogsCtrl(logBackend, $stateParams) {
         var tempLogQuery = {
-            clusterid: $stateParams.clusterid || '',
-            userid: $stateParams.userid || '',
+            cluster: $stateParams.cluster || '',
+            user: $stateParams.user || '',
             from: $stateParams.from,
             to: $stateParams.to,
-            appid: $stateParams.appid,
-            taskid: $stateParams.taskid,
+            app: $stateParams.app,
+            task: $stateParams.task,
             path: $stateParams.path,
             keyword: $stateParams.keyword,
             page: 1,
@@ -49,12 +49,12 @@
         function onPaginate(page, limit) {
             self.logDisplaySet = {};
             logBackend.searchLogs({
-                clusterid: tempLogQuery.clusterid || '',
-                userid: tempLogQuery.userid || '',
+                cluster: tempLogQuery.cluster || '',
+                user: tempLogQuery.user || '',
                 from: tempLogQuery.from,
                 to: tempLogQuery.to,
-                appid: tempLogQuery.appid,
-                taskid: tempLogQuery.taskid,
+                app: tempLogQuery.app,
+                task: tempLogQuery.task,
                 path: tempLogQuery.path,
                 keyword: tempLogQuery.keyword,
                 page: page,

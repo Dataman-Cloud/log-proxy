@@ -3,59 +3,59 @@
         <form layout="column" name="staticForm">
             <div flex class="form-item">
                 <label class="requirement">集群</label>
-                <input type="text" ng-maxlength="4096"  id="clusterName" name="clusterid" placeholder="集群" ng-model="vm.form.clusterid"
+                <input type="text" ng-maxlength="4096"  id="clusterName" name="cluster" placeholder="集群" ng-model="vm.form.cluster"
                        data-required="required">
 
                 <div layout="row" class="form-item">
                     <p flex class="error-info help-info-bottom"
-                       data-ng-show="staticForm.clusterid.$error.maxlength && !staticForm.clusterid.$pristine">集群名称最大长度为4096</p>
+                       data-ng-show="staticForm.cluster.$error.maxlength && !staticForm.cluster.$pristine">集群名称最大长度为4096</p>
                     <p flex class="error-info help-info-bottom"
-                       data-ng-show="staticForm.clusterid.$error.required && !staticForm.clusterid.$pristine">集群名称不能为空</p>
+                       data-ng-show="staticForm.cluster.$error.required && !staticForm.cluster.$pristine">集群名称不能为空</p>
                 </div>
             </div>
 
             <div flex class="form-item">
                 <label class="requirement">用户</label>
-                <input type="text" ng-maxlength="4096"  id="userName" name="userid" placeholder="用户" ng-model="vm.form.userid"
+                <input type="text" ng-maxlength="4096"  id="userName" name="user" placeholder="用户" ng-model="vm.form.user"
                        data-required="required">
 
                 <div layout="row" class="form-item">
                     <p flex class="error-info help-info-bottom"
-                       data-ng-show="staticForm.userid.$error.maxlength && !staticForm.userid.$pristine">用户名称最大长度为4096</p>
+                       data-ng-show="staticForm.user.$error.maxlength && !staticForm.user.$pristine">用户名称最大长度为4096</p>
                     <p flex class="error-info help-info-bottom"
-                       data-ng-show="staticForm.userid.$error.required && !staticForm.userid.$pristine">用户名称不能为空</p>
+                       data-ng-show="staticForm.user.$error.required && !staticForm.user.$pristine">用户名称不能为空</p>
                 </div>
             </div>
 
             <div flex class="form-item">
                 <label class="requirement">应用</label>
-                <input type="text" ng-maxlength="4096"  id="appName" name="appid" placeholder="应用" ng-model="vm.form.appid"
+                <input type="text" ng-maxlength="4096"  id="appName" name="app" placeholder="应用" ng-model="vm.form.app"
                        data-required="required">
 
                 <div layout="row" class="form-item">
                     <p flex class="error-info help-info-bottom"
-                       data-ng-show="staticForm.appid.$error.maxlength && !staticForm.appid.$pristine">应用名称最大长度为4096</p>
+                       data-ng-show="staticForm.app.$error.maxlength && !staticForm.app.$pristine">应用名称最大长度为4096</p>
                     <p flex class="error-info help-info-bottom"
-                       data-ng-show="staticForm.appid.$error.required && !staticForm.appid.$pristine">应用名称不能为空</p>
+                       data-ng-show="staticForm.app.$error.required && !staticForm.app.$pristine">应用名称不能为空</p>
                 </div>
             </div>
             <div flex class="form-item">
                 <label>实例 ID</label>
-                <input type="text" ng-maxlength="4096"  id="chooseInstance" name="taskid" placeholder="实例" ng-model="vm.form.taskid"
+                <input type="text" ng-maxlength="4096"  id="chooseInstance" name="task" placeholder="实例" ng-model="vm.form.task"
                        ng-required="!vm.form.keyword">
 
                 <div layout="row" class="form-item">
                     <p flex class="error-info help-info-bottom"
-                       data-ng-show="staticForm.taskid.$error.maxlength && !staticForm.taskid.$pristine">实例名称最大长度为4096</p>
+                       data-ng-show="staticForm.task.$error.maxlength && !staticForm.task.$pristine">实例名称最大长度为4096</p>
                     <p flex class="error-info help-info-bottom"
-                       data-ng-show="staticForm.taskid.$error.required && !staticForm.taskid.$pristine">实例名称不能为空</p>
+                       data-ng-show="staticForm.task.$error.required && !staticForm.task.$pristine">实例名称不能为空</p>
                 </div>
             </div>
             <div flex class="form-item">
                 <label>日志来源</label>
                 <md-select id="chooseSource" placeholder="选择来源" ng-model="vm.form.path" md-on-open="vm.loadPaths()"
                            ng-required="!vm.form.keyword"
-                           ng-disabled="!vm.form.appid">
+                           ng-disabled="!vm.form.app">
                     <md-option value="">未选</md-option>
                     <md-option id="chooseSource1" ng-value="key" ng-repeat="(key, value) in vm.paths">{/key/}</md-option>
                 </md-select>

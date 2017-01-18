@@ -7,10 +7,10 @@
         var self = this;
 
         self.form = {
-            clusterid: $stateParams.clusterid || '',
-            userid: $stateParams.userid || '',
-            appid: $stateParams.appid || '',
-            taskid: $stateParams.taskid || '',
+            cluster: $stateParams.cluster || '',
+            user: $stateParams.user || '',
+            app: $stateParams.app || '',
+            task: $stateParams.task || '',
             path: $stateParams.path || '',
             keyword: $stateParams.keyword || ''
         };
@@ -34,12 +34,12 @@
         }
 
         function loadPaths() {
-            if (self.form.appid) {
+            if (self.form.app) {
                 logBackend.listPath({
-                    clusterid: self.form.clusterid,
-                    userid: self.form.userid,
-                    appid: self.form.appid,
-                    taskid: self.form.taskid
+                    cluster: self.form.cluster,
+                    user: self.form.user,
+                    app: self.form.app,
+                    task: self.form.task
                 }).get(function (data) {
                     self.paths = data.data;
                 })
