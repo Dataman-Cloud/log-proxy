@@ -28,10 +28,12 @@ func (s *Search) CreateAlert(ctx *gin.Context) {
 		return
 	}
 
-	for _, v := range s.KeywordFilter[alert.AppID+alert.Path] {
-		if v == alert.Keyword {
-			utils.ErrorResponse(ctx, utils.NewError(CreateAlertError, errors.New("keyword exist")))
-			return
+	if s.KeywordFilter[alert.AppID+alert.Path] != nil {
+		for e := s.KeywordFilter[alert.AppID+alert.Path].Front(); e != nil; e = e.Next() {
+			if e.Value.(string) == alert.Keyword {
+				utils.ErrorResponse(ctx, utils.NewError(CreateAlertError, errors.New("keyword exist")))
+				return
+			}
 		}
 	}
 
@@ -43,7 +45,7 @@ func (s *Search) CreateAlert(ctx *gin.Context) {
 
 	s.Kmutex.Lock()
 	defer s.Kmutex.Unlock()
-	s.KeywordFilter[alert.AppID+alert.Path] = append(s.KeywordFilter[alert.AppID+alert.Path], alert.Keyword)
+	s.KeywordFilter[alert.AppID+alert.Path].PushBack(alert.Keyword)
 
 	utils.Ok(ctx, "create success")
 }
@@ -65,11 +67,9 @@ func (s *Search) DeleteAlert(ctx *gin.Context) {
 
 	s.Kmutex.Lock()
 	defer s.Kmutex.Unlock()
-	for i, v := range s.KeywordFilter[alert.AppID+alert.Path] {
-		if v == alert.Keyword {
-			s.KeywordFilter[alert.AppID+alert.Path] = append(s.KeywordFilter[alert.AppID+alert.Path][:i],
-				s.KeywordFilter[alert.AppID+alert.Path][i+1:]...)
-			break
+	for e := s.KeywordFilter[alert.AppID+alert.Path].Front(); e != nil; e = e.Next() {
+		if e.Value.(string) == alert.Keyword {
+			s.KeywordFilter[alert.AppID+alert.Path].Remove(e)
 		}
 	}
 
@@ -136,9 +136,11 @@ func (s *Search) UpdateAlert(ctx *gin.Context) {
 
 	s.Kmutex.Lock()
 	defer s.Kmutex.Unlock()
-	for i, v := range s.KeywordFilter[result.AppID+result.Path] {
-		if v == result.Keyword {
-			s.KeywordFilter[result.AppID+result.Path][i] = alert.Keyword
+	for e := s.KeywordFilter[result.AppID+result.Path].Front(); e != nil; e = e.Next() {
+		if e.Value.(string) == alert.Keyword {
+			s.KeywordFilter[result.AppID+result.Path].Remove(e)
+			s.KeywordFilter[result.AppID+result.Path].PushBack(alert.Keyword)
+			break
 		}
 	}
 

@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"container/list"
 	"encoding/json"
 	"net/http"
 	"testing"
@@ -196,7 +197,11 @@ func TestReciverLog(t *testing.T) {
 		"offset":  111,
 		"message": "get",
 	}
-	s.KeywordFilter["testtest"] = []string{"get"}
+	//s.KeywordFilter["testtest"] = []string{"get"}
+
+	l := list.New()
+	l.PushFront("get")
+	s.KeywordFilter["testtest"] = l
 
 	data, _ = json.Marshal(m)
 	req, _ = http.NewRequest("POST", apiURL+"/v1/receive/log", bytes.NewBuffer(data))

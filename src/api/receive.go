@@ -113,9 +113,8 @@ func (s *Search) ReceiverLog(ctx *gin.Context) {
 		utils.Ok(ctx, "ok")
 		return
 	}
-
-	for _, keyword := range keywords {
-		if strings.Index(message.(string), keyword) == -1 {
+	for e := keywords.Front(); e != nil; e = e.Next() {
+		if strings.Index(message.(string), e.Value.(string)) == -1 {
 			continue
 		}
 
@@ -123,7 +122,7 @@ func (s *Search) ReceiverLog(ctx *gin.Context) {
 			app.(string),
 			task.(string),
 			path.(string),
-			keyword,
+			e.Value.(string),
 			user.(string),
 			cluster.(string),
 		).Inc()
