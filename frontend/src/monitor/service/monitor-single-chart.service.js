@@ -60,7 +60,7 @@
             };
 
             Options.prototype._createFileSysWriteOptions = function () {
-                var options = chartUtil.createDefaultOptions({height: 500});
+                var options = chartUtil.createDefaultOptions({height: 500, showLegend: true, hideGuideline: true});
                 options.title.text = '磁盘写入速率';
                 options.chart.yAxis.tickFormat = function (d) {
                     return $filter('netRate')(d);
@@ -70,7 +70,7 @@
             };
 
             Options.prototype._createFileSysReadOptions = function () {
-                var options = chartUtil.createDefaultOptions({height: 500});
+                var options = chartUtil.createDefaultOptions({height: 500, showLegend: true, hideGuideline: true});
                 options.title.text = '磁盘读取速率';
                 options.chart.yAxis.tickFormat = function (d) {
                     return $filter('netRate')(d);
@@ -81,7 +81,7 @@
 
 
             Options.prototype._createNetworkTxOptions = function () {
-                var options = chartUtil.createDefaultOptions({height: 500});
+                var options = chartUtil.createDefaultOptions({height: 500, showLegend: true, hideGuideline: true});
                 options.title.text = '网络读取速率';
                 options.chart.yAxis.tickFormat = function (d) {
                     return $filter('netRate')(d);
@@ -91,7 +91,7 @@
             };
 
             Options.prototype._createNetworkRxOptions = function () {
-                var options = chartUtil.createDefaultOptions({height: 500});
+                var options = chartUtil.createDefaultOptions({height: 500, showLegend: true, hideGuideline: true});
                 options.title.text = '网络接收速率';
                 options.chart.yAxis.tickFormat = function (d) {
                     return $filter('netRate')(d);
@@ -101,7 +101,7 @@
             };
 
             Options.prototype._createCpuOptions = function () {
-                var options = chartUtil.createDefaultOptions({height: 500});
+                var options = chartUtil.createDefaultOptions({height: 500, showLegend: true, hideGuideline: true});
                 options.title.text = 'CPU 使用率';
                 options.chart.yAxis.tickFormat = function (d) {
                     return d + '%';
@@ -112,7 +112,7 @@
             };
 
             Options.prototype._createMemTotalOptions = function () {
-                var options = chartUtil.createDefaultOptions({height: 500});
+                var options = chartUtil.createDefaultOptions({height: 500, showLegend: true, hideGuideline: true});
                 options.title.text = '内存总量';
                 options.chart.yAxis.tickFormat = function (d) {
                     return $filter('size')(d);
@@ -123,7 +123,7 @@
             };
 
             Options.prototype._createMemUsageOptions = function () {
-                var options = chartUtil.createDefaultOptions({height: 500});
+                var options = chartUtil.createDefaultOptions({height: 500, showLegend: true, hideGuideline: true});
                 options.title.text = '内存使用量';
                 options.chart.yAxis.tickFormat = function (d) {
                     return $filter('size')(d);
@@ -134,7 +134,7 @@
             };
 
             Options.prototype._createMemOptions = function () {
-                var options = chartUtil.createDefaultOptions({height: 500});
+                var options = chartUtil.createDefaultOptions({height: 500, showLegend: true, hideGuideline: true});
                 options.title.text = '内存使用率';
                 options.chart.yAxis.tickFormat = function (d) {
                     return d + '%';
@@ -237,10 +237,10 @@
                             });
                             serialKey = serialKeyBuilder(serialKey);
                         } else {
-                            serialKey = serialKeyBuilder(item.metric.container_label_SLOT);
+                            serialKey = serialKeyBuilder(item.metric.container_label_SLOT + '-' + item.metric.id);
                         }
                     } else {
-                        serialKey = item.metric.container_label_SLOT;
+                        serialKey = item.metric.container_label_SLOT + '-' + item.metric.id;
                     }
                     angular.forEach(item.values, function (value) {
                         chartUtil.pushData(target, serialKey, {

@@ -40,7 +40,7 @@
             }
 
             Options.prototype._createFileSysOptions = function () {
-                var options = chartUtil.createDefaultOptions();
+                var options = chartUtil.createDefaultOptions({showLegend: true, hideGuideline: true});
                 options.title.text = '磁盘读/写速率';
                 options.chart.yAxis.tickFormat = function (d) {
                     return $filter('netRate')(d);
@@ -50,7 +50,7 @@
             };
 
             Options.prototype._createNetworkOptions = function () {
-                var options = chartUtil.createDefaultOptions();
+                var options = chartUtil.createDefaultOptions({showLegend: true, hideGuideline: true});
                 options.title.text = '网络接收/发送速率';
                 options.chart.yAxis.tickFormat = function (d) {
                     return $filter('netRate')(d);
@@ -60,7 +60,7 @@
             };
 
             Options.prototype._createCpuOptions = function () {
-                var options = chartUtil.createDefaultOptions();
+                var options = chartUtil.createDefaultOptions({showLegend: true, hideGuideline: true});
                 options.title.text = 'CPU 使用率';
                 options.chart.yAxis.tickFormat = function (d) {
                     return d + '%';
@@ -71,7 +71,7 @@
             };
 
             Options.prototype._createMemOptions = function () {
-                var options = chartUtil.createDefaultOptions();
+                var options = chartUtil.createDefaultOptions({showLegend: true, hideGuideline: true});
                 options.title.text = '内存使用率';
                 options.chart.yAxis.tickFormat = function (d) {
                     return d + '%';
@@ -122,9 +122,9 @@
                 angular.forEach(data, function (item) {
                     var serialKey;
                     if (serialKeyBuilder) {
-                        serialKey = serialKeyBuilder(item.metric.container_label_SLOT);
+                        serialKey = serialKeyBuilder(item.metric.container_label_SLOT + '-' + item.metric.id);
                     } else {
-                        serialKey = item.metric.container_label_SLOT;
+                        serialKey = item.metric.container_label_SLOT + '-' + item.metric.id;
                     }
                     angular.forEach(item.values, function (value) {
                         chartUtil.pushData(target, serialKey, {
