@@ -23,6 +23,7 @@
             <th md-column style="width: 60px;"></th>
             <th md-column style="width: 160px;">时间</th>
             <th md-column>信息</th>
+            <th md-column style="width: 60px;">实例</th>
             <th md-column style="width: 100px;">上下文</th>
         </tr>
         </thead>
@@ -42,7 +43,10 @@
                 <div ng-bind-html="log.message"></div>
             </td>
             <td md-cell>
-                <a id="logContext{/$index/}" ui-sref="home.logbase.logcontext({app: log.app, task: log.task, path: log.path, offset: log.offset})">上下文</a>
+              <p>{/log.task/}</p>
+            </td>
+            <td md-cell>
+              <a id="logContext{/$index/}" ui-sref="home.logbase.logcontext({app: log.app, task: log.task, path: log.path, offset: log.offset})">>>></a>
             </td>
         </tr>
         <tr ng-repeat-end ng-hide="!vm.logDisplaySet[$index]">
