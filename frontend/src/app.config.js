@@ -65,10 +65,10 @@
                 templateUrl: '/src/log/logs/logs.html',
                 controller: 'LogsCtrl as vm'
             })
-            .state('home.logbase.logWithoutKey', {
-                url: '/logWithoutKey',
-                templateUrl: '/src/log/logs-without-keyword/logs.html',
-                controller: 'LogWithoutKeyCtrl as vm'
+            .state('home.logbase.loglinks', {
+                url: '/loglinks',
+                templateUrl: '/src/log/logs-links/logs.html',
+                controller: 'LogLinksCtrl as vm'
             })
             .state('home.logbase.logcontext', {
                 url: '/logcontext?offset',

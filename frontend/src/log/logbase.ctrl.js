@@ -64,7 +64,7 @@
             if (self.form.keyword || (!self.form.keyword && !self.form.task)) {
                 $state.go('home.logbase.logs', self.form);
             } else {
-                $state.go('home.logbase.logWithoutKey', self.form);
+                $state.go('home.logbase.loglinks', self.form);
             }
         }
     }
