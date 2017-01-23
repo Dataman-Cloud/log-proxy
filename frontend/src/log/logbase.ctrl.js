@@ -61,10 +61,10 @@
         function searchLog() {
             checkTimeRange();
 
-            if (self.form.keyword || (!self.form.keyword && !self.form.task)) {
-                $state.go('home.logbase.logs', self.form);
-            } else {
+            if (!self.form.keyword && /^\d+$/.test(self.form.task)) {
                 $state.go('home.logbase.loglinks', self.form);
+            } else {
+                $state.go('home.logbase.logs', self.form);
             }
         }
     }
