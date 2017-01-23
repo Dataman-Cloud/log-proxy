@@ -62,7 +62,7 @@
             checkTimeRange();
 
             if (!self.form.keyword && /^\d+$/.test(self.form.task)) {
-                $state.go('home.logbase.loglinks', self.form);
+                $state.go('home.logbase.logdetail', self.form);
             } else {
                 $state.go('home.logbase.logs', self.form);
             }
