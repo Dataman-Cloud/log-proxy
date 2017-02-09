@@ -24,8 +24,8 @@ func startHTTPServer() *httptest.Server {
 	router := gin.New()
 	router.HEAD("/", func(ctx *gin.Context) { ctx.String(200, "") })
 	router.GET("/_nodes/http", nodes)
-	router.POST("/:index/dataman-test-web", task)
-	router.POST("/:index/dataman-test-web/_search", task)
+	router.POST("/:index/dataman-user-test-web", task)
+	router.POST("/:index/dataman-user-test-web/_search", task)
 	router.POST("/:index/dataman-prometheus/*action", task)
 	router.POST("/:index/dataman-alerts/*action", task)
 	router.POST("/:index/_search", app)
@@ -100,7 +100,7 @@ func TestApplications(t *testing.T) {
 
 func TestTasks(t *testing.T) {
 	service := NewEsService([]string{baseURL})
-	service.Tasks("test-web", models.Page{})
+	service.Tasks("test-web", "user", models.Page{})
 }
 
 func TestPath(t *testing.T) {
@@ -110,10 +110,10 @@ func TestPath(t *testing.T) {
 
 func TestSearch(t *testing.T) {
 	service := NewEsService([]string{baseURL})
-	service.Search("user", "cluster", "test-web", "test-web.ac4616e4-c02b-11e6-9030-024245dc84c8", "stdout", "GET", models.Page{})
+	service.Search("cluster", "user", "test-web", "test-web.ac4616e4-c02b-11e6-9030-024245dc84c8", "stdout", "GET", models.Page{})
 }
 
 func TestContext(t *testing.T) {
 	service := NewEsService([]string{baseURL})
-	service.Context("user", "cluster", "test-web", "test-web.ac4616e4-c02b-11e6-9030-024245dc84c8", "stdout", "1481650415421815800", models.Page{})
+	service.Context("cluster", "user", "test-web", "test-web.ac4616e4-c02b-11e6-9030-024245dc84c8", "stdout", "1481650415421815800", models.Page{})
 }
