@@ -52,6 +52,7 @@ func NewEsService(url []string) *SearchService {
 }
 
 // Applications get all applications
+// This function destroy now.
 func (s *SearchService) Applications(page models.Page) (map[string]int64, error) {
 	bquery := elastic.NewBoolQuery().
 		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte(page.RangeFrom).Lte(page.RangeTo).Format("epoch_millis"))
@@ -90,7 +91,8 @@ func (s *SearchService) Applications(page models.Page) (map[string]int64, error)
 }
 
 // Tasks get application tasks
-func (s *SearchService) Tasks(appName string, page models.Page) (map[string]int64, error) {
+// This function destroy now.
+func (s *SearchService) Tasks(appName, user string, page models.Page) (map[string]int64, error) {
 	bquery := elastic.NewBoolQuery().
 		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte(page.RangeFrom).Lte(page.RangeTo).Format("epoch_millis")).
 		Must(elastic.NewTermQuery("app", appName))
@@ -99,7 +101,7 @@ func (s *SearchService) Tasks(appName string, page models.Page) (map[string]int6
 	tasks := make(map[string]int64)
 	result, err := s.ESClient.Search().
 		Index("dataman-*-"+utils.ParseDate(page.RangeFrom, page.RangeTo)).
-		Type("dataman-"+appName).
+		Type("dataman-"+user+"-"+appName).
 		Query(bquery).
 		SearchType("count").
 		Aggregation("tasks", elastic.
@@ -150,7 +152,7 @@ func (s *SearchService) Paths(cluster, user, appName, taskID string, page models
 
 	result, err := s.ESClient.Search().
 		Index("dataman-*-"+utils.ParseDate(page.RangeFrom, page.RangeTo)).
-		Type("dataman-"+appName).
+		Type("dataman-"+user+"-"+appName).
 		Query(bquery).
 		SearchType("count").
 		Aggregation("paths", elastic.
@@ -207,7 +209,7 @@ func (s *SearchService) Search(cluster, user, app, task, source, keyword string,
 
 	result, err := s.ESClient.Search().
 		Index("dataman-"+cluster+"-"+utils.ParseDate(page.RangeFrom, page.RangeTo)).
-		Type("dataman-"+app).
+		Type("dataman-"+user+"-"+app).
 		Query(bquery).
 		Sort("logtime.sort", sort).
 		Highlight(elastic.NewHighlight().Field("message").PreTags(`@dataman-highlighted-field@`).PostTags(`@/dataman-highlighted-field@`)).
@@ -260,7 +262,7 @@ func (s *SearchService) Context(cluster, user, app, task, source, timestamp stri
 
 		result, err := s.ESClient.Search().
 			Index("dataman-"+cluster+"-"+time.Unix(offset/1e9, 0).Format("2006-01-02")).
-			Type("dataman-"+app).
+			Type("dataman-"+user+"-"+app).
 			Query(bquery).
 			Sort("logtime.sort", false).
 			From(0).
@@ -289,7 +291,7 @@ func (s *SearchService) Context(cluster, user, app, task, source, timestamp stri
 
 	result, err := s.ESClient.Search().
 		Index("dataman-"+cluster+"-"+time.Unix(offset/1e9, 0).Format("2006-01-02")).
-		Type("dataman-"+app).
+		Type("dataman-"+user+"-"+app).
 		Query(bquery).
 		Sort("logtime.sort", true).
 		From(page.PageFrom).

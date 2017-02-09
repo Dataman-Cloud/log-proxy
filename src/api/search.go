@@ -113,7 +113,7 @@ func (s *Search) Applications(ctx *gin.Context) {
 // Tasks search applications tasks
 func (s *Search) Tasks(ctx *gin.Context) {
 
-	tasks, err := s.Service.Tasks(ctx.Param("app"), ctx.MustGet("page").(models.Page))
+	tasks, err := s.Service.Tasks(ctx.Param("app"), ctx.Query("user"), ctx.MustGet("page").(models.Page))
 	if err != nil {
 		utils.ErrorResponse(ctx, utils.NewError(GetTaskError, err))
 		return
