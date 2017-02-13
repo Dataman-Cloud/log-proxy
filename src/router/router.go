@@ -70,6 +70,15 @@ func Router(middlewares ...gin.HandlerFunc) *gin.Engine {
 		monitorv1.PUT("/silence/:id", monitor.UpdateSilence)
 	}
 
+	alert := api.NewAlert()
+	alertv1 := r.Group("/v1/alert")
+	{
+		alertv1.POST("/rules", alert.CreateAlertRule)
+		alertv1.DELETE("/rules/:id", alert.DeleteAlertRule)
+		alertv1.GET("/rules", alert.GetAlertRule)
+		alertv1.PUT("/rules", alert.UpdateAlertRule)
+	}
+
 	staticRouter := r.Group("/ui")
 	{
 		staticRouter.GET("/*filepath", func(ctx *gin.Context) {

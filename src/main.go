@@ -9,6 +9,7 @@ import (
 	"github.com/Dataman-Cloud/log-proxy/src/config"
 	"github.com/Dataman-Cloud/log-proxy/src/router"
 	"github.com/Dataman-Cloud/log-proxy/src/router/middleware"
+	"github.com/Dataman-Cloud/log-proxy/src/store/datastore"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/gin-gonic/contrib/static"
@@ -18,6 +19,7 @@ func main() {
 	configFile := flag.String("config", "env_file", "config file path")
 	flag.Parse()
 	config.InitConfig(*configFile)
+	datastore.InitDB(config.GetConfig().DbDriver, config.GetConfig().DbDSN)
 
 	log.Infof("http server: %s start...", config.GetConfig().Addr)
 
