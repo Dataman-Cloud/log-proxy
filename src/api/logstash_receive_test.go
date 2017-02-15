@@ -10,54 +10,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func receiver(ctx *gin.Context) {
-	s.Receiver(ctx)
-}
-
 func receiverlog(ctx *gin.Context) {
 	s.ReceiverLog(ctx)
-}
-
-func getprometheus(ctx *gin.Context) {
-	s.GetPrometheus(ctx)
-}
-
-func getprometheu(ctx *gin.Context) {
-	s.GetPrometheu(ctx)
-}
-
-func TestReciver(t *testing.T) {
-	if s == nil {
-		s = GetSearch()
-	}
-	req, _ := http.NewRequest("POST", apiURL+"/v1/receive/prometheus", nil)
-	resp, err := http.DefaultClient.Do(req)
-	if err == nil && resp.StatusCode == 503 {
-		t.Log("success")
-	} else {
-		t.Error("faild")
-	}
-
-	m := map[string][]interface{}{
-		"alerts": []interface{}{
-			map[string]interface{}{
-				"labels": map[string]interface{}{
-					"alertname": "test",
-					"task":      "value",
-				},
-			},
-		},
-	}
-
-	data, _ := json.Marshal(m)
-
-	req, _ = http.NewRequest("POST", apiURL+"/v1/receive/prometheus", bytes.NewBuffer(data))
-	resp, err = http.DefaultClient.Do(req)
-	if err == nil && resp.StatusCode == 200 {
-		t.Log("success")
-	} else {
-		t.Error("faild")
-	}
 }
 
 func TestReciverLog(t *testing.T) {
@@ -206,32 +160,6 @@ func TestReciverLog(t *testing.T) {
 	data, _ = json.Marshal(m)
 	req, _ = http.NewRequest("POST", apiURL+"/v1/receive/log", bytes.NewBuffer(data))
 	resp, err = http.DefaultClient.Do(req)
-	if err == nil && resp.StatusCode == 200 {
-		t.Log("success")
-	} else {
-		t.Error("faild")
-	}
-}
-
-func TestGetPrometheus(t *testing.T) {
-	if s == nil {
-		s = GetSearch()
-	}
-	req, _ := http.NewRequest("GET", apiURL+"/api/v1/monitor/prometheus", nil)
-	resp, err := http.DefaultClient.Do(req)
-	if err == nil && resp.StatusCode == 200 {
-		t.Log("success")
-	} else {
-		t.Error("faild")
-	}
-}
-
-func TestGetPrometheu(t *testing.T) {
-	if s == nil {
-		s = GetSearch()
-	}
-	req, _ := http.NewRequest("GET", apiURL+"/api/v1/monitor/prometheus/test", nil)
-	resp, err := http.DefaultClient.Do(req)
 	if err == nil && resp.StatusCode == 200 {
 		t.Log("success")
 	} else {
