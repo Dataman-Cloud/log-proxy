@@ -1,3 +1,5 @@
+//KeywordAlert is handling the alert keywords CRUD
+
 package api
 
 import (

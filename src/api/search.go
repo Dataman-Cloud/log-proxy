@@ -197,3 +197,25 @@ func (s *Search) Context(ctx *gin.Context) {
 
 	utils.Ok(ctx, results)
 }
+
+// GetPrometheus get all prometheus
+func (s *Search) GetPrometheus(ctx *gin.Context) {
+	result, err := s.Service.GetPrometheus(ctx.MustGet("page").(models.Page))
+	if err != nil {
+		utils.ErrorResponse(ctx, utils.NewError(GetPrometheusError, err))
+		return
+	}
+
+	utils.Ok(ctx, result)
+}
+
+// GetPrometheu get prometheus by id
+func (s *Search) GetPrometheu(ctx *gin.Context) {
+	result, err := s.Service.GetPrometheu(ctx.Param("id"))
+	if err != nil {
+		utils.ErrorResponse(ctx, utils.NewError(GetPrometheusError, err))
+		return
+	}
+
+	utils.Ok(ctx, result)
+}

@@ -360,3 +360,37 @@ func TestContext(t *testing.T) {
 		t.Error("faild")
 	}
 }
+
+func getprometheus(ctx *gin.Context) {
+	s.GetPrometheus(ctx)
+}
+
+func getprometheu(ctx *gin.Context) {
+	s.GetPrometheu(ctx)
+}
+
+func TestGetPrometheus(t *testing.T) {
+	if s == nil {
+		s = GetSearch()
+	}
+	req, _ := http.NewRequest("GET", apiURL+"/api/v1/monitor/prometheus", nil)
+	resp, err := http.DefaultClient.Do(req)
+	if err == nil && resp.StatusCode == 200 {
+		t.Log("success")
+	} else {
+		t.Error("faild")
+	}
+}
+
+func TestGetPrometheu(t *testing.T) {
+	if s == nil {
+		s = GetSearch()
+	}
+	req, _ := http.NewRequest("GET", apiURL+"/api/v1/monitor/prometheus/test", nil)
+	resp, err := http.DefaultClient.Do(req)
+	if err == nil && resp.StatusCode == 200 {
+		t.Log("success")
+	} else {
+		t.Error("faild")
+	}
+}
