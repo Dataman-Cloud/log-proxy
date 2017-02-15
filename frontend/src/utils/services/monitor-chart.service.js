@@ -122,9 +122,9 @@
                 angular.forEach(data, function (item) {
                     var serialKey;
                     if (serialKeyBuilder) {
-                        serialKey = serialKeyBuilder(item.metric.container_label_SLOT + '-' + item.metric.id);
+                        serialKey = serialKeyBuilder(item.metric.container_label_SLOT);
                     } else {
-                        serialKey = item.metric.container_label_SLOT + '-' + item.metric.id;
+                        serialKey = item.metric.container_label_SLOT;
                     }
                     angular.forEach(item.values, function (value) {
                         chartUtil.pushData(target, serialKey, {

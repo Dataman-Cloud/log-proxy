@@ -1,9 +1,9 @@
 (function () {
     'use strict';
     angular.module('app')
-        .controller('LogLinksCtrl', LogLinksCtrl);
+        .controller('LogDetailCtrl', LogDetailCtrl);
     /* @ngInject */
-    function LogLinksCtrl(logBackend, $stateParams) {
+    function LogDetailCtrl(logBackend, $stateParams) {
         var tempLogQuery = {
             cluster: $stateParams.cluster || '',
             user: $stateParams.user || '',
