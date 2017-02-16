@@ -29,11 +29,11 @@ const (
 	IndexError = "503-11003"
 	// CreateAlertError create keyword error
 	CreateAlertError = "503-11004"
-	// DeleteAlertError delete keywrod error
+	// DeleteAlertError delete keyword error
 	DeleteAlertError = "503-11005"
 	// GetAlertError get keyword error
 	GetAlertError = "503-11006"
-	// UpdateAlertError update keywrod error
+	// UpdateAlertError update keyword error
 	UpdateAlertError = "503-11007"
 	// GetEventsError get event history error
 	GetEventsError = "503-11008"
