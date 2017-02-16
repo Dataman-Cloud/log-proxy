@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/Dataman-Cloud/log-proxy/src/api"
+	exporterapi "github.com/Dataman-Cloud/log-proxy/src/exporter/api"
 	"github.com/Dataman-Cloud/log-proxy/src/router/middleware"
 	"github.com/Dataman-Cloud/log-proxy/src/utils"
 
@@ -23,7 +24,19 @@ func Router(middlewares ...gin.HandlerFunc) *gin.Engine {
 	r.Use(middleware.CORSMiddleware())
 	r.Use(middlewares...)
 
-	s := api.GetSearch()
+	ep := exporterapi.NewExporter()
+
+	exporterv1 := r.Group("/v1/exporter")
+	{
+		exporterv1.GET("/keyword", ep.GetFilters)
+		exporterv1.POST("/keyword", ep.CreateFilter)
+		exporterv1.PUT("/keyword", ep.UpdateFilter)
+		exporterv1.DELETE("/keyword/:id", ep.DeleteFilter)
+		exporterv1.GET("/keyword/:id", ep.GetFilter)
+		exporterv1.POST("/input", ep.ReceiveLog)
+	}
+
+	s := api.NewSearch()
 	logv1 := r.Group("/v1/search")
 	{
 		logv1.GET("/ping", s.Ping)
@@ -33,11 +46,6 @@ func Router(middlewares ...gin.HandlerFunc) *gin.Engine {
 		logv1.GET("/index", s.Index)
 		logv1.GET("/context", s.Context)
 
-		logv1.GET("/keyword", s.GetAlerts)
-		logv1.POST("/keyword", s.CreateAlert)
-		logv1.PUT("/keyword", s.UpdateAlert)
-		logv1.DELETE("/keyword/:id", s.DeleteAlert)
-		logv1.GET("/keyword/:id", s.GetAlert)
 		logv1.GET("/prometheus", s.GetPrometheus)
 		logv1.GET("/prometheus/:id", s.GetPrometheu)
 
@@ -46,7 +54,6 @@ func Router(middlewares ...gin.HandlerFunc) *gin.Engine {
 	pv1 := r.Group("/v1/receive")
 	{
 		pv1.POST("/prometheus", s.Receiver)
-		pv1.POST("/log", s.ReceiverLog)
 	}
 
 	monitor := api.NewMonitor()

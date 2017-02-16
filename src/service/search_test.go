@@ -27,11 +27,11 @@ func startHTTPServer() *httptest.Server {
 	router.POST("/:index/dataman-user-test-web", task)
 	router.POST("/:index/dataman-user-test-web/_search", task)
 	router.POST("/:index/dataman-prometheus/*action", task)
-	router.POST("/:index/dataman-alerts/*action", task)
+	router.POST("/:index/dataman-keyword-filter/*action", task)
 	router.POST("/:index/_search", app)
 	router.GET("/.dataman-prometheus/dataman-prometheus/AVj3kWyMIIGpJqE63T3m", getp)
-	router.GET("/.dataman-alerts/dataman-alerts/test", getp)
-	router.DELETE("/.dataman-alerts/dataman-alerts/test", getp)
+	router.GET("/.dataman-keyword-filter/dataman-keyword-filter/test", getp)
+	router.DELETE("/.dataman-keyword-filter/dataman-keyword-filter/test", getp)
 
 	return httptest.NewServer(router)
 }

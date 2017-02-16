@@ -1,10 +1,10 @@
 package api
 
 import (
-	"container/list"
+	"encoding/json"
 	"errors"
 	"strings"
-	"sync"
+	"time"
 
 	"github.com/Dataman-Cloud/log-proxy/src/config"
 	"github.com/Dataman-Cloud/log-proxy/src/models"
@@ -12,84 +12,32 @@ import (
 	"github.com/Dataman-Cloud/log-proxy/src/utils"
 
 	"github.com/gin-gonic/gin"
-	"github.com/prometheus/client_golang/prometheus"
 )
 
-// registry prometheus registry counter
-var registry bool
-
 const (
-	// GetAppsError get application error
-	GetAppsError = "503-11000"
 	// ParamError param error
 	ParamError = "400-11001"
+	// GetAppsError get application error
+	GetAppsError = "503-11000"
 	// GetTaskError get task error
 	GetTaskError = "503-11002"
 	// IndexError search index log error
 	IndexError = "503-11003"
-	// CreateAlertError create keyword error
-	CreateAlertError = "503-11004"
-	// DeleteAlertError delete keyword error
-	DeleteAlertError = "503-11005"
-	// GetAlertError get keyword error
-	GetAlertError = "503-11006"
-	// UpdateAlertError update keyword error
-	UpdateAlertError = "503-11007"
 	// GetEventsError get event history error
 	GetEventsError = "503-11008"
 	// GetPrometheusError get prometheus event error
 	GetPrometheusError = "503-11009"
-	// GetLogError get log error
-	GetLogError = "503-11010"
 )
 
 // Search search client struct
 type Search struct {
-	Service       *service.SearchService
-	KeywordFilter map[string]*list.List
-	Counter       *prometheus.CounterVec
-	Kmutex        *sync.Mutex
+	Service *service.SearchService
 }
 
-// GetSearch new search client
-func GetSearch() *Search {
+// NewSearch new search client
+func NewSearch() *Search {
 	s := &Search{
-		Service:       service.NewEsService(strings.Split(config.GetConfig().EsURL, ",")),
-		KeywordFilter: make(map[string]*list.List),
-		Counter: prometheus.NewCounterVec(
-			prometheus.CounterOpts{
-				Name: "log_keyword",
-				Help: "log keyword counter",
-			},
-			[]string{"app", "task", "path", "keyword", "user", "cluster"},
-		),
-		Kmutex: new(sync.Mutex),
-	}
-
-	if !registry {
-		prometheus.MustRegister(s.Counter)
-		registry = true
-	}
-
-	alerts, err := s.Service.GetAlerts(models.Page{
-		PageFrom: 0,
-		PageSize: 1000,
-	})
-
-	if err != nil {
-		return s
-	}
-
-	s.Kmutex.Lock()
-	defer s.Kmutex.Unlock()
-	if alerts == nil {
-		return s
-	}
-	for _, alert := range alerts["results"].([]models.Alert) {
-		if s.KeywordFilter[alert.AppID+alert.Path] == nil {
-			s.KeywordFilter[alert.AppID+alert.Path] = list.New()
-		}
-		s.KeywordFilter[alert.AppID+alert.Path].PushBack(alert.Keyword)
+		Service: service.NewEsService(strings.Split(config.GetConfig().EsURL, ",")),
 	}
 
 	return s
@@ -218,4 +166,49 @@ func (s *Search) GetPrometheu(ctx *gin.Context) {
 	}
 
 	utils.Ok(ctx, result)
+}
+
+// Receiver receive alert event sourced from alertmanager, output to elasticsearch
+func (s *Search) Receiver(ctx *gin.Context) {
+	data, err := utils.ReadRequestBody(ctx.Request)
+	if err != nil {
+		utils.ErrorResponse(ctx, utils.NewError(GetEventsError, err))
+		return
+	}
+
+	var m map[string]interface{}
+	err = json.Unmarshal(data, &m)
+	if err != nil {
+		utils.ErrorResponse(ctx, utils.NewError(GetEventsError, err))
+		return
+	}
+
+	for _, alert := range m["alerts"].([]interface{}) {
+		a := alert.(map[string]interface{})
+		a["alertname"] = a["labels"].(map[string]interface{})["alertname"]
+		labels, err := json.Marshal(a["labels"])
+
+		if config.GetConfig().NotificationURL != "" {
+			utils.AlertNotification(config.GetConfig().NotificationURL, map[string]interface{}{
+				"alarminfo": []map[string]interface{}{
+					map[string]interface{}{
+						"level":         a["labels"].(map[string]interface{})["severity"],
+						"modelIdentify": a["alertname"],
+						"content":       utils.Byte2str(labels),
+						"alarmTime":     time.Now().Format(time.RFC3339Nano),
+					},
+				},
+				"apiVersion": time.Now().Format("2006-01-02"),
+			})
+		}
+
+		if err != nil {
+			continue
+		}
+		delete(a, "labels")
+		a["labels"] = utils.Byte2str(labels)
+		s.Service.SavePrometheus(a)
+	}
+
+	utils.Ok(ctx, map[string]string{"status": "success"})
 }

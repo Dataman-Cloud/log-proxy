@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -18,7 +19,6 @@ import (
 var (
 	apiURL  string
 	baseURL string
-	server  *httptest.Server
 	s       *Search
 	mo      *Monitor
 )
@@ -40,16 +40,10 @@ func startAPIServer(sv *Search) *httptest.Server {
 	vr := router.Group("/v1/receive")
 	{
 		vr.POST("/prometheus", receiver)
-		vr.POST("/log", receiverlog)
 	}
 
 	v1m := router.Group("/api/v1/monitor", func(ctx *gin.Context) { ctx.Set("page", models.Page{}) })
 	{
-		v1m.POST("/alert", func(ctx *gin.Context) { sv.CreateAlert(ctx) })
-		v1m.GET("/alert", func(ctx *gin.Context) { sv.GetAlerts(ctx) })
-		v1m.GET("/alert/:id", func(ctx *gin.Context) { sv.GetAlert(ctx) })
-		v1m.PUT("/alert", func(ctx *gin.Context) { sv.UpdateAlert(ctx) })
-		v1m.DELETE("/alert/:id", func(ctx *gin.Context) { sv.DeleteAlert(ctx) })
 		v1m.GET("/prometheus", getprometheus)
 		v1m.GET("/prometheus/:id", getprometheu)
 		v1m.GET("/query", getQuery)
@@ -82,11 +76,8 @@ func startHTTPServer() *httptest.Server {
 	router.POST("/:index/dataman-test-web", webs)
 	router.POST("/:index/dataman-test-web/_search", task)
 	router.POST("/:index/dataman-prometheus/*action", pro)
-	router.POST("/:index/dataman-alerts/*action", alerts)
 	router.POST("/:index/_search", app)
 	router.GET("/.dataman-prometheus/dataman-prometheus/AVj3kWyMIIGpJqE63T3m", getp)
-	router.GET("/.dataman-alerts/dataman-alerts/test", getp)
-	router.DELETE("/.dataman-alerts/dataman-alerts/test", getp)
 	router.GET("/api/v1/query_rang", queryResult)
 	router.GET("/api/v1/alerts", queryAlerts)
 	router.GET("/api/v1/alerts/groups", queryAlertsGroups)
@@ -94,6 +85,10 @@ func startHTTPServer() *httptest.Server {
 	router.GET("/api/v1/silences", querySliences)
 
 	return httptest.NewServer(router)
+}
+
+func receiver(ctx *gin.Context) {
+	s.Receiver(ctx)
 }
 
 func getp(ctx *gin.Context) {
@@ -113,14 +108,6 @@ func app(ctx *gin.Context) {
 }
 
 func webs(ctx *gin.Context) {
-	data := `{"took":15,"_scroll_id":"","hits":{"total":6,"max_score":0,"hits":[{"_score":0.1825316,"_index":"dataman-test-2016-12-13","_type":"dataman-test-web","_id":"AVj3kWyMIIGpJqE63T3m","_uid":"","_timestamp":0,"_ttl":600680748,"_routing":"","_parent":"","_version":null,"sort":null,"highlight":{"message":["192.168.1.98 - - [13/Dec/2016:17:33:31 +0000] \"@dataman-highlighted-field@GET@/dataman-highlighted-field@ / HTTP/1.1\" 304 0 \"-\" \"Mozilla/5.0 (Macintosh"]},"_source":{"message":"192.168.1.98 - - [13/Dec/2016:17:33:31 +0000] \"GET / HTTP/1.1\" 304 0 \"-\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.80 Safari/537.36\" \"-\"\n","@version":"1","@timestamp":"2016-12-13T09:44:07.282Z","host":"192.168.1.63","port":33762,"containerid":"55f3c919563f276b0566a8a2bb01167d24a7498a18a72d556fa8f630c5956958","logtime":"2016-12-14T01:33:35.421815898+08:00","path":"stdout","offset":1481650415421815800,"app":"test-web","user":"4","task":"test-web.ac4616e4-c02b-11e6-9030-024245dc84c8","groupid":"1","clusterid":"test"},"fields":null,"_explanation":null,"matched_queries":null,"inner_hits":null}]},"suggest":null,"aggregations":{"tasks":{"doc_count_error_upper_bound":0,"sum_other_doc_count":0,"buckets":[{"key":"test-web.ac4616e4-c02b-11e6-9030-024245dc84c8","doc_count":6}]},"paths":{"doc_count_error_upper_bound":0,"sum_other_doc_count":0,"buckets":[{"key":"test-web.ac4616e4-c02b-11e6-9030-024245dc84c8","doc_count":6}]}},"timed_out":false,"terminated_early":false,"_shards":{"total":5,"successful":5,"failed":0}}`
-	var info elastic.SearchResult
-	json.Unmarshal([]byte(data), &info)
-
-	ctx.JSON(http.StatusOK, info)
-}
-
-func alerts(ctx *gin.Context) {
 	data := `{"took":15,"_scroll_id":"","hits":{"total":6,"max_score":0,"hits":[{"_score":0.1825316,"_index":"dataman-test-2016-12-13","_type":"dataman-test-web","_id":"AVj3kWyMIIGpJqE63T3m","_uid":"","_timestamp":0,"_ttl":600680748,"_routing":"","_parent":"","_version":null,"sort":null,"highlight":{"message":["192.168.1.98 - - [13/Dec/2016:17:33:31 +0000] \"@dataman-highlighted-field@GET@/dataman-highlighted-field@ / HTTP/1.1\" 304 0 \"-\" \"Mozilla/5.0 (Macintosh"]},"_source":{"message":"192.168.1.98 - - [13/Dec/2016:17:33:31 +0000] \"GET / HTTP/1.1\" 304 0 \"-\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.80 Safari/537.36\" \"-\"\n","@version":"1","@timestamp":"2016-12-13T09:44:07.282Z","host":"192.168.1.63","port":33762,"containerid":"55f3c919563f276b0566a8a2bb01167d24a7498a18a72d556fa8f630c5956958","logtime":"2016-12-14T01:33:35.421815898+08:00","path":"stdout","offset":1481650415421815800,"app":"test-web","user":"4","task":"test-web.ac4616e4-c02b-11e6-9030-024245dc84c8","groupid":"1","clusterid":"test"},"fields":null,"_explanation":null,"matched_queries":null,"inner_hits":null}]},"suggest":null,"aggregations":{"tasks":{"doc_count_error_upper_bound":0,"sum_other_doc_count":0,"buckets":[{"key":"test-web.ac4616e4-c02b-11e6-9030-024245dc84c8","doc_count":6}]},"paths":{"doc_count_error_upper_bound":0,"sum_other_doc_count":0,"buckets":[{"key":"test-web.ac4616e4-c02b-11e6-9030-024245dc84c8","doc_count":6}]}},"timed_out":false,"terminated_early":false,"_shards":{"total":5,"successful":5,"failed":0}}`
 	var info elastic.SearchResult
 	json.Unmarshal([]byte(data), &info)
@@ -208,12 +195,12 @@ func querySlience(ctx *gin.Context) {
 
 func TestMain(m *testing.M) {
 	config.InitConfig("../../env_file.template")
-	server = startHTTPServer()
+	server := startHTTPServer()
 	baseURL = server.URL
 	config.GetConfig().EsURL = baseURL
 	config.GetConfig().PrometheusURL = baseURL
 	config.GetConfig().AlertManagerURL = baseURL
-	apiserver := startAPIServer(GetSearch())
+	apiserver := startAPIServer(NewSearch())
 	apiURL = apiserver.URL
 	defer apiserver.Close()
 	mo = NewMonitor()
@@ -224,10 +211,10 @@ func TestMain(m *testing.M) {
 
 func TestPing(t *testing.T) {
 	sr := startHTTPServer()
-	s = GetSearch()
+	s = NewSearch()
 	config.GetConfig().EsURL = sr.URL
 	baseURL = sr.URL
-	se := startAPIServer(GetSearch())
+	se := startAPIServer(NewSearch())
 	resp, err := http.Get(se.URL + "/api/v1/ping")
 	if err == nil && resp.StatusCode == 200 {
 		t.Log("success")
@@ -240,7 +227,7 @@ func TestApplications(t *testing.T) {
 	sr := startErrorClient()
 	config.GetConfig().EsURL = sr.URL
 	baseURL = sr.URL
-	s = GetSearch()
+	s = NewSearch()
 	se := startAPIServer(s)
 	resp, err := http.Get(se.URL + "/api/v1/applications")
 	if err == nil && resp.StatusCode == 503 {
@@ -252,7 +239,7 @@ func TestApplications(t *testing.T) {
 	sr = startHTTPServer()
 	config.GetConfig().EsURL = sr.URL
 	baseURL = sr.URL
-	s = GetSearch()
+	s = NewSearch()
 	se = startAPIServer(s)
 	resp, err = http.Get(se.URL + "/api/v1/applications")
 	if err == nil && resp.StatusCode == 200 {
@@ -267,7 +254,7 @@ func TestTasks(t *testing.T) {
 	sr := startHTTPServer()
 	config.GetConfig().EsURL = sr.URL
 	baseURL = sr.URL
-	s = GetSearch()
+	s = NewSearch()
 	se := startAPIServer(s)
 	resp, err := http.Get(se.URL + "/api/v1/tasks/test")
 	if err == nil && resp.StatusCode == 200 {
@@ -281,7 +268,7 @@ func TestPaths(t *testing.T) {
 	sr := startHTTPServer()
 	config.GetConfig().EsURL = sr.URL
 	baseURL = sr.URL
-	s = GetSearch()
+	s = NewSearch()
 	se := startAPIServer(s)
 	resp, err := http.Get(se.URL + "/api/v1/paths/test")
 	if err == nil && resp.StatusCode == 200 {
@@ -295,7 +282,7 @@ func TestIndex(t *testing.T) {
 	sr := startHTTPServer()
 	config.GetConfig().EsURL = sr.URL
 	baseURL = sr.URL
-	s = GetSearch()
+	s = NewSearch()
 	se := startAPIServer(s)
 	resp, err := http.Get(se.URL + "/api/v1/index")
 	if err == nil && resp.StatusCode == 400 {
@@ -323,7 +310,7 @@ func TestContext(t *testing.T) {
 	sr := startHTTPServer()
 	config.GetConfig().EsURL = sr.URL
 	baseURL = sr.URL
-	s = GetSearch()
+	s = NewSearch()
 	se := startAPIServer(s)
 	resp, err := http.Get(se.URL + "/api/v1/context")
 	if err == nil && resp.StatusCode == 400 {
@@ -371,7 +358,7 @@ func getprometheu(ctx *gin.Context) {
 
 func TestGetPrometheus(t *testing.T) {
 	if s == nil {
-		s = GetSearch()
+		s = NewSearch()
 	}
 	req, _ := http.NewRequest("GET", apiURL+"/api/v1/monitor/prometheus", nil)
 	resp, err := http.DefaultClient.Do(req)
@@ -384,7 +371,7 @@ func TestGetPrometheus(t *testing.T) {
 
 func TestGetPrometheu(t *testing.T) {
 	if s == nil {
-		s = GetSearch()
+		s = NewSearch()
 	}
 	req, _ := http.NewRequest("GET", apiURL+"/api/v1/monitor/prometheus/test", nil)
 	resp, err := http.DefaultClient.Do(req)
@@ -392,5 +379,39 @@ func TestGetPrometheu(t *testing.T) {
 		t.Log("success")
 	} else {
 		t.Error("faild")
+	}
+}
+
+func TestReceiver(t *testing.T) {
+	if s == nil {
+		s = NewSearch()
+	}
+	req, _ := http.NewRequest("POST", apiURL+"/v1/receive/prometheus", nil)
+	resp, err := http.DefaultClient.Do(req)
+	if err == nil && resp.StatusCode == 503 {
+		t.Log("success")
+	} else {
+		t.Error("failed")
+	}
+
+	m := map[string][]interface{}{
+		"alerts": []interface{}{
+			map[string]interface{}{
+				"labels": map[string]interface{}{
+					"alertname": "test",
+					"task":      "value",
+				},
+			},
+		},
+	}
+
+	data, _ := json.Marshal(m)
+
+	req, _ = http.NewRequest("POST", apiURL+"/v1/receive/prometheus", bytes.NewBuffer(data))
+	resp, err = http.DefaultClient.Do(req)
+	if err == nil && resp.StatusCode == 200 {
+		t.Log("success")
+	} else {
+		t.Error("failed")
 	}
 }
