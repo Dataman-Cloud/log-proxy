@@ -7,50 +7,50 @@ import (
 	"github.com/Dataman-Cloud/log-proxy/src/models"
 )
 
-func TestCreateAlert(t *testing.T) {
+func TestCreateFilter(t *testing.T) {
 	config.InitConfig("../../env_file.template")
 	service := NewEsService([]string{baseURL})
-	if service.CreateAlert(new(models.Alert)) == nil {
+	if service.CreateFilter(new(models.KWFilter)) == nil {
 		t.Log("success")
 	} else {
 		t.Error("faild")
 	}
 }
 
-func TestGetAlerts(t *testing.T) {
+func TestGetFilters(t *testing.T) {
 	config.InitConfig("../../env_file.template")
 	service := NewEsService([]string{baseURL})
-	if _, err := service.GetAlerts(models.Page{}); err == nil {
+	if _, err := service.GetFilters(models.Page{}); err == nil {
 		t.Log("success")
 	} else {
 		t.Error("faild")
 	}
 }
 
-func TestGetAlert(t *testing.T) {
+func TestGetFilter(t *testing.T) {
 	config.InitConfig("../../env_file.template")
 	service := NewEsService([]string{baseURL})
-	if _, err := service.GetAlert("test"); err == nil {
+	if _, err := service.GetFilter("test"); err == nil {
 		t.Log("success")
 	} else {
 		t.Error("faild")
 	}
 }
 
-func TestDeleteAlert(t *testing.T) {
+func TestDeleteFilter(t *testing.T) {
 	config.InitConfig("../../env_file.template")
 	service := NewEsService([]string{baseURL})
-	if service.DeleteAlert("test") == nil {
+	if service.DeleteFilter("test") == nil {
 		t.Log("success")
 	} else {
 		t.Error("faild")
 	}
 }
 
-func TestUpdateAlert(t *testing.T) {
+func TestUpdateFilter(t *testing.T) {
 	config.InitConfig("../../env_file.template")
 	service := NewEsService([]string{baseURL})
-	if service.UpdateAlert(new(models.Alert)) == nil {
+	if service.UpdateFilter(new(models.KWFilter)) == nil {
 		t.Log("success")
 	} else {
 		t.Error("faild")
