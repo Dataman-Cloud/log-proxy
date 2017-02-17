@@ -1,0 +1,55 @@
+*** Settings ***
+
+Resource          ../all_api.txt
+Library           RequestsLibrary
+Library           OperatingSystem
+Suite Setup       Get Token
+Suite Teardown    Delete All Sessions
+
+*** Variables ***
+
+${shurenyun}      http://192.168.1.244:81
+${mola}           http://192.168.1.75:5098
+${adminname}      admin
+${adminpasswd}    Admin1234
+
+*** Keywords ***
+
+Create App
+	[Arguments]   ${data}  ${headers}
+	Create Session  shurenyun    ${shurenyun}
+	${resp} =     Post Request   shurenyun  /v1/apps  data=${data}  headers=${headers}
+	[Return]      ${resp}
+
+Get Token
+    Create Session   shurenyun   ${shurenyun}
+    ${data}=      Set Variable   {"userName":"${adminname}","password":"${adminpasswd}"} 
+    ${resp}=      Post Request   shurenyun  /v1/login  data=${data} 
+    Should Be Equal As Strings   ${resp.status_code}   200 
+    ${token}=     Evaluate      '${resp.json()['data']}' 
+    ${headers}=   Create Dictionary  Authorization=${token} 
+    Set Suite Variable  ${headers}
+
+Create Filter
+	[Arguments]  ${data}
+	Create Session   Mola   ${mola}
+	${path} =    Evaluate   '/v1/search/keyword'
+	${resp}=     Post Request  Mola  ${path}  data=${data}
+	[Return]     ${resp}
+
+*** Test Cases ***
+
+Create Mola App
+	${data} =     Get Binary File  ${CURDIR}${/}init_app.json
+	${resp} =     Create App       ${data}  ${headers} 
+	Log   ${resp.text}
+	Should Be Equal As Strings  ${resp.status_code}   201
+
+Create Keyword
+	${data}=      Get Binary File  ${CURDIR}${/}init_keyword.json
+	Log   ${data}
+	${resp}=      Create Filter    ${data}
+	Log   ${resp.text}
+	Should Be Equal As Strings  ${resp.status_code}  200
+
+
