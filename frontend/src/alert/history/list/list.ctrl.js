@@ -36,11 +36,13 @@
 
         function listHistory() {
             alertBackend.histories({size: 100, page: 1}).get(function (data) {
-                self.histories = data.data.results;
-                self.count = data.data.count;
-                angular.forEach(self.histories, function (history, index) {
-                    history.labels = angular.fromJson(history.labels)
-                });
+                if (data.data != null) {
+                    self.histories = data.data.results;
+                    self.count = data.data.count;
+                    angular.forEach(self.histories, function (history, index) {
+                        history.labels = angular.fromJson(history.labels)
+                    });
+                }
             })
         }
 
