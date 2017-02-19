@@ -38,14 +38,10 @@ func Router(middlewares ...gin.HandlerFunc) *gin.Engine {
 		logv1.PUT("/keyword", s.UpdateAlert)
 		logv1.DELETE("/keyword/:id", s.DeleteAlert)
 		logv1.GET("/keyword/:id", s.GetAlert)
-		logv1.GET("/prometheus", s.GetPrometheus)
-		logv1.GET("/prometheus/:id", s.GetPrometheu)
-
 	}
 
 	pv1 := r.Group("/v1/receive")
 	{
-		pv1.POST("/prometheus", s.Receiver)
 		pv1.POST("/log", s.ReceiverLog)
 	}
 
@@ -77,6 +73,9 @@ func Router(middlewares ...gin.HandlerFunc) *gin.Engine {
 		alertv1.DELETE("/rules/:id", alert.DeleteAlertRule)
 		alertv1.GET("/rules", alert.GetAlertRule)
 		alertv1.PUT("/rules", alert.UpdateAlertRule)
+		alertv1.POST("/receiver", alert.ReceiveAlertEvent)
+		alertv1.PUT("/events/:id", alert.AckAlertEvent)
+		alertv1.GET("/events", alert.GetAlertEvents)
 	}
 
 	staticRouter := r.Group("/ui")

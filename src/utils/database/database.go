@@ -37,4 +37,5 @@ func OpenDB(driver, dsn string) {
 	db.SetLogger(log.StandardLogger())
 
 	db.LogMode(false)
+	log.Infof("successfully connected mysql uri: %s", dsn)
 }

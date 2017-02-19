@@ -19,7 +19,9 @@ func InitDB(driver, dsn string) {
 	db := database.DB(driver, dsn)
 
 	db.AutoMigrate(&models.Rule{})
+	db.AutoMigrate(&models.Event{})
 	// gorm don't support the union unique key, use raw SQL here.
 	db.Exec("ALTER TABLE rules ADD UNIQUE KEY(name, alert);")
+	db.Exec("ALTER TABLE events ADD UNIQUE KEY(severity,vcluster,app,slot,container_id,alert_name);")
 	db.LogMode(false)
 }
