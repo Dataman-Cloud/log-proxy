@@ -45,7 +45,6 @@ func Router(middlewares ...gin.HandlerFunc) *gin.Engine {
 
 	pv1 := r.Group("/v1/receive")
 	{
-		pv1.POST("/prometheus", s.Receiver)
 		pv1.POST("/log", s.ReceiverLog)
 	}
 
