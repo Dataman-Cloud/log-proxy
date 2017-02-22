@@ -72,8 +72,7 @@ func (alert *Alert) CreateAlertRule(ctx *gin.Context) {
 		return
 	}
 
-	err = alert.Store.ValidataRule(rule)
-	if err == nil {
+	if alert.Store.ValidataRule(rule) {
 		utils.ErrorResponse(ctx, errors.New("The rule is in Database"))
 		return
 	}
@@ -189,9 +188,8 @@ func (alert *Alert) UpdateAlertRule(ctx *gin.Context) {
 		utils.ErrorResponse(ctx, err)
 		return
 	}
-	fmt.Printf("name: %s, alert: %s\n", rule.Name, rule.Alert)
-	err = alert.Store.ValidataRule(rule)
-	if err != nil {
+
+	if !alert.Store.ValidataRule(rule) {
 		utils.ErrorResponse(ctx, errors.New("invalidata Rule"))
 		return
 	}
