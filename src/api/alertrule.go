@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"html/template"
@@ -19,6 +20,21 @@ import (
 	"github.com/Dataman-Cloud/log-proxy/src/utils/database"
 
 	"github.com/gin-gonic/gin"
+)
+
+const (
+	// Receive Alert event error
+	ReceiveEventError = "503-21000"
+	// Ack Alert event error
+	AckEventError = "503-21001"
+
+	ruleTempl = `# This rule was updated from {{ .UpdatedAt }}
+  ALERT {{.Alert}}
+  IF {{ .Expr }}
+  FOR {{ .Duration }}
+  LABELS {{ .Labels }}
+  ANNOTATIONS {description="{{ .Description }}", summary="{{ .Summary }}"}
+`
 )
 
 type Alert struct {
@@ -207,14 +223,6 @@ func (alert *Alert) ReloadAlertRuleConf(ctx *gin.Context) {
 	utils.Ok(ctx, "success")
 }
 
-const ruleTempl = `# This rule was updated from {{ .UpdatedAt }}
-ALERT {{.Alert}}
-  IF {{ .Expr }}
-  FOR {{ .Duration }}
-  LABELS {{ .Labels }}
-  ANNOTATIONS {description="{{ .Description }}", summary="{{ .Summary }}"}
-`
-
 func (alert *Alert) WriteAlertFile(rule *models.Rule) error {
 	path := config.GetConfig().RuleFilePath
 
@@ -280,4 +288,75 @@ func (alert *Alert) ReloadPrometheusConf() error {
 	defer resp.Body.Close()
 
 	return nil
+}
+
+func (alert *Alert) ReceiveAlertEvent(ctx *gin.Context) {
+	data, err := utils.ReadRequestBody(ctx.Request)
+	if err != nil {
+		utils.ErrorResponse(ctx, utils.NewError(ReceiveEventError, err))
+		return
+	}
+
+	var m map[string]interface{}
+	err = json.Unmarshal(data, &m)
+	if err != nil {
+		utils.ErrorResponse(ctx, utils.NewError(ReceiveEventError, err))
+		return
+	}
+
+	for _, item := range m["alerts"].([]interface{}) {
+		labels := item.(map[string]interface{})["labels"].(map[string]interface{})
+		annotations := item.(map[string]interface{})["annotations"].(map[string]interface{})
+		event := &models.Event{
+			AlertName:   labels["alertname"].(string),
+			Severity:    labels["severity"].(string),
+			VCluster:    labels["container_label_VCLUSTER"].(string),
+			App:         labels["container_label_APP"].(string),
+			Slot:        labels["container_label_SLOT"].(string),
+			UserName:    labels["container_label_USER_NAME"].(string),
+			GroupName:   labels["container_label_GROUP_NAME"].(string),
+			ContainerId: labels["id"].(string),
+			Description: annotations["description"].(string),
+			Summary:     annotations["summary"].(string),
+		}
+		if err := alert.Store.CreateOrIncreaseEvent(event); err != nil {
+			utils.ErrorResponse(ctx, utils.NewError(ReceiveEventError, err))
+			return
+		}
+	}
+
+	utils.Ok(ctx, map[string]string{"status": "success"})
+}
+
+func (alert *Alert) AckAlertEvent(ctx *gin.Context) {
+	pk, err := strconv.Atoi(ctx.Param("id"))
+	if err != nil {
+		utils.ErrorResponse(ctx, utils.NewError(AckEventError, err))
+		return
+	}
+	var data map[string]interface{}
+	if err := ctx.BindJSON(&data); err != nil {
+		utils.ErrorResponse(ctx, utils.NewError(AckEventError, err))
+		return
+	}
+
+	switch action := data["action"].(string); action {
+	case "ack":
+		if err = alert.Store.AckEvent(pk); err != nil {
+			utils.ErrorResponse(ctx, utils.NewError(AckEventError, err))
+			return
+		}
+		utils.Ok(ctx, map[string]string{"status": "success"})
+	}
+}
+
+func (alert *Alert) GetAlertEvents(ctx *gin.Context) {
+	switch ack := ctx.Query("ack"); ack {
+	case "true":
+		result := alert.Store.ListAckedEvent(ctx.MustGet("page").(models.Page), ctx.Query("user_name"), ctx.Query("group_name"))
+		utils.Ok(ctx, result)
+	case "false", "":
+		result := alert.Store.ListUnackedEvent(ctx.MustGet("page").(models.Page), ctx.Query("user_name"), ctx.Query("group_name"))
+		utils.Ok(ctx, result)
+	}
 }
