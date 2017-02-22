@@ -16,6 +16,7 @@ import (
 	"github.com/Dataman-Cloud/log-proxy/src/store"
 	"github.com/Dataman-Cloud/log-proxy/src/store/datastore"
 	"github.com/Dataman-Cloud/log-proxy/src/utils"
+	"github.com/Dataman-Cloud/log-proxy/src/utils/database"
 
 	"github.com/gin-gonic/gin"
 )
@@ -28,7 +29,7 @@ type Alert struct {
 
 func NewAlert() *Alert {
 	return &Alert{
-		Store:       datastore.InitDB(config.GetConfig().DbDriver, config.GetConfig().DbDSN),
+		Store:       datastore.From(database.GetDB()),
 		HTTPClient:  http.DefaultClient,
 		PromeServer: config.GetConfig().PrometheusURL,
 	}
