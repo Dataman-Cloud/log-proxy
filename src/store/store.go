@@ -5,14 +5,12 @@ import (
 )
 
 type Store interface {
-	ListAlertRules(page models.Page, name string) (map[string]interface{}, error)
+	ListAlertRules(page models.Page, user string) (map[string]interface{}, error)
 	GetAlertRule(id uint64) (models.Rule, error)
 	GetAlertRuleByName(name, alert string) (models.Rule, error)
 	CreateAlertRule(rule *models.Rule) error
 	UpdateAlertRule(rule *models.Rule) error
-	DeleteAlertRule(id uint64) (int64, error)
-	DeleteAlertRuleByName(name, alert string) (int64, error)
-	ValidataRule(rule *models.Rule) error
+	DeleteAlertRuleByIDName(id uint64, name string) (int64, error)
 	CreateOrIncreaseEvent(event *models.Event) error
 	AckEvent(pk int, username string, groupname string) error
 	ListAckedEvent(page models.Page, username string, groupname string) map[string]interface{}

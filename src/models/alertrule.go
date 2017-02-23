@@ -1,14 +1,16 @@
 package models
 
-import "github.com/jinzhu/gorm"
+import "time"
 
 type Rule struct {
-	gorm.Model
-	Name     string `json:"name";gorm:"primary_key"`
-	Alert    string `json:"alert";gorm:"primary_key"`
-	Expr     string `json:"if"`
-	Duration string `json:"for"`
-	Labels   string `json:"labels"`
+	ID        uint64    `json:"ID" gorm:"primary_key"`
+	CreatedAt time.Time `json:"CreatedAt"`
+	UpdatedAt time.Time `json:"UpdatedAt"`
+	Name      string    `json:"name" gorm:"not null;unique_index:idx_rule"`
+	Alert     string    `json:"alert" gorm:"not null;unique_index:idx_rule"`
+	Expr      string    `json:"if"`
+	Duration  string    `json:"for"`
+	Labels    string    `json:"labels"`
 	Annotations
 }
 

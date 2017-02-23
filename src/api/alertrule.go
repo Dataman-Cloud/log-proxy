@@ -28,7 +28,7 @@ const (
 	// Ack Alert event error
 	AckEventError = "503-21001"
 
-	ruleTempl = `# This rule was updated from {{ .UpdatedAt }}
+	ruleTempl = `# This rule was updated from {{ .UpdatedAt }} by {{ .Name }}
   ALERT {{.Alert}}
   IF {{ .Expr }}
   FOR {{ .Duration }}
@@ -55,6 +55,7 @@ func NewAlert() *Alert {
 func (alert *Alert) CreateAlertRule(ctx *gin.Context) {
 
 	var rule *models.Rule
+	var data models.Rule
 	var err error
 
 	if err = ctx.BindJSON(&rule); err != nil {
@@ -67,16 +68,6 @@ func (alert *Alert) CreateAlertRule(ctx *gin.Context) {
 		return
 	}
 
-	if v := rule.Alert; v == "" {
-		utils.ErrorResponse(ctx, errors.New("not found Alert string"))
-		return
-	}
-
-	err = alert.Store.ValidataRule(rule)
-	if err == nil {
-		utils.ErrorResponse(ctx, errors.New("The rule is in Database"))
-		return
-	}
 	err = alert.Store.CreateAlertRule(rule)
 	if err != nil {
 		utils.ErrorResponse(ctx, err)
@@ -88,50 +79,39 @@ func (alert *Alert) CreateAlertRule(ctx *gin.Context) {
 		return
 	}
 
-	utils.Ok(ctx, "success")
+	data, err = alert.Store.GetAlertRuleByName(rule.Name, rule.Alert)
+	if err != nil {
+		utils.ErrorResponse(ctx, err)
+		return
+	}
+
+	utils.Ok(ctx, data)
 }
 
 func (alert *Alert) DeleteAlertRule(ctx *gin.Context) {
 	var rowsAffected int64
-	var ruleID uint64
 	var err error
+	var rule *models.Rule
 	var result models.Rule
 
-	if ctx.Param("id") != "" {
-		ruleID, err = strconv.ParseUint(ctx.Param("id"), 10, 64)
-		if err != nil {
-			utils.ErrorResponse(ctx, err)
-			return
-		}
-		rowsAffected, err = alert.Store.DeleteAlertRule(ruleID)
-		if err != nil {
-			utils.ErrorResponse(ctx, err)
-			return
-		}
-		if rowsAffected == 0 {
-			utils.ErrorResponse(ctx, errors.New("no rule was deleted"))
-		}
-		result, err = alert.Store.GetAlertRule(ruleID)
-		if err != nil {
-			utils.ErrorResponse(ctx, err)
-			return
-		}
+	if err = ctx.BindJSON(&rule); err != nil {
+		utils.ErrorResponse(ctx, err)
+		return
 	}
 
-	if ctx.Param("name") != "" && ctx.Param("alert") != "" {
-		rowsAffected, err = alert.Store.DeleteAlertRuleByName(ctx.Param("name"), ctx.Param("alert"))
-		if err != nil {
-			utils.ErrorResponse(ctx, err)
-			return
-		}
-		if rowsAffected == 0 {
-			utils.ErrorResponse(ctx, errors.New("no rule was deleted"))
-		}
-		result, err = alert.Store.GetAlertRuleByName(ctx.Param("name"), ctx.Param("alert"))
-		if err != nil {
-			utils.ErrorResponse(ctx, err)
-			return
-		}
+	result, err = alert.Store.GetAlertRule(rule.ID)
+	if err != nil {
+		utils.ErrorResponse(ctx, err)
+		return
+	}
+
+	rowsAffected, err = alert.Store.DeleteAlertRuleByIDName(rule.ID, rule.Name)
+	if err != nil {
+		utils.ErrorResponse(ctx, err)
+		return
+	}
+	if rowsAffected == 0 {
+		utils.ErrorResponse(ctx, errors.New("no rule was deleted"))
 	}
 
 	err = alert.RemoveAlertFile(result)
@@ -157,25 +137,17 @@ func (alert *Alert) GetAlertRule(ctx *gin.Context) {
 	var err error
 	var ruleID uint64
 
-	if ctx.Param("id") != "" {
-		ruleID, err = strconv.ParseUint(ctx.Param("id"), 10, 64)
-		if err != nil {
-			utils.ErrorResponse(ctx, err)
-			return
-		}
-		data, err = alert.Store.GetAlertRule(ruleID)
-		if err != nil {
-			utils.ErrorResponse(ctx, err)
-			return
-		}
+	ruleID, err = strconv.ParseUint(ctx.Param("id"), 10, 64)
+	if err != nil {
+		utils.ErrorResponse(ctx, err)
+		return
 	}
-	if ctx.Param("name") != "" && ctx.Param("alert") != "" {
-		data, err = alert.Store.GetAlertRuleByName(ctx.Param("name"), ctx.Param("alert"))
-		if err != nil {
-			utils.ErrorResponse(ctx, err)
-			return
-		}
+	data, err = alert.Store.GetAlertRule(ruleID)
+	if err != nil {
+		utils.ErrorResponse(ctx, err)
+		return
 	}
+
 	utils.Ok(ctx, data)
 }
 
@@ -183,18 +155,14 @@ func (alert *Alert) GetAlertRule(ctx *gin.Context) {
 func (alert *Alert) UpdateAlertRule(ctx *gin.Context) {
 
 	var rule *models.Rule
+	var data models.Rule
 	var err error
 
 	if err = ctx.BindJSON(&rule); err != nil {
 		utils.ErrorResponse(ctx, err)
 		return
 	}
-	fmt.Printf("name: %s, alert: %s\n", rule.Name, rule.Alert)
-	err = alert.Store.ValidataRule(rule)
-	if err != nil {
-		utils.ErrorResponse(ctx, errors.New("invalidata Rule"))
-		return
-	}
+
 	err = alert.Store.UpdateAlertRule(rule)
 	if err != nil {
 		utils.ErrorResponse(ctx, err)
@@ -205,7 +173,14 @@ func (alert *Alert) UpdateAlertRule(ctx *gin.Context) {
 		utils.ErrorResponse(ctx, err)
 		return
 	}
-	utils.Ok(ctx, "success")
+
+	data, err = alert.Store.GetAlertRuleByName(rule.Name, rule.Alert)
+	if err != nil {
+		utils.ErrorResponse(ctx, err)
+		return
+	}
+
+	utils.Ok(ctx, data)
 }
 
 func (alert *Alert) ReloadAlertRuleConf(ctx *gin.Context) {
@@ -257,7 +232,7 @@ func (alert *Alert) RemoveAlertFile(rule models.Rule) error {
 		return err
 	}
 
-	message := fmt.Sprintf("# removed this rule from %s", rule.DeletedAt)
+	message := fmt.Sprintf("# removed this rule")
 	fmt.Println("message: ", message)
 	f.WriteString(message + "\n")
 
@@ -312,7 +287,7 @@ func (alert *Alert) ReceiveAlertEvent(ctx *gin.Context) {
 			Slot:        labels["container_label_SLOT"].(string),
 			UserName:    labels["container_label_USER_NAME"].(string),
 			GroupName:   labels["container_label_GROUP_NAME"].(string),
-			ContainerId: labels["id"].(string),
+			ContainerID: labels["id"].(string),
 			Description: annotations["description"].(string),
 			Summary:     annotations["summary"].(string),
 		}

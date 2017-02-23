@@ -71,7 +71,7 @@ func Router(middlewares ...gin.HandlerFunc) *gin.Engine {
 	alertv1 := r.Group("/v1/alert")
 	{
 		alertv1.POST("/rules", alert.CreateAlertRule)
-		alertv1.DELETE("/rules/:id", alert.DeleteAlertRule)
+		alertv1.DELETE("/rules", alert.DeleteAlertRule)
 		alertv1.GET("/rules", alert.ListAlertRules)
 		alertv1.GET("/rules/:id", alert.GetAlertRule)
 		alertv1.PUT("/rules", alert.UpdateAlertRule)
