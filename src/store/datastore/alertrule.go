@@ -2,6 +2,7 @@ package datastore
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/Dataman-Cloud/log-proxy/src/models"
 )
@@ -18,15 +19,12 @@ func (db *datastore) ListAlertRules(page models.Page, name string) (map[string]i
 func (db *datastore) ListAlertRules(name string) ([]*models.Rule, error) {
 	var rules []*models.Rule
 	var err error
-	fields := []string{"id", "updated_at", "deleted_at", "name", "alert", "expr", "duration", "labels", "description", "summary"}
 	if name == "" {
 		err = db.Table("rules").
-			Select(fields).
 			Where("deleted_at IS NULL").
 			Scan(&rules).Error
 	} else {
 		err = db.Table("rules").
-			Select(fields).
 			Where("name = ? AND deleted_at IS NULL", name).
 			Scan(&rules).Error
 	}
@@ -37,18 +35,8 @@ func (db *datastore) ListAlertRules(name string) ([]*models.Rule, error) {
 
 func (db *datastore) GetAlertRule(id uint64) (models.Rule, error) {
 	var result models.Rule
-	fields := []string{"id", "updated_at", "deleted_at", "name", "alert", "expr", "duration", "labels", "description", "summary"}
 	err := db.Table("rules").
-		Select(fields).Where("id = ?", id).
-		Scan(&result).Error
-	return result, err
-}
-
-func (db *datastore) GetAlertRuleByName(name, alert string) (models.Rule, error) {
-	var result models.Rule
-	fields := []string{"id", "updated_at", "deleted_at", "name", "alert", "expr", "duration", "labels", "description", "summary"}
-	err := db.Table("rules").
-		Select(fields).Where("name = ? AND alert = ?", name, alert).
+		Where("id = ?", id).
 		Scan(&result).Error
 	return result, err
 }
@@ -59,15 +47,15 @@ func (db *datastore) CreateAlertRule(rule *models.Rule) error {
 
 func (db *datastore) UpdateAlertRule(rule *models.Rule) error {
 	return db.Model(rule).
-		Where("name = ? AND alert = ?", rule.Name, rule.Alert).
-		Omit("name", "alert").
+		Where("name = ?", rule.Name).
+		Omit("name").
 		Updates(rule).Error
 }
 
 func (db *datastore) DeleteAlertRule(id uint64) (int64, error) {
 	var rule models.Rule
-	recordNotFound := db.
-		Where("rules.id = ? AND deleted_at IS NULL", id).
+	recordNotFound := db.Debug().
+		Where("rules.id = ?", id).
 		First(&rule).
 		RecordNotFound()
 
@@ -83,25 +71,12 @@ func (db *datastore) DeleteAlertRule(id uint64) (int64, error) {
 	return rowsAffected, err
 }
 
-func (db *datastore) DeleteAlertRuleByName(name, alert string) (int64, error) {
-	recordNotFound := db.Table("rules").
-		Where("rules.name = ? AND rules.alert AND deleted_at IS NULL", name, alert).
-		RecordNotFound()
-	if recordNotFound {
-		return 0, errors.New("No this rule in database")
-	}
-
-	result := db.Where("rules.name = ? AND rules.alert", name, alert).
-		Delete(&models.Rule{})
-	err := result.Error
-	rowsAffected := result.RowsAffected
-	return rowsAffected, err
-}
-
-func (db *datastore) ValidataRule(rule *models.Rule) bool {
+func (db *datastore) RuleNotFound(rule *models.Rule) bool {
 	var result models.Rule
-	recordNotFound := db.Where("rules.name = ? AND rules.alert = ? AND deleted_at IS NULL", rule.Name, rule.Alert).
+	fmt.Println("name: ", rule.Name)
+	recordNotFound := db.Where("rules.name = ?", rule.Name).
 		First(&result).
 		RecordNotFound()
-	return !recordNotFound //if the rule in DB, return true
+	fmt.Println("Notfound: ", recordNotFound)
+	return recordNotFound
 }

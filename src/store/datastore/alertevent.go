@@ -15,7 +15,7 @@ func (db *datastore) CreateOrIncreaseEvent(event *models.Event) error {
 		event.VCluster,
 		event.App,
 		event.Slot,
-		event.ContainerId,
+		event.ContainerID,
 		event.AlertName,
 	).First(&result).RecordNotFound()
 	if notfound {
