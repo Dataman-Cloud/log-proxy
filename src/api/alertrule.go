@@ -5,12 +5,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"html/template"
 	"net/http"
 	"net/url"
 	"os"
 	"strconv"
 	"strings"
+	"text/template"
 
 	"github.com/Dataman-Cloud/log-proxy/src/config"
 	"github.com/Dataman-Cloud/log-proxy/src/models"
