@@ -144,10 +144,7 @@ func (alert *Alert) DeleteAlertRule(ctx *gin.Context) {
 }
 
 func (alert *Alert) ListAlertRules(ctx *gin.Context) {
-	var data []*models.Rule
-	var err error
-
-	data, err = alert.Store.ListAlertRules()
+	data, err := alert.Store.ListAlertRules(ctx.MustGet("page").(models.Page), ctx.Query("name"))
 	if err != nil {
 		utils.ErrorResponse(ctx, err)
 		return

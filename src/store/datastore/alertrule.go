@@ -6,12 +6,15 @@ import (
 	"github.com/Dataman-Cloud/log-proxy/src/models"
 )
 
-func (db *datastore) ListAlertRules() ([]*models.Rule, error) {
-	var rules []*models.Rule
-	fields := []string{"id", "updated_at", "deleted_at", "name", "alert", "expr", "duration", "labels", "description", "summary"}
-	err := db.Table("rules").Select(fields).Where("deleted_at IS NULL").Scan(&rules).Error
+func (db *datastore) ListAlertRules(page models.Page, name string) (map[string]interface{}, error) {
+	var (
+		rules []*models.Rule
+		count int
+	)
+	err := db.Table("rules").Debug().Where("name = ?", name).Find(&rules).Count(&count).Error
+	err = db.Table("rules").Debug().Where("name = ?", name).Offset(page.PageFrom).Limit(page.PageSize).Find(&rules).Error
 
-	return rules, err
+	return map[string]interface{}{"count": count, "rules": rules}, err
 }
 
 func (db *datastore) GetAlertRule(id uint64) (models.Rule, error) {
