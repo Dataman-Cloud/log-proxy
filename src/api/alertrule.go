@@ -342,7 +342,15 @@ func (alert *Alert) AckAlertEvent(ctx *gin.Context) {
 
 	switch action := data["action"].(string); action {
 	case "ack":
-		if err = alert.Store.AckEvent(pk); err != nil {
+		// TODO ugly code
+		var username, groupname string
+		if data["user_name"] != nil {
+			username = data["user_name"].(string)
+		}
+		if data["group_name"] != nil {
+			groupname = data["group_name"].(string)
+		}
+		if err = alert.Store.AckEvent(pk, username, groupname); err != nil {
 			utils.ErrorResponse(ctx, utils.NewError(AckEventError, err))
 			return
 		}

@@ -29,10 +29,10 @@ func (db *datastore) CreateOrIncreaseEvent(event *models.Event) error {
 	}
 }
 
-func (db *datastore) AckEvent(pk int) error {
+func (db *datastore) AckEvent(pk int, username string, groupname string) error {
 	var result models.Event
-	if db.DB.First(&result, pk).RecordNotFound() {
-		return errors.New(fmt.Sprintf("Alert Event id=%d not found", pk))
+	if db.DB.Where("id = ?", pk).Where("user_name = ? OR group_name = ?", username, groupname).First(&result).RecordNotFound() {
+		return errors.New(fmt.Sprintf("Alert Event id=%d, user_name=%s or group_name=%s not found", pk, username, groupname))
 	}
 	result.Ack = true
 	return db.DB.Save(&result).Error
@@ -43,7 +43,7 @@ func (db *datastore) ListAckedEvent(page models.Page, username string, groupname
 		result []*models.Event
 		count  int
 	)
-	db.DB.Where("ack = ?", true).Find(&result).Count(&count)
+	db.DB.Where("ack = ?", true).Where("user_name = ? OR group_name = ?", username, groupname).Find(&result).Count(&count)
 	db.DB.Where("ack = ?", true).Where("user_name = ? OR group_name = ?", username, groupname).Offset(page.PageFrom).Limit(page.PageSize).Find(&result)
 
 	return map[string]interface{}{"count": count, "events": result}
@@ -54,7 +54,7 @@ func (db *datastore) ListUnackedEvent(page models.Page, username string, groupna
 		result []*models.Event
 		count  int
 	)
-	db.DB.Where("ack = ?", false).Find(&result).Count(&count)
+	db.DB.Where("ack = ?", false).Where("user_name = ? OR group_name = ?", username, groupname).Find(&result).Count(&count)
 	db.DB.Where("ack = ?", false).Where("user_name = ? OR group_name = ?", username, groupname).Offset(page.PageFrom).Limit(page.PageSize).Find(&result)
 	return map[string]interface{}{"count": count, "events": result}
 }
