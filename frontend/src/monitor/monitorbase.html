@@ -7,7 +7,7 @@
                         <div flex class="form-item">
                             <label class="requirement">集群</label>
                             <input type="text" ng-maxlength="4096"  id="clusterName" name="cluster" placeholder="集群" ng-model="vm.form.cluster"
-                                   data-required="required">
+                                   ng-required="!vm.queryTabIndex">
 
                             <div layout="row" class="form-item">
                                 <p flex class="error-info help-info-bottom"
@@ -20,7 +20,7 @@
                         <div flex class="form-item">
                             <label class="requirement">用户</label>
                             <input type="text" ng-maxlength="4096"  id="userName" name="user" placeholder="用户" ng-model="vm.form.user"
-                                   data-required="required">
+                                   ng-required="!vm.queryTabIndex">
 
                             <div layout="row" class="form-item">
                                 <p flex class="error-info help-info-bottom"
