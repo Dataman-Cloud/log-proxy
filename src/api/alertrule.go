@@ -2,12 +2,16 @@ package api
 
 import (
 	"bytes"
+	"crypto/md5"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"text/template"
@@ -19,7 +23,9 @@ import (
 	"github.com/Dataman-Cloud/log-proxy/src/utils"
 	"github.com/Dataman-Cloud/log-proxy/src/utils/database"
 
+	log "github.com/Sirupsen/logrus"
 	"github.com/gin-gonic/gin"
+	"github.com/robfig/cron"
 )
 
 const (
@@ -28,35 +34,48 @@ const (
 	// Ack Alert event error
 	AckEventError = "503-21001"
 
-	ruleTempl = `# This rule was updated from {{ .UpdatedAt }} by {{ .Name }}
+	PromtheusReloadPath = "/-/reload"
+	ruleTempl           = `# This rule was updated by {{ .Name }}
   ALERT {{.Alert}}
   IF {{ .Expr }}
   FOR {{ .Duration }}
   LABELS {{ .Labels }}
   ANNOTATIONS {description="{{ .Description }}", summary="{{ .Summary }}"}
 `
+	ruleFileUpdate = "update"
+	ruleFileDelete = "delete"
+	ruleInterval   = "1m"
 )
 
 type Alert struct {
 	Store       store.Store
 	HTTPClient  *http.Client
 	PromeServer string
+	Interval    string
 }
 
 func NewAlert() *Alert {
+	interval := config.GetConfig().RuleFileInterval
+	if interval == "" {
+		interval = ruleInterval
+	}
+
 	return &Alert{
 		Store:       datastore.From(database.GetDB()),
 		HTTPClient:  http.DefaultClient,
 		PromeServer: config.GetConfig().PrometheusURL,
+		Interval:    interval,
 	}
 }
 
 // CreateAlertRule create the alert rule in Database
 func (alert *Alert) CreateAlertRule(ctx *gin.Context) {
 
-	var rule *models.Rule
-	var data models.Rule
-	var err error
+	var (
+		rule *models.Rule
+		data models.Rule
+		err  error
+	)
 
 	if err = ctx.BindJSON(&rule); err != nil {
 		utils.ErrorResponse(ctx, err)
@@ -89,11 +108,12 @@ func (alert *Alert) CreateAlertRule(ctx *gin.Context) {
 }
 
 func (alert *Alert) DeleteAlertRule(ctx *gin.Context) {
-	var rowsAffected int64
-	var err error
-	var rule *models.Rule
-	var result models.Rule
-
+	var (
+		rowsAffected int64
+		err          error
+		rule         *models.Rule
+		result       models.Rule
+	)
 	if err = ctx.BindJSON(&rule); err != nil {
 		utils.ErrorResponse(ctx, err)
 		return
@@ -133,9 +153,11 @@ func (alert *Alert) ListAlertRules(ctx *gin.Context) {
 }
 
 func (alert *Alert) GetAlertRule(ctx *gin.Context) {
-	var data models.Rule
-	var err error
-	var ruleID uint64
+	var (
+		data   models.Rule
+		err    error
+		ruleID uint64
+	)
 
 	ruleID, err = strconv.ParseUint(ctx.Param("id"), 10, 64)
 	if err != nil {
@@ -153,11 +175,11 @@ func (alert *Alert) GetAlertRule(ctx *gin.Context) {
 
 // UpdateAlertRule create the alert rule in Database
 func (alert *Alert) UpdateAlertRule(ctx *gin.Context) {
-
-	var rule *models.Rule
-	var data models.Rule
-	var err error
-
+	var (
+		rule *models.Rule
+		data models.Rule
+		err  error
+	)
 	if err = ctx.BindJSON(&rule); err != nil {
 		utils.ErrorResponse(ctx, err)
 		return
@@ -245,13 +267,11 @@ func (alert *Alert) RemoveAlertFile(rule models.Rule) error {
 }
 
 func (alert *Alert) ReloadPrometheusConf() error {
-	ReloadPath := "/-/reload"
-
 	u, err := url.Parse(alert.PromeServer)
 	if err != nil {
 		return err
 	}
-	u.Path = strings.TrimRight(u.Path, "/") + ReloadPath
+	u.Path = strings.TrimRight(u.Path, "/") + PromtheusReloadPath
 	resp, err := alert.HTTPClient.Post(u.String(), "application/json", nil)
 	if err != nil || resp.StatusCode != 200 {
 		err = fmt.Errorf("Failed to reload the configuration file of prometheus %s, return %d", u.String(), resp.StatusCode)
@@ -339,4 +359,191 @@ func (alert *Alert) GetAlertEvents(ctx *gin.Context) {
 		result := alert.Store.ListUnackedEvent(ctx.MustGet("page").(models.Page), ctx.Query("user_name"), ctx.Query("group_name"))
 		utils.Ok(ctx, result)
 	}
+}
+
+func (alert *Alert) AlertRuleFilesMaintainer() {
+	c := cron.New()
+	interval := fmt.Sprintf("@every %s", alert.Interval)
+	c.AddFunc(interval, func() { alert.UpdateAlertRuleFiles() })
+	c.Start()
+	log.Infof("The alert files will be check in %s", alert.Interval)
+	alert.UpdateAlertRuleFiles()
+}
+
+func (alert *Alert) UpdateAlertRuleFiles() {
+	var (
+		rules     []*models.Rule
+		files     map[string]interface{}
+		ruleNames []*models.RuleOperation
+		err       error
+	)
+	reloadReady := false
+
+	path := config.GetConfig().RuleFilePath
+
+	rules, err = alert.Store.GetAlertRules()
+	if err != nil {
+		log.Errorf("Rule File Update Error: %v", err)
+		return
+	}
+
+	ruleNames = make([]*models.RuleOperation, 0)
+	for _, rule := range rules {
+		ruleOps := models.NewRuleOperation()
+		ruleOps.Rule = rule
+		ruleOps.File = fmt.Sprintf("%s-%s.rules", rule.Name, rule.Alert)
+
+		t := template.Must(template.New("ruleTempl").Parse(ruleTempl))
+		var buf bytes.Buffer
+		err = t.Execute(&buf, rule)
+		if err != nil {
+			log.Errorf("Rule File Update Error: %v", err)
+			return
+		}
+		h := md5.New()
+		io.WriteString(h, buf.String())
+		ruleOps.MD5 = h.Sum(nil)
+		ruleNames = append(ruleNames, ruleOps)
+	}
+
+	files = make(map[string]interface{})
+	files, err = getFilelist(path)
+	if err != nil {
+		log.Errorf("Rule File Update Error: %v", err)
+		return
+	}
+
+	var createRule, deleteRule []*models.RuleOperation
+	countRuleNames := len(ruleNames)
+	countFiles := len(files)
+	if countRuleNames == 0 && countFiles != 0 {
+		for k := range files {
+			ruleOps := models.NewRuleOperation()
+			ruleOps.File = k
+			deleteRule = append(deleteRule, ruleOps)
+		}
+	} else if countFiles == 0 {
+		for _, ruleName := range ruleNames {
+			createRule = append(createRule, ruleName)
+			delete(files, ruleName.File)
+		}
+	} else {
+		for _, ruleName := range ruleNames {
+			if files[ruleName.File] == nil {
+				createRule = append(createRule, ruleName)
+			} else if !bytes.Equal(files[ruleName.File].([]byte), ruleName.MD5) {
+				createRule = append(createRule, ruleName)
+			}
+			delete(files, ruleName.File)
+		}
+	}
+
+	if len(files) != 0 {
+		for k := range files {
+			ruleOps := models.NewRuleOperation()
+			ruleOps.File = k
+			deleteRule = append(deleteRule, ruleOps)
+		}
+	}
+
+	if len(createRule) != 0 {
+		for _, ruleOps := range createRule {
+			err := updateFileByAction(ruleOps, ruleFileUpdate)
+			if err != nil {
+				log.Errorf("Rule File Update Error: %v", err)
+				return
+			}
+		}
+		reloadReady = true
+	}
+
+	if len(deleteRule) != 0 {
+		for _, ruleOps := range deleteRule {
+			err := updateFileByAction(ruleOps, ruleFileDelete)
+			if err != nil {
+				log.Errorf("Rule File Update Error: %v", err)
+				return
+			}
+		}
+		reloadReady = true
+	}
+
+	if reloadReady {
+		err := alert.ReloadPrometheusConf()
+		if err != nil {
+			log.Errorf("Rule File Update Error: %v", err)
+			return
+		}
+		log.Infof("Reload prometheus conf.")
+	}
+
+	log.Infof("No rules Changed")
+}
+
+func getFilelist(path string) (map[string]interface{}, error) {
+	files := make(map[string]interface{})
+	err := filepath.Walk(path, func(path string, f os.FileInfo, err error) error {
+		if f == nil {
+			return err
+		}
+		if f.IsDir() {
+			return nil
+		}
+		md5, _ := getFileMD5value(path)
+		files[f.Name()] = md5
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return files, err
+}
+
+func getFileMD5value(file string) ([]byte, error) {
+	f, err := os.Open(file)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	fileContent, err := ioutil.ReadFile(file)
+	if err != nil {
+		return nil, err
+	}
+	var buf bytes.Buffer
+	buf.Write(fileContent)
+
+	h := md5.New()
+	io.WriteString(h, buf.String())
+	return h.Sum(nil), err
+}
+
+func updateFileByAction(ruleOps *models.RuleOperation, action string) error {
+	path := config.GetConfig().RuleFilePath
+	file := fmt.Sprintf("%s/%s.rules", path, strings.Split(ruleOps.File, ".")[0])
+
+	if action == ruleFileDelete {
+		err := os.Remove(file)
+		if err != nil {
+			return err
+		}
+		log.Infof("deleted rule file %s", ruleOps.File)
+		return nil
+	}
+
+	f, err := os.Create(file)
+	defer f.Close()
+	if err != nil {
+		return err
+	}
+	t := template.Must(template.New("ruleTempl").Parse(ruleTempl))
+	var buf bytes.Buffer
+	err = t.Execute(&buf, ruleOps.Rule)
+	if err != nil {
+		fmt.Println("executing templta: ", err)
+		return err
+	}
+	f.WriteString(buf.String())
+	log.Infof("updated rule file %s", ruleOps.File)
+	return nil
 }

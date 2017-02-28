@@ -7,6 +7,7 @@ import (
 type Store interface {
 	ListAlertRules(page models.Page, user string) (map[string]interface{}, error)
 	GetAlertRule(id uint64) (models.Rule, error)
+	GetAlertRules() ([]*models.Rule, error)
 	GetAlertRuleByName(name, alert string) (models.Rule, error)
 	CreateAlertRule(rule *models.Rule) error
 	UpdateAlertRule(rule *models.Rule) error

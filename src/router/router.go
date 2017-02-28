@@ -80,6 +80,7 @@ func Router(middlewares ...gin.HandlerFunc) *gin.Engine {
 		alertv1.PUT("/events/:id", alert.AckAlertEvent)
 		alertv1.GET("/events", alert.GetAlertEvents)
 	}
+	alert.AlertRuleFilesMaintainer()
 
 	staticRouter := r.Group("/ui")
 	{

@@ -12,17 +12,18 @@ import (
 
 // Config defines the conf info
 type Config struct {
-	Addr            string `require:"true" alias:"ADDR"`
-	EsURL           string `require:"true" alias:"ES_URL"`
-	SearchDebug     bool   `alias:"SEARCH_DEBUG"`
-	PrometheusURL   string `require:"true" alias:"PROMETHEUS_URL"`
-	AlertManagerURL string `require:"true" alias:"ALERTMANAGER_URL"`
-	FrontendPath    string `alias:"FRONTEND_PATH"`
-	MarathonURL     string `alias:"MARATHON_URL"`
-	NotificationURL string `alias:"NOTIFICATION_URL"`
-	DbDSN           string `alias:"DB_DSN"`
-	DbDriver        string `alias:"DB_DRIVER"`
-	RuleFilePath    string `alias:"RULE_FILE_PATH"`
+	Addr             string `require:"true" alias:"ADDR"`
+	EsURL            string `require:"true" alias:"ES_URL"`
+	SearchDebug      bool   `alias:"SEARCH_DEBUG"`
+	PrometheusURL    string `require:"true" alias:"PROMETHEUS_URL"`
+	AlertManagerURL  string `require:"true" alias:"ALERTMANAGER_URL"`
+	FrontendPath     string `alias:"FRONTEND_PATH"`
+	MarathonURL      string `alias:"MARATHON_URL"`
+	NotificationURL  string `alias:"NOTIFICATION_URL"`
+	DbDSN            string `alias:"DB_DSN"`
+	DbDriver         string `alias:"DB_DRIVER"`
+	RuleFilePath     string `alias:"RULE_FILE_PATH"`
+	RuleFileInterval string `alias:"RULE_FILE_INTERVAL"`
 }
 
 var c *Config

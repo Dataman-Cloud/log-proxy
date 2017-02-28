@@ -23,6 +23,16 @@ func (db *datastore) ListAlertRules(page models.Page, name string) (map[string]i
 	return map[string]interface{}{"count": count, "rules": rules}, err
 }
 
+func (db *datastore) GetAlertRules() ([]*models.Rule, error) {
+	var (
+		rules []*models.Rule
+		err   error
+	)
+	err = db.Table("rules").Find(&rules).Error
+
+	return rules, err
+}
+
 func (db *datastore) GetAlertRule(id uint64) (models.Rule, error) {
 	var result models.Rule
 	err := db.Table("rules").

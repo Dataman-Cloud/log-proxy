@@ -18,3 +18,13 @@ type Annotations struct {
 	Description string `json:"description"`
 	Summary     string `json:"summary"`
 }
+
+type RuleOperation struct {
+	Rule *Rule
+	File string
+	MD5  []byte
+}
+
+func NewRuleOperation() *RuleOperation {
+	return &RuleOperation{}
+}
