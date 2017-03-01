@@ -29,9 +29,9 @@ import (
 )
 
 const (
-	// Receive Alert event error
+	// ReceiveEventError code
 	ReceiveEventError = "503-21000"
-	// Ack Alert event error
+	// ReceiveEventError code
 	AckEventError = "503-21001"
 
 	PromtheusReloadPath = "/-/reload"
@@ -115,6 +115,12 @@ func (alert *Alert) DeleteAlertRule(ctx *gin.Context) {
 		result       models.Rule
 	)
 	if err = ctx.BindJSON(&rule); err != nil {
+		utils.ErrorResponse(ctx, err)
+		return
+	}
+
+	rule.ID, err = strconv.ParseUint(ctx.Param("id"), 10, 64)
+	if err != nil {
 		utils.ErrorResponse(ctx, err)
 		return
 	}
