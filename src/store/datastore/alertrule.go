@@ -50,6 +50,7 @@ func (db *datastore) GetAlertRuleByName(name, alert string) (models.Rule, error)
 }
 
 func (db *datastore) CreateAlertRule(rule *models.Rule) error {
+
 	var result models.Rule
 	notfound := db.Where("rules.name = ? AND rules.alert = ?", rule.Name, rule.Alert).
 		First(&result).
@@ -57,6 +58,7 @@ func (db *datastore) CreateAlertRule(rule *models.Rule) error {
 	if !notfound {
 		return errors.New("The rule is in Database")
 	}
+
 	return db.Save(rule).Error
 }
 
@@ -76,7 +78,7 @@ func (db *datastore) UpdateAlertRule(rule *models.Rule) error {
 }
 
 func (db *datastore) DeleteAlertRuleByIDName(id uint64, name string) (int64, error) {
-	result := db.Where("rules.id = ? AND rules.name = ?", id, name).
+	result := db.Debug().Where("rules.id = ? AND rules.name = ?", id, name).
 		Delete(&models.Rule{})
 	err := result.Error
 	rowsAffected := result.RowsAffected

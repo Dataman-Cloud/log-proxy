@@ -8,7 +8,7 @@ type Rule struct {
 	UpdatedAt time.Time `json:"UpdatedAt"`
 	Name      string    `json:"name" gorm:"not null;unique_index:idx_rule"`
 	Alert     string    `json:"alert" gorm:"not null;unique_index:idx_rule"`
-	Expr      string    `json:"if"`
+	Expr      string    `json:"if" gorm:"size:1020"`
 	Duration  string    `json:"for"`
 	Labels    string    `json:"labels"`
 	Annotations

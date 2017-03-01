@@ -11,6 +11,14 @@
 			"notests": true
 		},
 		{
+			"importpath": "github.com/PuerkitoBio/goquery",
+			"repository": "https://github.com/PuerkitoBio/goquery",
+			"vcs": "git",
+			"revision": "e1271ee34c6a305e38566ecd27ae374944907ee9",
+			"branch": "master",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/Sirupsen/logrus",
 			"repository": "https://github.com/Sirupsen/logrus",
 			"vcs": "git",
@@ -44,6 +52,14 @@
 			"notests": true
 		},
 		{
+			"importpath": "github.com/erikstmartin/go-testdb",
+			"repository": "https://github.com/erikstmartin/go-testdb",
+			"vcs": "git",
+			"revision": "8d10e4a1bae52cd8b81ffdec3445890d6dccab3d",
+			"branch": "master",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/gin-gonic/contrib/static",
 			"repository": "https://github.com/gin-gonic/contrib",
 			"vcs": "git",
@@ -58,6 +74,24 @@
 			"vcs": "git",
 			"revision": "bb159f9260a262fccbdbd6f37f8575d1e7e6aaa0",
 			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/golang/mock/gomock",
+			"repository": "https://github.com/golang/mock",
+			"vcs": "git",
+			"revision": "bd3c8e81be01eef76d4b503f5e687d2d1354d2d9",
+			"branch": "master",
+			"path": "/gomock",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/golang/mock/mockgen",
+			"repository": "https://github.com/golang/mock",
+			"vcs": "git",
+			"revision": "bd3c8e81be01eef76d4b503f5e687d2d1354d2d9",
+			"branch": "master",
+			"path": "/mockgen",
 			"notests": true
 		},
 		{
@@ -107,6 +141,14 @@
 			"repository": "https://github.com/manucorporat/stats",
 			"vcs": "git",
 			"revision": "8f2d6ace262eba462e9beb552382c98be51d807b",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/mattn/go-sqlite3",
+			"repository": "https://github.com/mattn/go-sqlite3",
+			"vcs": "git",
+			"revision": "2acfafad5870400156f6fceb12852c281cbba4d5",
 			"branch": "master",
 			"notests": true
 		},

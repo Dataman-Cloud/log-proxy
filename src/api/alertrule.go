@@ -119,6 +119,12 @@ func (alert *Alert) DeleteAlertRule(ctx *gin.Context) {
 		return
 	}
 
+	rule.ID, err = strconv.ParseUint(ctx.Param("id"), 10, 64)
+	if err != nil {
+		utils.ErrorResponse(ctx, err)
+		return
+	}
+
 	result, err = alert.Store.GetAlertRule(rule.ID)
 	if err != nil {
 		utils.ErrorResponse(ctx, err)
