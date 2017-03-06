@@ -69,12 +69,11 @@ func (db *datastore) UpdateAlertRule(rule *models.Rule) error {
 		RecordNotFound()
 	if notfound {
 		return errors.New("The rule not found")
-	} else {
-		return db.Model(rule).
-			Where("rules.name = ? AND rules.alert = ?", rule.Name, rule.Alert).
-			Omit("name, alert").
-			Updates(rule).Error
 	}
+	return db.Model(rule).
+		Where("rules.name = ? AND rules.alert = ?", rule.Name, rule.Alert).
+		Omit("name, alert").
+		Updates(rule).Error
 }
 
 func (db *datastore) DeleteAlertRuleByIDName(id uint64, name string) (int64, error) {
