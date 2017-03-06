@@ -21,6 +21,7 @@ var (
 	server  *httptest.Server
 	s       *Search
 	mo      *Monitor
+	al      *Alert
 )
 
 func startAPIServer(sv *Search) *httptest.Server {
@@ -61,6 +62,13 @@ func startAPIServer(sv *Search) *httptest.Server {
 		v1m.PUT("/silence", updateMonitorSilence)
 		v1m.DELETE("/silence/:id", deleteMonitorSilence)
 	}
+	/*
+		v1a := router.Group("/api/v1/alert", func(ctx *gin.Context) { ctx.Set("page", models.Page{}) })
+		{
+			v1a.POST("/rules/", createAlertRule)
+			v1a.GET("/rules/:id", getAlertRule)
+		}
+	*/
 	return httptest.NewServer(router)
 }
 

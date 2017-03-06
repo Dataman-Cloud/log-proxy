@@ -29,13 +29,16 @@ import (
 )
 
 const (
-	// Receive Alert event error
+	// ReceiveEventError code
+
 	ReceiveEventError = "503-21000"
-	// Ack Alert event error
+	// ReceiveEventError code
 	AckEventError = "503-21001"
 
+	// PromtheusReloadPath path string
 	PromtheusReloadPath = "/-/reload"
-	ruleTempl           = `# This rule was updated by {{ .Name }}
+
+	ruleTempl = `# This rule was updated by {{ .Name }}
   ALERT {{.Alert}}
   IF {{ .Expr }}
   FOR {{ .Duration }}
@@ -48,12 +51,14 @@ const (
 )
 
 type Alert struct {
-	Store       store.Store
-	HTTPClient  *http.Client
-	PromeServer string
-	Interval    string
+	Store      store.Store
+	HTTPClient *http.Client
+	PromServer string
+	Interval   string
+	RulesPath  string
 }
 
+// NewAlert init the struct Alert
 func NewAlert() *Alert {
 	interval := config.GetConfig().RuleFileInterval
 	if interval == "" {
@@ -61,10 +66,11 @@ func NewAlert() *Alert {
 	}
 
 	return &Alert{
-		Store:       datastore.From(database.GetDB()),
-		HTTPClient:  http.DefaultClient,
-		PromeServer: config.GetConfig().PrometheusURL,
-		Interval:    interval,
+		Store:      datastore.From(database.GetDB()),
+		HTTPClient: http.DefaultClient,
+		PromServer: config.GetConfig().PrometheusURL,
+		Interval:   interval,
+		RulesPath:  config.GetConfig().RuleFilePath,
 	}
 }
 
@@ -76,29 +82,27 @@ func (alert *Alert) CreateAlertRule(ctx *gin.Context) {
 		data models.Rule
 		err  error
 	)
-
 	if err = ctx.BindJSON(&rule); err != nil {
 		utils.ErrorResponse(ctx, err)
 		return
 	}
-
 	if v := rule.Name; v == "" {
 		utils.ErrorResponse(ctx, errors.New("not found Name string"))
 		return
 	}
-
 	err = alert.Store.CreateAlertRule(rule)
-	if err != nil {
-		utils.ErrorResponse(ctx, err)
-		return
-	}
-	err = alert.WriteAlertFile(rule)
 	if err != nil {
 		utils.ErrorResponse(ctx, err)
 		return
 	}
 
 	data, err = alert.Store.GetAlertRuleByName(rule.Name, rule.Alert)
+	if err != nil {
+		utils.ErrorResponse(ctx, err)
+		return
+	}
+
+	err = alert.WriteAlertFile(rule)
 	if err != nil {
 		utils.ErrorResponse(ctx, err)
 		return
@@ -115,6 +119,7 @@ func (alert *Alert) DeleteAlertRule(ctx *gin.Context) {
 		result       models.Rule
 	)
 	if err = ctx.BindJSON(&rule); err != nil {
+		log.Errorln("DeleteAlertRule: Parse JSON rule error, ", err)
 		utils.ErrorResponse(ctx, err)
 		return
 	}
@@ -127,21 +132,25 @@ func (alert *Alert) DeleteAlertRule(ctx *gin.Context) {
 
 	result, err = alert.Store.GetAlertRule(rule.ID)
 	if err != nil {
+		log.Errorln("DeleteAlertRule: GetAlertRule() error, ", err)
 		utils.ErrorResponse(ctx, err)
 		return
 	}
 
 	rowsAffected, err = alert.Store.DeleteAlertRuleByIDName(rule.ID, rule.Name)
 	if err != nil {
+		log.Errorln("DeleteAlertRule: DeleteAlertRuleByIDName() error, ", err)
 		utils.ErrorResponse(ctx, err)
 		return
 	}
+
 	if rowsAffected == 0 {
 		utils.ErrorResponse(ctx, errors.New("no rule was deleted"))
 	}
 
 	err = alert.RemoveAlertFile(result)
 	if err != nil {
+		log.Errorln("DeleteAlertRule: Delete Alert file error, ", err)
 		utils.ErrorResponse(ctx, err)
 		return
 	}
@@ -158,6 +167,7 @@ func (alert *Alert) ListAlertRules(ctx *gin.Context) {
 	utils.Ok(ctx, data)
 }
 
+// GetAlertRule return the info of alert rule by id
 func (alert *Alert) GetAlertRule(ctx *gin.Context) {
 	var (
 		data   models.Rule
@@ -196,13 +206,14 @@ func (alert *Alert) UpdateAlertRule(ctx *gin.Context) {
 		utils.ErrorResponse(ctx, err)
 		return
 	}
-	err = alert.WriteAlertFile(rule)
+
+	data, err = alert.Store.GetAlertRuleByName(rule.Name, rule.Alert)
 	if err != nil {
 		utils.ErrorResponse(ctx, err)
 		return
 	}
 
-	data, err = alert.Store.GetAlertRuleByName(rule.Name, rule.Alert)
+	err = alert.WriteAlertFile(rule)
 	if err != nil {
 		utils.ErrorResponse(ctx, err)
 		return
@@ -224,8 +235,7 @@ func (alert *Alert) ReloadAlertRuleConf(ctx *gin.Context) {
 }
 
 func (alert *Alert) WriteAlertFile(rule *models.Rule) error {
-	path := config.GetConfig().RuleFilePath
-
+	path := alert.RulesPath
 	alertfile := fmt.Sprintf("%s/%s-%s.rules", path, rule.Name, rule.Alert)
 	f, err := os.Create(alertfile)
 	defer f.Close()
@@ -237,7 +247,7 @@ func (alert *Alert) WriteAlertFile(rule *models.Rule) error {
 	var buf bytes.Buffer
 	err = t.Execute(&buf, rule)
 	if err != nil {
-		fmt.Println("executing templta: ", err)
+		log.Errorln("executing templta: ", err)
 		return err
 	}
 
@@ -252,7 +262,7 @@ func (alert *Alert) WriteAlertFile(rule *models.Rule) error {
 }
 
 func (alert *Alert) RemoveAlertFile(rule models.Rule) error {
-	path := config.GetConfig().RuleFilePath
+	path := alert.RulesPath
 	alertfile := fmt.Sprintf("%s/%s-%s.rules", path, rule.Name, rule.Alert)
 	f, err := os.Create(alertfile)
 	defer f.Close()
@@ -261,7 +271,6 @@ func (alert *Alert) RemoveAlertFile(rule models.Rule) error {
 	}
 
 	message := fmt.Sprintf("# removed this rule")
-	fmt.Println("message: ", message)
 	f.WriteString(message + "\n")
 
 	err = alert.ReloadPrometheusConf()
@@ -273,7 +282,7 @@ func (alert *Alert) RemoveAlertFile(rule models.Rule) error {
 }
 
 func (alert *Alert) ReloadPrometheusConf() error {
-	u, err := url.Parse(alert.PromeServer)
+	u, err := url.Parse(alert.PromServer)
 	if err != nil {
 		return err
 	}
@@ -385,7 +394,7 @@ func (alert *Alert) UpdateAlertRuleFiles() {
 	)
 	reloadReady := false
 
-	path := config.GetConfig().RuleFilePath
+	path := alert.RulesPath
 
 	rules, err = alert.Store.GetAlertRules()
 	if err != nil {
@@ -467,7 +476,7 @@ func (alert *Alert) UpdateAlertRuleFiles() {
 		for _, ruleOps := range deleteRule {
 			err := updateFileByAction(ruleOps, ruleFileDelete)
 			if err != nil {
-				log.Errorf("Rule File Update Error: %v", err)
+				log.Errorf("Rule File Delete Error: %v", err)
 				return
 			}
 		}
@@ -526,7 +535,7 @@ func getFileMD5value(file string) ([]byte, error) {
 
 func updateFileByAction(ruleOps *models.RuleOperation, action string) error {
 	path := config.GetConfig().RuleFilePath
-	file := fmt.Sprintf("%s/%s.rules", path, strings.Split(ruleOps.File, ".")[0])
+	file := fmt.Sprintf("%s/%s", path, ruleOps.File)
 
 	if action == ruleFileDelete {
 		err := os.Remove(file)
@@ -546,7 +555,7 @@ func updateFileByAction(ruleOps *models.RuleOperation, action string) error {
 	var buf bytes.Buffer
 	err = t.Execute(&buf, ruleOps.Rule)
 	if err != nil {
-		fmt.Println("executing templta: ", err)
+		log.Errorln("executing templta: ", err)
 		return err
 	}
 	f.WriteString(buf.String())
