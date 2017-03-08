@@ -7,3 +7,6 @@ FRONTEND_PATH=./
 MARATHON_URL=http://192.168.1.91:8080/
 UI_BACKEND=http://192.168.1.75:5098
 NOTIFICATION_URL=http://localhost:8080
+DB_DSN=root:dataman1234@tcp(localhost:3306)/mola?charset=utf8&parseTime=true&loc=Local
+DB_DRIVER=mysql
+RULE_FILE_PATH=/rules
