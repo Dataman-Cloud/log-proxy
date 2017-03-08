@@ -4,7 +4,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
-	_ "github.com/mattes/migrate/driver/mysql"
+	// _ "github.com/mattes/migrate/driver/mysql"
 )
 
 var db *gorm.DB

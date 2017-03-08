@@ -36,6 +36,14 @@
 			"notests": true
 		},
 		{
+			"importpath": "github.com/denisenkom/go-mssqldb",
+			"repository": "https://github.com/denisenkom/go-mssqldb",
+			"vcs": "git",
+			"revision": "1a31ec05df993056fae01cebcc2666c27d6bf60d",
+			"branch": "master",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/dustin/go-broadcast",
 			"repository": "https://github.com/dustin/go-broadcast",
 			"vcs": "git",
@@ -73,6 +81,14 @@
 			"repository": "https://github.com/gin-gonic/gin",
 			"vcs": "git",
 			"revision": "bb159f9260a262fccbdbd6f37f8575d1e7e6aaa0",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/go-sql-driver/mysql",
+			"repository": "https://github.com/go-sql-driver/mysql",
+			"vcs": "git",
+			"revision": "2e00b5cd70399450106cec6431c2e2ce3cae5034",
 			"branch": "master",
 			"notests": true
 		},
@@ -125,6 +141,22 @@
 			"repository": "https://github.com/gorilla/mux",
 			"vcs": "git",
 			"revision": "757bef944d0f21880861c2dd9c871ca543023cba",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/jinzhu/gorm",
+			"repository": "https://github.com/jinzhu/gorm",
+			"vcs": "git",
+			"revision": "5409931a1bb87e484d68d649af9367c207713ea2",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/jinzhu/inflection",
+			"repository": "https://github.com/jinzhu/inflection",
+			"vcs": "git",
+			"revision": "1c35d901db3da928c72a72d8458480cc9ade058f",
 			"branch": "master",
 			"notests": true
 		},
