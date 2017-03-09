@@ -79,7 +79,7 @@ ALERT LogKeyword
 * ES_URL: Elasticsearch地址
 
 ```
-   - ES_URL=http://192.168.1.75:9200
+   - ES_URL=http://192.168.1.75:9200,192.168.1.74:9200
 ```
 
 * PROMETHEUS_URL：Prometheus地址
