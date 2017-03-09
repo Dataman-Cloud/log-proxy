@@ -263,7 +263,7 @@ func (alert *Alert) WriteAlertFile(rule *models.Rule) error {
 
 func (alert *Alert) RemoveAlertFile(rule models.Rule) error {
 	path := alert.RulesPath
-	alertfile := fmt.Sprintf("%s/%s-%s.rules", path, rule.Name, rule.Alert)
+	alertfile := fmt.Sprintf("%s/%s-%s.rule", path, rule.Name, rule.Alert)
 	f, err := os.Create(alertfile)
 	defer f.Close()
 	if err != nil {
@@ -406,7 +406,7 @@ func (alert *Alert) UpdateAlertRuleFiles() {
 	for _, rule := range rules {
 		ruleOps := models.NewRuleOperation()
 		ruleOps.Rule = rule
-		ruleOps.File = fmt.Sprintf("%s-%s.rules", rule.Name, rule.Alert)
+		ruleOps.File = fmt.Sprintf("%s-%s.rule", rule.Name, rule.Alert)
 
 		t := template.Must(template.New("ruleTempl").Parse(ruleTempl))
 		var buf bytes.Buffer
