@@ -236,7 +236,7 @@ func (alert *Alert) ReloadAlertRuleConf(ctx *gin.Context) {
 
 func (alert *Alert) WriteAlertFile(rule *models.Rule) error {
 	path := alert.RulesPath
-	alertfile := fmt.Sprintf("%s/%s-%s.rules", path, rule.Name, rule.Alert)
+	alertfile := fmt.Sprintf("%s/%s-%s.rule", path, rule.Name, rule.Alert)
 	f, err := os.Create(alertfile)
 	defer f.Close()
 	if err != nil {
