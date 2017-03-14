@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"os"
 	"strings"
 	"testing"
@@ -503,4 +504,289 @@ func TestReloadAlertRuleConfError(t *testing.T) {
 	defer resp.Body.Close()
 	assert.Nil(t, err)
 	assert.Equal(t, 503, resp.StatusCode)
+}
+
+func TestGetAlertEventsAck(t *testing.T) {
+	router := gin.New()
+	mockCtl := gomock.NewController(t)
+	defer mockCtl.Finish()
+	mockStore := mock_store.NewMockStore(mockCtl)
+	alert := NewAlert()
+	alert.Store = mockStore
+
+	router.Use(middleware.CORSMiddleware())
+	router.GET("/alert/events", alert.GetAlertEvents)
+	testServer := httptest.NewServer(router)
+	assert.NotNil(t, testServer)
+	defer testServer.Close()
+
+	var event = &models.Event{
+		Count:       1,
+		Severity:    "warning",
+		VCluster:    "cluster1",
+		App:         "app1",
+		Slot:        "0",
+		UserName:    "user1",
+		GroupName:   "group1",
+		ContainerID: "container1",
+		AlertName:   "alert1",
+		Ack:         true,
+	}
+	var result []*models.Event
+	result = append(result, event)
+	var data = map[string]interface{}{
+		"count":  1,
+		"events": result,
+	}
+	mockStore.EXPECT().ListAckedEvent(gomock.Any(), gomock.Any(), gomock.Any()).Return(data).Times(1)
+	u, _ := url.Parse(testServer.URL)
+	u.Path = strings.TrimRight(u.Path, "/") + "/alert/events"
+	q := u.Query()
+	q.Set("ack", "true")
+	q.Set("user_name", "user1")
+	q.Set("group_name", "group1")
+	u.RawQuery = q.Encode()
+	resp, err := alert.HTTPClient.Get(u.String())
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+}
+
+func TestGetAlertEventsUnack(t *testing.T) {
+	router := gin.New()
+	mockCtl := gomock.NewController(t)
+	defer mockCtl.Finish()
+	mockStore := mock_store.NewMockStore(mockCtl)
+	alert := NewAlert()
+	alert.Store = mockStore
+
+	router.Use(middleware.CORSMiddleware())
+	router.GET("/alert/events", alert.GetAlertEvents)
+	testServer := httptest.NewServer(router)
+	assert.NotNil(t, testServer)
+	defer testServer.Close()
+
+	var event = &models.Event{
+		Count:       1,
+		Severity:    "warning",
+		VCluster:    "cluster1",
+		App:         "app1",
+		Slot:        "0",
+		UserName:    "user1",
+		GroupName:   "group1",
+		ContainerID: "container1",
+		AlertName:   "alert1",
+		Ack:         false,
+	}
+	var result []*models.Event
+	result = append(result, event)
+	var data = map[string]interface{}{
+		"count":  1,
+		"events": result,
+	}
+	mockStore.EXPECT().ListUnackedEvent(gomock.Any(), gomock.Any(), gomock.Any()).Return(data).Times(1)
+	u, _ := url.Parse(testServer.URL)
+	u.Path = strings.TrimRight(u.Path, "/") + "/alert/events"
+	q := u.Query()
+	q.Set("ack", "false")
+	q.Set("user_name", "user1")
+	q.Set("group_name", "group1")
+	u.RawQuery = q.Encode()
+	resp, err := alert.HTTPClient.Get(u.String())
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+}
+
+func TestAckAlertEvent(t *testing.T) {
+	router := gin.New()
+	mockCtl := gomock.NewController(t)
+	defer mockCtl.Finish()
+	mockStore := mock_store.NewMockStore(mockCtl)
+	alert := NewAlert()
+	alert.Store = mockStore
+
+	router.Use(middleware.CORSMiddleware())
+	router.PUT("/alert/events/:id", alert.AckAlertEvent)
+	testServer := httptest.NewServer(router)
+	assert.NotNil(t, testServer)
+	defer testServer.Close()
+
+	var event = map[string]interface{}{
+		"action": "ack",
+	}
+	body, err := json.Marshal(event)
+	assert.Nil(t, err, "invalid param")
+
+	mockStore.EXPECT().AckEvent(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil).Times(1)
+	req, err := http.NewRequest("PUT", testServer.URL+"/alert/events/1", strings.NewReader(string(body)))
+	if err != nil {
+		return
+	}
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := alert.HTTPClient.Do(req)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+
+	req, err = http.NewRequest("PUT", testServer.URL+"/alert/events/abc", strings.NewReader(string(body)))
+	if err != nil {
+		return
+	}
+	req.Header.Set("Content-Type", "application/json")
+	resp, err = alert.HTTPClient.Do(req)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+	assert.Nil(t, err)
+	assert.Equal(t, 503, resp.StatusCode)
+
+	req, err = http.NewRequest("PUT", testServer.URL+"/alert/events/1", strings.NewReader("err"))
+	if err != nil {
+		return
+	}
+	req.Header.Set("Content-Type", "application/json")
+	resp, err = alert.HTTPClient.Do(req)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+	assert.Nil(t, err)
+	assert.Equal(t, 400, resp.StatusCode)
+
+	event = map[string]interface{}{
+		"action":     "ack",
+		"user_name":  "user1",
+		"group_name": "group1",
+	}
+	body, err = json.Marshal(event)
+	assert.Nil(t, err, "invalid param")
+	mockStore.EXPECT().AckEvent(gomock.Any(), gomock.Any(), gomock.Any()).Return(errors.New("err")).Times(1)
+	req, err = http.NewRequest("PUT", testServer.URL+"/alert/events/1", strings.NewReader(string(body)))
+	if err != nil {
+		return
+	}
+	req.Header.Set("Content-Type", "application/json")
+	resp, err = alert.HTTPClient.Do(req)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+	assert.Nil(t, err)
+	assert.Equal(t, 503, resp.StatusCode)
+}
+
+func TestReceiveAlertEvent(t *testing.T) {
+	router := gin.New()
+	mockCtl := gomock.NewController(t)
+	defer mockCtl.Finish()
+	mockStore := mock_store.NewMockStore(mockCtl)
+	alert := NewAlert()
+	alert.Store = mockStore
+
+	router.Use(middleware.CORSMiddleware())
+	router.POST("/receiver", alert.ReceiveAlertEvent)
+	testServer := httptest.NewServer(router)
+	assert.NotNil(t, testServer)
+	defer testServer.Close()
+
+	labels := map[string]interface{}{
+		"alertname":                  "alert1",
+		"severity":                   "Warning",
+		"container_label_VCLUSTER":   "wtzhou-VCluster",
+		"container_label_APP":        "app-3",
+		"container_label_SLOT":       "slot-2",
+		"container_label_GROUP_NAME": "group-1",
+		"container_label_USER_NAME":  "wtzhou",
+		"id": "/docker/aaaxefgh32e2e23rfsda",
+	}
+	annotations := map[string]interface{}{
+		"description": "High Mem usage on instance: test-1",
+		"summary":     "Mem Usage on instance: test-1",
+	}
+	event := map[string]interface{}{
+		"labels":      labels,
+		"annotations": annotations,
+	}
+	var events []map[string]interface{}
+	events = append(events, event)
+
+	var data = map[string]interface{}{
+		"alerts": events,
+	}
+	body, err := json.Marshal(data)
+	assert.Nil(t, err, "invalid param")
+	mockStore.EXPECT().CreateOrIncreaseEvent(gomock.Any()).Return(nil).Times(1)
+
+	req, err := http.NewRequest("POST", testServer.URL+"/receiver", strings.NewReader(string(body)))
+	if err != nil {
+		return
+	}
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := alert.HTTPClient.Do(req)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+
+	req, err = http.NewRequest("POST", testServer.URL+"/receiver", strings.NewReader("err"))
+	if err != nil {
+		return
+	}
+	req.Header.Set("Content-Type", "application/json")
+	resp, err = alert.HTTPClient.Do(req)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+	assert.Nil(t, err)
+	assert.Equal(t, 503, resp.StatusCode)
+
+	mockStore.EXPECT().CreateOrIncreaseEvent(gomock.Any()).Return(errors.New("err")).Times(1)
+	req, err = http.NewRequest("POST", testServer.URL+"/receiver", strings.NewReader(string(body)))
+	if err != nil {
+		return
+	}
+	req.Header.Set("Content-Type", "application/json")
+	resp, err = alert.HTTPClient.Do(req)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+	assert.Nil(t, err)
+	assert.Equal(t, 503, resp.StatusCode)
+}
+
+func TestUpdateAlertRuleFiles(t *testing.T) {
+	mockCtl := gomock.NewController(t)
+	defer mockCtl.Finish()
+	mockStore := mock_store.NewMockStore(mockCtl)
+	alert := NewAlert()
+	alert.Store = mockStore
+	alert.RulesPath = os.TempDir() + "rules"
+	os.Create(alert.RulesPath)
+	os.Create(alert.RulesPath + "/testfile")
+	defer os.Remove(alert.RulesPath)
+
+	var rules []*models.Rule
+
+	var rule = &models.Rule{
+		ID:       1,
+		Name:     "user1",
+		Alert:    "alert",
+		Expr:     "expr1",
+		Duration: "duration",
+		Labels:   "labels",
+	}
+	rule.Description = "desciption"
+	rule.Summary = "summary"
+	rules = append(rules, rule)
+	alert.WriteAlertFile(rule)
+
+	mockStore.EXPECT().GetAlertRules().Return(rules, nil).Times(1)
+	alert.UpdateAlertRuleFiles()
 }

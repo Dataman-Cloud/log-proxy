@@ -30,7 +30,6 @@ import (
 
 const (
 	// ReceiveEventError code
-
 	ReceiveEventError = "503-21000"
 	// ReceiveEventError code
 	AckEventError = "503-21001"
@@ -111,6 +110,7 @@ func (alert *Alert) CreateAlertRule(ctx *gin.Context) {
 	utils.Ok(ctx, data)
 }
 
+// DeleteAlertRule delete the rule by id and name from DB and files
 func (alert *Alert) DeleteAlertRule(ctx *gin.Context) {
 	var (
 		rowsAffected int64
@@ -158,6 +158,7 @@ func (alert *Alert) DeleteAlertRule(ctx *gin.Context) {
 	utils.Ok(ctx, "success")
 }
 
+// ListAlertRules list the rules by name with pages.
 func (alert *Alert) ListAlertRules(ctx *gin.Context) {
 	data, err := alert.Store.ListAlertRules(ctx.MustGet("page").(models.Page), ctx.Query("name"))
 	if err != nil {
@@ -189,7 +190,7 @@ func (alert *Alert) GetAlertRule(ctx *gin.Context) {
 	utils.Ok(ctx, data)
 }
 
-// UpdateAlertRule create the alert rule in Database
+// UpdateAlertRule update the alert rule in Database
 func (alert *Alert) UpdateAlertRule(ctx *gin.Context) {
 	var (
 		rule *models.Rule
@@ -222,6 +223,7 @@ func (alert *Alert) UpdateAlertRule(ctx *gin.Context) {
 	utils.Ok(ctx, data)
 }
 
+// ReloadAlertRuleConf tigger the conf reloading by prometheus api
 func (alert *Alert) ReloadAlertRuleConf(ctx *gin.Context) {
 	var err error
 
@@ -234,6 +236,7 @@ func (alert *Alert) ReloadAlertRuleConf(ctx *gin.Context) {
 	utils.Ok(ctx, "success")
 }
 
+// WriteAlertFile write the alert rule to file
 func (alert *Alert) WriteAlertFile(rule *models.Rule) error {
 	path := alert.RulesPath
 	alertfile := fmt.Sprintf("%s/%s-%s.rule", path, rule.Name, rule.Alert)
@@ -261,6 +264,7 @@ func (alert *Alert) WriteAlertFile(rule *models.Rule) error {
 	return nil
 }
 
+// RemoveAlertFile remove the rule from the file.
 func (alert *Alert) RemoveAlertFile(rule models.Rule) error {
 	path := alert.RulesPath
 	alertfile := fmt.Sprintf("%s/%s-%s.rule", path, rule.Name, rule.Alert)
@@ -281,6 +285,7 @@ func (alert *Alert) RemoveAlertFile(rule models.Rule) error {
 	return nil
 }
 
+// ReloadPrometheusConf reload the conf by calling prometheus api
 func (alert *Alert) ReloadPrometheusConf() error {
 	u, err := url.Parse(alert.PromServer)
 	if err != nil {
@@ -297,6 +302,7 @@ func (alert *Alert) ReloadPrometheusConf() error {
 	return nil
 }
 
+// ReceiveAlertEvent recive the alerts from Alertmanager
 func (alert *Alert) ReceiveAlertEvent(ctx *gin.Context) {
 	data, err := utils.ReadRequestBody(ctx.Request)
 	if err != nil {
@@ -335,18 +341,20 @@ func (alert *Alert) ReceiveAlertEvent(ctx *gin.Context) {
 	utils.Ok(ctx, map[string]string{"status": "success"})
 }
 
+// AckAlertEvent mark the alert evnet ACK
 func (alert *Alert) AckAlertEvent(ctx *gin.Context) {
+	var err error
 	pk, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
 		utils.ErrorResponse(ctx, utils.NewError(AckEventError, err))
 		return
 	}
 	var data map[string]interface{}
-	if err := ctx.BindJSON(&data); err != nil {
+
+	if err = ctx.BindJSON(&data); err != nil {
 		utils.ErrorResponse(ctx, utils.NewError(AckEventError, err))
 		return
 	}
-
 	switch action := data["action"].(string); action {
 	case "ack":
 		// TODO ugly code
@@ -365,6 +373,7 @@ func (alert *Alert) AckAlertEvent(ctx *gin.Context) {
 	}
 }
 
+// GetAlertEvents list the alert events
 func (alert *Alert) GetAlertEvents(ctx *gin.Context) {
 	switch ack := ctx.Query("ack"); ack {
 	case "true":
@@ -376,6 +385,7 @@ func (alert *Alert) GetAlertEvents(ctx *gin.Context) {
 	}
 }
 
+// AlertRuleFilesMaintainer keep the rule files sync with db
 func (alert *Alert) AlertRuleFilesMaintainer() {
 	c := cron.New()
 	interval := fmt.Sprintf("@every %s", alert.Interval)
@@ -385,6 +395,7 @@ func (alert *Alert) AlertRuleFilesMaintainer() {
 	alert.UpdateAlertRuleFiles()
 }
 
+// UpdateAlertRuleFiles update the rule files
 func (alert *Alert) UpdateAlertRuleFiles() {
 	var (
 		rules     []*models.Rule
@@ -425,6 +436,7 @@ func (alert *Alert) UpdateAlertRuleFiles() {
 	files, err = getFilelist(path)
 	if err != nil {
 		log.Errorf("Rule File Update Error: %v", err)
+		fmt.Println(err)
 		return
 	}
 
@@ -463,7 +475,7 @@ func (alert *Alert) UpdateAlertRuleFiles() {
 
 	if len(createRule) != 0 {
 		for _, ruleOps := range createRule {
-			err := updateFileByAction(ruleOps, ruleFileUpdate)
+			err := updateFileByAction(path, ruleOps, ruleFileUpdate)
 			if err != nil {
 				log.Errorf("Rule File Update Error: %v", err)
 				return
@@ -474,7 +486,7 @@ func (alert *Alert) UpdateAlertRuleFiles() {
 
 	if len(deleteRule) != 0 {
 		for _, ruleOps := range deleteRule {
-			err := updateFileByAction(ruleOps, ruleFileDelete)
+			err := updateFileByAction(path, ruleOps, ruleFileDelete)
 			if err != nil {
 				log.Errorf("Rule File Delete Error: %v", err)
 				return
@@ -496,6 +508,7 @@ func (alert *Alert) UpdateAlertRuleFiles() {
 }
 
 func getFilelist(path string) (map[string]interface{}, error) {
+	fmt.Println(path)
 	files := make(map[string]interface{})
 	err := filepath.Walk(path, func(path string, f os.FileInfo, err error) error {
 		if f == nil {
@@ -530,11 +543,11 @@ func getFileMD5value(file string) ([]byte, error) {
 
 	h := md5.New()
 	io.WriteString(h, buf.String())
+	fmt.Println("getFileMD5value", h.Sum(nil))
 	return h.Sum(nil), err
 }
 
-func updateFileByAction(ruleOps *models.RuleOperation, action string) error {
-	path := config.GetConfig().RuleFilePath
+func updateFileByAction(path string, ruleOps *models.RuleOperation, action string) error {
 	file := fmt.Sprintf("%s/%s", path, ruleOps.File)
 
 	if action == ruleFileDelete {
