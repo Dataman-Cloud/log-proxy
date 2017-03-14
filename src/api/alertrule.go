@@ -508,7 +508,6 @@ func (alert *Alert) UpdateAlertRuleFiles() {
 }
 
 func getFilelist(path string) (map[string]interface{}, error) {
-	fmt.Println(path)
 	files := make(map[string]interface{})
 	err := filepath.Walk(path, func(path string, f os.FileInfo, err error) error {
 		if f == nil {
@@ -543,7 +542,6 @@ func getFileMD5value(file string) ([]byte, error) {
 
 	h := md5.New()
 	io.WriteString(h, buf.String())
-	fmt.Println("getFileMD5value", h.Sum(nil))
 	return h.Sum(nil), err
 }
 
@@ -562,6 +560,7 @@ func updateFileByAction(path string, ruleOps *models.RuleOperation, action strin
 	f, err := os.Create(file)
 	defer f.Close()
 	if err != nil {
+		fmt.Println(err)
 		return err
 	}
 	t := template.Must(template.New("ruleTempl").Parse(ruleTempl))

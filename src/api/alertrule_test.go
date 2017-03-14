@@ -768,8 +768,7 @@ func TestUpdateAlertRuleFiles(t *testing.T) {
 	alert := NewAlert()
 	alert.Store = mockStore
 	alert.RulesPath = os.TempDir() + "rules"
-	os.Create(alert.RulesPath)
-	os.Create(alert.RulesPath + "/testfile")
+	os.Mkdir(alert.RulesPath, 0755)
 	defer os.Remove(alert.RulesPath)
 
 	var rules []*models.Rule
@@ -785,6 +784,48 @@ func TestUpdateAlertRuleFiles(t *testing.T) {
 	rule.Description = "desciption"
 	rule.Summary = "summary"
 	rules = append(rules, rule)
+	alert.WriteAlertFile(rule)
+
+	mockStore.EXPECT().GetAlertRules().Return(rules, nil).Times(1)
+	alert.UpdateAlertRuleFiles()
+}
+
+func TestUpdateAlertRuleFilesCreate(t *testing.T) {
+	mockCtl := gomock.NewController(t)
+	defer mockCtl.Finish()
+	mockStore := mock_store.NewMockStore(mockCtl)
+	alert := NewAlert()
+	alert.Store = mockStore
+	alert.RulesPath = os.TempDir() + "rules"
+	os.Mkdir(alert.RulesPath, 0755)
+	defer os.Remove(alert.RulesPath)
+
+	var rules []*models.Rule
+
+	var rule = &models.Rule{
+		ID:       1,
+		Name:     "user1",
+		Alert:    "alert",
+		Expr:     "expr1",
+		Duration: "duration",
+		Labels:   "labels",
+	}
+	rule.Description = "desciption"
+	rule.Summary = "summary"
+
+	var rule2 = &models.Rule{
+		ID:       2,
+		Name:     "user2",
+		Alert:    "alert",
+		Expr:     "expr1",
+		Duration: "duration",
+		Labels:   "labels",
+	}
+	rule2.Description = "desciption"
+	rule2.Summary = "summary"
+
+	rules = append(rules, rule)
+	rules = append(rules, rule2)
 	alert.WriteAlertFile(rule)
 
 	mockStore.EXPECT().GetAlertRules().Return(rules, nil).Times(1)
