@@ -21,6 +21,7 @@ var (
 	server  *httptest.Server
 	s       *Search
 	mo      *Monitor
+	al      *Alert
 )
 
 func startAPIServer(sv *Search) *httptest.Server {
@@ -39,7 +40,6 @@ func startAPIServer(sv *Search) *httptest.Server {
 
 	vr := router.Group("/v1/receive")
 	{
-		vr.POST("/prometheus", receiver)
 		vr.POST("/log", receiverlog)
 	}
 
@@ -50,8 +50,6 @@ func startAPIServer(sv *Search) *httptest.Server {
 		v1m.GET("/alert/:id", func(ctx *gin.Context) { sv.GetAlert(ctx) })
 		v1m.PUT("/alert", func(ctx *gin.Context) { sv.UpdateAlert(ctx) })
 		v1m.DELETE("/alert/:id", func(ctx *gin.Context) { sv.DeleteAlert(ctx) })
-		v1m.GET("/prometheus", getprometheus)
-		v1m.GET("/prometheus/:id", getprometheu)
 		v1m.GET("/query", getQuery)
 		v1m.GET("/info", getQueryInfo)
 		v1m.GET("/nodes", getQueryNodes)
@@ -64,6 +62,13 @@ func startAPIServer(sv *Search) *httptest.Server {
 		v1m.PUT("/silence", updateMonitorSilence)
 		v1m.DELETE("/silence/:id", deleteMonitorSilence)
 	}
+	/*
+		v1a := router.Group("/api/v1/alert", func(ctx *gin.Context) { ctx.Set("page", models.Page{}) })
+		{
+			v1a.POST("/rules/", createAlertRule)
+			v1a.GET("/rules/:id", getAlertRule)
+		}
+	*/
 	return httptest.NewServer(router)
 }
 
@@ -354,40 +359,6 @@ func TestContext(t *testing.T) {
 	}
 
 	resp, err = http.Get(se.URL + "/api/v1/context?app=test&task=test&path=app&offset=100")
-	if err == nil && resp.StatusCode == 200 {
-		t.Log("success")
-	} else {
-		t.Error("faild")
-	}
-}
-
-func getprometheus(ctx *gin.Context) {
-	s.GetPrometheus(ctx)
-}
-
-func getprometheu(ctx *gin.Context) {
-	s.GetPrometheu(ctx)
-}
-
-func TestGetPrometheus(t *testing.T) {
-	if s == nil {
-		s = GetSearch()
-	}
-	req, _ := http.NewRequest("GET", apiURL+"/api/v1/monitor/prometheus", nil)
-	resp, err := http.DefaultClient.Do(req)
-	if err == nil && resp.StatusCode == 200 {
-		t.Log("success")
-	} else {
-		t.Error("faild")
-	}
-}
-
-func TestGetPrometheu(t *testing.T) {
-	if s == nil {
-		s = GetSearch()
-	}
-	req, _ := http.NewRequest("GET", apiURL+"/api/v1/monitor/prometheus/test", nil)
-	resp, err := http.DefaultClient.Do(req)
 	if err == nil && resp.StatusCode == 200 {
 		t.Log("success")
 	} else {

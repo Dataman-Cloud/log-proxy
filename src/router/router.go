@@ -38,14 +38,11 @@ func Router(middlewares ...gin.HandlerFunc) *gin.Engine {
 		logv1.PUT("/keyword", s.UpdateAlert)
 		logv1.DELETE("/keyword/:id", s.DeleteAlert)
 		logv1.GET("/keyword/:id", s.GetAlert)
-		logv1.GET("/prometheus", s.GetPrometheus)
-		logv1.GET("/prometheus/:id", s.GetPrometheu)
 
 	}
 
 	pv1 := r.Group("/v1/receive")
 	{
-		pv1.POST("/prometheus", s.Receiver)
 		pv1.POST("/log", s.ReceiverLog)
 	}
 
@@ -69,6 +66,21 @@ func Router(middlewares ...gin.HandlerFunc) *gin.Engine {
 		monitorv1.DELETE("/silence/:id", monitor.DeleteSilence)
 		monitorv1.PUT("/silence/:id", monitor.UpdateSilence)
 	}
+
+	alert := api.NewAlert()
+	alertv1 := r.Group("/v1/alert")
+	{
+		alertv1.POST("/rules", alert.CreateAlertRule)
+		alertv1.DELETE("/rules/:id", alert.DeleteAlertRule)
+		alertv1.GET("/rules", alert.ListAlertRules)
+		alertv1.GET("/rules/:id", alert.GetAlertRule)
+		alertv1.PUT("/rules", alert.UpdateAlertRule)
+		alertv1.POST("/rules/conf", alert.ReloadAlertRuleConf)
+		alertv1.POST("/receiver", alert.ReceiveAlertEvent)
+		alertv1.PUT("/events/:id", alert.AckAlertEvent)
+		alertv1.GET("/events", alert.GetAlertEvents)
+	}
+	alert.AlertRuleFilesMaintainer()
 
 	staticRouter := r.Group("/ui")
 	{
