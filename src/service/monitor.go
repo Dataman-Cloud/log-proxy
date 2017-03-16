@@ -7,6 +7,7 @@ import (
 
 	"github.com/Dataman-Cloud/log-proxy/src/backends"
 	"github.com/Dataman-Cloud/log-proxy/src/models"
+	"github.com/Dataman-Cloud/log-proxy/src/utils/prometheusexpr"
 )
 
 const (
@@ -500,4 +501,50 @@ func (ni *NodesInfo) GetQueryNodesInfo(query *backends.Query) error {
 		}
 	}
 	return nil
+}
+
+type Query struct {
+	Exprs map[string]string
+}
+
+func NewQuery() *Query {
+	return &Query{
+		Exprs: make(map[string]string, 0),
+	}
+}
+
+// GetQueryItemList set the Query exprs by utils.Expr
+func (query *Query) GetQueryItemList() []string {
+	list := make([]string, 0)
+	for k := range prometheusexpr.GetExprs() {
+		list = append(list, k)
+	}
+	return list
+}
+
+// SetQueryExprsList get the expr strings
+func (query *Query) SetQueryExprsList() {
+	for name, expr := range prometheusexpr.GetExprs() {
+		query.Exprs[name] = makeExprString(expr)
+	}
+}
+
+func makeExprString(expr *prometheusexpr.Expr) string {
+	var filter, byItems, queryExpr string
+	fmt.Println()
+	filter = fmt.Sprintf("%s, %s, %s, %s, %s", expr.Filter.Cluster, expr.Filter.User, expr.Filter.App, expr.Filter.Task, expr.Filter.Fixed)
+	for _, v := range expr.By {
+		byItems = byItems + v + ", "
+	}
+
+	queryExpr = fmt.Sprintf("%s{%s}", expr.Metric, filter)
+	if expr.Function != "" {
+		queryExpr = fmt.Sprintf("%s(%s[5m])", expr.Function, queryExpr)
+	}
+	if expr.Aggregation != "" {
+		queryExpr = fmt.Sprintf("%s(%s) by (%s)", expr.Aggregation, queryExpr, byItems)
+	} else {
+		queryExpr = fmt.Sprintf("%s by (%s)", queryExpr, byItems)
+	}
+	return queryExpr
 }

@@ -27,6 +27,7 @@ type Config struct {
 	BorgUser         string `alias:"BORG_USER"`
 	BorgPassword     string `alias:"BORG_PASSWORD"`
 	BorgURL          string `alias:"BORG_URL"`
+	QueryExprPATH    string `alias:"QUERY_EXPR_PATH"`
 }
 
 const (

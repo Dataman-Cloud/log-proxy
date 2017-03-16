@@ -1,0 +1,16 @@
+---
+name: "network_rx"
+aggregation: "sum"
+function: "irate"
+metric: "container_network_receive_bytes_total"
+filter:
+  cluster: "container_label_CLUSTER='%s'"
+  user: "container_label_USER='%s'"
+  app: "container_label_APP='%s'"
+  task: "container_label_SLOT='%s'"
+  fixed: "id=~'/docker/.*', name=~'mesos.*'"
+by:
+  - "container_label_CLUSTER"
+  - "container_label_USER"
+  - "container_label_APP"
+  - "container_label_SLOT"
