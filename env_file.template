@@ -10,7 +10,8 @@ NOTIFICATION_URL=http://localhost:8080
 DB_DSN=root:dataman1234@tcp(localhost:3306)/mola?charset=utf8&parseTime=true&loc=Local
 DB_DRIVER=mysql
 RULE_FILE_PATH=/dataman/rules
-QUERY_EXPR_FILE=./expr-sample.yaml
+QUERY_EXPR_PATH=/dataman/exprs
 BORG_USER=admin
 BORG_PASSWORD=Admin1234
 BORG_URL=http://192.168.59.3:5098/
+SRY_FRAMEWORK=marathon

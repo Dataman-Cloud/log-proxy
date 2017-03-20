@@ -6,6 +6,7 @@ import (
 
 	"github.com/Dataman-Cloud/log-proxy/src/backends"
 	"github.com/Dataman-Cloud/log-proxy/src/config"
+	"github.com/Dataman-Cloud/log-proxy/src/models"
 	"github.com/Dataman-Cloud/log-proxy/src/service"
 	"github.com/Dataman-Cloud/log-proxy/src/utils"
 
@@ -27,12 +28,13 @@ func (m *Monitor) Ping(ctx *gin.Context) {
 }
 
 // Query return the result of metric query or expr query
+/*
 func (m *Monitor) Query(ctx *gin.Context) {
 	param := &backends.QueryParameter{
 		Metric:  ctx.Query("metric"),
 		Cluster: ctx.Query("cluster"),
 		App:     ctx.Query("app"),
-		Slot:    ctx.Query("task"), //Slot is the swan's application field.
+		Task:    ctx.Query("task"), //Slot is the swan's application field.
 		User:    ctx.Query("user"),
 		Start:   ctx.Query("start"),
 		End:     ctx.Query("end"),
@@ -101,6 +103,159 @@ func (m *Monitor) Query(ctx *gin.Context) {
 			return
 		}
 		utils.Ok(ctx, data)
+	}
+}
+*/
+
+// GetQueryItems return the items of query metrics
+func (m *Monitor) GetQueryItems(ctx *gin.Context) {
+	query := &service.Query{
+		ExprTmpl: service.SetQueryExprsList(),
+	}
+	utils.Ok(ctx, query.GetQueryItemList())
+}
+
+// GetClusters return the items of query metrics
+func (m *Monitor) GetClusters(ctx *gin.Context) {
+	param := &models.QueryParameter{
+		Start: ctx.Query("start"),
+		End:   ctx.Query("end"),
+	}
+
+	query := &service.Query{
+		ExprTmpl:       service.SetQueryExprsList(),
+		HTTPClient:     http.DefaultClient,
+		PromServer:     config.GetConfig().PrometheusURL,
+		Path:           backends.QUERYRANGEPATH,
+		QueryParameter: param,
+	}
+
+	data, err := query.GetQueryClusters()
+	if err != nil {
+		utils.ErrorResponse(ctx, err)
+		return
+	}
+	utils.Ok(ctx, data)
+}
+
+// GetClusters return the items of query metrics
+func (m *Monitor) GetClusterApps(ctx *gin.Context) {
+	param := &models.QueryParameter{
+		Start:   ctx.Query("start"),
+		End:     ctx.Query("end"),
+		Cluster: ctx.Param("clusterid"),
+	}
+
+	query := &service.Query{
+		ExprTmpl:       service.SetQueryExprsList(),
+		HTTPClient:     http.DefaultClient,
+		PromServer:     config.GetConfig().PrometheusURL,
+		Path:           backends.QUERYRANGEPATH,
+		QueryParameter: param,
+	}
+
+	data, err := query.GetQueryApps()
+	if err != nil {
+		utils.ErrorResponse(ctx, err)
+		return
+	}
+	utils.Ok(ctx, data)
+}
+
+// GetClusters return the items of query metrics
+func (m *Monitor) GetAppsTasks(ctx *gin.Context) {
+	param := &models.QueryParameter{
+		Start:   ctx.Query("start"),
+		End:     ctx.Query("end"),
+		Cluster: ctx.Param("clusterid"),
+		App:     ctx.Param("appid"),
+	}
+
+	query := &service.Query{
+		ExprTmpl:       service.SetQueryExprsList(),
+		HTTPClient:     http.DefaultClient,
+		PromServer:     config.GetConfig().PrometheusURL,
+		Path:           backends.QUERYRANGEPATH,
+		QueryParameter: param,
+	}
+
+	data, err := query.GetQueryAppTasks()
+	if err != nil {
+		utils.ErrorResponse(ctx, err)
+		return
+	}
+	utils.Ok(ctx, data)
+}
+
+func (m *Monitor) Query(ctx *gin.Context) {
+	param := &models.QueryParameter{
+		Metric:  ctx.Query("metric"),
+		Cluster: ctx.Query("cluster"),
+		App:     ctx.Query("app"),
+		Task:    ctx.Query("task"),
+		User:    ctx.Query("user"),
+		Start:   ctx.Query("start"),
+		End:     ctx.Query("end"),
+		Step:    ctx.Query("step"),
+		Expr:    ctx.Query("expr"),
+	}
+
+	if param.Metric != "" && param.Expr != "" {
+		err := fmt.Errorf("The paramter confict between metric and expr")
+		utils.ErrorResponse(ctx, err)
+		return
+	}
+
+	if param.Metric == "" && param.Expr == "" {
+		err := fmt.Errorf("The paramter metric or expr required")
+		utils.ErrorResponse(ctx, err)
+		return
+	}
+
+	if param.Metric != "" && param.Cluster == "" {
+		err := fmt.Errorf("The paramter metric and cluster required")
+		utils.ErrorResponse(ctx, err)
+		return
+	}
+	/*
+		if param.Metric != "" && param.Cluster != "" && param.User == "" {
+			err := fmt.Errorf("The paramter user required")
+			utils.ErrorResponse(ctx, err)
+			return
+		}
+	*/
+	if param.Expr != "" {
+		query := &service.Query{
+			ExprTmpl:       service.SetQueryExprsList(),
+			HTTPClient:     http.DefaultClient,
+			PromServer:     config.GetConfig().PrometheusURL,
+			Path:           backends.QUERYRANGEPATH,
+			QueryParameter: param,
+		}
+		data, err := query.QueryExpr()
+		if err != nil {
+			utils.ErrorResponse(ctx, err)
+			return
+		}
+		utils.Ok(ctx, data)
+		return
+	}
+
+	if param.Metric != "" {
+		query := &service.Query{
+			ExprTmpl:       service.SetQueryExprsList(),
+			HTTPClient:     http.DefaultClient,
+			PromServer:     config.GetConfig().PrometheusURL,
+			Path:           backends.QUERYRANGEPATH,
+			QueryParameter: param,
+		}
+		data, err := query.QueryMetric()
+		if err != nil {
+			utils.ErrorResponse(ctx, err)
+			return
+		}
+		utils.Ok(ctx, data)
+		return
 	}
 }
 

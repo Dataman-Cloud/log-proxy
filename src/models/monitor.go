@@ -1,7 +1,24 @@
 package models
 
+// QueryParameter define the fields of query paramter,
+// Frontend pass the parameter in 2 way:
+// 1. Expr, Start, End, Step
+// 2. Metric, Cluster, User, App, Task, Start, End, Step
+type QueryParameter struct {
+	Expr    string
+	Metric  string
+	Cluster string
+	User    string
+	App     string
+	Task    string
+	Start   string
+	End     string
+	Step    string
+}
+
 // QueryRangeResult define the JSON format of query result from prometheus
 type QueryRangeResult struct {
+	Expr      string `json:"expr"`
 	Status    string `json:"status"`
 	Data      *Data  `json:"data"`
 	ErrorType string `json:"errorType"`
@@ -22,12 +39,13 @@ type Result struct {
 
 // Metric is the sub in Result
 type Metric struct {
-	ContainerLabelApp      string `json:"container_label_APP"`
-	ContainerLabelCluster  string `json:"container_label_CLUSTER"`
-	ContainerLabelSlot     string `json:"container_label_SLOT"`
-	ContainerLabelTask     string `json:"container_label_TASK"`
-	ContainerLabelUser     string `json:"container_label_USER"`
-	ContainerLabelVcluster string `json:"container_label_VCLUSTER"`
+	ContainerLabelAppID    string `json:"container_label_APP_ID,omitempty"`
+	ContainerLabelApp      string `json:"container_label_APP,omitempty"`
+	ContainerLabelCluster  string `json:"container_label_CLUSTER,omitempty"`
+	ContainerLabelSlot     string `json:"container_label_SLOT,omitempty"`
+	ContainerLabelTask     string `json:"container_env_mesos_task_id,omitempty"`
+	ContainerLabelUser     string `json:"container_label_USER,omitempty"`
+	ContainerLabelVcluster string `json:"container_label_VCLUSTER,omitempty"`
 	ID                     string `json:"id"`
 	Image                  string `json:"image"`
 	Instance               string `json:"instance"`
@@ -96,4 +114,10 @@ type InfoFilesystem struct {
 // NewInfoFilesystem init the nfoFilesystem
 func NewInfoFilesystem() *InfoFilesystem {
 	return &InfoFilesystem{}
+}
+
+// Task defines the JSON format of information in task(container)
+type Task struct {
+	ID     string `json:"id"`
+	Status string `json:"id"`
 }

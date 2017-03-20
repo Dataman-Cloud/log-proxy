@@ -1,7 +1,6 @@
 package prometheusexpr
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -65,7 +64,6 @@ func GetExprs() map[string]*Expr {
 }
 
 func parseExpr(file string) (*Expr, error) {
-	fmt.Println("func parseExpr")
 	f, err := os.Open(file)
 	if err != nil {
 		return nil, err
@@ -85,7 +83,7 @@ func parseExpr(file string) (*Expr, error) {
 }
 
 func getExprFiles(path string) ([]string, error) {
-	fmt.Println("func getExprFiles")
+	log.Infof("Getting the expr files in dir %s", path)
 	files := make([]string, 0)
 	err := filepath.Walk(path, func(path string, f os.FileInfo, err error) error {
 		if f == nil {
@@ -100,5 +98,6 @@ func getExprFiles(path string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
+	log.Infof("Got the %d expr files", len(files))
 	return files, err
 }
