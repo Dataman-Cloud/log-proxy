@@ -1,0 +1,15 @@
+---
+name: "fs_read"
+aggregation: "sum"
+function: "irate"
+metric: "container_fs_reads_total"
+filter:
+  cluster: "container_label_VCLUSTER='%s'"
+  user: ""
+  app: "container_label_APP_ID='%s'"
+  task: "container_env_mesos_task_id='%s'"
+  fixed: "id=~'/docker/.*', name=~'mesos.*'"
+by:
+  - "container_label_VCLUSTER"
+  - "container_label_APP_ID"
+  - "container_env_mesos_task_id"
