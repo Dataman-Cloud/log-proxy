@@ -24,7 +24,14 @@ type Config struct {
 	DbDriver         string `alias:"DB_DRIVER"`
 	RuleFilePath     string `alias:"RULE_FILE_PATH"`
 	RuleFileInterval string `alias:"RULE_FILE_INTERVAL"`
+	BorgUser         string `alias:"BORG_USER"`
+	BorgPassword     string `alias:"BORG_PASSWORD"`
+	BorgURL          string `alias:"BORG_URL"`
 }
+
+const (
+	BorgAPIVersion string = "/v1/"
+)
 
 var c *Config
 
@@ -83,4 +90,12 @@ func LoadConfig() {
 			}
 		}
 	}
+}
+
+func BorgLoginURL() string {
+	return c.BorgURL + BorgAPIVersion + "login"
+}
+
+func BorgAppTasksURL(appName string) string {
+	return c.BorgURL + BorgAPIVersion + "apps/" + appName + "/tasks"
 }

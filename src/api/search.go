@@ -112,13 +112,42 @@ func (s *Search) Applications(ctx *gin.Context) {
 
 // Tasks search applications tasks
 func (s *Search) Tasks(ctx *gin.Context) {
-
-	tasks, err := s.Service.Tasks(ctx.Param("app"), ctx.Query("user"), ctx.MustGet("page").(models.Page))
+	appName := ctx.Param("app")
+	tasks, err := s.Service.Tasks(appName, ctx.Query("user"), ctx.MustGet("page").(models.Page))
 	if err != nil {
 		utils.ErrorResponse(ctx, utils.NewError(GetTaskError, err))
 		return
 	}
-	utils.Ok(ctx, tasks)
+
+	borgToken, err := utils.LoginBorg(config.GetConfig().BorgUser, config.GetConfig().BorgPassword, config.BorgLoginURL())
+	if err != nil {
+		utils.ErrorResponse(ctx, utils.NewError(GetTaskError, err))
+		return
+	}
+
+	runningTasks, err := utils.ListAppTaskFromBorg(borgToken, config.BorgAppTasksURL(appName))
+	if err != nil {
+		utils.ErrorResponse(ctx, utils.NewError(GetTaskError, err))
+		return
+	}
+
+	var taskInfoList []models.TaskInfo
+	for _, runningTask := range runningTasks {
+		if count, ok := tasks[runningTask.ID]; ok {
+			taskInfo := models.TaskInfo{runningTask.ID, models.TaskRunning, count}
+			taskInfoList = append(taskInfoList, taskInfo)
+			delete(tasks, runningTask.ID)
+		} else {
+			continue
+		}
+	}
+
+	for taskID, count := range tasks {
+		taskInfo := models.TaskInfo{taskID, models.TaskDied, count}
+		taskInfoList = append(taskInfoList, taskInfo)
+	}
+
+	utils.Ok(ctx, taskInfoList)
 }
 
 // Paths search applications paths
