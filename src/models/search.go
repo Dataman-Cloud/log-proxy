@@ -22,3 +22,14 @@ type Alert struct {
 	Path       string `json:"path"`
 	CreateTime string `json:"createtime"`
 }
+
+type TaskInfo struct {
+	ID       string `json:"id"`
+	Status   string `json:"status"`
+	LogCount int64  `json:"logCount"`
+}
+
+const (
+	TaskRunning string = "running"
+	TaskDied    string = "died"
+)
