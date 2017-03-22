@@ -93,56 +93,125 @@ http://127.0.0.1:5098/v1/monitor/nodes?nodeid=192.168.1.101
 
 ## 日志
 
-### 获取所有应用
-`GET /v1/search/applications`
+### 获取某个时间段内有日志的所有集群
+
+```
+ GET /v1/log/clusters
+```
 
 For example:
+
 ```
-curl -XGET http://localhost:5098/v1/search/applications
+http://192.168.59.3:5098/v1/log/clusters?from=1451577600000&to=1490096284000
 ```
 
 - Query Params:from, to
- - from=1478769333000
- - to=1478769333000
+ - 起始时间: from=1478769333000
+ - 结束时间: to=1478769333000
 
 return
 
 ```
 {
-    "code": 0,
-    "data": {
-        "cluster1-maliao": 79273,
-        "cluster1-proxytest": 78595,
-        "cluster1-test": 88599
-    }
+  "code": 0,
+  "data": {
+    "yaoyun": 84
+  }
 }
 ```
 
-### 根据应用获取所有实例
-`GET /v1/search/tasks/:appid`
+### 获取指定集群在指定时间段内有日志的所有应用
+
+```
+GET /v1/log/clusters/:cluster/apps
+```
+
+For example
+
+```
+http://192.168.59.3:5098/v1/log/clusters/yaoyun/apps
+```
+
+- URL Params: cluster
+ - cluster: 集群ID
+- Query Params:from, to
+ - 起始时间: from=1478769333000
+ - 结束时间: to=1478769333000
+ 
+ return
+ 
+ ```
+ {
+  "code": 0,
+  "data": {
+    "yaoyun-nginx": 73,
+    "yaoyun-nginx2": 11
+  }
+}
+ ```
+ 
+### 获取指定集群和应用在指定时间段内有日志的所有实例
+
+```
+http://192.168.59.3:5098/v1/log/clusters/:cluser/apps/:app/tasks
+```
 
 For example:
 
 ```
-curl -XGET http://localhost:5098/v1/search/tasks/test
+curl -XGET http://192.168.59.3:5098/v1/log/clusters/yaoyun/apps/yaoyun-nginx/tasks
 ```
 
-- URL Params: appid
- - appid=test
+- URL Params: cluster, app
+ - cluster: 集群ID
+ - app: appID
 - Query Params:from, to
- - from=1478769333000
- - to=1478769333000
+ - 起始时间: from=1478769333000
+ - 结束时间: to=1478769333000
+
 
  return
 
 ```
 {
-    "code": 0,
-    "data": {
-        "cluster1-maliao.e43f85e6-9f7f-11e6-8313-02421fb0085c": 79273
+  "code": 0,
+  "data": [
+    {
+      "id": "yaoyun-nginx.26f179b7-0a8f-11e7-a287-02427ffc9690",
+      "status": "running",
+      "logCount": 7
+    },
+    {
+      "id": "yaoyun-nginx.383c3939-0a33-11e7-b151-0242933964c8",
+      "status": "died",
+      "logCount": 9
+    },
+    {
+      "id": "yaoyun-nginx.71fe7d3b-0a34-11e7-b151-0242933964c8",
+      "status": "died",
+      "logCount": 9
+    },
+    {
+      "id": "yaoyun-nginx.26ff5c69-0a8f-11e7-a287-02427ffc9690",
+      "status": "died",
+      "logCount": 8
+    },
+    {
+      "id": "yaoyun-nginx.45f8be4a-0a8f-11e7-a287-02427ffc9690",
+      "status": "died",
+      "logCount": 8
+    },
+    {
+      "id": "yaoyun-nginx.be47fa68-0a32-11e7-b151-0242933964c8",
+      "status": "died",
+      "logCount": 9
     }
+  ]
 }
 ```
+
+* 说明: status 标记日志产生的实例是否正在运行
+
 
 ### 根据应用实例获取所有日志来源
 `GET /v1/search/paths/:appid
