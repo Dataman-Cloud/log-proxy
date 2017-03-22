@@ -41,6 +41,8 @@ const (
 	GetPrometheusError = "503-11009"
 	// GetLogError get log error
 	GetLogError = "503-11010"
+
+	GetClustersError = "503-11011"
 )
 
 // Search search client struct
@@ -100,9 +102,20 @@ func (s *Search) Ping(ctx *gin.Context) {
 	utils.Ok(ctx, "success")
 }
 
+func (s *Search) Clusters(ctx *gin.Context) {
+	clusters, err := s.Service.Clusters(ctx.MustGet("page").(models.Page))
+	if err != nil {
+		utils.ErrorResponse(ctx, utils.NewError(GetClustersError, err))
+		return
+	}
+
+	utils.Ok(ctx, clusters)
+	return
+}
+
 // Applications get all applications
 func (s *Search) Applications(ctx *gin.Context) {
-	apps, err := s.Service.Applications(ctx.MustGet("page").(models.Page))
+	apps, err := s.Service.Applications(ctx.Param("cluster"), ctx.MustGet("page").(models.Page))
 	if err != nil {
 		utils.ErrorResponse(ctx, utils.NewError(GetAppsError, err))
 		return
@@ -113,7 +126,7 @@ func (s *Search) Applications(ctx *gin.Context) {
 // Tasks search applications tasks
 func (s *Search) Tasks(ctx *gin.Context) {
 	appName := ctx.Param("app")
-	tasks, err := s.Service.Tasks(appName, ctx.Query("user"), ctx.MustGet("page").(models.Page))
+	tasks, err := s.Service.Tasks(ctx.Param("cluster"), appName, ctx.MustGet("page").(models.Page))
 	if err != nil {
 		utils.ErrorResponse(ctx, utils.NewError(GetTaskError, err))
 		return
