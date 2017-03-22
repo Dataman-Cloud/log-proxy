@@ -64,7 +64,9 @@ func (s *SearchService) Applications(page models.Page) (map[string]int64, error)
 		Query(bquery).
 		Aggregation("apps", elastic.
 			NewTermsAggregation().
-			Field("app").
+			Field("appid").
+			// swan case
+			// Field("app").
 			Size(0).
 			OrderByCountDesc()).
 		Pretty(true).
@@ -95,18 +97,24 @@ func (s *SearchService) Applications(page models.Page) (map[string]int64, error)
 func (s *SearchService) Tasks(appName, user string, page models.Page) (map[string]int64, error) {
 	bquery := elastic.NewBoolQuery().
 		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte(page.RangeFrom).Lte(page.RangeTo).Format("epoch_millis")).
-		Must(elastic.NewTermQuery("app", appName))
+		Must(elastic.NewTermQuery("appid", appName))
+		// swan-case
+		// Must(elastic.NewTermQuery("app", appName))
 
 	//Index("dataman-*").
 	tasks := make(map[string]int64)
 	result, err := s.ESClient.Search().
 		Index("dataman-*-"+utils.ParseDate(page.RangeFrom, page.RangeTo)).
-		Type("dataman-"+user+"-"+appName).
+		Type("dataman-"+appName).
+		// swan-case
+		//Type("dataman-"+user+"-"+appName).
 		Query(bquery).
 		SearchType("count").
 		Aggregation("tasks", elastic.
 			NewTermsAggregation().
-			Field("task").
+			Field("taskid").
+			// swan case
+			// Field("task").
 			Size(0).
 			OrderByCountDesc()).
 		Pretty(true).
