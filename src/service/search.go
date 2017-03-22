@@ -51,11 +51,50 @@ func NewEsService(url []string) *SearchService {
 	}
 }
 
-// Applications get all applications
-// This function destroy now.
-func (s *SearchService) Applications(page models.Page) (map[string]int64, error) {
+func (s *SearchService) Clusters(page models.Page) (map[string]int64, error) {
 	bquery := elastic.NewBoolQuery().
 		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte(page.RangeFrom).Lte(page.RangeTo).Format("epoch_millis"))
+
+	clusters := make(map[string]int64)
+	result, err := s.ESClient.Search().
+		Index("dataman-*").
+		SearchType("count").
+		Query(bquery).
+		Aggregation("clusters", elastic.
+			NewTermsAggregation().
+			Field("clusterid").
+			// swan case
+			// Field("app").
+			Size(0).
+			OrderByCountDesc()).
+		Pretty(true).
+		Do()
+
+	if err != nil && err.(*elastic.Error).Status == http.StatusNotFound {
+		return nil, nil
+	}
+
+	if err != nil {
+		log.Errorf("get applications error: %v", err)
+		return clusters, err
+	}
+
+	agg, found := result.Aggregations.Terms("clusters")
+	if !found {
+		return clusters, nil
+	}
+
+	for _, bucket := range agg.Buckets {
+		clusters[fmt.Sprint(bucket.Key)] = bucket.DocCount
+	}
+	return clusters, nil
+}
+
+// Applications get all applications
+func (s *SearchService) Applications(cluster string, page models.Page) (map[string]int64, error) {
+	bquery := elastic.NewBoolQuery().
+		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte(page.RangeFrom).Lte(page.RangeTo).Format("epoch_millis")).
+		Must(elastic.NewTermQuery("clusterid", cluster))
 
 	apps := make(map[string]int64)
 	result, err := s.ESClient.Search().
@@ -93,11 +132,10 @@ func (s *SearchService) Applications(page models.Page) (map[string]int64, error)
 }
 
 // Tasks get application tasks
-// This function destroy now.
-func (s *SearchService) Tasks(appName, user string, page models.Page) (map[string]int64, error) {
+func (s *SearchService) Tasks(cluster, app string, page models.Page) (map[string]int64, error) {
 	bquery := elastic.NewBoolQuery().
 		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte(page.RangeFrom).Lte(page.RangeTo).Format("epoch_millis")).
-		Must(elastic.NewTermQuery("appid", appName))
+		Must(elastic.NewTermQuery("clusterid", cluster), elastic.NewTermQuery("appid", app))
 		// swan-case
 		// Must(elastic.NewTermQuery("app", appName))
 
@@ -105,7 +143,7 @@ func (s *SearchService) Tasks(appName, user string, page models.Page) (map[strin
 	tasks := make(map[string]int64)
 	result, err := s.ESClient.Search().
 		Index("dataman-*-"+utils.ParseDate(page.RangeFrom, page.RangeTo)).
-		Type("dataman-"+appName).
+		Type("dataman-"+app).
 		// swan-case
 		//Type("dataman-"+user+"-"+appName).
 		Query(bquery).
@@ -125,7 +163,7 @@ func (s *SearchService) Tasks(appName, user string, page models.Page) (map[strin
 	}
 
 	if err != nil {
-		log.Errorf("get app %s tasks error: %v", appName, err)
+		log.Errorf("get app %s tasks error: %v", app, err)
 		return tasks, err
 	}
 
