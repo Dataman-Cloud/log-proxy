@@ -50,7 +50,6 @@ func (db *datastore) GetAlertRuleByName(name, alert string) (models.Rule, error)
 }
 
 func (db *datastore) CreateAlertRule(rule *models.Rule) error {
-
 	var result models.Rule
 	notfound := db.Where("rules.name = ? AND rules.alert = ?", rule.Name, rule.Alert).
 		First(&result).

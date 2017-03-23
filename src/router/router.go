@@ -34,11 +34,11 @@ func Router(middlewares ...gin.HandlerFunc) *gin.Engine {
 		logv1.GET("/index", s.Index)
 		logv1.GET("/context", s.Context)
 
-		logv1.GET("/keyword", s.GetAlerts)
-		logv1.POST("/keyword", s.CreateAlert)
-		logv1.PUT("/keyword", s.UpdateAlert)
-		logv1.DELETE("/keyword/:id", s.DeleteAlert)
-		logv1.GET("/keyword/:id", s.GetAlert)
+		logv1.GET("/rules", s.GetLogAlertRules)
+		logv1.POST("/rules", s.CreateLogAlertRule)
+		logv1.PUT("/rules", s.UpdateLogAlertRule)
+		logv1.DELETE("/rules/:id", s.DeleteLogAlertRule)
+		logv1.GET("/rules/:id", s.GetLogAlertRule)
 
 	}
 
