@@ -19,10 +19,10 @@ Get the metrics list
 "http://127.0.0.1:5098/v1/monitor/query/metrics"
 ```
 
-#### Get the cluster list
+#### Get the clusters list
 
-```GET /v1/monitor/cluster```
-- path: /v1/monitor/cluster
+```GET /v1/monitor/clusters```
+- path: /v1/monitor/clusters
 - HTTP Method: GET
 - URL Params: Null
 - Query Params: Null
@@ -52,8 +52,8 @@ Get the metrics list
 
 #### Get the tasks list by app
 
-```GET /v1/monitor/clusters/:clusterid/apps/:appid/task```
-- path: /v1/monitor/cluster/:clusterid/apps/:appid/task
+```GET /v1/monitor/clusters/:clusterid/apps/:appid/tasks```
+- path: /v1/monitor/cluster/:clusterid/apps/:appid/tasks
 - HTTP Method: GET
 - URL Params:
   - clusterid:=<string>: vcluster ID

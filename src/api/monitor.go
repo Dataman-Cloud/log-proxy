@@ -120,6 +120,7 @@ func (m *Monitor) GetClusters(ctx *gin.Context) {
 	param := &models.QueryParameter{
 		Start: ctx.Query("start"),
 		End:   ctx.Query("end"),
+		Step:  ctx.Query("step"),
 	}
 
 	query := &service.Query{
@@ -143,6 +144,7 @@ func (m *Monitor) GetClusterApps(ctx *gin.Context) {
 	param := &models.QueryParameter{
 		Start:   ctx.Query("start"),
 		End:     ctx.Query("end"),
+		Step:    ctx.Query("step"),
 		Cluster: ctx.Param("clusterid"),
 	}
 
@@ -167,6 +169,7 @@ func (m *Monitor) GetAppsTasks(ctx *gin.Context) {
 	param := &models.QueryParameter{
 		Start:   ctx.Query("start"),
 		End:     ctx.Query("end"),
+		Step:    ctx.Query("step"),
 		Cluster: ctx.Param("clusterid"),
 		App:     ctx.Param("appid"),
 	}

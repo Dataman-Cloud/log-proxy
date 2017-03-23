@@ -683,7 +683,7 @@ func (query *Query) getQueryMetricExpr() string {
 }
 
 // QueryExpr return the result by calling function getExprResponse
-func (query *Query) QueryExpr() (map[string]interface{}, error) {
+func (query *Query) QueryExpr() (*models.QueryExprResult, error) {
 	start, end := timeRange(query.Start, query.End)
 	query.Start = start
 	query.End = end
@@ -692,12 +692,14 @@ func (query *Query) QueryExpr() (map[string]interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	var result map[string]interface{}
+
+	var result *models.QueryExprResult
 	err = json.Unmarshal(response, &result)
 	if err != nil {
 		err = fmt.Errorf("Failed to parse the response from %s", request)
 		return nil, err
 	}
+	result.Expr = query.Expr
 	return result, nil
 }
 
