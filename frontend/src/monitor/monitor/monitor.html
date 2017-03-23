@@ -1,31 +1,11 @@
 <div layout="column" class="layout-column">
+    <div ng-if="vm.expression" class="expr-search-panel" layout="row" layout-align="space-between center">
+        <h3 flex="none">表达式</h3>
+        <div flex="auto">{/vm.expression/}</div>
+    </div>
     <div class="chart-panel" flex="100">
-        <nvd3 ng-if="vm.query.metric === 'cpu'" options="vm.chartOptions.cpuOptions" data="vm.chartOptions.cpuData"
+        <nvd3 options="vm.chartOptions.options" data="vm.chartOptions.data"
               api="vm.api" layout-wrap
-              config="{deepWatchData: false, deepWatchOptions:false}"></nvd3>
-        <nvd3 ng-if="vm.query.metric === 'memory'" options="vm.chartOptions.memOptions" data="vm.chartOptions.memData"
-              api="vm.api" layout-wrap
-              config="{deepWatchData: false, deepWatchOptions:false}"></nvd3>
-        <nvd3 ng-if="vm.query.metric === 'memory_usage'" options="vm.chartOptions.memUsageOptions"
-              data="vm.chartOptions.memUsageData" api="vm.api" layout-wrap
-              config="{deepWatchData: false, deepWatchOptions:false}"></nvd3>
-        <nvd3 ng-if="vm.query.metric === 'memory_total'" options="vm.chartOptions.memTotalOptions"
-              data="vm.chartOptions.memTotalData" api="vm.api" layout-wrap
-              config="{deepWatchData: false, deepWatchOptions:false}"></nvd3>
-        <nvd3 ng-if="vm.query.metric === 'network_rx'" options="vm.chartOptions.networkRxOptions"
-              data="vm.chartOptions.networkRxData" api="vm.api" layout-wrap
-              config="{deepWatchData: false, deepWatchOptions:false}"></nvd3>
-        <nvd3 ng-if="vm.query.metric === 'network_tx'" options="vm.chartOptions.networkTxOptions"
-              data="vm.chartOptions.networkTxData" api="vm.api" layout-wrap
-              config="{deepWatchData: false, deepWatchOptions:false}"></nvd3>
-        <nvd3 ng-if="vm.query.metric === 'fs_read'" options="vm.chartOptions.fileSysReadOptions"
-              data="vm.chartOptions.fileSysReadData" api="vm.api" layout-wrap
-              config="{deepWatchData: false, deepWatchOptions:false}"></nvd3>
-        <nvd3 ng-if="vm.query.metric === 'fs_write'" options="vm.chartOptions.fileSysWriteOptions"
-              data="vm.chartOptions.fileSysWriteData" api="vm.api" layout-wrap
-              config="{deepWatchData: false, deepWatchOptions:false}"></nvd3>
-        <nvd3 ng-if="!vm.query.metric" options="vm.chartOptions.exprOptions"
-              data="vm.chartOptions.exprData" api="vm.api" layout-wrap
               config="{deepWatchData: false, deepWatchOptions:false}"></nvd3>
     </div>
 </div>

@@ -1,78 +1,6 @@
 <div class="log" layout="row" layout-align="space-between start">
     <div class="panel log-condition">
         <form layout="column" name="staticForm">
-            <md-tabs id="querymodelTabs" layout="column" md-dynamic-height md-border-bottom md-selected="vm.queryTabIndex">
-                <md-tab label="快捷查询">
-                    <md-content>
-                        <div flex class="form-item">
-                            <label class="requirement">集群</label>
-                            <input type="text" ng-maxlength="4096"  id="clusterName" name="cluster" placeholder="集群" ng-model="vm.form.cluster"
-                                   ng-required="!vm.queryTabIndex">
-
-                            <div layout="row" class="form-item">
-                                <p flex class="error-info help-info-bottom"
-                                   data-ng-show="staticForm.cluster.$error.maxlength && !staticForm.cluster.$pristine">集群名称最大长度为4096</p>
-                                <p flex class="error-info help-info-bottom"
-                                   data-ng-show="staticForm.cluster.$error.required && !staticForm.cluster.$pristine">集群名称不能为空</p>
-                            </div>
-                        </div>
-
-                        <div flex class="form-item">
-                            <label class="requirement">用户</label>
-                            <input type="text" ng-maxlength="4096"  id="userName" name="user" placeholder="用户" ng-model="vm.form.user"
-                                   ng-required="!vm.queryTabIndex">
-
-                            <div layout="row" class="form-item">
-                                <p flex class="error-info help-info-bottom"
-                                   data-ng-show="staticForm.user.$error.maxlength && !staticForm.user.$pristine">用户名称最大长度为4096</p>
-                                <p flex class="error-info help-info-bottom"
-                                   data-ng-show="staticForm.user.$error.required && !staticForm.user.$pristine">用户名称不能为空</p>
-                            </div>
-                        </div>
-
-                        <div flex class="form-item">
-                            <label class="requirement">应用</label>
-                            <input id="app" type="text" placeholder="应用" ng-model="vm.form.app" name="app"
-                                   ng-required="!vm.queryTabIndex">
-                            <p data-ng-show="staticForm.app.$error.required && !staticForm.app.$pristine">
-                                应用名称不能为空</p>
-                        </div>
-                        <div flex class="form-item">
-                            <label>实例</label>
-                            <input id="instance" name="task" type="text" placeholder="实例" ng-model="vm.form.task">
-                            <p data-ng-show="staticForm.task.$error.required && !staticForm.task.$pristine">
-                                实例名称不能为空</p>
-                        </div>
-                        <div flex class="form-item">
-                            <label class="requirement">监控指标</label>
-                            <md-select id="monitoringIndicators" placeholder="监控指标" ng-model="vm.form.metric"
-                                       aria-label="metric" ng-required="!vm.queryTabIndex">
-                                <md-option id="monitoringIndicators0"  value="cpu">cpu</md-option>
-                                <md-option id="monitoringIndicators1"  value="memory">memory</md-option>
-                                <md-option id="monitoringIndicators2"  value="memory_usage">memory_usage</md-option>
-                                <md-option id="monitoringIndicators3"  value="memory_total">memory_total</md-option>
-                                <md-option id="monitoringIndicators4"  value="network_rx">network_rx</md-option>
-                                <md-option id="monitoringIndicators5"  value="network_tx">network_tx</md-option>
-                                <md-option id="monitoringIndicators6"  value="fs_read">fs_read</md-option>
-                                <md-option id="monitoringIndicators7"  value="fs_write">fs_write</md-option>
-                            </md-select>
-                        </div>
-                    </md-content>
-                </md-tab>
-                <md-tab label="高级查询">
-                    <md-content>
-                        <div flex class="form-item">
-                            <label class="requirement">表达式</label>
-                            <textarea ng-model="vm.form.expr" id="expr" name="advance" rows="15"
-                                      ng-required="vm.queryTabIndex"></textarea>
-                            <p data-ng-show="staticForm.advance.$error.required && !staticForm.advance.$pristine">
-                                表达式不能为空</p>
-                        </div>
-                    </md-content>
-                </md-tab>
-            </md-tabs>
-
-
             <md-tabs id="timeTabs" layout="column" md-dynamic-height md-border-bottom md-selected="vm.selectedTabIndex">
                 <md-tab id="recentlyTab" label="最近">
                     <md-content>
@@ -92,12 +20,14 @@
                     <md-content>
                         <div flex class="form-item">
                             <div flex class="form-item">
-                                <input id="monitorStartTime" type="datetime-local" placeholder="开始时间" ng-model="vm.startTime"
+                                <input id="monitorStartTime" type="datetime-local" placeholder="开始时间"
+                                       ng-model="vm.startTime"
                                        ng-max="vm.endTime" name="startTime" ng-required="vm.selectedTabIndex">
                                 <p data-ng-show="staticForm.startTime.$error.max && !staticForm.startTime.$pristine">
                                     起始时间大于结束时间</p>
                                 <span ng-show="staticForm.startTime.$error.datetimelocal">请填写正确时间格式:年-月-日T时:分:秒</span>
-                                <input id="monitorEndTime" type="datetime-local" placeholder="结束时间" ng-model="vm.endTime"
+                                <input id="monitorEndTime" type="datetime-local" placeholder="结束时间"
+                                       ng-model="vm.endTime"
                                        ng-min="vm.startTime" name="endTime" ng-required="vm.selectedTabIndex">
                                 <p data-ng-show="staticForm.endTime.$error.min && !staticForm.endTime.$pristine">
                                     结束时间小于起始时间</p>
@@ -108,8 +38,81 @@
                 </md-tab>
             </md-tabs>
 
+            <md-tabs id="querymodelTabs" layout="column" md-dynamic-height md-border-bottom
+                     md-selected="vm.queryTabIndex">
+                <md-tab label="快捷查询">
+                    <md-content>
+                        <div flex class="form-item">
+                            <label class="requirement">集群</label>
+                            <md-select id="clusterName" name="cluster" placeholder="选择集群" ng-model="vm.form.cluster"
+                                       md-on-open="vm.loadClusters()"
+                                       ng-required="!vm.selectedTabIndex" ng-disabled="vm.checkTimeVali(vm.selectedTabIndex)">
+                                <md-option id="cluster{/$index/}" ng-value="cluster"
+                                           ng-repeat="cluster in vm.clusters track by $index">{/cluster/}
+                                </md-option>
+                            </md-select>
+
+                            <div layout="row" class="form-item">
+                                <p flex class="error-info help-info-bottom"
+                                   data-ng-show="staticForm.cluster.$error.required && !staticForm.cluster.$pristine">
+                                    集群不能为空</p>
+                            </div>
+                        </div>
+
+                        <div flex class="form-item">
+                            <label class="requirement">应用</label>
+
+                            <md-select id="appName" name="app" placeholder="选择应用" ng-model="vm.form.app" md-on-open="vm.loadApps()"
+                                       ng-required="!vm.queryTabIndex" ng-disabled="!vm.form.cluster">
+                                <md-option id="app{/$index/}" ng-value="app" ng-repeat="app in vm.apps track by $index">
+                                    {/app/}
+                                </md-option>
+                            </md-select>
+
+                            <p data-ng-show="staticForm.app.$error.required && !staticForm.app.$pristine">
+                                应用名称不能为空</p>
+                        </div>
+                        <div flex class="form-item">
+                            <label>实例</label>
+                            <md-select id="chooseInstance" name="task" placeholder="选择实例" ng-model="vm.form.task"
+                                       md-on-open="vm.loadTasks()"
+                                       ng-disabled="!vm.form.app || !vm.form.cluster">
+                                <md-option value="">无</md-option>
+                                <md-option id="task{/$index/}" ng-value="task" ng-repeat="task in vm.tasks track by $index">
+                                    {/task/}
+                                </md-option>
+                            </md-select>
+                            <p data-ng-show="staticForm.task.$error.required && !staticForm.task.$pristine">
+                                实例名称不能为空</p>
+                        </div>
+                        <div flex class="form-item">
+                            <label class="requirement">监控指标</label>
+                            <md-select id="monitoringIndicators" placeholder="监控指标" ng-model="vm.form.metric"
+                                       aria-label="metric" ng-required="!vm.queryTabIndex">metrics
+                                <md-option id="metric{/$index/}" ng-value="metric" ng-repeat="metric in vm.metrics track by $index">
+                                    {/metric/}
+                                </md-option>
+                            </md-select>
+                        </div>
+                    </md-content>
+                </md-tab>
+                <md-tab label="高级查询">
+                    <md-content>
+                        <div flex class="form-item">
+                            <label class="requirement">表达式</label>
+                            <textarea ng-model="vm.form.expr" id="expr" name="advance" rows="15"
+                                      ng-required="vm.queryTabIndex"></textarea>
+                            <p data-ng-show="staticForm.advance.$error.required && !staticForm.advance.$pristine">
+                                表达式不能为空</p>
+                        </div>
+                    </md-content>
+                </md-tab>
+            </md-tabs>
+
+
             <div flex class="form-item" layout="column">
-                <md-button id="monitorCheck" class="md-raised md-primary" ng-click="vm.search()" ng-disabled="staticForm.$invalid">查询
+                <md-button id="monitorCheck" class="md-raised md-primary" ng-click="vm.search()"
+                           ng-disabled="staticForm.$invalid">查询
                 </md-button>
             </div>
         </form>
