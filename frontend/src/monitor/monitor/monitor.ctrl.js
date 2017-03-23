@@ -6,9 +6,10 @@
     function MonitorCtrl($stateParams, monitorBackend, monitorSingleChart) {
         var self = this;
 
+        self.expression = '';
+
         self.query = {
             cluster: $stateParams.cluster,
-            user: $stateParams.user,
             metric: $stateParams.metric,
             app: $stateParams.app,
             task: $stateParams.task,
@@ -29,6 +30,7 @@
         function activate() {
             if (self.chartOptions) {
                 monitorBackend.monitor(self.query).get(function (data) {
+                    self.expression = data.data.expr
                     self.chartOptions.pushData(data.data, self.api);
                     setTimeout(function () {
                         self.chartOptions.flushCharts(self.api)

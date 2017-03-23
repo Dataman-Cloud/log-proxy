@@ -14,36 +14,36 @@
                 abstract: true
             })
 
-            //about dashboard
-            .state('home.dashboard', {
-                url: '/dashboard',
-                templateUrl: '/src/dashboard/dashboard.html',
-                controller: 'DashboardCtrl as vm'
-            })
-            .state('home.dashboardMonitor', {
-                url: '/dashboardMonitor/:cluster/:user',
-                templateUrl: '/src/dashboard/monitor/app/list.html',
-                controller: 'DashboardListAppCtrl as vm',
-                abstract: true,
-                resolve: {
-                    info: getInfo
-                }
-            })
-            .state('home.dashboardMonitor.detail', {
-                url: '/:app',
-                templateUrl: '/src/dashboard/monitor/app/detail.html',
-                controller: 'DashboardAppDetailCtrl as vm'
-            })
-            .state('home.dashboardInstanceMonitor', {
-                url: '/dashboardMonitor/:cluster/:user/:app/instances/:task',
-                templateUrl: '/src/dashboard/monitor/instance/detail.html',
-                controller: 'DashboardInstanceCtrl as vm'
-            })
-            //end dashboard
+            // //about dashboard
+            // .state('home.dashboard', {
+            //     url: '/dashboard',
+            //     templateUrl: '/src/dashboard/dashboard.html',
+            //     controller: 'DashboardCtrl as vm'
+            // })
+            // .state('home.dashboardMonitor', {
+            //     url: '/dashboardMonitor/:cluster/:user',
+            //     templateUrl: '/src/dashboard/monitor/app/list.html',
+            //     controller: 'DashboardListAppCtrl as vm',
+            //     abstract: true,
+            //     resolve: {
+            //         info: getInfo
+            //     }
+            // })
+            // .state('home.dashboardMonitor.detail', {
+            //     url: '/:app',
+            //     templateUrl: '/src/dashboard/monitor/app/detail.html',
+            //     controller: 'DashboardAppDetailCtrl as vm'
+            // })
+            // .state('home.dashboardInstanceMonitor', {
+            //     url: '/dashboardMonitor/:cluster/:user/:app/instances/:task',
+            //     templateUrl: '/src/dashboard/monitor/instance/detail.html',
+            //     controller: 'DashboardInstanceCtrl as vm'
+            // })
+            // //end dashboard
 
             //about monitor
             .state('home.monitor', {
-                url: '/monitor?cluster&user&metric&app&task&start&end&step&expr',
+                url: '/monitor?cluster&metric&app&task&start&end&step&expr',
                 templateUrl: '/src/monitor/monitorbase.html',
                 controller: 'MonitorBaseCtrl as vm'
             })
@@ -165,7 +165,7 @@
         //warning: otherwise(url) will be redirect loop on state with errored resolve
         $urlRouterProvider.otherwise(function ($injector) {
             var $state = $injector.get('$state');
-            $state.go('home.dashboard');
+            $state.go('home.monitor');
         });
         $interpolateProvider.startSymbol('{/');
         $interpolateProvider.endSymbol('/}');

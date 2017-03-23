@@ -456,3 +456,16 @@ textarea {
     padding-top: 40px;
     padding-bottom: 50px;
 }
+
+.expr-search-panel {
+    border: 1px solid #DDD;
+    background-color: #EEE;
+    padding: 6px 12px;
+    margin-bottom: 12px;
+    font-family: mono;
+    line-height: 1.2;
+    font-size: 12px;
+}
+.expr-search-panel h3 {
+    margin-right: 24px;
+}
