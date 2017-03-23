@@ -16,15 +16,6 @@ type Log struct {
 	TaskID    string
 }
 
-// Alert keyword filter struct
-type Alert struct {
-	ID         string `json:"id,omitempty"`
-	AppID      string `json:"app"`
-	Keyword    string `json:"keyword"`
-	Path       string `json:"path"`
-	CreateTime string `json:"createtime"`
-}
-
 type LogAlertRule struct {
 	ID        uint64    `json:"id" gorm:"NOT NULL; AUTO_INCREMENT"`
 	App       string    `json:"app"`
