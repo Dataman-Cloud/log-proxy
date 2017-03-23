@@ -362,6 +362,10 @@ textarea {
     padding-top: 12px;
 }
 
+.log-condition .form-item md-checkbox {
+    margin-bottom: 8px;
+}
+
 .log-result tbody .md-row td {
     border-bottom: 1px solid white;
 }

@@ -6,7 +6,6 @@
     function LogDetailCtrl(logBackend, $stateParams) {
         var tempLogQuery = {
             cluster: $stateParams.cluster || '',
-            user: $stateParams.user || '',
             from: $stateParams.from,
             to: $stateParams.to,
             app: $stateParams.app,
