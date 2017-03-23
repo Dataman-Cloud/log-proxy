@@ -9,7 +9,11 @@ import (
 	"github.com/Dataman-Cloud/log-proxy/src/config"
 	"github.com/Dataman-Cloud/log-proxy/src/models"
 	"github.com/Dataman-Cloud/log-proxy/src/service"
+	"github.com/Dataman-Cloud/log-proxy/src/store"
+	"github.com/Dataman-Cloud/log-proxy/src/store/datastore"
 	"github.com/Dataman-Cloud/log-proxy/src/utils"
+	"github.com/Dataman-Cloud/log-proxy/src/utils/database"
+	"github.com/Sirupsen/logrus"
 
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus"
@@ -47,6 +51,7 @@ const (
 
 // Search search client struct
 type Search struct {
+	Store         store.Store
 	Service       *service.SearchService
 	KeywordFilter map[string]*list.List
 	Counter       *prometheus.CounterVec
@@ -56,6 +61,7 @@ type Search struct {
 // GetSearch new search client
 func GetSearch() *Search {
 	s := &Search{
+		Store:         datastore.From(database.GetDB()),
 		Service:       service.NewEsService(strings.Split(config.GetConfig().EsURL, ",")),
 		KeywordFilter: make(map[string]*list.List),
 		Counter: prometheus.NewCounterVec(
@@ -73,12 +79,14 @@ func GetSearch() *Search {
 		registry = true
 	}
 
-	alerts, err := s.Service.GetAlerts(models.Page{
+	//TODO: rules count maybe greate than 10000
+	alerts, err := s.Store.GetLogAlertRules(models.Page{
 		PageFrom: 0,
-		PageSize: 1000,
+		PageSize: 10000,
 	})
 
 	if err != nil {
+		logrus.Errorf("init rules of log alert failed, error: %s", err.Error())
 		return s
 	}
 
@@ -87,11 +95,13 @@ func GetSearch() *Search {
 	if alerts == nil {
 		return s
 	}
-	for _, alert := range alerts["results"].([]models.Alert) {
-		if s.KeywordFilter[alert.AppID+alert.Path] == nil {
-			s.KeywordFilter[alert.AppID+alert.Path] = list.New()
+
+	for _, alertRule := range alerts["rules"].([]*models.LogAlertRule) {
+		ruleIndex := alertRule.App + alertRule.Source
+		if s.KeywordFilter[ruleIndex] == nil {
+			s.KeywordFilter[ruleIndex] = list.New()
 		}
-		s.KeywordFilter[alert.AppID+alert.Path].PushBack(alert.Keyword)
+		s.KeywordFilter[ruleIndex].PushBack(alertRule.Keyword)
 	}
 
 	return s
