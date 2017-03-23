@@ -21,8 +21,8 @@
                 <tr md-row ng-repeat="keyword in vm.keywords track by $index">
                     <td md-cell>{/keyword.app/}</td>
                     <td md-cell>{/keyword.keyword/}</td>
-                    <td md-cell>{/keyword.createtime | date:" yyyy-MM-dd HH:mm:ss"/}</td>
-                    <td md-cell>{/keyword.path/}</td>
+                    <td md-cell>{/keyword.createdAt | date:" yyyy-MM-dd HH:mm:ss"/}</td>
+                    <td md-cell>{/keyword.source/}</td>
                     <td md-cell>
                         <div class="action" layout="row">
                             <md-button aria-label="delete" class="md-raised" data-ng-click="vm.deleteKeyword(keyword.id)">
@@ -36,6 +36,15 @@
                 </tr>
                 </tbody>
             </table>
+            <md-table-pagination md-limit="vm.query.limit"
+                                 md-label="{page: '页:', rowsPerPage: '每页:', of: 'of'}"
+                                 md-limit-options="vm.limitOptions"
+                                 md-boundary-links="vm.limitOptions.boundaryLinks"
+                                 md-page="vm.query.page"
+                                 md-total="{/vm.count/}"
+                                 md-on-paginate="vm.onPaginate"
+                                 md-page-select="vm.options.pageSelect">
+            </md-table-pagination>
         </md-table-container>
     </div>
 </div>

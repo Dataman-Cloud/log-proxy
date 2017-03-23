@@ -15,16 +15,16 @@
             </div>
             <div flex class="form-item">
                 <label>来源</label>
-                <input id="source" type="text" ng-model="vm.form.path">
+                <input id="source" type="text" ng-model="vm.form.source" data-required="required">
             </div>
             <div class="form-buttons-footer" layout="column">
                 <md-button id="createW" class="md-raised md-primary" style="width: 100px;"
-                           ng-disabled="staticForm.$invalid" ng-show="vm.target === 'create'"
+                           ng-disabled="staticForm.$invalid" ng-if="vm.target === 'create'"
                            ng-click="vm.create()">
                     创建
                 </md-button>
                 <md-button id="upDateW" class="md-raised md-primary" style="width: 100px;"
-                           ng-disabled="staticForm.$invalid" ng-show="vm.target === 'update'"
+                           ng-disabled="staticForm.$invalid" ng-if="vm.target === 'update'"
                            ng-click="vm.update()">
                     更新
                 </md-button>

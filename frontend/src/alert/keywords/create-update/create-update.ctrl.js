@@ -12,7 +12,7 @@
         self.form = {
             app: alert.app,
             keyword: alert.keyword || '',
-            path: alert.path || ''
+            source: alert.source || ''
         };
 
         self.create = create;

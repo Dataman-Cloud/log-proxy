@@ -17,14 +17,18 @@
             silence: silence
         };
 
-        function alerts() {
-            return $resource(BACKEND_URL_BASE.defaultBase + '/v1/search/keyword', null, {
+        function alerts(data) {
+            var paramObj = data || {};
+            return $resource(BACKEND_URL_BASE.defaultBase + '/v1/log/rules', {
+                page: paramObj.page,
+                size: paramObj.size
+            }, {
                 'update': {method: 'PUT'}
             });
         }
 
         function alert(id) {
-            return $resource(BACKEND_URL_BASE.defaultBase + '/v1/search/keyword/:id', {id: id});
+            return $resource(BACKEND_URL_BASE.defaultBase + '/v1/log/rules/:id', {id: id});
         }
 
         function histories(data) {
