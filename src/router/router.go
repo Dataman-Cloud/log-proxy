@@ -54,9 +54,9 @@ func Router(middlewares ...gin.HandlerFunc) *gin.Engine {
 		// Query metric/expr
 		monitorv1.GET("/query", monitor.Query)
 		monitorv1.GET("/query/metrics", monitor.GetQueryItems)
-		monitorv1.GET("/cluster", monitor.GetClusters)
-		monitorv1.GET("/cluster/:clusterid/apps", monitor.GetClusterApps)
-		monitorv1.GET("/cluster/:clusterid/apps/:appid/tasks", monitor.GetAppsTasks)
+		monitorv1.GET("/clusters", monitor.GetClusters)
+		monitorv1.GET("/clusters/:clusterid/apps", monitor.GetClusterApps)
+		monitorv1.GET("/clusters/:clusterid/apps/:appid/tasks", monitor.GetAppsTasks)
 		// Query info
 		//monitorv1.GET("/info", monitor.QueryInfo)
 		//monitorv1.GET("/nodes", monitor.QueryNodes)

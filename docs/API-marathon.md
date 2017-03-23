@@ -31,24 +31,41 @@ For example:
 
 Get the metrics list
 ```
-"http://127.0.0.1:5098/v1/monitor/cluster/"
+"http://127.0.0.1:5098/v1/monitor/clusters"
 ```
 
 #### Get the app list by cluster
 
-```GET /v1/monitor/cluster/:clusterid/apps```
-- path: /v1/monitor/cluster/:clusterid/apps
+```GET /v1/monitor/clusters/:clusterid/apps```
+- path: /v1/monitor/clusters/:clusterid/apps
 - HTTP Method: GET
-- URL Params: Null
+- URL Params:
+  - clusterid:=<string>: vcluster ID
 - Query Params: Null
 
 For example:
 
 Get the metrics list
 ```
-"http://127.0.0.1:5098/v1/monitor/cluster/work/apps"
+"http://127.0.0.1:5098/v1/monitor/clusters/work/apps"
 ```
 
+#### Get the tasks list by app
+
+```GET /v1/monitor/clusters/:clusterid/apps/:appid/task```
+- path: /v1/monitor/cluster/:clusterid/apps/:appid/task
+- HTTP Method: GET
+- URL Params:
+  - clusterid:=<string>: vcluster ID
+  - appid:=<string>: app ID
+- Query Params: Null
+
+For example:
+
+Get the metrics list
+```
+"http://127.0.0.1:5098/v1/monitor/clusters/work/apps/work-web/tasks"
+```
 
 #### Get the metric values
 
