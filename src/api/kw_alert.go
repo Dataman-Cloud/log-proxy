@@ -13,7 +13,7 @@ import (
 )
 
 // CreateAlert create keyword filter
-func (s *Search) CreateAlert(ctx *gin.Context) {
+func (s *Search) CreateLogAlertRule(ctx *gin.Context) {
 	var alertRule models.LogAlertRule
 	if err := ctx.BindJSON(&alertRule); err != nil {
 		utils.ErrorResponse(ctx, utils.NewError(ParamError, errors.New("request body param error")))
@@ -51,7 +51,7 @@ func (s *Search) CreateAlert(ctx *gin.Context) {
 }
 
 // DeleteAlert delete keyword filter
-func (s *Search) DeleteAlert(ctx *gin.Context) {
+func (s *Search) DeleteLogAlertRule(ctx *gin.Context) {
 	ruleID := ctx.Param("id")
 	alertRule, err := s.Store.GetLogAlertRule(ruleID)
 	if err != nil {
@@ -85,7 +85,7 @@ func (s *Search) DeleteAlert(ctx *gin.Context) {
 }
 
 // GetAlerts get all keyword filter
-func (s *Search) GetAlerts(ctx *gin.Context) {
+func (s *Search) GetLogAlertRules(ctx *gin.Context) {
 	alertRules, err := s.Store.GetLogAlertRules(ctx.MustGet("page").(models.Page))
 	if err != nil {
 		utils.ErrorResponse(ctx, utils.NewError(GetAlertError, err))
@@ -96,7 +96,7 @@ func (s *Search) GetAlerts(ctx *gin.Context) {
 }
 
 // GetAlert get keyword filter by id
-func (s *Search) GetAlert(ctx *gin.Context) {
+func (s *Search) GetLogAlertRule(ctx *gin.Context) {
 	alertRule, err := s.Store.GetLogAlertRule(ctx.Param("id"))
 	if err != nil {
 		utils.ErrorResponse(ctx, utils.NewError(GetAlertError, err))
@@ -107,7 +107,7 @@ func (s *Search) GetAlert(ctx *gin.Context) {
 }
 
 // UpdateAlert update keyword filter
-func (s *Search) UpdateAlert(ctx *gin.Context) {
+func (s *Search) UpdateLogAlertRule(ctx *gin.Context) {
 	var alertRule models.LogAlertRule
 	if err := ctx.BindJSON(&alertRule); err != nil {
 		utils.ErrorResponse(ctx, utils.NewError(ParamError, errors.New("request body param error")))
