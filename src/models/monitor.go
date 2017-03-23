@@ -37,6 +37,15 @@ type Result struct {
 	Values [][]interface{} `json:"values"`
 }
 
+// QueryExpreResult define the JSON format
+type QueryExprResult struct {
+	Expr      string                 `json:"expr"`
+	Status    string                 `json:"status"`
+	Data      map[string]interface{} `json:"data"`
+	ErrorType string                 `json:"errorType"`
+	Error     string                 `json:"error"`
+}
+
 // Metric is the sub in Result
 type Metric struct {
 	ContainerLabelAppID    string `json:"container_label_APP_ID,omitempty"`
@@ -114,10 +123,4 @@ type InfoFilesystem struct {
 // NewInfoFilesystem init the nfoFilesystem
 func NewInfoFilesystem() *InfoFilesystem {
 	return &InfoFilesystem{}
-}
-
-// Task defines the JSON format of information in task(container)
-type Task struct {
-	ID     string `json:"id"`
-	Status string `json:"id"`
 }
