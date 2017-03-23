@@ -8,7 +8,6 @@
 
         self.contextQueryObj = {
             cluster: $stateParams.cluster || '',
-            user: $stateParams.user || '',
             app: $stateParams.app,
             task: $stateParams.task,
             path: $stateParams.path,

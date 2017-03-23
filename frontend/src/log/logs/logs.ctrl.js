@@ -6,7 +6,6 @@
     function LogsCtrl(logBackend, $stateParams) {
         var tempLogQuery = {
             cluster: $stateParams.cluster || '',
-            user: $stateParams.user || '',
             from: $stateParams.from,
             to: $stateParams.to,
             app: $stateParams.app,
@@ -50,7 +49,6 @@
             self.logDisplaySet = {};
             logBackend.searchLogs({
                 cluster: tempLogQuery.cluster || '',
-                user: tempLogQuery.user || '',
                 from: tempLogQuery.from,
                 to: tempLogQuery.to,
                 app: tempLogQuery.app,

@@ -1,70 +1,6 @@
 <div class="log" layout="row" layout-align="space-between start">
     <div class="panel log-condition">
         <form layout="column" name="staticForm">
-            <div flex class="form-item">
-                <label class="requirement">集群</label>
-                <input type="text" ng-maxlength="4096"  id="clusterName" name="cluster" placeholder="集群" ng-model="vm.form.cluster"
-                       data-required="required">
-
-                <div layout="row" class="form-item">
-                    <p flex class="error-info help-info-bottom"
-                       data-ng-show="staticForm.cluster.$error.maxlength && !staticForm.cluster.$pristine">集群名称最大长度为4096</p>
-                    <p flex class="error-info help-info-bottom"
-                       data-ng-show="staticForm.cluster.$error.required && !staticForm.cluster.$pristine">集群名称不能为空</p>
-                </div>
-            </div>
-
-            <div flex class="form-item">
-                <label class="requirement">用户</label>
-                <input type="text" ng-maxlength="4096"  id="userName" name="user" placeholder="用户" ng-model="vm.form.user"
-                       data-required="required">
-
-                <div layout="row" class="form-item">
-                    <p flex class="error-info help-info-bottom"
-                       data-ng-show="staticForm.user.$error.maxlength && !staticForm.user.$pristine">用户名称最大长度为4096</p>
-                    <p flex class="error-info help-info-bottom"
-                       data-ng-show="staticForm.user.$error.required && !staticForm.user.$pristine">用户名称不能为空</p>
-                </div>
-            </div>
-
-            <div flex class="form-item">
-                <label class="requirement">应用</label>
-                <input type="text" ng-maxlength="4096"  id="appName" name="app" placeholder="应用" ng-model="vm.form.app"
-                       data-required="required">
-
-                <div layout="row" class="form-item">
-                    <p flex class="error-info help-info-bottom"
-                       data-ng-show="staticForm.app.$error.maxlength && !staticForm.app.$pristine">应用名称最大长度为4096</p>
-                    <p flex class="error-info help-info-bottom"
-                       data-ng-show="staticForm.app.$error.required && !staticForm.app.$pristine">应用名称不能为空</p>
-                </div>
-            </div>
-            <div flex class="form-item">
-                <label>实例 ID</label>
-                <input type="text" ng-maxlength="4096"  id="chooseInstance" name="task" placeholder="实例" ng-model="vm.form.task">
-
-                <div layout="row" class="form-item">
-                    <p flex class="error-info help-info-bottom"
-                       data-ng-show="staticForm.task.$error.maxlength && !staticForm.task.$pristine">实例名称最大长度为4096</p>
-                    <p flex class="error-info help-info-bottom"
-                       data-ng-show="staticForm.task.$error.required && !staticForm.task.$pristine">实例名称不能为空</p>
-                </div>
-            </div>
-            <div flex class="form-item">
-                <label class="requirement">日志来源</label>
-                <md-select id="chooseSource" placeholder="选择来源" ng-model="vm.form.path" md-on-open="vm.loadPaths()"
-                           data-required="required" ng-disabled="!vm.form.app">
-                    <md-option id="chooseSource1" ng-value="key" ng-repeat="(key, value) in vm.paths">{/key/}</md-option>
-                </md-select>
-            </div>
-            <div flex class="form-item">
-                <label>关键字</label>
-                <input type="text" ng-maxlength="4096"  id="logKeyW" name="logKeyW" placeholder="关键字" ng-model="vm.form.keyword">
-                <div layout="row" class="form-item">
-                    <p flex class="error-info help-info-bottom"
-                       data-ng-show="staticForm.logKeyW.$error.maxlength && !staticForm.logKeyW.$pristine">关键字最大长度为4096！</p>
-                </div>
-            </div>
             <md-tabs id="logRecentlyTab" md-dynamic-height md-border-bottom md-selected="vm.selectedTabIndex">
                 <md-tab label="最近">
                     <md-content>
@@ -83,22 +19,106 @@
                 <md-tab label="起始">
                     <md-content>
                         <div flex class="form-item">
-                            <input id="logStartTime" type="datetime-local" placeholder="开始时间" ng-model="vm.startTime" ng-max="vm.endTime"
+                            <input id="logStartTime" type="datetime-local" placeholder="开始时间" ng-model="vm.startTime"
+                                   ng-max="vm.endTime"
                                    name="startTime" ng-required="vm.selectedTabIndex === 1">
                             <p data-ng-show="staticForm.startTime.$error.max && !staticForm.startTime.$pristine">
                                 起始时间大于结束时间
                             </p>
                             <span ng-show="staticForm.startTime.$error.datetimelocal">请填写正确时间格式</span>
-                            <input id="logEndTime" type="datetime-local" placeholder="结束时间" ng-model="vm.endTime" ng-min="vm.startTime"
+                            <input id="logEndTime" type="datetime-local" placeholder="结束时间" ng-model="vm.endTime"
+                                   ng-min="vm.startTime"
                                    name="endTime" ng-required="vm.selectedTabIndex === 1">
-                            <p data-ng-show="staticForm.endTime.$error.min && !staticForm.endTime.$pristine">结束时间小于起始时间</p>
+                            <p data-ng-show="staticForm.endTime.$error.min && !staticForm.endTime.$pristine">
+                                结束时间小于起始时间</p>
                             <span ng-show="staticForm.endTime.$error.datetimelocal">请填写正确时间格式</span>
                         </div>
                     </md-content>
                 </md-tab>
             </md-tabs>
+
+            <div flex class="form-item">
+                <label class="requirement">集群</label>
+                <md-select id="cluster" name="cluster" placeholder="选择集群" ng-model="vm.form.cluster"
+                           md-on-open="vm.loadClusters()"
+                           data-required="required" ng-disabled="vm.checkTimeVali(vm.selectedTabIndex)">
+                    <md-option id="cluster{/$index/}" ng-value="key"
+                               ng-repeat="(key, value) in vm.clusters track by $index">{/key/}
+                    </md-option>
+                </md-select>
+
+                <div layout="row" class="form-item">
+                    <p flex class="error-info help-info-bottom"
+                       data-ng-show="staticForm.cluster.$error.required && !staticForm.cluster.$pristine">集群不能为空</p>
+                </div>
+            </div>
+
+            <div flex class="form-item">
+                <label class="requirement">应用</label>
+                <md-select id="appName" name="app" placeholder="选择应用" ng-model="vm.form.app" md-on-open="vm.loadApps()"
+                           data-required="required" ng-disabled="!vm.form.cluster">
+                    <md-option id="app{/$index/}" ng-value="key" ng-repeat="(key, value) in vm.apps track by $index">
+                        {/key/}
+                    </md-option>
+                </md-select>
+
+                <div layout="row" class="form-item">
+                    <p flex class="error-info help-info-bottom"
+                       data-ng-show="staticForm.app.$error.required && !staticForm.app.$pristine">应用不能为空</p>
+                </div>
+            </div>
+            <div flex class="form-item">
+                <div layout="row" layout-align="space-between center">
+                    <label>实例 ID</label>
+                    <div>
+                        <md-checkbox ng-model="vm.isTaskRunning" aria-label="task_status">
+                            正常状态
+                        </md-checkbox>
+                    </div>
+                </div>
+                <md-select id="chooseInstance" name="task" placeholder="选择实例" ng-model="vm.form.task"
+                           md-on-open="vm.loadTasks()"
+                           ng-disabled="!vm.form.app || !vm.form.cluster">
+                    <md-option value="">无</md-option>
+                    <md-option id="task{/$index/}" ng-value="task.id" ng-repeat="task in vm.tasks track by $index">
+                        {/task.id/}
+                    </md-option>
+                </md-select>
+
+                <div layout="row" class="form-item">
+                    <p flex class="error-info help-info-bottom"
+                       data-ng-show="staticForm.task.$error.required && !staticForm.task.$pristine">实例名称不能为空</p>
+                </div>
+            </div>
+            <!--<div flex class="form-item">-->
+            <!--<label class="requirement">日志来源</label>-->
+            <!--<md-select id="chooseSource" placeholder="选择来源" ng-model="vm.form.path" md-on-open="vm.loadPaths()"-->
+            <!--data-required="required" ng-disabled="!vm.form.app">-->
+            <!--<md-option id="chooseSource1" ng-value="key" ng-repeat="(key, value) in vm.paths">{/key/}</md-option>-->
+            <!--</md-select>-->
+            <!--</div>-->
+            <div flex class="form-item">
+                <label class="requirement">日志来源</label>
+                <md-select id="chooseSource" placeholder="选择来源" ng-model="vm.form.path"
+                           data-required="required">
+                    <md-option value="stdout">stdout</md-option>
+                    <md-option value="stderr">stderr</md-option>
+                </md-select>
+            </div>
+            <div flex class="form-item">
+                <label>关键字</label>
+                <input type="text" ng-maxlength="4096" id="logKeyW" name="logKeyW" placeholder="关键字"
+                       ng-model="vm.form.keyword">
+                <div layout="row" class="form-item">
+                    <p flex class="error-info help-info-bottom"
+                       data-ng-show="staticForm.logKeyW.$error.maxlength && !staticForm.logKeyW.$pristine">
+                        关键字最大长度为4096！</p>
+                </div>
+            </div>
+
             <div class="form-buttons-footer" layout="column">
-                <md-button id="logQuery" class="md-raised md-primary" ng-click="vm.searchLog()" ng-disabled="staticForm.$invalid">查询
+                <md-button id="logQuery" class="md-raised md-primary" ng-click="vm.searchLog()"
+                           ng-disabled="staticForm.$invalid">查询
                 </md-button>
             </div>
         </form>
