@@ -218,7 +218,7 @@ curl -XGET http://192.168.59.3:5098/v1/log/clusters/yaoyun/apps/yaoyun-nginx/tas
 
 <span id="itm1">For example:</span>
 ```
-curl -XGET http://localhost:5098/v1/search/paths/appid
+curl -XGET http://localhost:5098/v1/log/paths/appid
 ```
 
 - URL Params: appid
@@ -245,7 +245,7 @@ curl -XGET http://localhost:5098/v1/search/paths/appid
 `GET /v1/search/index`
 
 ```
-http://192.168.1.46:5098/v1/search/index?appid=cluster1-maliao&from=now-7d&taskid=cluster1-maliao.e43f85e6-9f7f-11e6-8313-02421fb0085c,cluster1-maliao.e43f85e6-9f7f-11e6-8313-02421fb0085c&path=stdout,stderr&keyword=container
+http://192.168.1.46:5098/v1/log/index?appid=cluster1-maliao&from=now-7d&taskid=cluster1-maliao.e43f85e6-9f7f-11e6-8313-02421fb0085c,cluster1-maliao.e43f85e6-9f7f-11e6-8313-02421fb0085c&path=stdout,stderr&keyword=container
 ```
 
 - Query Params: appid,taskid,path,keyword,from,to
@@ -310,10 +310,90 @@ return
 }
 ```
 
+## 日志报警
 
-GET /v1/search/keyword
+### 创建一条报警规则
+
+```
+POST http://192.168.59.3:5098/v1/log/rules -d 
+'{
+	"app":"nginx",
+	"source":"stderr",
+	"keyword":"ABBBAcccd"
+}'
+```
+* 说明: app,source,keyword分别代表应用.日志来源(stdout,stderr,文件路径),关键字三个都是必填.
+
+### 更新一条告警规则
+```
+PUT http://192.168.59.3:5098/v1/log/rules -d
+'{
+{
+	"id":4,
+	"app":"nginx",
+	"source":"stderr",
+	"keyword":"ABBBAcccd"
+}
+}'
+```
+
+### 删除一条告警规则
+```
+DELETE http://192.168.59.3:5098/v1/log/rules/:id
+```
+
+### 获取指定的告警规则
+```
+GET http://192.168.59.3:5098/v1/log/rules/:id
+```
 
 return
+```
+{
+  "code": 0,
+  "data": {
+    "id": 1,
+    "app": "nginx",
+    "keyword": "ABBBA",
+    "source": "stderr",
+    "createdAt": "2017-03-23T14:54:57+08:00",
+    "updatedAt": "2017-03-23T15:46:45+08:00"
+  }
+}
+```
+
+### 获取告警规则列表
+```
+GET http://192.168.59.3:5098/v1/log/rules?page=1&size=50
+```
+
+return
+```
+{
+  "code": 0,
+  "data": {
+    "count": 2,
+    "rules": [
+      {
+        "id": 1,
+        "app": "nginx",
+        "keyword": "ABBBA",
+        "source": "stderr",
+        "createdAt": "2017-03-23T14:54:57+08:00",
+        "updatedAt": "2017-03-23T15:46:45+08:00"
+      },
+      {
+        "id": 5,
+        "app": "nginx",
+        "keyword": "ABBBAcccd",
+        "source": "stderr",
+        "createdAt": "2017-03-23T17:36:03+08:00",
+        "updatedAt": "2017-03-23T17:36:03+08:00"
+      }
+    ]
+  }
+}
+```
 
 ```
 {"code":0,"data":{"count":4,"results":[{"id":"AVkHBbEQIIGpJqE63UXA","appid":"dsgsdg","keyword":"gdsgsdg","path":"gsdsdgsd","createtime":"2016-12-16T17:45:30.639081077+08:00"},{"id":"AVkV4YfXIIGpJqE63U2b","appid":"6566y6","keyword":"y65y56","path":"y56y6","createtime":"2016-12-19T15:00:19.024077007+08:00"},{"id":"AVkHBV59IIGpJqE63UW_","appid":"sxacsacs111","keyword":"scsacsac","path":"csacasc","createtime":"2016-12-19T17:42:25.092717794+08:00"},{"id":"AVkAeS_LIIGpJqE63UH7","appid":"work-nginxefef","keyword":"GET11","path":"stdout","createtime":"2016-12-19T17:43:11.950277076+08:00"}]}}
@@ -322,41 +402,9 @@ return
 
 POST /v1/search/keyword -d '{"period":1,"appid":"test","keyword":"keyword","condition":1,"enable":true}'
 
-return
-
-```
-{"code":0,"data":"create success"}
-```
 
 
-PUT /v1/search/keyword -d '{"id":"x","period":1,"appid":"test","keyword":"keyword","condition":1,"enable":true}'
-
-return
-
-```
-{"code":0,"data":"update success"}
-```
-
-
-DELETE /v1/search/keyword/:id
-
-return
-
-```
-{"code":0,"data":"delete success"}
-```
-
-GET /v1/search/keyword/:id
-
-return
-
-```
-{"code":0,"data":{"id":"AVkAeS_LIIGpJqE63UH7","appid":"work-nginxefef","keyword":"GET11","path":"stdout","createtime":"2016-12-19T17:43:11.950277076+08:00"}}
-
-```
-
-
-GET /v1/search/prometheus
+GET /v1/log/prometheus
 
 return
 
@@ -365,7 +413,7 @@ return
 
 ```
 
-GET /v1/search/prometheus/:id
+GET /v1/log/prometheus/:id
 
 return
 
@@ -374,7 +422,7 @@ return
 
 ```
 
-GET /v1/search/mointor
+GET /v1/log/mointor
 
 GET /v1/monitor/alerts/groups
 
