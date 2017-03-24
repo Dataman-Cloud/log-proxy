@@ -46,7 +46,7 @@
                             <label class="requirement">集群</label>
                             <md-select id="clusterName" name="cluster" placeholder="选择集群" ng-model="vm.form.cluster"
                                        md-on-open="vm.loadClusters()"
-                                       ng-required="!vm.selectedTabIndex" ng-disabled="vm.checkTimeVali(vm.selectedTabIndex)">
+                                       ng-required="!vm.queryTabIndex" ng-disabled="vm.checkTimeVali(vm.selectedTabIndex)">
                                 <md-option id="cluster{/$index/}" ng-value="cluster"
                                            ng-repeat="cluster in vm.clusters track by $index">{/cluster/}
                                 </md-option>
@@ -72,10 +72,11 @@
                             <p data-ng-show="staticForm.app.$error.required && !staticForm.app.$pristine">
                                 应用名称不能为空</p>
                         </div>
+
                         <div flex class="form-item">
-                            <label>实例</label>
+                            <label class="requirement">实例</label>
                             <md-select id="chooseInstance" name="task" placeholder="选择实例" ng-model="vm.form.task"
-                                       md-on-open="vm.loadTasks()"
+                                       md-on-open="vm.loadTasks()" ng-required="!vm.queryTabIndex"
                                        ng-disabled="!vm.form.app || !vm.form.cluster">
                                 <md-option value="">无</md-option>
                                 <md-option id="task{/$index/}" ng-value="task" ng-repeat="task in vm.tasks track by $index">
@@ -85,6 +86,7 @@
                             <p data-ng-show="staticForm.task.$error.required && !staticForm.task.$pristine">
                                 实例名称不能为空</p>
                         </div>
+
                         <div flex class="form-item">
                             <label class="requirement">监控指标</label>
                             <md-select id="monitoringIndicators" placeholder="监控指标" ng-model="vm.form.metric"
