@@ -88,7 +88,7 @@
                         <div flex class="form-item">
                             <label class="requirement">监控指标</label>
                             <md-select id="monitoringIndicators" placeholder="监控指标" ng-model="vm.form.metric"
-                                       aria-label="metric" ng-required="!vm.queryTabIndex">metrics
+                                       aria-label="metric" ng-required="!vm.queryTabIndex">
                                 <md-option id="metric{/$index/}" ng-value="metric" ng-repeat="metric in vm.metrics track by $index">
                                     {/metric/}
                                 </md-option>
