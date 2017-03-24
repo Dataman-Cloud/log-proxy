@@ -213,100 +213,139 @@ curl -XGET http://192.168.59.3:5098/v1/log/clusters/yaoyun/apps/yaoyun-nginx/tas
 * 说明: status 标记日志产生的实例是否正在运行
 
 
-### 根据应用实例获取所有日志来源
-`GET /v1/search/paths/:appid
+### 查询指定集群和应用在指定时间段内有日志的来源
+```/clusters/:cluster/apps/:app/sources```
 
-<span id="itm1">For example:</span>
+- URL Params: cluster,app
+ - cluster: 集群ID
+ - app: appid
+- Query Params:task, from, to
+ -task: taskid
+ - 起始时间: from=1478769333000
+ - 结束时间: to=1478769333000
+
+for example
 ```
-curl -XGET http://localhost:5098/v1/log/paths/appid
+curl -XGET http://192.168.59.3:5098/v1/log/clusters/yaoyun/apps/yaoyun-nginx/source?task=yaoyun-nginx.26f179b7-0a8f-11e7-a287-02427ffc9690
 ```
 
-- URL Params: appid
- - appid=test
- - taskid=taskid
-- Query Params:from, to
- - from=1478769333000
- - to=1478769333000
-
- return
+return
 
 ```
 {
-    "code": 0,
-    "data": {
-        "stderr": 5,
-        "stdout": 79268
-    }
+  "code": 0,
+  "data": {
+    "stdout": 21
+  }
 }
 ```
 
 ### 日志搜索
 
-`GET /v1/search/index`
+`GET /v1/log/clusters/:cluster/apps/:app/index`
 
-```
-http://192.168.1.46:5098/v1/log/index?appid=cluster1-maliao&from=now-7d&taskid=cluster1-maliao.e43f85e6-9f7f-11e6-8313-02421fb0085c,cluster1-maliao.e43f85e6-9f7f-11e6-8313-02421fb0085c&path=stdout,stderr&keyword=container
-```
-
-- Query Params: appid,taskid,path,keyword,from,to
- - appid=test
- - taskid=tasktest
- - path=stdout
+- URL Params: cluster,app
+ - cluster: 集群ID
+ - app: appid
+- Query Params: task,source,keyword,from,to
+ - task=tasktest
+ - source=stdout
  - keyword=test
  - from=now-7d
  - to=now
 
-return
-
 ```
-{
-"code": 0,
-"data": [
-{
-"@timestamp": "2016-11-08T10:27:56.759Z",
-"@version": "1",
-"appid": "cluster1-maliao",
-"clusterid": "cluster1",
-"groupid": "9",
-"host": "192.168.1.71",
-"id": "75145e5517b7f2038e39012bc471db59bd8c7dab1b5779075603fdb452fbac27",
-"message": "--container=\"mesos-c62c27ef-c144-4a38-b9fb-684794919bc7-S5.6b08bb27-409c-49fa-9606-7ed56e9d8366\" --docker=\"docker\" --docker_socket=\"/var/run/docker.sock\" --help=\"false\" --initialize_driver_logging=\"true\" --launcher_dir=\"/usr/libexec/mesos\" --logbufsecs=\"0\" --logging_level=\"INFO\" --mapped_directory=\"/mnt/mesos/sandbox\" --quiet=\"false\" --sandbox_directory=\"/data/mesos/slaves/c62c27ef-c144-4a38-b9fb-684794919bc7-S5/frameworks/c62c27ef-c144-4a38-b9fb-684794919bc7-0000/executors/cluster1-maliao.e43f85e6-9f7f-11e6-8313-02421fb0085c/runs/6b08bb27-409c-49fa-9606-7ed56e9d8366\" --stop_timeout=\"0ns\"\n",
-"offset": 1,
-"path": "stdout",
-"port": 39426,
-"taskid": "cluster1-maliao.e43f85e6-9f7f-11e6-8313-02421fb0085c",
-"time": "2016-11-09T02:16:09.405026732+08:00",
-"userid": "23"
-}
-]
-}
+curl -XGET http://192.168.59.3:5098/v1/log/clusters/yaoyun/apps/yaoyun-nginx/index?task=yaoyun-nginx.67202d60-1041-11e7-aea5-024292f41627&keyword=Starting
 ```
-
-`GET /v1/search/context?appid=x&taskid=x&path=x&offset=x`
 
 return
 
 ```
 {
-"code": 0,
-"data": [
-{
-"@timestamp": "2016-11-08T10:27:56.759Z",
-"@version": "1",
-"appid": "cluster1-maliao",
-"clusterid": "cluster1",
-"groupid": "9",
-"host": "192.168.1.71",
-"id": "75145e5517b7f2038e39012bc471db59bd8c7dab1b5779075603fdb452fbac27",
-"message": "--container=\"mesos-c62c27ef-c144-4a38-b9fb-684794919bc7-S5.6b08bb27-409c-49fa-9606-7ed56e9d8366\" --docker=\"docker\" --docker_socket=\"/var/run/docker.sock\" --help=\"false\" --initialize_driver_logging=\"true\" --launcher_dir=\"/usr/libexec/mesos\" --logbufsecs=\"0\" --logging_level=\"INFO\" --mapped_directory=\"/mnt/mesos/sandbox\" --quiet=\"false\" --sandbox_directory=\"/data/mesos/slaves/c62c27ef-c144-4a38-b9fb-684794919bc7-S5/frameworks/c62c27ef-c144-4a38-b9fb-684794919bc7-0000/executors/cluster1-maliao.e43f85e6-9f7f-11e6-8313-02421fb0085c/runs/6b08bb27-409c-49fa-9606-7ed56e9d8366\" --stop_timeout=\"0ns\"\n",
-"offset": 1,
-"path": "stdout",
-"port": 39426,
-"taskid": "cluster1-maliao.e43f85e6-9f7f-11e6-8313-02421fb0085c",
-"time": "2016-11-09T02:16:09.405026732+08:00",
-"userid": "23"
+  "code": 0,
+  "data": {
+    "count": 1,
+    "results": [
+      {
+        "@timestamp": "2017-03-24T03:24:40.077Z",
+        "@version": "1",
+        "appid": "yaoyun-nginx",
+        "clusterid": "yaoyun",
+        "containerid": "3978677ccad9c22b2d7140a46abb81522cd15272f890d01d387e519e9bdaf573",
+        "groupid": "1",
+        "host": "192.168.59.104",
+        "logtime": "2017-03-24T11:24:40.021974705+08:00",
+        "message": "<mark>Starting</mark> task yaoyun-nginx.67202d60-1041-11e7-aea5-024292f41627\n",
+        "offset": 1490325880021974800,
+        "path": "stdout",
+        "port": 48398,
+        "taskid": "yaoyun-nginx.67202d60-1041-11e7-aea5-024292f41627",
+        "userid": "1"
+      }
+    ]
+  }
 }
-]
+```
+
+### 查询指定日志上下文
+
+`GET /v1/log/clusters/:cluster/apps/:app/context`
+
+- URL Params: cluster,app
+ - cluster: 集群ID
+ - app: appid
+- Query Params: task,source, offset,from,to
+ - task=tasktest
+ - source=stdout
+ - offset=1489720851875141600(从index返回的接口中取)
+ - from=now-7d
+ - to=now
+
+
+for example
+```
+curl -XGET http://192.168.59.3:5098/v1/log/clusters/yaoyun/apps/yaoyun-nginx2/context?offset=1489720851875141600&page=1&source=stdout&size=100&task=yaoyun-nginx2.719226da-0a34-11e7-b151-0242933964c8
+```
+
+return
+
+```
+{
+  "code": 0,
+  "data": [
+    {
+      "@timestamp": "2017-03-17T15:52:59.657Z",
+      "@version": "1",
+      "appid": "yaoyun-nginx2",
+      "clusterid": "yaoyun",
+      "containerid": "461d7a408b55b97aa401ff22f24a3365422928840069f345c7b57d3ef2cf895e",
+      "groupid": "1",
+      "host": "192.168.59.104",
+      "logtime": "2017-03-17T23:52:59.609401568+08:00",
+      "message": "192.168.59.3 - - [17/Mar/2017:15:52:55 +0000] \"GET / HTTP/1.1\" 200 612 \"http://192.168.59.103:5013/ui/app/yaoyun-nginx2/instance?from=my\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36\" \"-\"\n",
+      "offset": 1489765979609401600,
+      "path": "stdout",
+      "port": 51698,
+      "taskid": "yaoyun-nginx2.719226da-0a34-11e7-b151-0242933964c8",
+      "userid": "1"
+    },
+    {
+      "@timestamp": "2017-03-17T15:52:59.664Z",
+      "@version": "1",
+      "appid": "yaoyun-nginx2",
+      "clusterid": "yaoyun",
+      "containerid": "461d7a408b55b97aa401ff22f24a3365422928840069f345c7b57d3ef2cf895e",
+      "groupid": "1",
+      "host": "192.168.59.104",
+      "logtime": "2017-03-17T23:52:59.609529309+08:00",
+      "message": "192.168.59.3 - - [17/Mar/2017:15:52:56 +0000] \"GET / HTTP/1.1\" 304 0 \"http://192.168.59.103:5013/ui/app/yaoyun-nginx2/instance?from=my\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36\" \"-\"\n",
+      "offset": 1489765979609529300,
+      "path": "stdout",
+      "port": 51698,
+      "taskid": "yaoyun-nginx2.719226da-0a34-11e7-b151-0242933964c8",
+      "userid": "1"
+    }
+ ]
 }
 ```
 
