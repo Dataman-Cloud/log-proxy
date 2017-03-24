@@ -13,14 +13,14 @@
             cluster: $stateParams.cluster || '',
             app: $stateParams.app || '',
             task: $stateParams.task || '',
-            path: $stateParams.path || '',
+            source: $stateParams.source || '',
             keyword: $stateParams.keyword || ''
         };
 
         self.clusters = {};
         self.apps = {};
         self.tasks = [];
-        self.paths = [];
+        self.sources = {};
 
         self.startTime = new Date(parseInt($stateParams.from));
         self.endTime = new Date(parseInt($stateParams.to));
@@ -28,7 +28,7 @@
         self.loadClusters = loadClusters;
         self.loadApps = loadApps;
         self.loadTasks = loadTasks;
-        self.loadPaths = loadPaths;
+        self.loadSources = loadSources;
         self.checkTimeVali = checkTimeVali;
 
         self.searchLog = searchLog;
@@ -39,7 +39,7 @@
             loadClusters();
             loadApps();
             loadTasks();
-            // loadPaths();
+            loadSources();
         }
 
         function loadClusters() {
@@ -81,16 +81,16 @@
             }
         }
 
-        function loadPaths() {
+        function loadSources() {
             if (self.form.app && self.form.cluster) {
-                logBackend.paths({
+                logBackend.sources({
                     cluster: self.form.cluster,
                     app: self.form.app,
                     task: self.form.task,
                     from: self.selectedTabIndex ? self.startTime.getTime() : self.form.from,
                     to: self.selectedTabIndex ? self.endTime.getTime() : self.form.to
                 }).get(function (data) {
-                    self.paths = data.data;
+                    self.sources = data.data;
                 })
             }
         }

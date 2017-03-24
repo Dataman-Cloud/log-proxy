@@ -10,16 +10,16 @@
             clusters: clusters,
             apps: apps,
             tasks: tasks,
-            paths: paths
+            sources: sources
         };
 
         function searchLogs(data) {
             var paramObj = data || {};
-            return $resource(BACKEND_URL_BASE.defaultBase + '/v1/log/index', {
+            return $resource(BACKEND_URL_BASE.defaultBase + '/v1/log/clusters/:cluster/apps/:app/index', {
                 cluster: paramObj.cluster,
                 app: paramObj.app,
                 task: paramObj.task,
-                path: paramObj.path,
+                source: paramObj.source,
                 keyword: paramObj.keyword,
                 from: paramObj.from,
                 to: paramObj.to,
@@ -30,11 +30,11 @@
 
         function logContext(data) {
             var paramObj = data || {};
-            return $resource(BACKEND_URL_BASE.defaultBase + '/v1/log/context', {
+            return $resource(BACKEND_URL_BASE.defaultBase + '/v1/log/clusters/:cluster/apps/:app/context', {
                 cluster: paramObj.cluster,
                 app: paramObj.app,
                 task: paramObj.task,
-                path: paramObj.path,
+                source: paramObj.source,
                 offset: paramObj.offset,
                 page: paramObj.page,
                 size: paramObj.size
@@ -68,9 +68,9 @@
             });
         }
 
-        function paths(data) {
+        function sources(data) {
             var paramObj = data || {};
-            return $resource(BACKEND_URL_BASE.defaultBase + '/v1/log/paths/:app', {
+            return $resource(BACKEND_URL_BASE.defaultBase + '/v1/log/clusters/:cluster/apps/:app/sources', {
                 cluster: paramObj.cluster,
                 app: paramObj.app,
                 task: paramObj.task,

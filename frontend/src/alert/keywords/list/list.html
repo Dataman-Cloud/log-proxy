@@ -12,8 +12,8 @@
                 <tr md-row>
                     <th md-column style="width: 200px;">应用</th>
                     <th md-column>关键字</th>
-                    <th md-column style="width: 150px;">创建时间</th>
                     <th md-column>来源</th>
+                    <th md-column>创建时间</th>
                     <th md-column style="width: 100px;">操作</th>
                 </tr>
                 </thead>
@@ -21,8 +21,8 @@
                 <tr md-row ng-repeat="keyword in vm.keywords track by $index">
                     <td md-cell>{/keyword.app/}</td>
                     <td md-cell>{/keyword.keyword/}</td>
-                    <td md-cell>{/keyword.createdAt | date:" yyyy-MM-dd HH:mm:ss"/}</td>
                     <td md-cell>{/keyword.source/}</td>
+                    <td md-cell>{/keyword.createdAt | date:" yyyy-MM-dd HH:mm:ss"/}</td>
                     <td md-cell>
                         <div class="action" layout="row">
                             <md-button aria-label="delete" class="md-raised" data-ng-click="vm.deleteKeyword(keyword.id)">

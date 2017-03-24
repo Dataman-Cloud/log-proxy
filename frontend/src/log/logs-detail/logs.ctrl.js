@@ -10,7 +10,7 @@
             to: $stateParams.to,
             app: $stateParams.app,
             task: $stateParams.task,
-            path: $stateParams.path,
+            source: $stateParams.source,
             page: 1,
             size: 50
         };

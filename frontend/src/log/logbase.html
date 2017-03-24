@@ -90,19 +90,12 @@
                        data-ng-show="staticForm.task.$error.required && !staticForm.task.$pristine">实例名称不能为空</p>
                 </div>
             </div>
-            <!--<div flex class="form-item">-->
-            <!--<label class="requirement">日志来源</label>-->
-            <!--<md-select id="chooseSource" placeholder="选择来源" ng-model="vm.form.path" md-on-open="vm.loadPaths()"-->
-            <!--data-required="required" ng-disabled="!vm.form.app">-->
-            <!--<md-option id="chooseSource1" ng-value="key" ng-repeat="(key, value) in vm.paths">{/key/}</md-option>-->
-            <!--</md-select>-->
-            <!--</div>-->
             <div flex class="form-item">
                 <label class="requirement">日志来源</label>
-                <md-select id="chooseSource" placeholder="选择来源" ng-model="vm.form.path"
-                           data-required="required">
-                    <md-option value="stdout">stdout</md-option>
-                    <md-option value="stderr">stderr</md-option>
+                <md-select id="chooseSource" placeholder="选择来源" ng-model="vm.form.source" md-on-open="vm.loadSources()"
+                           data-required="required" ng-disabled="!vm.form.app">
+                    <md-option id="chooseSource1" ng-value="key" ng-repeat="(key, value) in vm.sources">{/key/}
+                    </md-option>
                 </md-select>
             </div>
             <div flex class="form-item">
