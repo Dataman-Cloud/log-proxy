@@ -10,7 +10,7 @@
             cluster: $stateParams.cluster || '',
             app: $stateParams.app,
             task: $stateParams.task,
-            path: $stateParams.path,
+            source: $stateParams.source,
             offset: parseInt($stateParams.offset),
             page: 1,
             size: 100

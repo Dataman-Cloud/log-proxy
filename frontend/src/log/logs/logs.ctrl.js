@@ -10,7 +10,7 @@
             to: $stateParams.to,
             app: $stateParams.app,
             task: $stateParams.task,
-            path: $stateParams.path,
+            source: $stateParams.source,
             keyword: $stateParams.keyword,
             page: 1,
             size: 50
@@ -53,7 +53,7 @@
                 to: tempLogQuery.to,
                 app: tempLogQuery.app,
                 task: tempLogQuery.task,
-                path: tempLogQuery.path,
+                source: tempLogQuery.source,
                 keyword: tempLogQuery.keyword,
                 page: page,
                 size: limit

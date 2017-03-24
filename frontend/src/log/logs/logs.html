@@ -2,7 +2,7 @@
     <p ng-show="$stateParams.cluster">集群: <em>{/$stateParams.cluster/}</em></p>
     <p ng-show="$stateParams.app">应用: <em>{/$stateParams.app/}</em></p>
     <p ng-show="$stateParams.task">实例: <em>{/$stateParams.task/}</em></p>
-    <p ng-show="$stateParams.path">来源: <em>{/$stateParams.path/}</em></p>
+    <p ng-show="$stateParams.source">来源: <em>{/$stateParams.source/}</em></p>
     <p ng-show="$stateParams.keyword">关键词: <em>{/$stateParams.keyword/}</em></p>
     <p ng-show="$stateParams.from">起始时间: <em>{/$stateParams.from | date: 'yyyy-MM-dd HH:mm'/}</em></p>
     <p ng-show="$stateParams.to">结束时间: <em>{/$stateParams.to | date: 'yyyy-MM-dd HH:mm'/}</em></p>
@@ -20,9 +20,9 @@
         <thead md-head>
         <tr md-row>
             <th md-column style="width: 60px;"></th>
+            <th md-column style="width: 160px;">实例</th>
             <th md-column style="width: 160px;">时间</th>
             <th md-column>信息</th>
-            <th md-column style="width: 60px;">实例</th>
             <th md-column style="width: 100px;">上下文</th>
         </tr>
         </thead>
@@ -36,16 +36,16 @@
                 </a>
             </td>
             <td md-cell>
+                <p>{/log.taskid/}</p>
+            </td>
+            <td md-cell>
                 {/log.logtime | date: 'yyyy-MM-dd HH:mm:ss'/}
             </td>
             <td md-cell>
                 <div ng-bind-html="log.message"></div>
             </td>
             <td md-cell>
-              <p>{/log.task/}</p>
-            </td>
-            <td md-cell>
-              <a id="logContext{/$index/}" ui-sref="home.logbase.logcontext({app: log.app, task: log.task, path: log.path, offset: log.offset})">>>></a>
+              <a id="logContext{/$index/}" ui-sref="home.logbase.logcontext({app: log.appid, task: log.taskid, source: log.path, offset: log.offset})">>>></a>
             </td>
         </tr>
         <tr ng-repeat-end ng-hide="!vm.logDisplaySet[$index]">
