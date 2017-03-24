@@ -293,7 +293,11 @@ func (alert *Alert) ReloadPrometheusConf() error {
 	}
 	u.Path = strings.TrimRight(u.Path, "/") + PromtheusReloadPath
 	resp, err := alert.HTTPClient.Post(u.String(), "application/json", nil)
-	if err != nil || resp.StatusCode != 200 {
+	if err != nil {
+		err = fmt.Errorf("request to reload prometheus error: %v", err)
+		return err
+	}
+	if resp.StatusCode != 200 {
 		err = fmt.Errorf("Failed to reload the configuration file of prometheus %s, return %d", u.String(), resp.StatusCode)
 		return err
 	}
