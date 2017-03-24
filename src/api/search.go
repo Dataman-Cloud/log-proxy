@@ -174,10 +174,9 @@ func (s *Search) Tasks(ctx *gin.Context) {
 }
 
 // Paths search applications paths
-func (s *Search) Paths(ctx *gin.Context) {
-	paths, err := s.Service.Paths(
-		ctx.Query("cluster"),
-		ctx.Query("user"),
+func (s *Search) Source(ctx *gin.Context) {
+	paths, err := s.Service.Source(
+		ctx.Param("cluster"),
 		ctx.Param("app"),
 		ctx.Query("task"),
 		ctx.MustGet("page").(models.Page),
@@ -191,15 +190,14 @@ func (s *Search) Paths(ctx *gin.Context) {
 
 // Index search log by condition
 func (s *Search) Index(ctx *gin.Context) {
-	if ctx.Query("app") == "" {
+	if ctx.Param("app") == "" {
 		utils.ErrorResponse(ctx, utils.NewError(ParamError, errors.New("app can't be empty")))
 		return
 	}
 
 	results, err := s.Service.Search(
-		ctx.Query("cluster"),
-		ctx.Query("user"),
-		ctx.Query("app"),
+		ctx.Param("cluster"),
+		ctx.Param("app"),
 		ctx.Query("task"),
 		ctx.Query("path"),
 		ctx.Query("keyword"),
@@ -214,7 +212,7 @@ func (s *Search) Index(ctx *gin.Context) {
 
 // Context search log context
 func (s *Search) Context(ctx *gin.Context) {
-	if ctx.Query("app") == "" {
+	if ctx.Param("app") == "" {
 		utils.ErrorResponse(ctx, utils.NewError(ParamError, errors.New("app can't be empty")))
 		return
 	}
@@ -224,8 +222,8 @@ func (s *Search) Context(ctx *gin.Context) {
 		return
 	}
 
-	if ctx.Query("path") == "" {
-		utils.ErrorResponse(ctx, utils.NewError(ParamError, errors.New("path can't be empty")))
+	if ctx.Query("source") == "" {
+		utils.ErrorResponse(ctx, utils.NewError(ParamError, errors.New("source can't be empty")))
 		return
 	}
 
@@ -235,11 +233,10 @@ func (s *Search) Context(ctx *gin.Context) {
 	}
 
 	results, err := s.Service.Context(
-		ctx.Query("cluster"),
-		ctx.Query("user"),
-		ctx.Query("app"),
+		ctx.Param("cluster"),
+		ctx.Param("app"),
 		ctx.Query("task"),
-		ctx.Query("path"),
+		ctx.Query("source"),
 		ctx.Query("offset"),
 		ctx.MustGet("page").(models.Page))
 	if err != nil {
