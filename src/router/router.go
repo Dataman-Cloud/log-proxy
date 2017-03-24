@@ -24,15 +24,22 @@ func Router(middlewares ...gin.HandlerFunc) *gin.Engine {
 	r.Use(middlewares...)
 
 	s := api.GetSearch()
+
+	// for consul health check remove it after offline pkg update
+	pingv1 := r.Group("/v1/search")
+	{
+		pingv1.GET("/ping", s.Ping)
+	}
+
 	logv1 := r.Group("/v1/log")
 	{
 		logv1.GET("/ping", s.Ping)
 		logv1.GET("/clusters", s.Clusters)
 		logv1.GET("/clusters/:cluster/apps", s.Applications)
 		logv1.GET("/clusters/:cluster/apps/:app/tasks", s.Tasks)
-		logv1.GET("/paths/:app", s.Paths)
-		logv1.GET("/index", s.Index)
-		logv1.GET("/context", s.Context)
+		logv1.GET("/clusters/:cluster/apps/:app/sources", s.Source)
+		logv1.GET("/clusters/:cluster/apps/:app/index", s.Index)
+		logv1.GET("/clusters/:cluster/apps/:app/context", s.Context)
 
 		logv1.GET("/rules", s.GetLogAlertRules)
 		logv1.POST("/rules", s.CreateLogAlertRule)
