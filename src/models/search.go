@@ -16,8 +16,23 @@ type Log struct {
 	TaskID    string
 }
 
+type LogAlertEvent struct {
+	ID          uint64    `json:"id" gorm:"not null; auto_increment"`
+	ContainerID string    `json:"containerid"`
+	Message     string    `json:"message" binding:"required" gorm:"type:longtext"`
+	LogTime     time.Time `json:"logtime" binding:"required"`
+	Path        string    `json:"path" binding:"required"`
+	Offset      int64     `json:"offset" binding:"required"`
+	App         string    `json:"appid" binding:"required"`
+	User        string    `json:"user"`
+	Task        string    `json:"taskid" binding:"required"`
+	Group       string    `json:"group"`
+	Cluster     string    `json:"clusterid" binding:"required"`
+	Keyword     string    `json:"keyword"`
+}
+
 type LogAlertRule struct {
-	ID        uint64    `json:"id" gorm:"NOT NULL; AUTO_INCREMENT"`
+	ID        uint64    `json:"id" gorm:"not null; auto_increment"`
 	App       string    `json:"app"`
 	Keyword   string    `json:"keyword"`
 	Source    string    `json:"source"`

@@ -1,75 +1,41 @@
 package api
 
 import (
-	"encoding/json"
 	"strings"
 
+	"github.com/Dataman-Cloud/log-proxy/src/models"
 	"github.com/Dataman-Cloud/log-proxy/src/utils"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/gin-gonic/gin"
 )
 
 // ReceiverLog receive log data from logstash
 func (s *Search) ReceiverLog(ctx *gin.Context) {
-	data, err := utils.ReadRequestBody(ctx.Request)
-	if err != nil {
+	var event models.LogAlertEvent
+
+	if err := ctx.BindJSON(&event); err != nil {
+		logrus.Errorf("Unmarshal log alert event got error: %s", err.Error())
 		utils.ErrorResponse(ctx, utils.NewError(GetLogError, err))
 		return
 	}
 
-	var m map[string]interface{}
-	if err := json.Unmarshal(data, &m); err != nil {
-		utils.ErrorResponse(ctx, utils.NewError(GetLogError, err))
-		return
-	}
-
-	app, ok := m["appid"]
-	if !ok {
-		utils.ErrorResponse(ctx, utils.NewError(GetLogError, "not found app"))
-		return
-	}
-
-	task, ok := m["taskid"]
-	if !ok {
-		utils.ErrorResponse(ctx, utils.NewError(GetLogError, "not found task"))
-		return
-	}
-
-	path, ok := m["path"]
-	if !ok {
-		utils.ErrorResponse(ctx, utils.NewError(GetLogError, "not found path"))
-		return
-	}
-
-	cluster, ok := m["clusterid"]
-	if !ok {
-		utils.ErrorResponse(ctx, utils.NewError(GetLogError, "not found cluster"))
-		return
-	}
-
-	message, ok := m["message"]
-	if !ok {
-		utils.ErrorResponse(ctx, utils.NewError(GetLogError, "not found message"))
-		return
-	}
-
-	keywords, ok := s.KeywordFilter[app.(string)+path.(string)]
+	keywords, ok := s.KeywordFilter[event.App+event.Path]
 	if !ok {
 		utils.Ok(ctx, "ok")
 		return
 	}
+
 	for e := keywords.Front(); e != nil; e = e.Next() {
-		if strings.Index(message.(string), e.Value.(string)) == -1 {
+		keyword := e.Value.(string)
+		if strings.Index(event.Message, keyword) == -1 {
 			continue
 		}
 
-		s.Counter.WithLabelValues(
-			app.(string),
-			task.(string),
-			path.(string),
-			e.Value.(string),
-			cluster.(string),
-		).Inc()
+		event.Keyword = keyword
+		if err := s.Store.CreateLogAlertEvent(&event); err != nil {
+			logrus.Errorf("create log alert event got error: %s", err.Error())
+		}
 	}
 
 	utils.Ok(ctx, "ok")

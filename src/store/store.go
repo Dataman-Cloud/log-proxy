@@ -21,4 +21,6 @@ type Store interface {
 	DeleteLogAlertRule(ID string) error
 	GetLogAlertRule(ID string) (models.LogAlertRule, error)
 	GetLogAlertRules(page models.Page) (map[string]interface{}, error)
+	CreateLogAlertEvent(event *models.LogAlertEvent) error
+	GetLogAlertEvents(options map[string]interface{}, page models.Page) (map[string]interface{}, error)
 }
