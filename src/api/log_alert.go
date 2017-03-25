@@ -158,3 +158,40 @@ func verifyLogAlertRule(rule models.LogAlertRule) error {
 
 	return nil
 }
+
+func (s *Search) GetLogAlertEvents(ctx *gin.Context) {
+	options := make(map[string]interface{})
+
+	if ctx.Query("cluster") != "" {
+		options["cluster"] = ctx.Query("cluster")
+	}
+
+	if ctx.Query("app") != "" {
+		options["app"] = ctx.Query("app")
+	}
+
+	if ctx.Query("source") != "" {
+		options["path"] = ctx.Query("source")
+	}
+
+	if ctx.Query("keyword") != "" {
+		options["keyword"] = ctx.Query("source")
+	}
+
+	if ctx.Query("start") != "" {
+		options["start"] = ctx.Query("start")
+	}
+
+	if ctx.Query("end") != "" {
+		options["end"] = ctx.Query("end")
+	}
+
+	events, err := s.Store.GetLogAlertEvents(options, ctx.MustGet("page").(models.Page))
+	if err != nil {
+		utils.ErrorResponse(ctx, utils.NewError(GetLogAlertEventsError, err))
+		return
+	}
+
+	utils.Ok(ctx, events)
+	return
+}
