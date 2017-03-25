@@ -8,13 +8,14 @@ import (
 
 func (db *datastore) CreateOrIncreaseEvent(event *models.Event) error {
 	var result models.Event
-	notfound := db.Where("ack = ? AND severity = ? AND v_cluster = ? AND app = ? AND slot = ? AND container_id = ? AND alert_name = ?",
+	notfound := db.Where("ack = ? AND severity = ? AND cluster = ? AND app = ? AND task = ? AND container_id = ? AND container_name =? AND alert_name = ?",
 		false,
 		event.Severity,
-		event.VCluster,
+		event.Cluster,
 		event.App,
-		event.Slot,
+		event.Task,
 		event.ContainerID,
+		event.ContainerName,
 		event.AlertName,
 	).First(&result).RecordNotFound()
 	if notfound {
@@ -29,32 +30,51 @@ func (db *datastore) CreateOrIncreaseEvent(event *models.Event) error {
 
 }
 
-func (db *datastore) AckEvent(ID int, userName string, groupName string) error {
+func (db *datastore) AckEvent(ID int, cluster, app string) error {
 	var result models.Event
-	if db.Where("id = ?", ID).Where("user_name = ? OR group_name = ?", userName, groupName).First(&result).RecordNotFound() {
-		return fmt.Errorf("Alert Event id=%d, user_name=%s or group_name=%s not found", ID, userName, groupName)
+	if db.Where("id = ?", ID).Where("cluster = ? AND app = ?", cluster, app).First(&result).RecordNotFound() {
+		return fmt.Errorf("Alert Event id=%d, cluster=%s or app=%s not found", ID, cluster, app)
 	}
 	result.Ack = true
 	return db.Save(&result).Error
 }
 
-func (db *datastore) ListAckedEvent(page models.Page, userName string, groupName string) map[string]interface{} {
+func (db *datastore) ListAckedEvent(page models.Page, cluster, app string) map[string]interface{} {
 	var (
 		result []*models.Event
 		count  int
 	)
-	db.Where("ack = ?", true).Where("user_name = ? OR group_name = ?", userName, groupName).Find(&result).Count(&count)
-	db.Where("ack = ?", true).Where("user_name = ? OR group_name = ?", userName, groupName).Offset(page.PageFrom).Limit(page.PageSize).Find(&result)
-
+	if cluster == "" && app == "" {
+		db.Where("ack = ?", true).Find(&result).Count(&count)
+		db.Where("ack = ?", true).Offset(page.PageFrom).Limit(page.PageSize).Find(&result)
+	} else if cluster != "" && app == "" {
+		db.Where("ack = ?", true).Where("cluster = ?", cluster).Find(&result).Count(&count)
+		db.Where("ack = ?", true).Where("cluster = ?", cluster).Offset(page.PageFrom).Limit(page.PageSize).Find(&result)
+	} else if cluster != "" && app != "" {
+		db.Where("ack = ?", true).Where("cluster = ? AND app = ?", cluster, app).Find(&result).Count(&count)
+		db.Where("ack = ?", true).Where("cluster = ? AND app = ?", cluster, app).Offset(page.PageFrom).Limit(page.PageSize).Find(&result)
+	} else {
+		result = nil
+	}
 	return map[string]interface{}{"count": count, "events": result}
 }
 
-func (db *datastore) ListUnackedEvent(page models.Page, username string, groupname string) map[string]interface{} {
+func (db *datastore) ListUnackedEvent(page models.Page, cluster, app string) map[string]interface{} {
 	var (
 		result []*models.Event
 		count  int
 	)
-	db.Debug().Where("ack = ?", false).Where("user_name = ? OR group_name = ?", username, groupname).Find(&result).Count(&count)
-	db.Where("ack = ?", false).Where("user_name = ? OR group_name = ?", username, groupname).Offset(page.PageFrom).Limit(page.PageSize).Find(&result)
+	if cluster == "" && app == "" {
+		db.Where("ack = ?", false).Find(&result).Count(&count)
+		db.Where("ack = ?", false).Offset(page.PageFrom).Limit(page.PageSize).Find(&result)
+	} else if cluster != "" && app == "" {
+		db.Where("ack = ?", false).Where("cluster = ?", cluster).Find(&result).Count(&count)
+		db.Where("ack = ?", false).Where("cluster = ?", cluster).Offset(page.PageFrom).Limit(page.PageSize).Find(&result)
+	} else if cluster != "" && app != "" {
+		db.Where("ack = ?", false).Where("cluster = ? AND app = ?", cluster, app).Find(&result).Count(&count)
+		db.Where("ack = ?", false).Where("cluster = ? AND app = ?", cluster, app).Offset(page.PageFrom).Limit(page.PageSize).Find(&result)
+	} else {
+		result = nil
+	}
 	return map[string]interface{}{"count": count, "events": result}
 }
