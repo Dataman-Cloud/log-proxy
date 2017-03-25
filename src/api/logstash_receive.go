@@ -18,19 +18,18 @@ func (s *Search) ReceiverLog(ctx *gin.Context) {
 	}
 
 	var m map[string]interface{}
-	err = json.Unmarshal(data, &m)
-	if err != nil {
+	if err := json.Unmarshal(data, &m); err != nil {
 		utils.ErrorResponse(ctx, utils.NewError(GetLogError, err))
 		return
 	}
 
-	app, ok := m["app"]
+	app, ok := m["appid"]
 	if !ok {
 		utils.ErrorResponse(ctx, utils.NewError(GetLogError, "not found app"))
 		return
 	}
 
-	task, ok := m["task"]
+	task, ok := m["taskid"]
 	if !ok {
 		utils.ErrorResponse(ctx, utils.NewError(GetLogError, "not found task"))
 		return
@@ -42,13 +41,7 @@ func (s *Search) ReceiverLog(ctx *gin.Context) {
 		return
 	}
 
-	user, ok := m["user"]
-	if !ok {
-		utils.ErrorResponse(ctx, utils.NewError(GetLogError, "not found user"))
-		return
-	}
-
-	cluster, ok := m["cluster"]
+	cluster, ok := m["clusterid"]
 	if !ok {
 		utils.ErrorResponse(ctx, utils.NewError(GetLogError, "not found cluster"))
 		return
@@ -75,7 +68,6 @@ func (s *Search) ReceiverLog(ctx *gin.Context) {
 			task.(string),
 			path.(string),
 			e.Value.(string),
-			user.(string),
 			cluster.(string),
 		).Inc()
 	}

@@ -69,7 +69,7 @@ func GetSearch() *Search {
 				Name: "log_keyword",
 				Help: "log keyword counter",
 			},
-			[]string{"app", "task", "path", "keyword", "user", "cluster"},
+			[]string{"app", "task", "path", "keyword", "cluster"},
 		),
 		Kmutex: new(sync.Mutex),
 	}
