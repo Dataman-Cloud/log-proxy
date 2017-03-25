@@ -16,11 +16,7 @@ import (
 	"github.com/Sirupsen/logrus"
 
 	"github.com/gin-gonic/gin"
-	"github.com/prometheus/client_golang/prometheus"
 )
-
-// registry prometheus registry counter
-var registry bool
 
 const (
 	// GetAppsError get application error
@@ -56,7 +52,6 @@ type Search struct {
 	Store         store.Store
 	Service       *service.SearchService
 	KeywordFilter map[string]*list.List
-	Counter       *prometheus.CounterVec
 	Kmutex        *sync.Mutex
 }
 
@@ -66,19 +61,7 @@ func GetSearch() *Search {
 		Store:         datastore.From(database.GetDB()),
 		Service:       service.NewEsService(strings.Split(config.GetConfig().EsURL, ",")),
 		KeywordFilter: make(map[string]*list.List),
-		Counter: prometheus.NewCounterVec(
-			prometheus.CounterOpts{
-				Name: "log_keyword",
-				Help: "log keyword counter",
-			},
-			[]string{"app", "task", "path", "keyword", "cluster"},
-		),
-		Kmutex: new(sync.Mutex),
-	}
-
-	if !registry {
-		prometheus.MustRegister(s.Counter)
-		registry = true
+		Kmutex:        new(sync.Mutex),
 	}
 
 	//TODO: rules count maybe greate than 10000
