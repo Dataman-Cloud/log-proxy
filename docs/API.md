@@ -434,71 +434,73 @@ return
 }
 ```
 
+### 获取日志告警事件
 ```
-{"code":0,"data":{"count":4,"results":[{"id":"AVkHBbEQIIGpJqE63UXA","appid":"dsgsdg","keyword":"gdsgsdg","path":"gsdsdgsd","createtime":"2016-12-16T17:45:30.639081077+08:00"},{"id":"AVkV4YfXIIGpJqE63U2b","appid":"6566y6","keyword":"y65y56","path":"y56y6","createtime":"2016-12-19T15:00:19.024077007+08:00"},{"id":"AVkHBV59IIGpJqE63UW_","appid":"sxacsacs111","keyword":"scsacsac","path":"csacasc","createtime":"2016-12-19T17:42:25.092717794+08:00"},{"id":"AVkAeS_LIIGpJqE63UH7","appid":"work-nginxefef","keyword":"GET11","path":"stdout","createtime":"2016-12-19T17:43:11.950277076+08:00"}]}}
-
+/v1/log/alerts
 ```
-
-POST /v1/search/keyword -d '{"period":1,"appid":"test","keyword":"keyword","condition":1,"enable":true}'
-
-
-
-GET /v1/log/prometheus
+- Query Params: cluster,app,task,surce,keyword,start,end
+ - cluster: 集群ID
+ - app: appid
+ - task=tasktest
+ - source=stdout
+ - start=now-7d
+ - end=now
+ 
+for example
+```
+curl -XGET http://192.168.59.3:5098/v1/log/alerts?cluster=yaoyun&app=yaoyun-nginx2&source=stdout
+```
 
 return
-
 ```
-{"code":0,"data":{"count":3301,"results":[{"alertname":"DatamanServiceDown","annotations":{"description":"mesos-master of node srymaster1 has been down for more than 1 minutes.","summary":"DatamanService mesos-master down"},"createtime":"2016-12-20T11:14:38.095324531+08:00","endsAt":"2016-12-20T11:13:52.807+08:00","generatorURL":"http://srymaster2:9090/graph#%5B%7B%22expr%22%3A%22consul_catalog_service_node_healthy%7Bservice%21%3D%5C%22alertmanager-vip%5C%22%2Cservice%21%3D%5C%22mysql-vip%5C%22%7D%20%3D%3D%200%22%2C%22tab%22%3A0%7D%5D","id":"AVkaOUWQIIGpJqE63VOl","labels":"{\"alertname\":\"DatamanServiceDown\",\"instance\":\"192.168.1.92:9107\",\"job\":\"consul\",\"node\":\"srymaster1\",\"service\":\"mesos-master\",\"severity\":\"Warning\"}","startsAt":"2016-12-20T11:11:22.807+08:00","status":"resolved"}]}}
-
+{
+  "code": 0,
+  "data": {
+    "count": 3,
+    "events": [
+      {
+        "id": 3,
+        "containerid": "f6bd57fae3ecc550cc92e39a2df9f57e9127daad3d032b39995370de5fdf7d08",
+        "message": "192.168.59.3 - - [24/Mar/2017:17:43:39 +0000] \"GET / HTTP/1.1\" 304 0 \"http://192.168.59.103:5013/ui/app/yaoyun-nginx2/instance?from=my\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36\" \"-\"\n",
+        "logtime": "2017-03-25T01:43:43+08:00",
+        "path": "stdout",
+        "offset": 1490377422529395557,
+        "appid": "yaoyun-nginx2",
+        "user": "",
+        "taskid": "yaoyun-nginx2.668b405f-1041-11e7-aea5-024292f41627",
+        "group": "",
+        "clusterid": "yaoyun",
+        "keyword": "from"
+      },
+      {
+        "id": 2,
+        "containerid": "f6bd57fae3ecc550cc92e39a2df9f57e9127daad3d032b39995370de5fdf7d08",
+        "message": "192.168.59.3 - - [24/Mar/2017:17:43:37 +0000] \"GET / HTTP/1.1\" 304 0 \"http://192.168.59.103:5013/ui/app/yaoyun-nginx2/instance?from=my\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36\" \"-\"\n",
+        "logtime": "2017-03-25T01:43:38+08:00",
+        "path": "stdout",
+        "offset": 1490377417525792544,
+        "appid": "yaoyun-nginx2",
+        "user": "",
+        "taskid": "yaoyun-nginx2.668b405f-1041-11e7-aea5-024292f41627",
+        "group": "",
+        "clusterid": "yaoyun",
+        "keyword": "from"
+      },
+      {
+        "id": 1,
+        "containerid": "f6bd57fae3ecc550cc92e39a2df9f57e9127daad3d032b39995370de5fdf7d08",
+        "message": "192.168.59.3 - - [24/Mar/2017:16:29:41 +0000] \"GET / HTTP/1.1\" 304 0 \"http://192.168.59.103:5013/ui/app/yaoyun-nginx2/instance?from=my\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36\" \"-\"\n",
+        "logtime": "2017-03-25T00:29:46+08:00",
+        "path": "stdout",
+        "offset": 1490372986060576781,
+        "appid": "yaoyun-nginx2",
+        "user": "",
+        "taskid": "yaoyun-nginx2.668b405f-1041-11e7-aea5-024292f41627",
+        "group": "",
+        "clusterid": "yaoyun",
+        "keyword": ""
+      }
+    ]
+  }
+}
 ```
-
-GET /v1/log/prometheus/:id
-
-return
-
-```
-{"code":0,"data":{"alertname":"DatamanServiceDown","annotations":{"description":"mesos-master of node srymaster1 has been down for more than 1 minutes.","summary":"DatamanService mesos-master down"},"createtime":"2016-12-20T11:14:38.095324531+08:00","endsAt":"2016-12-20T11:13:52.807+08:00","generatorURL":"http://srymaster2:9090/graph#%5B%7B%22expr%22%3A%22consul_catalog_service_node_healthy%7Bservice%21%3D%5C%22alertmanager-vip%5C%22%2Cservice%21%3D%5C%22mysql-vip%5C%22%7D%20%3D%3D%200%22%2C%22tab%22%3A0%7D%5D","labels":"{\"alertname\":\"DatamanServiceDown\",\"instance\":\"192.168.1.92:9107\",\"job\":\"consul\",\"node\":\"srymaster1\",\"service\":\"mesos-master\",\"severity\":\"Warning\"}","startsAt":"2016-12-20T11:11:22.807+08:00","status":"resolved"}}
-
-```
-
-GET /v1/log/mointor
-
-GET /v1/monitor/alerts/groups
-
-GET /v1/monitor/silences
-
-return
-
-```
-{"code":0,"data":[{"comment":"121","createdAt":"2016-12-19T17:51:51.513126826+08:00","createdBy":"1@1","endsAt":"2016-12-19T09:56:16Z","id":4,"matchers":[{"isRegex":false,"name":"alertname","value":"DatamanServiceDown"},{"isRegex":false,"name":"instance","value":"192.168.1.91:9107"},{"isRegex":false,"name":"job","value":"consul"},{"isRegex":false,"name":"node","value":"srymaster1"},{"isRegex":false,"name":"service","value":"zookeeper"},{"isRegex":false,"name":"severity","value":"Warning"}],"startsAt":"2016-12-19T07:56:16Z"},{"comment":"qgqw","createdAt":"2016-12-19T16:48:55.764252+08:00","createdBy":"adf@qfwf","endsAt":"2016-12-19T08:40:17Z","id":3,"matchers":[{"isRegex":false,"name":"node","value":"srymaster1"},{"isRegex":false,"name":"service","value":"prometheus"},{"isRegex":false,"name":"severity","value":"Warning"}],"startsAt":"2016-12-19T06:40:17Z"},{"comment":"asdfasdf","createdAt":"2016-12-19T11:08:14.816592362+08:00","createdBy":"test@123.com","endsAt":"2016-12-19T07:12:00Z","id":2,"matchers":[{"isRegex":false,"name":"alertname","value":"LogKeyword"},{"isRegex":false,"name":"appid","value":"work-nginx"},{"isRegex":false,"name":"clusterid","value":"work"},{"isRegex":false,"name":"instance","value":"192.168.1.75:5098"},{"isRegex":false,"name":"job","value":"log-proxy"},{"isRegex":false,"name":"keyword","value":"GET"},{"isRegex":false,"name":"offset","value":"1481781258185649664"},{"isRegex":false,"name":"path","value":"stdout"},{"isRegex":false,"name":"severity","value":"Warning"},{"isRegex":false,"name":"taskid","value":"work-nginx.1f17a9f0-c02b-11e6-9030-024245dc84c8"},{"isRegex":false,"name":"userid","value":"4"}],"startsAt":"2016-12-19T03:12:00Z"}]}
-
-```
-
-
-GET /v1/monitor/silence/:id
-
-return
-
-```
-{"code":0,"data":{"comment":"121","createdAt":"2016-12-19T17:51:51.513126826+08:00","createdBy":"1@1","endsAt":"2016-12-19T09:56:16Z","id":4,"matchers":[{"isRegex":false,"name":"alertname","value":"DatamanServiceDown"},{"isRegex":false,"name":"instance","value":"192.168.1.91:9107"},{"isRegex":false,"name":"job","value":"consul"},{"isRegex":false,"name":"node","value":"srymaster1"},{"isRegex":false,"name":"service","value":"zookeeper"},{"isRegex":false,"name":"severity","value":"Warning"}],"startsAt":"2016-12-19T07:56:16Z"}}
-
-```
-
-DELETE /v1/monitor/silence/:id
-
-return
-
-```
-{"code":0,"data":"delete success"}
-```
-
-PUT /v1/monitor/silence/:id
-
-return
-
-```
-{"code":0,"data":"update success"}
-```
-
-
-POST /v1/monitor/silences -d '{"matchers":[{"name":"alertname","value":"cpu_usage","isRegex":false},{"name":"container_label_APP_ID","value":"work-web","isRegex":false},{"name":"container_label_VCLUSTER","value":"work","isRegex":false},{"name":"cpu","value":"cpu01","isRegex":false},{"name":"id","value":"/docker/e4a59106d9f763626c70fc5e6bfa8c46a14a471ad66f102618a142f1e2f3e33f","isRegex":false},{"name":"image","value":"192.168.1.75/library/nginx-stress:1.10","isRegex":false},{"name":"instance","value":"192.168.1.102:5014","isRegex":false},{"name":"job","value":"cadvisor","isRegex":false},{"name":"name","value":"mesos-f011c830-7bb0-4edf-8c25-f9e64fa2246a-S0.3836a388-864b-48dc-95dd-25119b9ee3fa","isRegex":false},{"name":"severity","value":"critical","isRegex":false}],"startsAt":"2016-12-05T11:08:00.000Z","endsAt":"2016-12-05T15:08:00.000Z","createdBy":"yqguo@dataman-inc.com","comment":"this is a test"}'
