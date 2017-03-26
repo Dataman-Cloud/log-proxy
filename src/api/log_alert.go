@@ -175,7 +175,7 @@ func (s *Search) GetLogAlertEvents(ctx *gin.Context) {
 	}
 
 	if ctx.Query("keyword") != "" {
-		options["keyword"] = ctx.Query("source")
+		options["keyword"] = ctx.Query("keyword")
 	}
 
 	if ctx.Query("start") != "" {
