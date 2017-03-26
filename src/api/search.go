@@ -45,6 +45,8 @@ const (
 	GetClustersError = "503-11011"
 
 	GetLogAlertEventsError = "503-11012"
+
+	DeleteLogAlertEventsError = "503-11013"
 )
 
 // Search search client struct

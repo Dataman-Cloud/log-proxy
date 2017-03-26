@@ -48,6 +48,7 @@ func Router(middlewares ...gin.HandlerFunc) *gin.Engine {
 		logv1.GET("/rules/:id", s.GetLogAlertRule)
 
 		logv1.GET("/alerts", s.GetLogAlertEvents)
+		logv1.DELETE("/alerts", s.DeleteLogAlertEvents)
 	}
 
 	pv1 := r.Group("/v1/receive")

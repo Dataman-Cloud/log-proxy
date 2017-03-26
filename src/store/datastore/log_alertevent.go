@@ -1,6 +1,7 @@
 package datastore
 
 import (
+	"errors"
 	"strconv"
 	"time"
 
@@ -53,4 +54,30 @@ func (db *datastore) GetLogAlertEvents(options map[string]interface{}, page mode
 	}
 
 	return map[string]interface{}{"count": count, "events": events}, nil
+}
+
+func (db *datastore) DeleteLogAlertEvents(start, end string) error {
+	if start == "" || end == "" {
+		return errors.New("interval start or end time")
+	}
+
+	query := db.Table("log_alert_events")
+
+	startTimestamp, err := strconv.ParseInt(start, 10, 64)
+	if err != nil {
+		return err
+	}
+
+	startTime := time.Unix(startTimestamp, 0)
+	query = query.Where("log_time >= ?", startTime)
+
+	endTimestamp, err := strconv.ParseInt(end, 10, 64)
+	if err != nil {
+		return err
+	}
+
+	endTime := time.Unix(endTimestamp, 0)
+	query = query.Where("log_time <= ?", endTime)
+
+	return query.Delete(&models.LogAlertEvent{}).Error
 }
