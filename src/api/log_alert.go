@@ -195,3 +195,13 @@ func (s *Search) GetLogAlertEvents(ctx *gin.Context) {
 	utils.Ok(ctx, events)
 	return
 }
+
+func (s *Search) DeleteLogAlertEvents(ctx *gin.Context) {
+	if err := s.Store.DeleteLogAlertEvents(ctx.Query("start"), ctx.Query("end")); err != nil {
+		utils.ErrorResponse(ctx, utils.NewError(DeleteLogAlertEventsError, err))
+		return
+	}
+
+	utils.Ok(ctx, "delete success")
+	return
+}
