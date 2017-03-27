@@ -76,16 +76,16 @@
                         </a>
                     </td>
                     <td md-cell>
-                        {/history.createtime | date: 'yyyy-MM-dd HH:mm:ss'/}
+                        {/history.logtime | date: 'yyyy-MM-dd HH:mm:ss'/}
                     </td>
                     <td md-cell>
-                        {/history.alertname/}
+                        {/history.appid/}
                     </td>
                     <td md-cell>
-                        {/history.annotations.description/}
+                        {/history.clusterid/}
                     </td>
                     <td md-cell>
-                        {/history.annotations.summary/}
+                        {/history.keyword/}
                     </td>
                 </tr>
                 <tr ng-repeat-end ng-if="vm.historyDisplaySet[$index]">
