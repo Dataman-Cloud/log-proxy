@@ -358,7 +358,8 @@ POST http://192.168.59.3:5098/v1/log/rules -d
 '{
 	"app":"nginx",
 	"source":"stderr",
-	"keyword":"ABBBAcccd"
+	"keyword":"ABBBAcccd",
+	"cluster":"xxx"
 }'
 ```
 * 说明: app,source,keyword分别代表应用.日志来源(stdout,stderr,文件路径),关键字三个都是必填.
@@ -371,7 +372,8 @@ PUT http://192.168.59.3:5098/v1/log/rules -d
 	"id":4,
 	"app":"nginx",
 	"source":"stderr",
-	"keyword":"ABBBAcccd"
+	"keyword":"ABBBAcccd",
+	"cluster":"xxxx"
 }
 }'
 ```
@@ -394,6 +396,7 @@ return
     "id": 1,
     "app": "nginx",
     "keyword": "ABBBA",
+    "cluster":"xxx",
     "source": "stderr",
     "createdAt": "2017-03-23T14:54:57+08:00",
     "updatedAt": "2017-03-23T15:46:45+08:00"
