@@ -141,6 +141,39 @@
             //         silence: getSilence
             //     }
             // });
+            //about monitorAlert
+            .state('home.monitorAlert', {
+                url: '/monitorAlert',
+                templateUrl: '/src/monitorAlert/list/list.html',
+                controller: 'MonitorAlertCtrl as vm',
+                resolve: {
+                    rules: getRules
+                }
+            })
+            .state('home.monitorAlertCreate', {
+                url: '/monitorAlertCreate',
+                templateUrl: '/src/monitorAlert/create-update/create-update.html',
+                controller: 'CreateMonitorAlertCtrl as vm',
+                resolve: {
+                    target: function () {
+                        return 'create'
+                    },
+                    clusters: getClusters,
+                    apps: getApps,
+                    indicators: getIndicators
+                }
+            })
+            .state('home.monitorAlertUpdate', {
+                url: '/monitorAlertUpdate',
+                templateUrl: '/src/monitorAlert/create-update/create-update.html',
+                controller: 'CreateMonitorAlertCtrl as vm',
+                resolve: {
+                    target: function () {
+                        return 'update'
+                    }
+                }
+            });
+
 
         /* @ngInject */
         function getInfo(dashboardBackend, $stateParams) {
@@ -157,9 +190,32 @@
             return alertBackend.alert($stateParams.id).get().$promise
         }
 
+        /* @ngInject */
         function getSilence(alertBackend, $stateParams) {
             return alertBackend.silence($stateParams.id).get().$promise
         }
+
+
+        /* @ngInject */
+        function getClusters(monitorAlertBackend) {
+            return monitorAlertBackend.clusters().get().$promise
+        }
+
+        /* @ngInject */
+        function getApps(monitorAlertBackend) {
+            return monitorAlertBackend.apps().get().$promise
+        }
+
+        /* @ngInject */
+        function getIndicators(monitorAlertBackend) {
+            return monitorAlertBackend.indicators().get().$promise
+        }
+
+        /* @ngInject */
+        function getRules(monitorAlertBackend) {
+            return monitorAlertBackend.rules().get().$promise
+        }
+
 
         $locationProvider.html5Mode(true);
         //warning: otherwise(url) will be redirect loop on state with errored resolve

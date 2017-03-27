@@ -469,3 +469,7 @@ textarea {
 .expr-search-panel h3 {
     margin-right: 24px;
 }
+.form-input-addon{
+    padding: 6px;
+    display: inline-block;
+}
