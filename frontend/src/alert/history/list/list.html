@@ -59,7 +59,6 @@
             <table md-table id="user-list-table">
                 <thead md-head>
                 <tr md-row>
-                    <th md-column></th>
                     <th md-column>时间</th>
                     <th md-column>应用</th>
                     <th md-column>集群</th>
@@ -68,13 +67,7 @@
                 </tr>
                 </thead>
                 <tbody md-body>
-                <tr md-row ng-repeat-start="history in vm.histories track by $index">
-                    <td md-cell>
-                        <a ng-click="vm.historyDisplaySet[$index] = !vm.historyDisplaySet[$index]">
-                            <i id="alertHistory{/$index/}" class="fa"
-                               ng-class="{'fa-chevron-down':vm.historyDisplaySet[$index], 'fa-chevron-right':!vm.historyDisplaySet[$index]}"></i>
-                        </a>
-                    </td>
+                <tr md-row ng-repeat="history in vm.histories track by $index">
                     <td md-cell>
                         {/history.logtime | date: 'yyyy-MM-dd HH:mm:ss'/}
                     </td>
@@ -87,12 +80,8 @@
                     <td md-cell>
                         {/history.keyword/}
                     </td>
-                </tr>
-                <tr ng-repeat-end ng-if="vm.historyDisplaySet[$index]">
-                    <td colspan="6">
-                        <div class="json-detail">
-                            <p>{/history.message/}</p>
-                        </div>
+                    <td md-cell>
+                        {/history.message/}
                     </td>
                 </tr>
                 </tbody>

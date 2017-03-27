@@ -7,7 +7,6 @@
         var self = this;
 
         self.timePeriod = 60;
-        self.historyDisplaySet = {};
 
         self.count = 0;
         self.histories = [];
@@ -19,8 +18,8 @@
         self.form = {
             cluster: $stateParams.cluster || '',
             app: $stateParams.app || '',
-            start: moment().subtract(self.timePeriod, 'minutes').unix() * 1000,
-            end: moment().unix() * 1000,
+            start: moment().subtract(self.timePeriod, 'minutes').unix(),
+            end: moment().unix(),
             page: 1,
             size: 100
         };
@@ -98,8 +97,8 @@
                 self.form.size = 100;
                 self.form.page = 1;
 
-                self.form.to = moment().unix() * 1000;
-                self.form.from = moment().subtract(self.timePeriod, 'minutes').unix() * 1000;
+                self.form.to = moment().unix();
+                self.form.from = moment().subtract(self.timePeriod, 'minutes').unix();
 
                 fetchHistory(self.form);
             }
@@ -116,18 +115,10 @@
         }
 
         function onPaginate(page, limit) {
-            self.historyDisplaySet = {};
-
             self.form.size = limit;
             self.form.page = page;
 
-            alertBackend.histories(self.form).get(function (data) {
-                self.histories = data.data.results;
-                self.count = data.data.count;
-                angular.forEach(self.histories, function (history, index) {
-                    history.labels = angular.fromJson(history.labels)
-                });
-            })
+            fetchHistory(self.form)
         }
     }
 })();
