@@ -18,8 +18,8 @@
         self.form = {
             cluster: $stateParams.cluster || '',
             app: $stateParams.app || '',
-            start: moment().subtract(self.timePeriod, 'minutes').unix() * 1000,
-            end: moment().unix() * 1000,
+            start: moment().subtract(self.timePeriod, 'minutes').unix(),
+            end: moment().unix(),
             page: 1,
             size: 100
         };
@@ -97,8 +97,8 @@
                 self.form.size = 100;
                 self.form.page = 1;
 
-                self.form.to = moment().unix() * 1000;
-                self.form.from = moment().subtract(self.timePeriod, 'minutes').unix() * 1000;
+                self.form.to = moment().unix();
+                self.form.from = moment().subtract(self.timePeriod, 'minutes').unix();
 
                 fetchHistory(self.form);
             }
