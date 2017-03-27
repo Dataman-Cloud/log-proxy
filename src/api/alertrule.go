@@ -2,19 +2,15 @@ package api
 
 import (
 	"bytes"
-	"crypto/md5"
 	"encoding/json"
-	"errors"
 	"fmt"
-	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
-	"path/filepath"
 	"strconv"
 	"strings"
 	"text/template"
+	"time"
 
 	"github.com/Dataman-Cloud/log-proxy/src/config"
 	"github.com/Dataman-Cloud/log-proxy/src/models"
@@ -22,10 +18,10 @@ import (
 	"github.com/Dataman-Cloud/log-proxy/src/store/datastore"
 	"github.com/Dataman-Cloud/log-proxy/src/utils"
 	"github.com/Dataman-Cloud/log-proxy/src/utils/database"
+	"github.com/Dataman-Cloud/log-proxy/src/utils/prometheusrule"
+	"github.com/prometheus/common/log"
 
-	log "github.com/Sirupsen/logrus"
 	"github.com/gin-gonic/gin"
-	"github.com/robfig/cron"
 )
 
 const (
@@ -37,16 +33,19 @@ const (
 	// PromtheusReloadPath path string
 	PromtheusReloadPath = "/-/reload"
 
-	ruleTempl = `# This rule was updated by {{ .Name }}
-  ALERT {{.Alert}}
+	ruleTempl = `# This rule was update at {{ .UpdatedAt }}
+ALERT {{.Alert}}
   IF {{ .Expr }}
-  FOR {{ .Duration }}
+  FOR {{ .Pending }}
   LABELS {{ .Labels }}
-  ANNOTATIONS {description="{{ .Description }}", summary="{{ .Summary }}"}
+  ANNOTATIONS {{ .Annotations }}
 `
 	ruleFileUpdate = "update"
 	ruleFileDelete = "delete"
 	ruleInterval   = "1m"
+
+	ruleStatusActive   = "Enabled"
+	ruleStatusInActive = "Disabled"
 )
 
 type Alert struct {
@@ -73,35 +72,49 @@ func NewAlert() *Alert {
 	}
 }
 
+// GetAlertIndicators return the alert rule indicator list
+func (alert *Alert) GetAlertIndicators(ctx *gin.Context) {
+	mapper := prometheusrule.NewRuleMapper()
+	data := mapper.GetRuleIndicatorsList()
+	utils.Ok(ctx, data)
+}
+
 // CreateAlertRule create the alert rule in Database
 func (alert *Alert) CreateAlertRule(ctx *gin.Context) {
-
 	var (
-		rule *models.Rule
 		data models.Rule
 		err  error
 	)
+	rule := models.NewRule()
 	if err = ctx.BindJSON(&rule); err != nil {
 		utils.ErrorResponse(ctx, err)
 		return
 	}
-	if v := rule.Name; v == "" {
-		utils.ErrorResponse(ctx, errors.New("not found Name string"))
+	if err = isValidRuleFiled(rule); err != nil {
+		utils.ErrorResponse(ctx, err)
 		return
 	}
+	// Create Alert rule in DB
 	err = alert.Store.CreateAlertRule(rule)
 	if err != nil {
 		utils.ErrorResponse(ctx, err)
 		return
 	}
-
-	data, err = alert.Store.GetAlertRuleByName(rule.Name, rule.Alert)
+	// Get the rule record from DB
+	data, err = alert.Store.GetAlertRuleByUniqueIndex(rule.Class, rule.Name, rule.Cluster, rule.App)
 	if err != nil {
 		utils.ErrorResponse(ctx, err)
 		return
 	}
-
+	// Write the Rule in file and reload Prometheus conf
 	err = alert.WriteAlertFile(rule)
+	if err != nil {
+		utils.ErrorResponse(ctx, err)
+		return
+	}
+	// Update the rule status as active
+	data.Status = ruleStatusActive
+	err = alert.Store.UpdateAlertRule(&data)
 	if err != nil {
 		utils.ErrorResponse(ctx, err)
 		return
@@ -110,57 +123,57 @@ func (alert *Alert) CreateAlertRule(ctx *gin.Context) {
 	utils.Ok(ctx, data)
 }
 
-// DeleteAlertRule delete the rule by id and name from DB and files
-func (alert *Alert) DeleteAlertRule(ctx *gin.Context) {
-	var (
-		rowsAffected int64
-		err          error
-		rule         *models.Rule
-		result       models.Rule
-	)
-	if err = ctx.BindJSON(&rule); err != nil {
-		log.Errorln("DeleteAlertRule: Parse JSON rule error, ", err)
-		utils.ErrorResponse(ctx, err)
-		return
+func isValidRuleFiled(rule *models.Rule) error {
+	switch {
+	case rule.Class == "":
+		return fmt.Errorf("class required")
+	case rule.Name == "":
+		return fmt.Errorf("name required")
+	case rule.Cluster == "":
+		return fmt.Errorf("cluster required")
+	case rule.App == "":
+		return fmt.Errorf("app required")
+	case rule.Pending == "":
+		return fmt.Errorf("pending required")
+	case rule.Indicator == "":
+		return fmt.Errorf("indicator required")
+	case rule.Severity == "":
+		return fmt.Errorf("severity required")
+	case rule.Aggregation == "":
+		return fmt.Errorf("aggregation required")
+	case rule.Comparison == "":
+		return fmt.Errorf("comparison required")
 	}
 
-	rule.ID, err = strconv.ParseUint(ctx.Param("id"), 10, 64)
-	if err != nil {
-		utils.ErrorResponse(ctx, err)
-		return
+	switch {
+	case strings.Contains(rule.Class, "_"):
+		return fmt.Errorf("Char \"_\" should not exist in class: %s", rule.Class)
+	case strings.Contains(rule.Name, "_"):
+		return fmt.Errorf("Char \"_\" should not exist in name: %s", rule.Name)
+	case strings.Contains(rule.Cluster, "_"):
+		return fmt.Errorf("Char \"_\" should not exist in cluster: %s", rule.Cluster)
+	case strings.Contains(rule.App, "_"):
+		return fmt.Errorf("Char \"_\" should not exist in app: %s", rule.App)
 	}
 
-	result, err = alert.Store.GetAlertRule(rule.ID)
-	if err != nil {
-		log.Errorln("DeleteAlertRule: GetAlertRule() error, ", err)
-		utils.ErrorResponse(ctx, err)
-		return
+	switch {
+	case strings.Contains(rule.Class, "-"):
+		return fmt.Errorf("Char \"-\" should not exist in class: %s", rule.Class)
+	case strings.Contains(rule.Name, "-"):
+		return fmt.Errorf("Char \"-\" should not exist in ame: %s", rule.Name)
+	case strings.Contains(rule.Cluster, "-"):
+		return fmt.Errorf("Char \"-\" should not exist in cluster: %s", rule.Cluster)
 	}
 
-	rowsAffected, err = alert.Store.DeleteAlertRuleByIDName(rule.ID, rule.Name)
-	if err != nil {
-		log.Errorln("DeleteAlertRule: DeleteAlertRuleByIDName() error, ", err)
-		utils.ErrorResponse(ctx, err)
-		return
-	}
-
-	if rowsAffected == 0 {
-		utils.ErrorResponse(ctx, errors.New("no rule was deleted"))
-	}
-
-	err = alert.RemoveAlertFile(result)
-	if err != nil {
-		log.Errorln("DeleteAlertRule: Delete Alert file error, ", err)
-		utils.ErrorResponse(ctx, err)
-		return
-	}
-
-	utils.Ok(ctx, "success")
+	return nil
 }
 
 // ListAlertRules list the rules by name with pages.
 func (alert *Alert) ListAlertRules(ctx *gin.Context) {
-	data, err := alert.Store.ListAlertRules(ctx.MustGet("page").(models.Page), ctx.Query("name"))
+	class := ctx.Query("class")
+	cluster := ctx.Query("cluster")
+	app := ctx.Query("app")
+	data, err := alert.Store.ListAlertRules(ctx.MustGet("page").(models.Page), class, cluster, app)
 	if err != nil {
 		utils.ErrorResponse(ctx, err)
 		return
@@ -190,6 +203,56 @@ func (alert *Alert) GetAlertRule(ctx *gin.Context) {
 	utils.Ok(ctx, data)
 }
 
+// DeleteAlertRule delete the rule by id and name from DB and files
+func (alert *Alert) DeleteAlertRule(ctx *gin.Context) {
+	var (
+		rowsAffected int64
+		err          error
+		rule         *models.Rule
+		result       models.Rule
+	)
+	// parse the json and param id
+	if err = ctx.BindJSON(&rule); err != nil {
+		utils.ErrorResponse(ctx, fmt.Errorf("Parse JSON rule error: %s", err))
+		return
+	}
+	rule.ID, err = strconv.ParseUint(ctx.Param("id"), 10, 64)
+	if err != nil {
+		utils.ErrorResponse(ctx, fmt.Errorf("Failed to parse the id: %s", err))
+		return
+	}
+
+	// Get alert rule by ID
+	result, err = alert.Store.GetAlertRule(rule.ID)
+	if err != nil {
+		log.Errorln("DeleteAlertRule: GetAlertRule() error, ", err)
+		utils.ErrorResponse(ctx, err)
+		return
+	}
+
+	// Delate alert rule
+	rowsAffected, err = alert.Store.DeleteAlertRuleByIDClass(rule.ID, rule.Class)
+	if err != nil {
+		utils.ErrorResponse(ctx, fmt.Errorf("Failed to delete the rule by %s", err))
+		return
+	}
+
+	if rowsAffected == 0 {
+		utils.Ok(ctx, "no rule was deleted")
+		return
+	}
+
+	// Update the alert file content
+	err = alert.UpdateAlertFile(&result)
+	if err != nil {
+		log.Errorln("DeleteAlertRule: Delete Alert file error, ", err)
+		utils.ErrorResponse(ctx, err)
+		return
+	}
+
+	utils.Ok(ctx, "success")
+}
+
 // UpdateAlertRule update the alert rule in Database
 func (alert *Alert) UpdateAlertRule(ctx *gin.Context) {
 	var (
@@ -202,53 +265,84 @@ func (alert *Alert) UpdateAlertRule(ctx *gin.Context) {
 		return
 	}
 
+	rule.ID, err = strconv.ParseUint(ctx.Param("id"), 10, 64)
+	if err != nil {
+		utils.ErrorResponse(ctx, fmt.Errorf("Failed to parse the id: %s", err))
+		return
+	}
+
 	err = alert.Store.UpdateAlertRule(rule)
 	if err != nil {
 		utils.ErrorResponse(ctx, err)
 		return
 	}
 
-	data, err = alert.Store.GetAlertRuleByName(rule.Name, rule.Alert)
+	data, err = alert.Store.GetAlertRuleByUniqueIndex(rule.Class, rule.Name, rule.Cluster, rule.App)
 	if err != nil {
 		utils.ErrorResponse(ctx, err)
 		return
 	}
-
-	err = alert.WriteAlertFile(rule)
-	if err != nil {
-		utils.ErrorResponse(ctx, err)
-		return
+	if data.Status == ruleStatusInActive {
+		err = alert.UpdateAlertFile(&data)
+		if err != nil {
+			log.Errorln("DeleteAlertRule: Delete Alert file error, ", err)
+			utils.ErrorResponse(ctx, err)
+			return
+		}
+	} else {
+		err = alert.WriteAlertFile(&data)
+		if err != nil {
+			utils.ErrorResponse(ctx, err)
+			return
+		}
 	}
-
 	utils.Ok(ctx, data)
 }
 
-// ReloadAlertRuleConf tigger the conf reloading by prometheus api
-func (alert *Alert) ReloadAlertRuleConf(ctx *gin.Context) {
-	var err error
-
-	err = alert.ReloadPrometheusConf()
+// ReloadPrometheusConf reload the conf by calling prometheus api
+func (alert *Alert) ReloadPrometheusConf() error {
+	u, err := url.Parse(alert.PromServer)
 	if err != nil {
-		utils.ErrorResponse(ctx, err)
-		return
+		return err
 	}
+	u.Path = strings.TrimRight(u.Path, "/") + PromtheusReloadPath
+	resp, err := alert.HTTPClient.Post(u.String(), "application/json", nil)
+	if err != nil || resp.StatusCode != 200 {
+		err = fmt.Errorf("Failed to reload the configuration file of prometheus %s, return %d", u.String(), resp.StatusCode)
+		return err
+	}
+	defer resp.Body.Close()
 
-	utils.Ok(ctx, "success")
+	return nil
 }
 
 // WriteAlertFile write the alert rule to file
 func (alert *Alert) WriteAlertFile(rule *models.Rule) error {
+	var (
+		mapper  *prometheusrule.RuleMapper
+		rawRule *models.RawRule
+		err     error
+	)
+	// mapping the rule from rule to raw rule
+	mapper = prometheusrule.NewRuleMapper()
+	rawRule, err = mapper.Map2Raw(rule)
+	if err != nil {
+		return err
+	}
+	rawRule.UpdatedAt = time.Now()
+
+	//open the alert rule file
 	path := alert.RulesPath
-	alertfile := fmt.Sprintf("%s/%s-%s.rule", path, rule.Name, rule.Alert)
+	alertfile := fmt.Sprintf("%s/%s.rule", path, rawRule.Alert)
 	f, err := os.Create(alertfile)
 	defer f.Close()
 	if err != nil {
 		return err
 	}
-
+	// convert the rawRule with the template
 	t := template.Must(template.New("ruleTempl").Parse(ruleTempl))
 	var buf bytes.Buffer
-	err = t.Execute(&buf, rule)
+	err = t.Execute(&buf, rawRule)
 	if err != nil {
 		log.Errorln("executing templta: ", err)
 		return err
@@ -264,45 +358,31 @@ func (alert *Alert) WriteAlertFile(rule *models.Rule) error {
 	return nil
 }
 
-// RemoveAlertFile remove the rule from the file.
-func (alert *Alert) RemoveAlertFile(rule models.Rule) error {
+// UpdateAlertFile remove the rule from the file.
+func (alert *Alert) UpdateAlertFile(rule *models.Rule) error {
+	var (
+		err     error
+		message string
+	)
+
+	filename := fmt.Sprintf("%s_%s_%s_%s", rule.Class, rule.Name, rule.Cluster, rule.App)
+
 	path := alert.RulesPath
-	alertfile := fmt.Sprintf("%s/%s-%s.rule", path, rule.Name, rule.Alert)
+	alertfile := fmt.Sprintf("%s/%s.rule", path, filename)
 	f, err := os.Create(alertfile)
 	defer f.Close()
 	if err != nil {
 		return err
 	}
 
-	message := fmt.Sprintf("# removed this rule")
+	message = "# inactive this rule"
+
 	f.WriteString(message + "\n")
 
 	err = alert.ReloadPrometheusConf()
 	if err != nil {
 		return err
 	}
-
-	return nil
-}
-
-// ReloadPrometheusConf reload the conf by calling prometheus api
-func (alert *Alert) ReloadPrometheusConf() error {
-	u, err := url.Parse(alert.PromServer)
-	if err != nil {
-		return err
-	}
-	u.Path = strings.TrimRight(u.Path, "/") + PromtheusReloadPath
-	resp, err := alert.HTTPClient.Post(u.String(), "application/json", nil)
-	if err != nil {
-		err = fmt.Errorf("request to reload prometheus error: %v", err)
-		return err
-	}
-	if resp.StatusCode != 200 {
-		err = fmt.Errorf("Failed to reload the configuration file of prometheus %s, return %d", u.String(), resp.StatusCode)
-		return err
-	}
-	defer resp.Body.Close()
-
 	return nil
 }
 
@@ -325,16 +405,18 @@ func (alert *Alert) ReceiveAlertEvent(ctx *gin.Context) {
 		labels := item.(map[string]interface{})["labels"].(map[string]interface{})
 		annotations := item.(map[string]interface{})["annotations"].(map[string]interface{})
 		event := &models.Event{
-			AlertName:   labels["alertname"].(string),
-			Severity:    labels["severity"].(string),
-			VCluster:    labels["container_label_VCLUSTER"].(string),
-			App:         labels["container_label_APP"].(string),
-			Slot:        labels["container_label_SLOT"].(string),
-			UserName:    labels["container_label_USER_NAME"].(string),
-			GroupName:   labels["container_label_GROUP_NAME"].(string),
-			ContainerID: labels["id"].(string),
-			Description: annotations["description"].(string),
-			Summary:     annotations["summary"].(string),
+			AlertName: labels["alertname"].(string),
+			Severity:  labels["severity"].(string),
+			Cluster:   labels["container_label_VCLUSTER"].(string),
+			App:       labels["container_label_APP_ID"].(string),
+			Task:      labels["container_env_mesos_task_id"].(string),
+			//UserName:    labels["container_label_USER_NAME"].(string),
+			//GroupName:   labels["container_label_GROUP_NAME"].(string),
+			ContainerID:   labels["id"].(string),
+			ContainerName: labels["name"].(string),
+			Value:         labels["value"].(string),
+			Description:   annotations["description"].(string),
+			Summary:       annotations["summary"].(string),
 		}
 		if err := alert.Store.CreateOrIncreaseEvent(event); err != nil {
 			utils.ErrorResponse(ctx, utils.NewError(ReceiveEventError, err))
@@ -362,14 +444,14 @@ func (alert *Alert) AckAlertEvent(ctx *gin.Context) {
 	switch action := data["action"].(string); action {
 	case "ack":
 		// TODO ugly code
-		var username, groupname string
-		if data["user_name"] != nil {
-			username = data["user_name"].(string)
+		var cluster, app string
+		if data["cluster"] != nil {
+			cluster = data["cluster"].(string)
 		}
-		if data["group_name"] != nil {
-			groupname = data["group_name"].(string)
+		if data["app"] != nil {
+			app = data["app"].(string)
 		}
-		if err = alert.Store.AckEvent(pk, username, groupname); err != nil {
+		if err = alert.Store.AckEvent(pk, cluster, app); err != nil {
 			utils.ErrorResponse(ctx, utils.NewError(AckEventError, err))
 			return
 		}
@@ -379,16 +461,30 @@ func (alert *Alert) AckAlertEvent(ctx *gin.Context) {
 
 // GetAlertEvents list the alert events
 func (alert *Alert) GetAlertEvents(ctx *gin.Context) {
-	switch ack := ctx.Query("ack"); ack {
-	case "true":
-		result := alert.Store.ListAckedEvent(ctx.MustGet("page").(models.Page), ctx.Query("user_name"), ctx.Query("group_name"))
+	var (
+		ack bool
+		err error
+	)
+	if ctx.Query("ack") == "" {
+		ack = false
+	} else {
+		ack, err = strconv.ParseBool(ctx.Query("ack"))
+		if err != nil {
+			utils.ErrorResponse(ctx, utils.NewError(AckEventError, err))
+			return
+		}
+	}
+	switch ack {
+	case true:
+		result := alert.Store.ListAckedEvent(ctx.MustGet("page").(models.Page), ctx.Query("cluster"), ctx.Query("app"))
 		utils.Ok(ctx, result)
-	case "false", "":
-		result := alert.Store.ListUnackedEvent(ctx.MustGet("page").(models.Page), ctx.Query("user_name"), ctx.Query("group_name"))
+	case false:
+		result := alert.Store.ListUnackedEvent(ctx.MustGet("page").(models.Page), ctx.Query("cluster"), ctx.Query("app"))
 		utils.Ok(ctx, result)
 	}
 }
 
+/*
 // AlertRuleFilesMaintainer keep the rule files sync with db
 func (alert *Alert) AlertRuleFilesMaintainer() {
 	c := cron.New()
@@ -578,3 +674,4 @@ func updateFileByAction(path string, ruleOps *models.RuleOperation, action strin
 	log.Infof("updated rule file %s", ruleOps.File)
 	return nil
 }
+*/

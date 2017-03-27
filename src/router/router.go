@@ -84,17 +84,18 @@ func Router(middlewares ...gin.HandlerFunc) *gin.Engine {
 	alert := api.NewAlert()
 	alertv1 := r.Group("/v1/alert")
 	{
+		alertv1.GET("/indicators", alert.GetAlertIndicators)
 		alertv1.POST("/rules", alert.CreateAlertRule)
-		alertv1.DELETE("/rules/:id", alert.DeleteAlertRule)
 		alertv1.GET("/rules", alert.ListAlertRules)
 		alertv1.GET("/rules/:id", alert.GetAlertRule)
-		alertv1.PUT("/rules", alert.UpdateAlertRule)
-		alertv1.POST("/rules/conf", alert.ReloadAlertRuleConf)
+		alertv1.DELETE("/rules/:id", alert.DeleteAlertRule)
+		alertv1.PUT("/rules/:id", alert.UpdateAlertRule)
+		//alertv1.POST("/rules/conf", alert.ReloadAlertRuleConf)
 		alertv1.POST("/receiver", alert.ReceiveAlertEvent)
 		alertv1.PUT("/events/:id", alert.AckAlertEvent)
 		alertv1.GET("/events", alert.GetAlertEvents)
 	}
-	alert.AlertRuleFilesMaintainer()
+	//alert.AlertRuleFilesMaintainer()
 
 	staticRouter := r.Group("/ui")
 	{
