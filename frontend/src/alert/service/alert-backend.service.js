@@ -12,7 +12,6 @@
             alerts: alerts,
             alert: alert,
             histories: histories,
-            history: history,
             silences: silences,
             silence: silence
         };
@@ -33,14 +32,16 @@
 
         function histories(data) {
             var paramObj = data || {};
-            return $resource(BACKEND_URL_BASE.defaultBase + '/v1/search/prometheus', {
+            return $resource(BACKEND_URL_BASE.defaultBase + '/v1/log/alerts', {
+                cluster: paramObj.cluster,
+                app: paramObj.app,
+                task: paramObj.task,
+                source: paramObj.source,
+                start: paramObj.start,
+                end: paramObj.end,
                 page: paramObj.page,
                 size: paramObj.size
             });
-        }
-
-        function history(id) {
-            return $resource(BACKEND_URL_BASE.defaultBase + '/v1/search/prometheus/:id', {id: id});
         }
 
         function silences() {

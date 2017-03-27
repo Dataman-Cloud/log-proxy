@@ -10,7 +10,8 @@
     function alertcurd(alertBackend, confirmModal, Notification, $state) {
         return {
             deleteKeyword: deleteKeyword,
-            deleteSilence: deleteSilence
+            deleteSilence: deleteSilence,
+            activateAlarm: activateAlarm
         };
 
         function deleteKeyword(id) {
@@ -30,6 +31,18 @@
                         Notification.success('删除成功');
                         $state.go('home.alertSilences', null, {reload: true});
                     })
+            });
+        }
+
+        function activateAlarm(data) {
+            var modalText = data.status === 'Enabled' ? '是否关闭该告警?' : '是否激活该告警';
+
+            confirmModal.open(modalText).then(function () {
+                data.status = data.status === 'Enabled' ? 'Disabled' : 'Enabled';
+
+                alertBackend.alerts().update(data, function (data) {
+                    $state.reload();
+                });
             });
         }
     }

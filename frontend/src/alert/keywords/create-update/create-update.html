@@ -2,21 +2,49 @@
     <div flex class="panel">
         <form layout="column" name="staticForm">
             <div flex class="form-item">
-                <label class="requirement">应用名称</label>
-                <input id="appN" name="appN" type="text" ng-model="vm.form.app" data-required="required">
+                <label class="requirement">集群</label>
+                <md-select id="cluster" name="cluster" placeholder="选择集群" ng-model="vm.form.cluster"
+                           md-on-open="vm.loadClusters()"
+                           data-required="required">
+                    <md-option id="cluster{/$index/}" ng-value="key"
+                               ng-repeat="(key, value) in vm.clusters track by $index">{/key/}
+                    </md-option>
+                </md-select>
                 <p class="error-info help-info-bottom"
-                   data-ng-show="staticForm.appN.$error.required && !staticForm.appN.$pristine">应用名称不能为空</p>
+                   data-ng-show="staticForm.cluster.$error.required && !staticForm.cluster.$pristine">应用名称不能为空</p>
             </div>
+
+            <div flex class="form-item">
+                <label class="requirement">应用</label>
+                <md-select id="appName" name="app" placeholder="选择应用" ng-model="vm.form.app" md-on-open="vm.loadApps()"
+                           data-required="required" ng-disabled="!vm.form.cluster">
+                    <md-option id="app{/$index/}" ng-value="key" ng-repeat="(key, value) in vm.apps track by $index">
+                        {/key/}
+                    </md-option>
+                </md-select>
+                <p class="error-info help-info-bottom"
+                   data-ng-show="staticForm.app.$error.required && !staticForm.app.$pristine">应用名称不能为空</p>
+            </div>
+
+            <div flex class="form-item">
+                <label>来源</label>
+                <md-select id="chooseSource" name="source" placeholder="选择来源" ng-model="vm.form.source" md-on-open="vm.loadSources()"
+                           data-required="required" ng-disabled="!vm.form.app">
+                    <md-option id="chooseSource1" ng-value="key" ng-repeat="(key, value) in vm.sources">{/key/}
+                    </md-option>
+                </md-select>
+
+                <p class="error-info help-info-bottom"
+                   data-ng-show="staticForm.source.$error.required && !staticForm.source.$pristine">应用名称不能为空</p>
+            </div>
+
             <div flex class="form-item">
                 <label class="requirement">关键字</label>
                 <input id="keyW" name="keyW" type="text" ng-model="vm.form.keyword" data-required="required">
                 <p class="error-info help-info-bottom"
                    data-ng-show="staticForm.keyW.$error.required && !staticForm.keyW.$pristine">关键字不能为空</p>
             </div>
-            <div flex class="form-item">
-                <label>来源</label>
-                <input id="source" type="text" ng-model="vm.form.source" data-required="required">
-            </div>
+
             <div class="form-buttons-footer" layout="column">
                 <md-button id="createW" class="md-raised md-primary" style="width: 100px;"
                            ng-disabled="staticForm.$invalid" ng-if="vm.target === 'create'"

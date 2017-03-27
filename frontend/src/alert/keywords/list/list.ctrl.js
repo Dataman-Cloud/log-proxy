@@ -9,6 +9,11 @@
     function AlertKeywordsCtrl(alertBackend, alertcurd) {
         var self = this;
 
+        self.ALERT_STATUS = {
+            Enabled: '激活',
+            Disabled: '未激活'
+        };
+
         self.count = 0;
         self.keywords = [];
 
@@ -29,6 +34,7 @@
         };
 
         self.deleteKeyword = deleteKeyword;
+        self.activateAlarm = activateAlarm;
         self.onPaginate = onPaginate;
 
         activate();
@@ -46,6 +52,10 @@
 
         function deleteKeyword(id) {
             alertcurd.deleteKeyword(id)
+        }
+
+        function activateAlarm(data) {
+            alertcurd.activateAlarm(data)
         }
 
         function onPaginate(page, limit) {
