@@ -116,12 +116,11 @@ return
 ```
 {
   "code": 0,
-  "data": [
-    "cpu_usage",
-    "mem_usage"
-  ]
-}
-```
+  "data": {
+    "cpu_usage": "%",
+    "mem_usage": "%"
+  }
+}```
 
 #### 新建报警规则
 

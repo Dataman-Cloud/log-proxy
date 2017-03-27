@@ -74,9 +74,10 @@ func (ruleMap *RuleMapper) Map2Raw(rule *models.Rule) (*models.RawRule, error) {
 	return &raw, nil
 }
 
-func (ruleMap *RuleMapper) GetRuleIndicatorsList() (keys []string) {
-	for k := range GetRuleIndicators() {
-		keys = append(keys, k)
+func (ruleMap *RuleMapper) GetRuleIndicatorsList() (keys map[string]string) {
+	keys = make(map[string]string)
+	for k, v := range GetRuleIndicators() {
+		keys[k] = v.Unit
 	}
 	return keys
 }
