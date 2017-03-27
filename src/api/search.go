@@ -88,7 +88,7 @@ func GetSearch() *Search {
 		if s.KeywordFilter[ruleIndex] == nil {
 			s.KeywordFilter[ruleIndex] = list.New()
 		}
-		s.KeywordFilter[ruleIndex].PushBack(alertRule.Keyword)
+		s.KeywordFilter[ruleIndex].PushBack(alertRule)
 	}
 
 	return s
