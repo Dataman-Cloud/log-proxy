@@ -19,8 +19,8 @@ import (
 	"github.com/Dataman-Cloud/log-proxy/src/utils"
 	"github.com/Dataman-Cloud/log-proxy/src/utils/database"
 	"github.com/Dataman-Cloud/log-proxy/src/utils/prometheusrule"
-	"github.com/prometheus/common/log"
 
+	log "github.com/Sirupsen/logrus"
 	"github.com/gin-gonic/gin"
 )
 
