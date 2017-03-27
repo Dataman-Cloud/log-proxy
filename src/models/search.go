@@ -33,6 +33,7 @@ type LogAlertEvent struct {
 
 type LogAlertRule struct {
 	ID        uint64    `json:"id" gorm:"not null; auto_increment"`
+	Cluster   string    `json:"cluster"`
 	App       string    `json:"app"`
 	Keyword   string    `json:"keyword"`
 	Source    string    `json:"source"`
