@@ -77,7 +77,7 @@
             })
             //end log
 
-            //about alert
+            //about log alert
             .state('home.alertKeywordCreate', {
                 url: '/alertKeywordCreate',
                 templateUrl: '/src/alert/keywords/create-update/create-update.html',
@@ -108,39 +108,39 @@
                 controller: 'AlertKeywordsCtrl as vm'
             })
             .state('home.alerthistory', {
-                url: '/alerthistory',
+                url: '/alerthistory?cluster&app',
                 templateUrl: '/src/alert/history/list/list.html',
                 controller: 'AlertHistoriesCtrl as vm'
             })
-            .state('home.alertSilences', {
-                url: '/alertSilences',
-                templateUrl: '/src/alert/silence/list/list.html',
-                controller: 'AlertSilencesCtrl as vm'
-            })
-            .state('home.alertSilencesCreate', {
-                url: '/alertSilencesCreate?fromByHistory',
-                templateUrl: '/src/alert/silence/create-update/create-update.html',
-                controller: 'CreateAlertSilenceCtrl as vm',
-                resolve: {
-                    target: function () {
-                        return 'create'
-                    },
-                    silence: function () {
-                        return {}
-                    }
-                }
-            })
-            .state('home.alertSilencesUpdate', {
-                url: '/alertSilencesUpdate/:id?from',
-                templateUrl: '/src/alert/silence/create-update/create-update.html',
-                controller: 'CreateAlertSilenceCtrl as vm',
-                resolve: {
-                    target: function () {
-                        return 'update'
-                    },
-                    silence: getSilence
-                }
-            });
+            // .state('home.alertSilences', {
+            //     url: '/alertSilences',
+            //     templateUrl: '/src/alert/silence/list/list.html',
+            //     controller: 'AlertSilencesCtrl as vm'
+            // })
+            // .state('home.alertSilencesCreate', {
+            //     url: '/alertSilencesCreate?fromByHistory',
+            //     templateUrl: '/src/alert/silence/create-update/create-update.html',
+            //     controller: 'CreateAlertSilenceCtrl as vm',
+            //     resolve: {
+            //         target: function () {
+            //             return 'create'
+            //         },
+            //         silence: function () {
+            //             return {}
+            //         }
+            //     }
+            // })
+            // .state('home.alertSilencesUpdate', {
+            //     url: '/alertSilencesUpdate/:id?from',
+            //     templateUrl: '/src/alert/silence/create-update/create-update.html',
+            //     controller: 'CreateAlertSilenceCtrl as vm',
+            //     resolve: {
+            //         target: function () {
+            //             return 'update'
+            //         },
+            //         silence: getSilence
+            //     }
+            // });
 
         /* @ngInject */
         function getInfo(dashboardBackend, $stateParams) {

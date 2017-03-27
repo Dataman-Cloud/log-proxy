@@ -1,18 +1,70 @@
-<div class="alarm-strategy-list" layout="column">
-    <div class="result-sum">
-        <h2>告警历史</h2>
+<div class="log" layout="row" layout-align="space-between start">
+    <div class="panel log-condition">
+        <form layout="column" name="staticForm">
+            <md-content>
+                <div class="result-sum">
+                    <h3>日志告警历史</h3>
+                </div>
+                <div flex class="form-item">
+                    <md-select id="logRecently" placeholder="最近时间" ng-model="vm.timePeriod">
+                        <md-option id="logRecently0" ng-value="30">最近三十分钟</md-option>
+                        <md-option id="logRecently1" ng-value="60">最近一小时</md-option>
+                        <md-option id="logRecently2" ng-value="120">最近两小时</md-option>
+                        <md-option id="logRecently4" ng-value="720">最近12小时</md-option>
+                        <md-option id="logRecently5" ng-value="">全部日志</md-option>
+                    </md-select>
+                </div>
+            </md-content>
+
+            <div flex class="form-item" ng-if="vm.timePeriod">
+                <label class="requirement">集群</label>
+                <md-select id="cluster" name="cluster" placeholder="选择集群" ng-model="vm.form.cluster"
+                           md-on-open="vm.loadClusters()"
+                           ng-required="vm.timePeriod">
+                    <md-option id="cluster{/$index/}" ng-value="key"
+                               ng-repeat="(key, value) in vm.clusters track by $index">{/key/}
+                    </md-option>
+                </md-select>
+
+                <div layout="row" class="form-item">
+                    <p flex class="error-info help-info-bottom"
+                       data-ng-show="staticForm.cluster.$error.required && !staticForm.cluster.$pristine">集群不能为空</p>
+                </div>
+            </div>
+
+            <div flex class="form-item" ng-if="vm.timePeriod">
+                <label class="requirement">应用</label>
+                <md-select id="appName" name="app" placeholder="选择应用" ng-model="vm.form.app" md-on-open="vm.loadApps()"
+                           ng-required="vm.timePeriod" ng-disabled="!vm.form.cluster">
+                    <md-option id="app{/$index/}" ng-value="key" ng-repeat="(key, value) in vm.apps track by $index">
+                        {/key/}
+                    </md-option>
+                </md-select>
+
+                <div layout="row" class="form-item">
+                    <p flex class="error-info help-info-bottom"
+                       data-ng-show="staticForm.app.$error.required && !staticForm.app.$pristine">应用不能为空</p>
+                </div>
+            </div>
+
+            <div class="form-buttons-footer" layout="column">
+                <md-button id="logQuery" class="md-raised md-primary" ng-click="vm.searchHistory()"
+                           ng-disabled="staticForm.$invalid">查询
+                </md-button>
+            </div>
+        </form>
     </div>
-    <div class="panel">
-        <md-table-container>
+    <div flex class="panel log-result">
+        <md-table-container ng-hide="!vm.histories.length">
             <table md-table id="user-list-table">
                 <thead md-head>
                 <tr md-row>
-                    <th md-column style="width: 50px;"></th>
-                    <th md-column style="width: 150px;">时间</th>
-                    <th md-column>报警名</th>
-                    <th md-column>详情</th>
+                    <th md-column></th>
+                    <th md-column>时间</th>
+                    <th md-column>应用</th>
+                    <th md-column>集群</th>
+                    <th md-column>关键词</th>
                     <th md-column>摘要</th>
-                    <th md-column style="width: 100px;">操作</th>
                 </tr>
                 </thead>
                 <tbody md-body>
@@ -35,26 +87,11 @@
                     <td md-cell>
                         {/history.annotations.summary/}
                     </td>
-                    <td md-cell>
-                        <div class="action" layout="row">
-                            <md-button id="silencesBtn{/$index/}" aria-label="update" class="md-raised"
-                                       ui-sref="home.alertSilencesCreate({fromByHistory: history.id})">
-                                静默
-                            </md-button>
-                        </div>
-                    </td>
                 </tr>
                 <tr ng-repeat-end ng-if="vm.historyDisplaySet[$index]">
                     <td colspan="6">
                         <div class="json-detail">
-                            <dl ng-repeat="(key, value) in history.annotations track by $index">
-                                <dt>{/key/}</dt>
-                                <dd>{/value/}</dd>
-                            </dl>
-                            <dl ng-repeat="(key, value) in history.labels track by $index">
-                                <dt>{/key/}</dt>
-                                <dd>{/value/}</dd>
-                            </dl>
+                            <p>{/history.message/}</p>
                         </div>
                     </td>
                 </tr>
@@ -70,5 +107,9 @@
                                  md-page-select="vm.options.pageSelect">
             </md-table-pagination>
         </md-table-container>
+        <div class="alert-panel" data-ng-if="!vm.histories.length">
+            未查询到数据
+        </div>
     </div>
 </div>
+
