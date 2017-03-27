@@ -84,7 +84,7 @@
         function fetchHistory(data) {
             alertBackend.histories(data).get(function (data) {
                 if (data.data) {
-                    self.histories = data.data.results;
+                    self.histories = data.data.events;
                     self.count = data.data.count;
 
                 }
