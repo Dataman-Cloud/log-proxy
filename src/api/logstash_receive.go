@@ -10,6 +10,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+const (
+	LogAlertRuleEnabled  = "Enabled"
+	LogAlertRuleDisabled = "Disabled"
+)
+
 // ReceiverLog receive log data from logstash
 func (s *Search) ReceiverLog(ctx *gin.Context) {
 	var event models.LogAlertEvent
@@ -27,7 +32,12 @@ func (s *Search) ReceiverLog(ctx *gin.Context) {
 	}
 
 	for e := keywords.Front(); e != nil; e = e.Next() {
-		keyword := e.Value.(string)
+		rule := e.Value.(models.LogAlertRule)
+		if rule.Status == LogAlertRuleDisabled {
+			continue
+		}
+
+		keyword := rule.Keyword
 		if strings.Index(event.Message, keyword) == -1 {
 			continue
 		}

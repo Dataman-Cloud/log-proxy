@@ -28,7 +28,7 @@ func (s *Search) CreateLogAlertRule(ctx *gin.Context) {
 	ruleIndex := alertRule.App + alertRule.Source
 	if s.KeywordFilter[ruleIndex] != nil {
 		for e := s.KeywordFilter[ruleIndex].Front(); e != nil; e = e.Next() {
-			if e.Value.(string) == alertRule.Keyword {
+			if e.Value.(models.LogAlertRule).Keyword == alertRule.Keyword {
 				utils.ErrorResponse(ctx, utils.NewError(CreateAlertError, errors.New("keyword exist")))
 				return
 			}
@@ -43,7 +43,7 @@ func (s *Search) CreateLogAlertRule(ctx *gin.Context) {
 	}
 
 	s.Kmutex.Lock()
-	s.KeywordFilter[ruleIndex].PushBack(alertRule.Keyword)
+	s.KeywordFilter[ruleIndex].PushBack(alertRule)
 	s.Kmutex.Unlock()
 
 	utils.Ok(ctx, "create success")
@@ -73,7 +73,7 @@ func (s *Search) DeleteLogAlertRule(ctx *gin.Context) {
 		return
 	} else {
 		for e := s.KeywordFilter[ruleIndex].Front(); e != nil; e = e.Next() {
-			if e.Value.(string) == alertRule.Keyword {
+			if e.Value.(models.LogAlertRule).Keyword == alertRule.Keyword {
 				s.KeywordFilter[ruleIndex].Remove(e)
 			}
 		}
@@ -128,15 +128,15 @@ func (s *Search) UpdateLogAlertRule(ctx *gin.Context) {
 	s.Kmutex.Lock()
 	if s.KeywordFilter[ruleIndex] != nil {
 		for e := s.KeywordFilter[ruleIndex].Front(); e != nil; e = e.Next() {
-			if e.Value.(string) == alertRule.Keyword {
+			if e.Value.(models.LogAlertRule).Keyword == alertRule.Keyword {
 				s.KeywordFilter[ruleIndex].Remove(e)
-				s.KeywordFilter[ruleIndex].PushBack(alertRule.Keyword)
+				s.KeywordFilter[ruleIndex].PushBack(alertRule)
 				break
 			}
 		}
 	} else {
 		s.KeywordFilter[ruleIndex] = list.New()
-		s.KeywordFilter[ruleIndex].PushBack(alertRule.Keyword)
+		s.KeywordFilter[ruleIndex].PushBack(alertRule)
 	}
 	s.Kmutex.Unlock()
 

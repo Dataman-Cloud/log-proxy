@@ -36,6 +36,7 @@ type LogAlertRule struct {
 	App       string    `json:"app"`
 	Keyword   string    `json:"keyword"`
 	Source    string    `json:"source"`
+	Status    string    `json:"status" sql:"DEFAULT:'Enabled'"`
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
 }
