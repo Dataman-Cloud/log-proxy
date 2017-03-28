@@ -2,6 +2,8 @@ package datastore
 
 import (
 	"fmt"
+	"strconv"
+	"time"
 
 	"github.com/Dataman-Cloud/log-proxy/src/models"
 )
@@ -39,42 +41,55 @@ func (db *datastore) AckEvent(ID int, cluster, app string) error {
 	return db.Save(&result).Error
 }
 
-func (db *datastore) ListAckedEvent(page models.Page, cluster, app string) map[string]interface{} {
+func (db *datastore) ListEvents(page models.Page, options map[string]interface{}) (map[string]interface{}, error) {
 	var (
 		result []*models.Event
 		count  int
 	)
-	if cluster == "" && app == "" {
-		db.Where("ack = ?", true).Find(&result).Count(&count)
-		db.Where("ack = ?", true).Offset(page.PageFrom).Limit(page.PageSize).Find(&result)
-	} else if cluster != "" && app == "" {
-		db.Where("ack = ?", true).Where("cluster = ?", cluster).Find(&result).Count(&count)
-		db.Where("ack = ?", true).Where("cluster = ?", cluster).Offset(page.PageFrom).Limit(page.PageSize).Find(&result)
-	} else if cluster != "" && app != "" {
-		db.Where("ack = ?", true).Where("cluster = ? AND app = ?", cluster, app).Find(&result).Count(&count)
-		db.Where("ack = ?", true).Where("cluster = ? AND app = ?", cluster, app).Offset(page.PageFrom).Limit(page.PageSize).Find(&result)
-	} else {
-		result = nil
-	}
-	return map[string]interface{}{"count": count, "events": result}
-}
+	query := db.Table("events")
 
-func (db *datastore) ListUnackedEvent(page models.Page, cluster, app string) map[string]interface{} {
-	var (
-		result []*models.Event
-		count  int
-	)
-	if cluster == "" && app == "" {
-		db.Where("ack = ?", false).Find(&result).Count(&count)
-		db.Where("ack = ?", false).Offset(page.PageFrom).Limit(page.PageSize).Find(&result)
-	} else if cluster != "" && app == "" {
-		db.Where("ack = ?", false).Where("cluster = ?", cluster).Find(&result).Count(&count)
-		db.Where("ack = ?", false).Where("cluster = ?", cluster).Offset(page.PageFrom).Limit(page.PageSize).Find(&result)
-	} else if cluster != "" && app != "" {
-		db.Where("ack = ?", false).Where("cluster = ? AND app = ?", cluster, app).Find(&result).Count(&count)
-		db.Where("ack = ?", false).Where("cluster = ? AND app = ?", cluster, app).Offset(page.PageFrom).Limit(page.PageSize).Find(&result)
-	} else {
-		result = nil
+	if start, ok := options["start"]; ok {
+		timeStamp, err := strconv.ParseInt(start.(string), 10, 64)
+		if err != nil {
+			return nil, err
+		}
+
+		startTime := time.Unix(timeStamp, 0)
+		query = query.Where("updated_at >= ?", startTime)
+
+		delete(options, "start")
 	}
-	return map[string]interface{}{"count": count, "events": result}
+
+	if end, ok := options["end"]; ok {
+		timeStamp, err := strconv.ParseInt(end.(string), 10, 64)
+		if err != nil {
+			return nil, err
+		}
+
+		endTime := time.Unix(timeStamp, 0)
+		query = query.Where("updated_at <= ?", endTime)
+
+		delete(options, "end")
+	}
+
+	err := query.
+		Where(options).
+		Find(&result).
+		Count(&count).
+		Error
+	if err != nil {
+		return nil, err
+	}
+
+	err = query.Where(options).
+		Offset(page.PageFrom).
+		Limit(page.PageSize).
+		Find(&result).
+		Order("updated_at desc").
+		Error
+	if err != nil {
+		return nil, err
+	}
+
+	return map[string]interface{}{"count": count, "events": result}, nil
 }
