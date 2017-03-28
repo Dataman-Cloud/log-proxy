@@ -84,8 +84,8 @@ func (db *datastore) ListEvents(page models.Page, options map[string]interface{}
 	err = query.Where(options).
 		Offset(page.PageFrom).
 		Limit(page.PageSize).
-		Find(&result).
 		Order("updated_at desc").
+		Find(&result).
 		Error
 	if err != nil {
 		return nil, err
