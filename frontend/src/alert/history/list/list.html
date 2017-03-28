@@ -21,8 +21,8 @@
                 <md-select id="cluster" name="cluster" placeholder="选择集群" ng-model="vm.form.cluster"
                            md-on-open="vm.loadClusters()"
                            ng-required="vm.timePeriod">
-                    <md-option id="cluster{/$index/}" ng-value="key"
-                               ng-repeat="(key, value) in vm.clusters track by $index">{/key/}
+                    <md-option id="cluster{/$index/}" ng-value="cluster.cluster"
+                               ng-repeat="cluster in vm.clusters track by $index">{/cluster.cluster/}
                     </md-option>
                 </md-select>
 
@@ -36,8 +36,8 @@
                 <label class="requirement">应用</label>
                 <md-select id="appName" name="app" placeholder="选择应用" ng-model="vm.form.app" md-on-open="vm.loadApps()"
                            ng-required="vm.timePeriod" ng-disabled="!vm.form.cluster">
-                    <md-option id="app{/$index/}" ng-value="key" ng-repeat="(key, value) in vm.apps track by $index">
-                        {/key/}
+                    <md-option id="app{/$index/}" ng-value="app.app" ng-repeat="app in vm.apps track by $index">
+                        {/app.app/}
                     </md-option>
                 </md-select>
 

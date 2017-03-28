@@ -12,6 +12,8 @@
             alerts: alerts,
             alert: alert,
             histories: histories,
+            clusters: clusters,
+            apps: apps,
             silences: silences,
             silence: silence
         };
@@ -41,6 +43,25 @@
                 end: paramObj.end,
                 page: paramObj.page,
                 size: paramObj.size
+            });
+        }
+
+        function clusters(data) {
+            var paramObj = data || {};
+
+            return $resource(BACKEND_URL_BASE.defaultBase + '/v1/log/alerts/clusters', {
+                start: paramObj.start,
+                end: paramObj.end
+            });
+        }
+
+        function apps(data) {
+            var paramObj = data || {};
+
+            return $resource(BACKEND_URL_BASE.defaultBase + '/v1/log/alerts/clusters/:cluster/apps', {
+                cluster: paramObj.cluster,
+                start: paramObj.start,
+                end: paramObj.end
             });
         }
 
