@@ -3,7 +3,7 @@
     angular.module('app')
         .controller('AlertHistoriesCtrl', AlertHistoriesCtrl);
     /* @ngInject */
-    function AlertHistoriesCtrl(alertBackend, $stateParams, moment, logBackend) {
+    function AlertHistoriesCtrl(alertBackend, $stateParams, moment) {
         var self = this;
 
         self.timePeriod = 60;
@@ -11,9 +11,8 @@
         self.count = 0;
         self.histories = [];
 
-        self.clusters = {};
-        self.apps = {};
-        self.sources = {};
+        self.clusters = [];
+        self.apps = [];
 
         self.form = {
             cluster: $stateParams.cluster || '',
@@ -42,7 +41,6 @@
 
         self.loadClusters = loadClusters;
         self.loadApps = loadApps;
-        self.loadSources = loadSources;
         self.onPaginate = onPaginate;
         self.searchHistory = searchHistory;
 
@@ -51,31 +49,25 @@
         function activate() {
             loadClusters();
             loadApps();
-            loadSources();
             listHistory();
         }
 
         function loadClusters() {
-            logBackend.clusters().get(function (data) {
+            checkTimeRange();
+
+            alertBackend.clusters({start: self.startTime, end: self.endTime}).get(function (data) {
                 self.clusters = data.data;
             })
         }
 
         function loadApps() {
             if (self.form.cluster) {
-                logBackend.apps(self.form.cluster).get(function (data) {
-                    self.apps = data.data;
-                })
-            }
-        }
-
-        function loadSources() {
-            if (self.form.app && self.form.cluster) {
-                logBackend.sources({
+                alertBackend.apps({
                     cluster: self.form.cluster,
-                    app: self.form.app
+                    start: self.startTime,
+                    end: self.endTime
                 }).get(function (data) {
-                    self.sources = data.data;
+                    self.apps = data.data;
                 })
             }
         }
@@ -119,6 +111,16 @@
             self.form.page = page;
 
             fetchHistory(self.form)
+        }
+
+        function checkTimeRange() {
+            if (self.timePeriod) {
+                self.startTime = moment().unix();
+                self.endTime = moment().subtract(self.timePeriod, 'minutes').unix();
+            } else {
+                self.startTime = null;
+                self.endTime = null;
+            }
         }
     }
 })();
