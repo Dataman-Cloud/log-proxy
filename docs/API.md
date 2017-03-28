@@ -251,6 +251,7 @@ return
  - task=tasktest
  - source=stdout
  - keyword=test
+ - conj=and/or(日志关键字连接词, 可以选择AND/OR 表示搜索的日志是同事包含所有关键字或只需包含其中一个)
  - from=now-7d
  - to=now
 
