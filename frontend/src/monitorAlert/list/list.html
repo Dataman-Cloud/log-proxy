@@ -1,6 +1,6 @@
 <div class="alarm-strategy-list" layout="column">
     <div class="result-sum">
-        <h2>监控告警</h2>
+        <h2>报警规则</h2>
     </div>
     <div class="panel">
         <div layout="row" layout-align="end start">
@@ -29,7 +29,7 @@
                 <tr md-row
                     ng-repeat="rule in vm.rules track by $index">
                     <td md-cell>
-                       {/rule.class/}
+                        {/rule.class/}
                     </td>
                     <td md-cell>
                         {/rule.name/}
@@ -65,11 +65,18 @@
                     <td md-cell>
                         <div class="action" layout="row">
                             <md-button id="update{/$index/}" aria-label="update" class="md-raised"
-                                       data-ui-sref = "home.monitorAlertUpdate">
-                                修改
+                                       data-ui-sref="home.monitorAlertUpdate({id: rule.ID})">
+                                更新
                             </md-button>
-                            <md-button id="delete{/$index/}" aria-label="update" class="md-raised"">
+                            <md-button id="delete{/$index/}" aria-label="update" class="md-raised"
+                                       data-ng-click="vm.deleteAlert(rule.ID, rule.class)">
                                 删除
+                            </md-button>
+                            <md-button aria-label="update" class="md-raised" ng-if="rule.status === 'Disabled'"
+                                       ng-click="vm.activateAlert(rule)">启用
+                            </md-button>
+                            <md-button aria-label="update" class="md-raised" ng-if="rule.status === 'Enabled'"
+                                       ng-click="vm.activateAlert(rule)">暂停
                             </md-button>
                         </div>
                     </td>

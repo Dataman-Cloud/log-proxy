@@ -8,7 +8,7 @@
 
     /* @ngInject */
 
-    function monitorAlertCurd(){
-
+    function monitorAlertCurd() {
+        
     }
 })();

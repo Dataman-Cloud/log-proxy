@@ -5,7 +5,7 @@
                 <div><label class="requirement">报警组</label></div>
                 <div>
                     <input type="text" class="form-input" name="class" id="input-alert"
-                           aria-label="class"
+                           aria-label="class" ng-disabled="vm.target === 'update'"
                            data-ng-model="vm.form.class" data-required="required"
                            data-ng-maxlength="255" data-ng-pattern="/^[A-Za-z0-9\-]+$/" data-ng-trim="true">
                 </div>
@@ -23,7 +23,7 @@
                 <div><label class="requirement">报警名称</label></div>
                 <div>
                     <input type="text" class="form-input" name="name" id="input-alert-name"
-                           aria-label="class"
+                           aria-label="class" ng-disabled="vm.target === 'update'"
                            data-ng-model="vm.form.name" data-required="required"
                            data-ng-maxlength="255" data-ng-pattern="/^[A-Za-z0-9\-]+$/" data-ng-trim="true">
                 </div>
@@ -173,7 +173,6 @@
                        data-ng-click="vm.update()" data-ng-disabled="staticForm.$invalid"
                        aria-label="create" id="submit-update-user">更 新
             </md-button>
-            <md-button class="md-primary" data-ng-click="rootCtrl.goBack()" id="cancel-create-user">取 消</md-button>
         </div>
     </form>
 </div>

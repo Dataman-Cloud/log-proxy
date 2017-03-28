@@ -158,19 +158,29 @@
                     target: function () {
                         return 'create'
                     },
-                    clusters: getClusters,
-                    apps: getApps,
-                    indicators: getIndicators
+                    rule: function () {
+                        return {}
+                    }
                 }
             })
             .state('home.monitorAlertUpdate', {
-                url: '/monitorAlertUpdate',
+                url: '/monitorAlertUpdate/:id',
                 templateUrl: '/src/monitorAlert/create-update/create-update.html',
                 controller: 'CreateMonitorAlertCtrl as vm',
                 resolve: {
                     target: function () {
                         return 'update'
-                    }
+                    },
+                    rule: getRule
+                }
+            })
+            .state('home.alertRules', {
+                url: '/alertRules',
+                templateUrl: '/src/monitorAlert/rules/rules.html',
+                controller: 'AlertRulesCtrl as vm',
+                resolve: {
+
+                    events: getEvents
                 }
             });
 
@@ -214,6 +224,16 @@
         /* @ngInject */
         function getRules(monitorAlertBackend) {
             return monitorAlertBackend.rules().get().$promise
+        }
+
+        /* @ngInject */
+        function getRule(monitorAlertBackend, $stateParams) {
+            return monitorAlertBackend.rule($stateParams.id).get().$promise
+        }
+
+        /* @ngInject */
+        function getEvents(monitorAlertBackend) {
+            return monitorAlertBackend.events().get().$promise
         }
 
 

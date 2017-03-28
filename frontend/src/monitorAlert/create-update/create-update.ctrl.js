@@ -7,30 +7,36 @@
         .controller('CreateMonitorAlertCtrl', CreateMonitorAlertCtrl);
     /* @ngInject */
 
-    function CreateMonitorAlertCtrl(target, monitorAlertBackend, Notification, $state) {
+    function CreateMonitorAlertCtrl(target, monitorAlertBackend, Notification, $state, rule) {
         var self = this;
+
+        var rule = rule.data || {};
+
         self.target = target;
+
         self.clusters = [];
         self.apps = [];
         self.indicators = [];
         self.unit = [];
+        
         self.form = {
-            class: '',
-            name: '',
-            cluster: '',
-            app: '',
-            severity: '',
-            indicator: '',
-            pending: '',
-            aggregation: '',
-            comparison: '',
-            threshold: ''
+            class: rule.class || '',
+            name: rule.name || '',
+            cluster: rule.cluster || '',
+            app: rule.app || '',
+            severity: rule.severity || '',
+            indicator: rule.indicator || '',
+            pending: rule.pending || '',
+            aggregation: rule.aggregation || '',
+            comparison: rule.comparison || '',
+            threshold: rule.threshold || ''
         };
 
         self.loadClusters = loadClusters;
         self.loadApps = loadApps;
         self.loadIndicators = loadIndicators;
         self.create = create;
+        self.update = update;
 
         activate();
 
@@ -72,6 +78,15 @@
                 Notification.success('创建成功');
                 $state.go('home.monitorAlert', null, {reload: true})
             })
+        }
+
+        // 更新
+        function update() {
+            self.form.ID = rule.ID;
+            monitorAlertBackend.rule(self.form.ID).update(self.form, function (data) {
+                Notification.success('更新成功');
+                $state.go('home.monitorAlert', null, {reload: true})
+            });
         }
     }
 })();
