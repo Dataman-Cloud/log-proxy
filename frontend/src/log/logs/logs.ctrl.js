@@ -12,6 +12,7 @@
             task: $stateParams.task,
             source: $stateParams.source,
             keyword: $stateParams.keyword,
+            conj: $stateParams.conj,
             page: 1,
             size: 50
         };
@@ -55,6 +56,7 @@
                 task: tempLogQuery.task,
                 source: tempLogQuery.source,
                 keyword: tempLogQuery.keyword,
+                conj: tempLogQuery.conj,
                 page: page,
                 size: limit
             }).get(function (data) {

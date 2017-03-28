@@ -109,6 +109,14 @@
                 </div>
             </div>
 
+            <div flex class="form-item">
+                <label>关键字连接词</label>
+                <md-select id="conj" placeholder="关键字连接词" name="conj" ng-model="vm.form.conj">
+                    <md-option value="and">AND</md-option>
+                    <md-option value="or">OR</md-option>
+                </md-select>
+            </div>
+
             <div class="form-buttons-footer" layout="column">
                 <md-button id="logQuery" class="md-raised md-primary" ng-click="vm.searchLog()"
                            ng-disabled="staticForm.$invalid">查询
