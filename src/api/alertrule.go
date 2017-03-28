@@ -208,22 +208,20 @@ func (alert *Alert) DeleteAlertRule(ctx *gin.Context) {
 	var (
 		rowsAffected int64
 		err          error
-		rule         *models.Rule
 		result       models.Rule
+		id           uint64
+		class        string
 	)
-	// parse the json and param id
-	if err = ctx.BindJSON(&rule); err != nil {
-		utils.ErrorResponse(ctx, fmt.Errorf("Parse JSON rule error: %s", err))
-		return
-	}
-	rule.ID, err = strconv.ParseUint(ctx.Param("id"), 10, 64)
+
+	id, err = strconv.ParseUint(ctx.Param("id"), 10, 64)
 	if err != nil {
 		utils.ErrorResponse(ctx, fmt.Errorf("Failed to parse the id: %s", err))
 		return
 	}
+	class = ctx.Query("class")
 
 	// Get alert rule by ID
-	result, err = alert.Store.GetAlertRule(rule.ID)
+	result, err = alert.Store.GetAlertRule(id)
 	if err != nil {
 		log.Errorln("DeleteAlertRule: GetAlertRule() error, ", err)
 		utils.ErrorResponse(ctx, err)
@@ -231,7 +229,7 @@ func (alert *Alert) DeleteAlertRule(ctx *gin.Context) {
 	}
 
 	// Delate alert rule
-	rowsAffected, err = alert.Store.DeleteAlertRuleByIDClass(rule.ID, rule.Class)
+	rowsAffected, err = alert.Store.DeleteAlertRuleByIDClass(id, class)
 	if err != nil {
 		utils.ErrorResponse(ctx, fmt.Errorf("Failed to delete the rule by %s", err))
 		return
