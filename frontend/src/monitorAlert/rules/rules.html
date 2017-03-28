@@ -1,0 +1,109 @@
+<div class="log" layout="row" layout-align="space-between start">
+    <div class="panel log-condition">
+        <form layout="column" name="staticForm">
+            <div class="result-sum">
+                <h3>报警事件</h3>
+            </div>
+            <md-content>
+                <div flex class="form-item">
+                    <label>最近时间</label>
+                    <md-select id="times" aria-label="role" ng-model="vm.timePeriod">
+                        <md-option id="times0" ng-value="30">最近三十分钟</md-option>
+                        <md-option id="times1" ng-value="60">最近一小时</md-option>
+                        <md-option id="times2" ng-value="120">最近两小时</md-option>
+                        <md-option id="times3" ng-value="300">最近五小时</md-option>
+                        <md-option id="times4" ng-value="720">最近12小时</md-option>
+                        <md-option id="times5" ng-value="1440">最近一天</md-option>
+                        <md-option selected id="times6" ng-value="">全部事件</md-option>
+                    </md-select>
+                </div>
+            </md-content>
+
+            <div flex class="form-item">
+                <label>集群</label>
+                <input type="text" ng-maxlength="4096" id="cluster" name="cluster" placeholder="关键字"
+                       ng-model="vm.form.cluster">
+            </div>
+            <div flex class="form-item">
+                <label>应用</label>
+                <input type="text" ng-maxlength="4096" id="app" name="app" placeholder="关键字"
+                       ng-model="vm.form.app">
+            </div>
+            <div flex class="form-item">
+                <div>
+                    <md-checkbox ng-model="vm.form.ack" aria-label="task_status">
+                        已知事件
+                    </md-checkbox>
+                </div>
+            </div>
+            <div flex class="form-item" layout="column">
+                <md-button id="monitorCheck" class="md-raised md-primary" ng-click="vm.searchAlert()"
+                           ng-disabled="staticForm.$invalid">查询
+                </md-button>
+            </div>
+        </form>
+    </div>
+    <div flex class="panel log-result">
+        <md-table-container ng-hide="!vm.events.length">
+            <table md-table id="user-list-table">
+                <thead md-head>
+                <tr md-row>
+                    <th md-column>更新时间</th>
+                    <th md-column>报警名称</th>
+                    <th md-column>集群</th>
+                    <th md-column>应用</th>
+                    <th md-column>告警级别</th>
+                    <th md-column>次数</th>
+                    <th md-column>值</th>
+                    <th md-column>操作</th>
+                </tr>
+                </thead>
+                <tbody md-body>
+                <tr md-row ng-repeat="event in vm.events track by $index">
+                    <td md-cell>
+                        {/event.UpdatedAt | date:" yyyy-MM-dd HH:mm:ss"/}
+                    </td>
+                    <td md-cell>
+                        {/event.alert_name/}
+                    </td>
+                    <td md-cell>
+                        {/event.cluster/}
+                    </td>
+                    <td md-cell>
+                        {/event.app/}
+                    </td>
+                    <td md-cell>
+                        {/event.severity/}
+                    </td>
+                    <td md-cell>
+                        {/event.count/}
+                    </td>
+                    <td md-cell>
+                        {/event.value/}
+                    </td>
+                    <td md-cell>
+                        <div class="action" layout="row">
+                            <md-button data-ng-disabled="event.ack === true" aria-label="delete" class="md-raised"
+                                       data-ng-click="vm.activateAck(event)">
+                                已知
+                            </md-button>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <!--<md-table-pagination md-limit="vm.query.limit"-->
+            <!--md-label="{page: '页:', rowsPerPage: '每页:', of: 'of'}"-->
+            <!--md-limit-options="vm.limitOptions"-->
+            <!--md-boundary-links="vm.limitOptions.boundaryLinks"-->
+            <!--md-page="vm.query.page"-->
+            <!--md-total="{/vm.count/}"-->
+            <!--md-on-paginate="vm.onPaginate"-->
+            <!--md-page-select="vm.options.pageSelect">-->
+            <!--</md-table-pagination>-->
+        </md-table-container>
+        <div class="alert-panel" data-ng-if="!vm.events.length">
+            未查询到数据
+        </div>
+    </div>
+</div>
