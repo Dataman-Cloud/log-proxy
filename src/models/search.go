@@ -52,3 +52,11 @@ const (
 	TaskRunning string = "running"
 	TaskDied    string = "died"
 )
+
+type LogAlertClusters struct {
+	Cluster string `json:"cluster"`
+}
+
+type LogAlertApps struct {
+	App string `json:"app"`
+}

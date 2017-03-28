@@ -205,3 +205,25 @@ func (s *Search) DeleteLogAlertEvents(ctx *gin.Context) {
 	utils.Ok(ctx, "delete success")
 	return
 }
+
+func (s *Search) GetLogAlertClusters(ctx *gin.Context) {
+	clusters, err := s.Store.GetLogAlertClusters(ctx.Query("start"), ctx.Query("end"))
+	if err != nil {
+		utils.ErrorResponse(ctx, utils.NewError(GetLogALertClustersError, err))
+		return
+	}
+
+	utils.Ok(ctx, clusters)
+	return
+}
+
+func (s *Search) GetLogAlertApps(ctx *gin.Context) {
+	apps, err := s.Store.GetLogAlertApps(ctx.Param("cluster"), ctx.Query("start"), ctx.Query("end"))
+	if err != nil {
+		utils.ErrorResponse(ctx, utils.NewError(GetLogALertAppsError, err))
+		return
+	}
+
+	utils.Ok(ctx, apps)
+	return
+}
