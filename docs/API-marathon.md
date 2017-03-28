@@ -347,9 +347,8 @@ For example:
 Delete the alert rule
 
 ```
-curl -X DELETE "http://127.0.0.1:5098/v1/alert/rules/1" -d '{
-  "class" : "mola",
-}'
+curl -X DELETE "http://127.0.0.1:5098/v1/alert/rules/1?class=mola"
+
 ```
 return
 ```
