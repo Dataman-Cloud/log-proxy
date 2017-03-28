@@ -1,0 +1,178 @@
+<div class="main-section">
+    <form name="staticForm">
+        <div layout="column" class="panel">
+            <div layout="column" class="form-item">
+                <div><label class="requirement">报警组</label></div>
+                <div>
+                    <input type="text" class="form-input" name="class" id="input-alert"
+                           aria-label="class" ng-disabled="vm.target === 'update'"
+                           data-ng-model="vm.form.class" data-required="required"
+                           data-ng-maxlength="255" data-ng-pattern="/^[A-Za-z0-9\-]+$/" data-ng-trim="true">
+                </div>
+                <p class="error-info help-info-bottom"
+                   data-ng-show="staticForm.alert.$error.required && !staticForm.alert.$pristine">事件名称不能为空</p>
+                <p class="error-info help-info-bottom"
+                   data-ng-show="staticForm.alert.$error.maxlength && !staticForm.alert.$pristine">超过 255
+                    个字符</p>
+                <p class="error-info help-info-bottom"
+                   data-ng-show="staticForm.alert.$error.pattern && !staticForm.alert.$pristine">
+                    事件名称必须为英文,-或者数字</p>
+            </div>
+
+            <div layout="column" class="form-item">
+                <div><label class="requirement">报警名称</label></div>
+                <div>
+                    <input type="text" class="form-input" name="name" id="input-alert-name"
+                           aria-label="class" ng-disabled="vm.target === 'update'"
+                           data-ng-model="vm.form.name" data-required="required"
+                           data-ng-maxlength="255" data-ng-pattern="/^[A-Za-z0-9\-]+$/" data-ng-trim="true">
+                </div>
+                <p class="error-info help-info-bottom"
+                   data-ng-show="staticForm.alert.$error.required && !staticForm.alert.$pristine">事件名称不能为空</p>
+                <p class="error-info help-info-bottom"
+                   data-ng-show="staticForm.alert.$error.maxlength && !staticForm.alert.$pristine">超过 255
+                    个字符</p>
+                <p class="error-info help-info-bottom"
+                   data-ng-show="staticForm.alert.$error.pattern && !staticForm.alert.$pristine">
+                    事件名称必须为英文,-或者数字</p>
+            </div>
+
+            <div layout="column" class="form-item">
+                <div><label class="requirement">集群</label></div>
+                <div>
+                    <md-select data-ng-model="vm.form.cluster" class="md-no-underline"
+                               data-required="required" aria-label="groups select" md-on-open="vm.loadClusters()"
+                               ng-disabled="vm.target === 'update'">
+                        <md-option ng-repeat="cluster in vm.clusters"
+                                   ng-value="cluster">
+                            {/cluster/}
+                        </md-option>
+                    </md-select>
+                </div>
+            </div>
+
+            <div layout="column" class="form-item">
+                <div><label class="requirement">应用</label></div>
+                <div>
+                    <md-select data-ng-model="vm.form.app" class="md-no-underline"
+                               data-required="required" aria-label="groups select"
+                               ng-disabled="vm.target === 'update'">
+                        <md-option ng-repeat="app in vm.apps"
+                                   ng-value="app">
+                            {/app/}
+                        </md-option>
+                    </md-select>
+                </div>
+            </div>
+
+            <div layout="column" class="form-item">
+                <div><label class="requirement">报警级别</label></div>
+                <div flex layout="column">
+                    <div layout="row">
+                        <div flex>
+                            <md-select data-ng-model="vm.form.severity" data-required="required"
+                                       aria-label="metric">
+                                <md-option value="warning">warning</md-option>
+                                <md-option value="critical">critical</md-option>
+                            </md-select>
+                        </div>
+                        <!--<div flex>-->
+                        <!--<span class="form-input-addon" id="memused"-->
+                        <!--data-ng-if="vm.form.rule.indicator === 'memory'">MB</span>-->
+                        <!--<span class="form-input-addon" id="cpuused"-->
+                        <!--data-ng-if="vm.form.rule.indicator === 'cpu'">%</span>-->
+                        <!--<span class="form-input-addon" id="diskused"-->
+                        <!--data-ng-if="vm.form.rule.indicator === 'network' || vm.form.rule.indicator === 'filesys'">B/s</span>-->
+                        <!--</div>-->
+                    </div>
+                </div>
+            </div>
+
+            <div layout="column" class="form-item">
+                <div><label class="requirement">报警延迟</label></div>
+                <div layout="column">
+                    <div layout="row">
+                        <div flex>
+                            <md-select data-ng-model="vm.form.pending" data-required="required"
+                                       aria-label="metric">
+                                <md-option value="30s">30秒</md-option>
+                                <md-option value="1m">1分钟</md-option>
+                                <md-option value="2m">2分钟</md-option>
+                            </md-select>
+                        </div>
+                        <!--<div flex>-->
+                        <!--<span class="form-input-addon" id="memused"-->
+                        <!--data-ng-if="vm.form.rule.indicator === 'memory'">MB</span>-->
+                        <!--<span class="form-input-addon" id="cpuused"-->
+                        <!--data-ng-if="vm.form.rule.indicator === 'cpu'">%</span>-->
+                        <!--<span class="form-input-addon" id="diskused"-->
+                        <!--data-ng-if="vm.form.rule.indicator === 'network' || vm.form.rule.indicator === 'filesys'">B/s</span>-->
+                        <!--</div>-->
+                    </div>
+                </div>
+            </div>
+
+            <div layout="column" class="form-item">
+                <div><label class="requirement">报警指标</label></div>
+                <div>
+                    <md-select data-ng-model="vm.form.indicator" class="md-no-underline"
+                               data-required="required" aria-label="groups select">
+                        <md-option ng-repeat="indicator in vm.indicators"
+                                   ng-value="indicator">
+                            {/indicator/}
+                        </md-option>
+                    </md-select>
+                </div>
+            </div>
+
+            <div layout="column" class="form-item">
+                <div><label class="requirement">监控阀值</label></div>
+                <div flex="50" layout="column">
+                    <div layout="row">
+                        <div flex="25">
+                            <md-select data-ng-model="vm.form.aggregation" data-required="required"
+                                       aria-label="metric">
+                                <md-option value="avg">平均值</md-option>
+                                <md-option value="max">最大值</md-option>
+                                <md-option value="min">最小值</md-option>
+                                <md-option value="sum">总和</md-option>
+                            </md-select>
+                        </div>
+                        <div flex="25" flex-offset="5">
+                            <md-select data-ng-model="vm.form.comparison" data-required="required"
+                                       aria-label="selectSize">
+                                <md-option value=">">大于</md-option>
+                                <md-option value="<">小于</md-option>
+                                <md-option value="==">等于</md-option>
+                            </md-select>
+                        </div>
+                        <div flex="30" flex-offset="5">
+                            <input type="number" class="form-input"
+                                   aria-label="threshold" placeholder="value"
+                                   data-ng-model="vm.form.threshold" name="threshold"
+                                   data-required="required">
+                        </div>
+                        <div flex>
+                        <span class="form-input-addon" id="memused"
+                              data-ng-if="vm.form.indicator === 'cpu_usage'">%</span>
+                        <span class="form-input-addon" id="cpuused"
+                              data-ng-if="vm.form.indicator === 'mem_usage'">%</span>
+                        </div>
+                    </div>
+                </div>
+                <div flex></div>
+            </div>
+
+        </div>
+        <div layout="row" layout-align="center start" class="form-buttons-footer">
+            <md-button ng-if="vm.target==='create'" class="md-raised md-primary"
+                       data-ng-click="vm.create()" data-ng-disabled="staticForm.$invalid"
+                       aria-label="create" id="submit-create-user">创 建
+            </md-button>
+            <md-button ng-if="vm.target==='update'" class="md-raised md-primary"
+                       data-ng-click="vm.update()" data-ng-disabled="staticForm.$invalid"
+                       aria-label="create" id="submit-update-user">更 新
+            </md-button>
+        </div>
+    </form>
+</div>

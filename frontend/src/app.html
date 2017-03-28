@@ -7,22 +7,37 @@
                 <!--<md-button ui-sref=".dashboard" ui-sref-active="active">Dashboard</md-button>-->
             <!--</li>-->
             <li>
-                <md-button id="monitor" ui-sref="home.monitor" ui-sref-active="active">监控</md-button>
-            </li>
-            <li>
-                <md-button id="log" ui-sref="home.logbase" ui-sref-active="active">日志</md-button>
+                <md-button id="monitor" ui-sref="home.monitor" ui-sref-active="active">监控查询</md-button>
             </li>
             <li>
                 <md-menu>
-                    <md-button id="alert" aria-label="More" ng-click="$mdOpenMenu($event)">
-                        告警
+                    <md-button id="monitorAlert" aria-label="More" ng-click="$mdOpenMenu($event)">
+                        监控告警
                     </md-button>
                     <md-menu-content>
                         <md-menu-item>
-                            <md-button id="alerthistory" ui-sref="home.alerthistory" ui-sref-opts="{inherit: false}">告警历史</md-button>
+                            <md-button id="alertRules" ui-sref="home.alertRules" ui-sref-opts="{inherit: false}">告警事件</md-button>
                         </md-menu-item>
                         <md-menu-item>
-                            <md-button id="alertkeyword" ui-sref="home.alertkeyword">日志过滤关键字</md-button>
+                            <md-button id="alertEvent" ui-sref="home.monitorAlert">告警规则</md-button>
+                        </md-menu-item>
+                    </md-menu-content>
+                </md-menu>
+            </li>
+            <li>
+                <md-button id="log" ui-sref="home.logbase" ui-sref-active="active">日志查询</md-button>
+            </li>
+            <li>
+                <md-menu>
+                    <md-button id="logAlert" aria-label="More" ng-click="$mdOpenMenu($event)">
+                        日志告警
+                    </md-button>
+                    <md-menu-content>
+                        <md-menu-item>
+                            <md-button id="alerthistory" ui-sref="home.alerthistory" ui-sref-opts="{inherit: false}">告警事件</md-button>
+                        </md-menu-item>
+                        <md-menu-item>
+                            <md-button id="alertkeyword" ui-sref="home.alertkeyword">告警规则</md-button>
                         </md-menu-item>
                         <!--<md-menu-item>-->
                             <!--<md-button id="alertSilences" ui-sref="home.alertSilences">静默管理</md-button>-->
