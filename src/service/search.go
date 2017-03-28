@@ -235,7 +235,7 @@ func (s *SearchService) Source(cluster, app, task string, page models.Page) (map
 }
 
 // Search search log by condition
-func (s *SearchService) Search(cluster, app, task, source, keyword string, page models.Page) (map[string]interface{}, error) {
+func (s *SearchService) Search(cluster, app, task, source, keyword, conj string, page models.Page) (map[string]interface{}, error) {
 	data := make(map[string]interface{})
 
 	sort := false
@@ -249,6 +249,11 @@ func (s *SearchService) Search(cluster, app, task, source, keyword string, page 
 		querys = append(querys, elastic.NewTermsQuery("path", strings.Split(source, ",")))
 	}
 	if keyword != "" {
+		if strings.ToLower(conj) == "or" {
+			keyword = strings.Join(strings.Split(keyword, " "), " OR ")
+		} else {
+			keyword = strings.Join(strings.Split(keyword, " "), " AND ")
+		}
 		sort = true
 		querys = append(querys, elastic.NewQueryStringQuery("message:"+keyword).AnalyzeWildcard(true))
 	}

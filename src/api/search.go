@@ -192,6 +192,7 @@ func (s *Search) Index(ctx *gin.Context) {
 		ctx.Query("task"),
 		ctx.Query("path"),
 		ctx.Query("keyword"),
+		ctx.Query("conj"),
 		ctx.MustGet("page").(models.Page))
 	if err != nil {
 		utils.ErrorResponse(ctx, utils.NewError(IndexError, err))
