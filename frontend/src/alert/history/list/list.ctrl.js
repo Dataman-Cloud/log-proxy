@@ -89,8 +89,8 @@
                 self.form.size = 100;
                 self.form.page = 1;
 
-                self.form.to = moment().unix();
-                self.form.from = moment().subtract(self.timePeriod, 'minutes').unix();
+                self.form.end = moment().unix();
+                self.form.start = moment().subtract(self.timePeriod, 'minutes').unix();
 
                 fetchHistory(self.form);
             }
@@ -115,8 +115,8 @@
 
         function checkTimeRange() {
             if (self.timePeriod) {
-                self.startTime = moment().unix();
-                self.endTime = moment().subtract(self.timePeriod, 'minutes').unix();
+                self.startTime = moment().subtract(self.timePeriod, 'minutes').unix();
+                self.endTime = moment().unix();
             } else {
                 self.startTime = null;
                 self.endTime = null;
