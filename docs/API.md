@@ -437,6 +437,54 @@ return
 }
 ```
 
+### 获取有告警事件的所有集群
+```
+/v1/log/alerts/clusters
+```
+
+for example
+
+```
+curl -XGET http://192.168.59.3:5098/v1/log/alerts/clusters
+```
+
+return
+
+```
+{
+  "code": 0,
+  "data": [
+    {
+      "cluster": "yaoyun"
+    }
+  ]
+}
+```
+
+### 获取指定集群下有告警时间的所有应用
+```
+/v1/log/alerts/clusters/:cluster/apps",
+```
+
+for example
+
+```
+http://192.168.59.3:5098/v1/log/alerts/clusters/yaoyun/apps
+```
+
+return
+
+```
+{
+  "code": 0,
+  "data": [
+    {
+      "app": "yaoyun-nginx2"
+    }
+  ]
+}
+```
+
 ### 获取日志告警事件
 ```
 /v1/log/alerts
