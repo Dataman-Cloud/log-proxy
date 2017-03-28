@@ -120,7 +120,8 @@ return
     "cpu_usage": "%",
     "mem_usage": "%"
   }
-}```
+}
+```
 
 #### 新建报警规则
 
@@ -385,6 +386,10 @@ http://127.0.0.1:5098/v1/alert/events?cluster=work
 - 获取集群的应用的所有事件
 ```
 http://127.0.0.1:5098/v1/alert/events?cluster=work&app=work-nginx
+```
+- 按时间获取事件
+```
+http://127.0.0.1:5098/v1/alert/events?cluster=work&start=1490660541&end=1490660542
 ```
 return
 ```

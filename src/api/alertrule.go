@@ -462,26 +462,38 @@ func (alert *Alert) AckAlertEvent(ctx *gin.Context) {
 // GetAlertEvents list the alert events
 func (alert *Alert) GetAlertEvents(ctx *gin.Context) {
 	var (
-		ack bool
 		err error
 	)
+	options := make(map[string]interface{})
 	if ctx.Query("ack") == "" {
-		ack = false
+		options["ack"] = false
 	} else {
-		ack, err = strconv.ParseBool(ctx.Query("ack"))
+		options["ack"], err = strconv.ParseBool(ctx.Query("ack"))
 		if err != nil {
 			utils.ErrorResponse(ctx, utils.NewError(AckEventError, err))
 			return
 		}
 	}
-	switch ack {
-	case true:
-		result := alert.Store.ListAckedEvent(ctx.MustGet("page").(models.Page), ctx.Query("cluster"), ctx.Query("app"))
-		utils.Ok(ctx, result)
-	case false:
-		result := alert.Store.ListUnackedEvent(ctx.MustGet("page").(models.Page), ctx.Query("cluster"), ctx.Query("app"))
-		utils.Ok(ctx, result)
+
+	if ctx.Query("cluster") != "" {
+		options["cluster"] = ctx.Query("cluster")
 	}
+	if ctx.Query("app") != "" {
+		options["app"] = ctx.Query("app")
+	}
+	if ctx.Query("start") != "" {
+		options["start"] = ctx.Query("start")
+	}
+	if ctx.Query("end") != "" {
+		options["end"] = ctx.Query("end")
+	}
+
+	result, err := alert.Store.ListEvents(ctx.MustGet("page").(models.Page), options)
+	if err != nil {
+		utils.ErrorResponse(ctx, utils.NewError(AckEventError, err))
+		return
+	}
+	utils.Ok(ctx, result)
 }
 
 /*
