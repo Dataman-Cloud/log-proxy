@@ -24,7 +24,8 @@
                 from: paramObj.from,
                 to: paramObj.to,
                 page: paramObj.page,
-                size: paramObj.size
+                size: paramObj.size,
+                conj: paramObj.conj
             });
         }
 

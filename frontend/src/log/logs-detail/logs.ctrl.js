@@ -11,6 +11,7 @@
             app: $stateParams.app,
             task: $stateParams.task,
             source: $stateParams.source,
+            conj: $stateParams.conj,
             page: 1,
             size: 50
         };

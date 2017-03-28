@@ -14,7 +14,8 @@
             app: $stateParams.app || '',
             task: $stateParams.task || '',
             source: $stateParams.source || '',
-            keyword: $stateParams.keyword || ''
+            keyword: $stateParams.keyword || '',
+            conj: $stateParams.conj || 'and'
         };
 
         self.clusters = {};
