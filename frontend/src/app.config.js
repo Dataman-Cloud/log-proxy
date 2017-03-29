@@ -175,13 +175,9 @@
                 }
             })
             .state('home.alertRules', {
-                url: '/alertRules',
+                url: '/alertRules?ack&app&cluster&end&page&size&start',
                 templateUrl: '/src/monitorAlert/rules/rules.html',
                 controller: 'AlertRulesCtrl as vm',
-                resolve: {
-
-                    events: getEvents
-                }
             });
 
 
