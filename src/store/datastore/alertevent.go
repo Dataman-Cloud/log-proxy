@@ -28,6 +28,7 @@ func (db *datastore) CreateOrIncreaseEvent(event *models.Event) error {
 	result.Count++
 	result.Description = event.Description
 	result.Summary = event.Summary
+	result.Value = event.Value
 	return db.Save(&result).Error
 
 }
