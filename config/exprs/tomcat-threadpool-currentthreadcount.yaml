@@ -1,0 +1,15 @@
+---
+name: "tomcat_threadpool_currentthreadcount"
+aggregation: "sum"
+function: ""
+metric: "tomcat_threadpool_currentthreadcount"
+filter:
+  cluster: "cluster='%s'"
+  user: ""
+  app: "app='%s'"
+  task: "task='%s'"
+  fixed: ""
+by:
+  - "cluster"
+  - "app"
+  - "task"
