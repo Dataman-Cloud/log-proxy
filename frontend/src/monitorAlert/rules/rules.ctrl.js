@@ -1,27 +1,24 @@
-/**
- * Created by lixiaoyan on 2017/3/27.
- */
-/**
- * Created by lixiaoyan on 2017/3/24.
- */
 (function () {
     'use strict';
     angular.module('app')
         .controller('AlertRulesCtrl', AlertRulesCtrl);
     /* @ngInject */
 
-    function AlertRulesCtrl(monitorAlertBackend, $stateParams, events, timing, Notification, $state, $scope) {
+    function AlertRulesCtrl(monitorAlertBackend, $stateParams, timing, Notification, $state, $scope) {
         var self = this;
-
-        self.timePeriod = 60;
-        self.count = 0;
         var appListReloadInterval = 10000;
-        self.events = events.data.events;
+
+        self.timePeriod = ($stateParams.start && $stateParams.end) ?
+            ($stateParams.end - $stateParams.start) / 60 : '';
+
+        self.count = 0;
+
+        self.events = [];
         self.form = {
             cluster: $stateParams.cluster || '',
             app: $stateParams.app || '',
-            start: moment().subtract(self.timePeriod, 'minutes').unix(),
-            end: moment().unix(),
+            start: $stateParams.start || '',
+            end: $stateParams.end || '',
             page: 1,
             size: 100,
             ack: false
@@ -36,37 +33,67 @@
         activate();
 
         function activate() {
-
+            search()
         }
 
         function search() {
-            monitorAlertBackend.events(self.form).get(function (data) {
+            return monitorAlertBackend.events(self.form).get().$promise.then(function (data) {
                 self.events = data.data.events;
                 self.count = data.data.count;
+
+                return data
             })
+
         }
 
         function reloadSearch() {
+            if (self.timePeriod) {
+                self.form = {
+                    cluster: $stateParams.cluster || '',
+                    app: $stateParams.app || '',
+                    start: moment().subtract(self.timePeriod, 'minutes').unix(),
+                    end: moment().unix(),
+                    page: 1,
+                    size: 100,
+                    ack: false
+                };
+            } else {
+                self.form = {
+                    cluster: $stateParams.cluster || '',
+                    app: $stateParams.app || '',
+                    page: 1,
+                    size: 100,
+                    ack: false
+                };
+            }
             return monitorAlertBackend.events(self.form).get()
                 .$promise.then(function (data) {
                     self.events = data.data.events;
                     self.count = data.data.count;
-                })
+                });
         }
 
         function searchAlert() {
-            if (!self.timePeriod) {
-                search({page: 1, size: 100});
+            if (self.timePeriod) {
+                self.form = {
+                    cluster: $stateParams.cluster || '',
+                    app: $stateParams.app || '',
+                    start: moment().subtract(self.timePeriod, 'minutes').unix(),
+                    end: moment().unix(),
+                    page: 1,
+                    size: 100,
+                    ack: false
+                };
             } else {
-                self.form.size = 100;
-                self.form.page = 1;
-
-                self.form.end = moment().unix();
-                self.form.start = moment().subtract(self.timePeriod, 'minutes').unix();
-
-                search(self.form);
+                self.form = {
+                    cluster: $stateParams.cluster || '',
+                    app: $stateParams.app || '',
+                    page: 1,
+                    size: 100,
+                    ack: false
+                };
             }
-
+            $state.go('home.alertRules', self.form, {inherit: false})
         }
 
         function activateAck(event) {
