@@ -48,6 +48,7 @@
             <table md-table id="user-list-table">
                 <thead md-head>
                 <tr md-row>
+                    <th md-column>创建时间</th>
                     <th md-column>更新时间</th>
                     <th md-column>报警名称</th>
                     <th md-column>集群</th>
@@ -60,6 +61,9 @@
                 </thead>
                 <tbody md-body>
                 <tr md-row ng-repeat="event in vm.events track by $index">
+                    <td md-cell>
+                        {/event.CreatedAt | date:" yyyy-MM-dd HH:mm:ss"/}
+                    </td>
                     <td md-cell>
                         {/event.UpdatedAt | date:" yyyy-MM-dd HH:mm:ss"/}
                     </td>
