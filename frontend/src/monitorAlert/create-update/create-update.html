@@ -7,16 +7,13 @@
                     <input type="text" class="form-input" name="class" id="input-alert"
                            aria-label="class" ng-disabled="vm.target === 'update'"
                            data-ng-model="vm.form.class" data-required="required"
-                           data-ng-maxlength="255" data-ng-pattern="/^[A-Za-z0-9\-]+$/" data-ng-trim="true">
+                           data-ng-pattern="/^[A-Za-z0-9]+$/" data-ng-trim="true">
                 </div>
                 <p class="error-info help-info-bottom"
-                   data-ng-show="staticForm.alert.$error.required && !staticForm.alert.$pristine">事件名称不能为空</p>
+                   data-ng-show="staticForm.class.$error.required && !staticForm.class.$pristine">事件名称不能为空</p>
                 <p class="error-info help-info-bottom"
-                   data-ng-show="staticForm.alert.$error.maxlength && !staticForm.alert.$pristine">超过 255
-                    个字符</p>
-                <p class="error-info help-info-bottom"
-                   data-ng-show="staticForm.alert.$error.pattern && !staticForm.alert.$pristine">
-                    事件名称必须为英文,-或者数字</p>
+                   data-ng-show="staticForm.class.$error.pattern && !staticForm.class.$pristine">
+                    报警组不能有空格，只能是字母和数字</p>
             </div>
 
             <div layout="column" class="form-item">
@@ -25,16 +22,13 @@
                     <input type="text" class="form-input" name="name" id="input-alert-name"
                            aria-label="class" ng-disabled="vm.target === 'update'"
                            data-ng-model="vm.form.name" data-required="required"
-                           data-ng-maxlength="255" data-ng-pattern="/^[A-Za-z0-9\-]+$/" data-ng-trim="true">
+                           data-ng-pattern="/^[A-Za-z0-9]+$/" data-ng-trim="true">
                 </div>
                 <p class="error-info help-info-bottom"
-                   data-ng-show="staticForm.alert.$error.required && !staticForm.alert.$pristine">事件名称不能为空</p>
+                   data-ng-show="staticForm.name.$error.required && !staticForm.name.$pristine">事件名称不能为空</p>
                 <p class="error-info help-info-bottom"
-                   data-ng-show="staticForm.alert.$error.maxlength && !staticForm.alert.$pristine">超过 255
-                    个字符</p>
-                <p class="error-info help-info-bottom"
-                   data-ng-show="staticForm.alert.$error.pattern && !staticForm.alert.$pristine">
-                    事件名称必须为英文,-或者数字</p>
+                   data-ng-show="staticForm.name.$error.pattern && !staticForm.name.$pristine">
+                    报警名称不能有空格，只能是字母和数字</p>
             </div>
 
             <div layout="column" class="form-item">
@@ -95,19 +89,12 @@
                         <div flex>
                             <md-select data-ng-model="vm.form.pending" data-required="required"
                                        aria-label="metric">
+                                <md-option value="5s">5秒</md-option>
+                                <md-option value="15s">15秒</md-option>
                                 <md-option value="30s">30秒</md-option>
                                 <md-option value="1m">1分钟</md-option>
-                                <md-option value="2m">2分钟</md-option>
                             </md-select>
                         </div>
-                        <!--<div flex>-->
-                        <!--<span class="form-input-addon" id="memused"-->
-                        <!--data-ng-if="vm.form.rule.indicator === 'memory'">MB</span>-->
-                        <!--<span class="form-input-addon" id="cpuused"-->
-                        <!--data-ng-if="vm.form.rule.indicator === 'cpu'">%</span>-->
-                        <!--<span class="form-input-addon" id="diskused"-->
-                        <!--data-ng-if="vm.form.rule.indicator === 'network' || vm.form.rule.indicator === 'filesys'">B/s</span>-->
-                        <!--</div>-->
                     </div>
                 </div>
             </div>
