@@ -1,5 +1,5 @@
 ---
-name: "fs_read"
+name: "文件系统读取总数"
 aggregation: "sum"
 function: "irate"
 metric: "container_fs_reads_total"

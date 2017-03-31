@@ -4,7 +4,7 @@ import (
 	"github.com/Dataman-Cloud/log-proxy/src/models"
 )
 
-var filter = "id=~\"/docker/.*\", name=~\"mesos.*\", container_label_VCLUSTER=\"%s\", container_label_APP_ID=\"%s\""
+var filter = "id=~\"/docker/.*\", name=~\"mesos.*\", container_label_VCLUSTER=\"%s\", container_label_APP_ID=\"%s\", container_label_DM_LOG_TAG!=\"ignore\""
 
 var cpuUsagePercent = &models.Indicator{
 	Name:  "cpu_usage",

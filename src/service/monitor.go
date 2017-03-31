@@ -540,7 +540,7 @@ func (query *Query) GetQueryClusters() ([]string, error) {
 	start, end := timeRange(query.Start, query.End)
 	query.Start = start
 	query.End = end
-	query.Expr = "count(container_tasks_state{id=~'/docker/.*', name=~'mesos.*', state='running'}) by (container_label_VCLUSTER)"
+	query.Expr = "count(container_tasks_state{id=~'/docker/.*', name=~'mesos.*', state='running', container_label_DM_LOG_TAG!='ignore'}) by (container_label_VCLUSTER)"
 
 	response, request, err := query.getExprResponse()
 	if err != nil {
@@ -575,7 +575,7 @@ func (query *Query) GetQueryApps() ([]string, error) {
 	start, end := timeRange(query.Start, query.End)
 	query.Start = start
 	query.End = end
-	query.Expr = fmt.Sprintf("count(container_tasks_state{container_label_VCLUSTER='%s', id=~'/docker/.*', name=~'mesos.*', state='running'}) by (container_label_APP_ID)", query.Cluster)
+	query.Expr = fmt.Sprintf("count(container_tasks_state{container_label_VCLUSTER='%s', container_label_DM_LOG_TAG!='ignore'}) by (container_label_APP_ID)", query.Cluster)
 
 	response, request, err := query.getExprResponse()
 	if err != nil {
@@ -610,7 +610,7 @@ func (query *Query) GetQueryAppTasks() ([]string, error) {
 	start, end := timeRange(query.Start, query.End)
 	query.Start = start
 	query.End = end
-	query.Expr = fmt.Sprintf("count(container_tasks_state{container_label_VCLUSTER='%s', container_label_APP_ID='%s', id=~'/docker/.*', name=~'mesos.*', state='running'}) by (container_env_mesos_task_id)", query.Cluster, query.App)
+	query.Expr = fmt.Sprintf("count(container_tasks_state{container_label_VCLUSTER='%s', container_label_APP_ID='%s', id=~'/docker/.*', name=~'mesos.*', state='running', container_label_DM_LOG_TAG!='ignore'}) by (container_env_mesos_task_id)", query.Cluster, query.App)
 
 	response, request, err := query.getExprResponse()
 	if err != nil {

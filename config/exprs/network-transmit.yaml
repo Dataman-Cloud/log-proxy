@@ -1,5 +1,5 @@
 ---
-name: "network_tx"
+name: "网络发送字节数"
 aggregation: "sum"
 function: "irate"
 metric: "container_network_transmit_bytes_total"
