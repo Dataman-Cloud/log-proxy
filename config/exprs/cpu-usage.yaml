@@ -1,5 +1,5 @@
 ---
-name: "cpu_usage"
+name: "CPU使用率"
 aggregation: "avg"
 function: "irate"
 metric: "container_cpu_usage_seconds_total"

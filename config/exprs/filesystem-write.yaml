@@ -1,5 +1,5 @@
 ---
-name: "fs_write"
+name: "文件系统写入总数"
 aggregation: "sum"
 function: "irate"
 metric: "container_fs_writes_total"

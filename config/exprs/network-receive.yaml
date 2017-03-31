@@ -1,5 +1,5 @@
 ---
-name: "network_rx"
+name: "网络接收字节数"
 aggregation: "sum"
 function: "irate"
 metric: "container_network_receive_bytes_total"
