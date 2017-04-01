@@ -25,8 +25,8 @@
             return $resource(BACKEND_URL_BASE.defaultBase + '/v1/monitor/clusters');
         }
 
-        function apps() {
-            return $resource(BACKEND_URL_BASE.defaultBase + '/v1/monitor/clusters/work/apps');
+        function apps(cluster) {
+            return $resource(BACKEND_URL_BASE.defaultBase + '/v1/monitor/clusters/:cluster/apps', {cluster: cluster});
         }
 
         function indicators() {
@@ -70,7 +70,7 @@
                 page: paramObj.page,
                 size: paramObj.size,
                 action: paramObj.action
-            },  {
+            }, {
                 'update': {method: 'PUT'}
             });
         }
