@@ -67,6 +67,9 @@ func (ruleMap *RuleMapper) Map2Raw(rule *models.Rule) (*models.RawRule, error) {
 		case "cpu_usage":
 			raw.Expr = fmt.Sprintf(templ, aggregation, rule.Cluster, rule.App,
 				rule.Duration, comparison, threshold)
+		case "tomcat_thread_count":
+			raw.Expr = fmt.Sprintf(templ, aggregation, rule.Cluster, rule.App,
+				comparison, threshold)
 		}
 	} else {
 		return nil, errors.New("Cannot support monitor indicator: " + rule.Indicator)
