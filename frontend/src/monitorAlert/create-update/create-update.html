@@ -50,6 +50,7 @@
                 <div>
                     <md-select data-ng-model="vm.form.app" class="md-no-underline"
                                data-required="required" aria-label="groups select"
+                               md-on-open="vm.loadApps()"
                                ng-disabled="vm.target === 'update'">
                         <md-option ng-repeat="app in vm.apps"
                                    ng-value="app">

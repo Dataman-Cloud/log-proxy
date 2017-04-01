@@ -55,7 +55,7 @@
 
         // 应用
         function loadApps() {
-            monitorAlertBackend.apps().get(function (data) {
+            monitorAlertBackend.apps(self.form.cluster).get(function (data) {
                 self.apps = data.data;
             })
         }
