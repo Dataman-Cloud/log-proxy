@@ -33,13 +33,8 @@ func NewRuleMapper() *RuleMapper {
 }
 
 func (ruleMap *RuleMapper) Map2Raw(rule *models.Rule) (*models.RawRule, error) {
-	var app string
-	if appName := strings.Split(rule.App, "-"); len(appName) == 2 {
-		app = appName[1]
-	} else {
-		app = rule.App
-	}
-	alert := fmt.Sprintf("%s_%s_%s_%s", rule.Class, rule.Name, rule.Cluster, app)
+	app := strings.Replace(rule.App, "-", "_", -1)
+	alert := fmt.Sprintf("%s_%s_%s", rule.Class, rule.Name, app)
 	pending := rule.Pending
 	serverity := rule.Severity
 	indicator := rule.Indicator
@@ -48,7 +43,7 @@ func (ruleMap *RuleMapper) Map2Raw(rule *models.Rule) (*models.RawRule, error) {
 	threshold := strconv.FormatInt(rule.Threshold, 10)
 	judgement := fmt.Sprintf("%s %s %s", aggregation, comparison, threshold)
 	duration := rule.Duration
-	labels := fmt.Sprintf(`{ value = "{{ $value }}", severity = "%s", indicator = "%s", judgement = "%s", duration = "%s" }`, serverity, indicator, judgement, duration)
+	labels := fmt.Sprintf(`{ cluster = "%s", app = "%s", value = "{{ $value }}", severity = "%s", indicator = "%s", judgement = "%s", duration = "%s" }`, rule.Cluster, rule.App, serverity, indicator, judgement, duration)
 	annotations := `{ description = "", summary = "" }`
 
 	raw := models.RawRule{}
