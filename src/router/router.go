@@ -50,21 +50,6 @@ func Router(middlewares ...gin.HandlerFunc) *gin.Engine {
 	monitorv1 := r.Group("/v1/monitor")
 	{
 		monitorv1.GET("/ping", monitor.Ping)
-		// Query metric/expr
-		monitorv1.GET("/query", monitor.Query)
-		// Query info
-		monitorv1.GET("/info", monitor.QueryInfo)
-		monitorv1.GET("/nodes", monitor.QueryNodes)
-
-		// AlertManager API
-		monitorv1.GET("/alerts", monitor.GetAlerts)
-		monitorv1.GET("/alerts/groups", monitor.GetAlertsGroups)
-		monitorv1.GET("/alerts/status", monitor.GetAlertsStatus)
-		monitorv1.GET("/silences", monitor.GetSilences)
-		monitorv1.POST("/silences", monitor.CreateSilence)
-		monitorv1.GET("/silence/:id", monitor.GetSilence)
-		monitorv1.DELETE("/silence/:id", monitor.DeleteSilence)
-		monitorv1.PUT("/silence/:id", monitor.UpdateSilence)
 	}
 
 	alert := api.NewAlert()
