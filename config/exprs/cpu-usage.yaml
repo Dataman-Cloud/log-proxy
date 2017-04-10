@@ -1,0 +1,17 @@
+---
+name: "cpu_usage"
+aggregation: "avg"
+function: "irate"
+metric: "container_cpu_usage_seconds_total"
+filter:
+  cluster: "container_label_DM_VCLUSTER='%s'"
+  user: "container_label_DM_USER='%s'"
+  app: "container_label_DM_APP_NAME='%s'"
+  slot: "container_label_DM_SLOT_ID='%s'"
+  task: ""
+  fixed: "id=~'/docker/.*', name=~'mesos.*'"
+by:
+  - "container_label_DM_VCLUSTER"
+  - "container_label_DM_USER"
+  - "container_label_DM_APP_NAME"
+  - "container_label_DM_SLOT_ID"
