@@ -1,8 +1,8 @@
 ---
-name: "CPU使用率"
-aggregation: "avg"
-function: "irate"
-metric: "container_cpu_usage_seconds_total"
+name: "内存分配字节数"
+aggregation: "sum"
+function: ""
+metric: "container_spec_memory_limit_bytes"
 filter:
   cluster: "container_label_DM_VCLUSTER='%s'"
   user: "container_label_DM_USER='%s'"
