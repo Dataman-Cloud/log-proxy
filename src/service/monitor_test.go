@@ -6,6 +6,8 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"testing"
+
+	"github.com/Dataman-Cloud/log-proxy/src/utils/prometheusexpr"
 )
 
 var (
@@ -50,5 +52,26 @@ func TestIsInArray(t *testing.T) {
 	value = "test1"
 	if isInArray(values, value) {
 		t.Error("Expect get false, but get true")
+	}
+}
+
+func TestSetQueryExprsList(t *testing.T) {
+	path := "../../config/exprs/"
+	prometheusexpr.Exprs(path)
+	exprTempl := SetQueryExprsList()
+	if exprTempl == nil {
+		t.Error("Expect exprTempl is not nil, but got nil")
+	}
+}
+
+func TestGetQueryItemList(t *testing.T) {
+	path := "../../config/exprs/"
+	prometheusexpr.Exprs(path)
+	query := &Query{
+		ExprTmpl: SetQueryExprsList(),
+	}
+	items := query.GetQueryItemList()
+	if items[0] != "CPU使用率" {
+		t.Errorf("Expect the first item is CPU使用率, but got %s", items[0])
 	}
 }
