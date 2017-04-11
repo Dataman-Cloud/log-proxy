@@ -31,7 +31,7 @@ func TestGetExprFiles(t *testing.T) {
 }
 
 func TestExprs(t *testing.T) {
-	path := "../../../config/expr/"
+	path := "../../../config/exprs/"
 	err := Exprs(path)
 	if err != nil {
 		t.Error("failed")
@@ -41,7 +41,7 @@ func TestExprs(t *testing.T) {
 }
 
 func TestGetExprs(t *testing.T) {
-	path := "../../../config/expr/"
+	path := "../../../config/exprs/"
 	err := Exprs(path)
 	if err != nil {
 		t.Error("failed")

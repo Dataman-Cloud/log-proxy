@@ -46,12 +46,6 @@ func Router(middlewares ...gin.HandlerFunc) *gin.Engine {
 		pv1.POST("/log", s.ReceiverLog)
 	}
 
-	monitor := api.NewMonitor()
-	monitorv1 := r.Group("/v1/monitor")
-	{
-		monitorv1.GET("/ping", monitor.Ping)
-	}
-
 	alert := api.NewAlert()
 	alertv1 := r.Group("/v1/alert")
 	{
