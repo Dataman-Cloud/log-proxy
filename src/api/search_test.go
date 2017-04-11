@@ -50,17 +50,6 @@ func startAPIServer(sv *Search) *httptest.Server {
 		v1m.GET("/alert/:id", func(ctx *gin.Context) { sv.GetAlert(ctx) })
 		v1m.PUT("/alert", func(ctx *gin.Context) { sv.UpdateAlert(ctx) })
 		v1m.DELETE("/alert/:id", func(ctx *gin.Context) { sv.DeleteAlert(ctx) })
-		v1m.GET("/query", getQuery)
-		v1m.GET("/info", getQueryInfo)
-		v1m.GET("/nodes", getQueryNodes)
-		v1m.GET("/alerts", getMonitorAlerts)
-		v1m.GET("/alerts/groups", getMonitorAlertsGroups)
-		v1m.GET("/alerts/status", getMonitorAlertsStatus)
-		v1m.GET("/silences", getMonitorSilences)
-		v1m.GET("/silence", getMonitorSilence)
-		v1m.POST("/silence", createMonitorSilence)
-		v1m.PUT("/silence", updateMonitorSilence)
-		v1m.DELETE("/silence/:id", deleteMonitorSilence)
 	}
 	/*
 		v1a := router.Group("/api/v1/alert", func(ctx *gin.Context) { ctx.Set("page", models.Page{}) })

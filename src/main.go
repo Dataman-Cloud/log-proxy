@@ -10,6 +10,7 @@ import (
 	"github.com/Dataman-Cloud/log-proxy/src/router"
 	"github.com/Dataman-Cloud/log-proxy/src/router/middleware"
 	"github.com/Dataman-Cloud/log-proxy/src/store/datastore"
+	expr "github.com/Dataman-Cloud/log-proxy/src/utils/prometheusexpr"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/gin-gonic/contrib/static"
@@ -20,6 +21,10 @@ func main() {
 	flag.Parse()
 	config.InitConfig(*configFile)
 	datastore.InitDB(config.GetConfig().DbDriver, config.GetConfig().DbDSN)
+	err := expr.Exprs(config.GetConfig().QueryExprPATH)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	log.Infof("http server: %s start...", config.GetConfig().Addr)
 

@@ -24,6 +24,7 @@ type Config struct {
 	DbDriver         string `alias:"DB_DRIVER"`
 	RuleFilePath     string `alias:"RULE_FILE_PATH"`
 	RuleFileInterval string `alias:"RULE_FILE_INTERVAL"`
+	QueryExprPATH    string `alias:"QUERY_EXPR_PATH"`
 }
 
 var c *Config
