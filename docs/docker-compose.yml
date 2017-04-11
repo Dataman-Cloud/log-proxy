@@ -1,0 +1,14 @@
+mola:
+    image: demoregistry.dataman-inc.com/shurenyun/centos7-mola-swan:v0.4-35-g823b43c
+    environment:
+      - ES_URL=http://192.168.56.102:9200
+      - PROMETHEUS_URL=http://192.168.56.102:9090
+      - ALERTMANAGER_URL=http://192.168.56.102:9093
+      - SEARCH_DEBUG=false
+      - BORG_URL=http://192.168.56.102:5013
+      - DB_DSN=root:dataman1234@tcp(localhost:3306)/mola?charset=utf8&parseTime=true&loc=Local
+    volumes:
+      - /data/config/prometheus/rules:/dataman/rules
+    restart: always
+    ports:
+      - "5098:5098"
