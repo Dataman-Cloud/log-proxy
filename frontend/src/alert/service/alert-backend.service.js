@@ -37,6 +37,7 @@
             return $resource(BACKEND_URL_BASE.defaultBase + '/v1/log/alerts', {
                 cluster: paramObj.cluster,
                 app: paramObj.app,
+                keyword: paramObj.keyword,
                 task: paramObj.task,
                 source: paramObj.source,
                 start: paramObj.start,
