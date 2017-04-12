@@ -147,3 +147,7 @@ func (db *datastore) GetLogAlertApps(cluster, start, end string) ([]*models.LogA
 
 	return apps, nil
 }
+
+func (db *datastore) AckLogAlertEvent(ID string) error {
+	return db.Table("log_alert_events").Where("id = ?", ID).Updates(map[string]interface{}{"ack": true}).Error
+}
