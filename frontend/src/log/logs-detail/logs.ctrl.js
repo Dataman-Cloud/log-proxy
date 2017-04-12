@@ -3,7 +3,7 @@
     angular.module('app')
         .controller('LogDetailCtrl', LogDetailCtrl);
     /* @ngInject */
-    function LogDetailCtrl(logBackend, $stateParams) {
+    function LogDetailCtrl(logBackend, $stateParams, logDownload) {
         var tempLogQuery = {
             cluster: $stateParams.cluster || '',
             from: $stateParams.from,
@@ -52,7 +52,12 @@
                 }
             }
         };
+        self.downloadFile = downloadFile;
 
+        function downloadFile(logs) {
+            self.fileName =  logs[0].clusterid+'-'+logs[0].appid;
+            logDownload.downloadFile(self.fileName, logs);
+        }
         activate();
 
         function activate() {
