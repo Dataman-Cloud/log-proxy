@@ -495,6 +495,7 @@ return
  - app: appid
  - task=tasktest
  - source=stdout
+ - keyword=keyword
  - start=now-7d
  - end=now
  
@@ -555,4 +556,27 @@ return
     ]
   }
 }
+```
+
+### 更新日志告警时间Ack
+
+```
+/v1/log/alerts/:id
+```
+
+for example
+
+```
+curl -XPATCH http://192.168.59.3:5098/v1/log/alerts/2 
+'
+{
+	"action":"ack"
+}
+'
+```
+
+return 
+
+```
+success
 ```
