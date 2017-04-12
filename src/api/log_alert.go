@@ -1,5 +1,3 @@
-//KeywordAlert is handling the alert keywords CRUD
-
 package api
 
 import (
@@ -234,7 +232,7 @@ func (s *Search) HandleLogAlertEvent(ctx *gin.Context) {
 	}
 
 	if err := ctx.BindJSON(&handleInfo); err != nil {
-		utils.ErrorResponse(ctx, utils.NewError(ParamError, errors.New("request body param error")))
+		utils.ErrorResponse(ctx, utils.NewError(ParamError, err))
 		return
 	}
 

@@ -23,6 +23,7 @@ func InitDB(driver, dsn string) store.Store {
 	db.AutoMigrate(&models.Event{})
 	db.AutoMigrate(&models.LogAlertRule{})
 	db.AutoMigrate(&models.LogAlertEvent{})
+	db.AutoMigrate(&models.CmdbServer{})
 	db.LogMode(false)
 
 	return From(db)

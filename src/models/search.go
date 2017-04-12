@@ -61,3 +61,8 @@ type LogAlertClusters struct {
 type LogAlertApps struct {
 	App string `json:"app"`
 }
+
+type CmdbServer struct {
+	CmdbAppID string `json:"cmdbAppid" binding:"required"`
+	AppID     string `json:"appid" binding:"required" gorm:"primary_key"`
+}
