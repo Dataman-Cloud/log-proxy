@@ -25,4 +25,5 @@ type Store interface {
 	DeleteLogAlertEvents(start, end string) error
 	GetLogAlertClusters(start, end string) ([]*models.LogAlertClusters, error)
 	GetLogAlertApps(cluster, start, end string) ([]*models.LogAlertApps, error)
+	AckLogAlertEvent(ID string) error
 }

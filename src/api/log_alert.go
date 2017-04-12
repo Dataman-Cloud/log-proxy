@@ -227,3 +227,27 @@ func (s *Search) GetLogAlertApps(ctx *gin.Context) {
 	utils.Ok(ctx, apps)
 	return
 }
+
+func (s *Search) HandleLogAlertEvent(ctx *gin.Context) {
+	var handleInfo struct {
+		Action string `json:action`
+	}
+
+	if err := ctx.BindJSON(&handleInfo); err != nil {
+		utils.ErrorResponse(ctx, utils.NewError(ParamError, errors.New("request body param error")))
+		return
+	}
+
+	if handleInfo.Action == "ack" {
+		if err := s.Store.AckLogAlertEvent(ctx.Param("id")); err != nil {
+			utils.ErrorResponse(ctx, utils.NewError(ParamError, err))
+			return
+		}
+	} else {
+		utils.ErrorResponse(ctx, utils.NewError(ParamError, errors.New("invalid action"+handleInfo.Action)))
+		return
+	}
+
+	utils.Ok(ctx, "success")
+	return
+}

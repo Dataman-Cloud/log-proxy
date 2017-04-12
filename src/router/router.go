@@ -48,6 +48,7 @@ func Router(middlewares ...gin.HandlerFunc) *gin.Engine {
 		logv1.GET("/rules/:id", s.GetLogAlertRule)
 
 		logv1.GET("/alerts", s.GetLogAlertEvents)
+		logv1.PATCH("/alerts/:id", s.HandleLogAlertEvent)
 		logv1.DELETE("/alerts", s.DeleteLogAlertEvents)
 		logv1.GET("/alerts/clusters", s.GetLogAlertClusters)
 		logv1.GET("/alerts/clusters/:cluster/apps", s.GetLogAlertApps)
