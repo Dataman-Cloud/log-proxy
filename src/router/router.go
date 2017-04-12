@@ -50,6 +50,7 @@ func Router(middlewares ...gin.HandlerFunc) *gin.Engine {
 	monitorv1 := r.Group("/v1/monitor")
 	{
 		monitorv1.GET("/query/items", monitor.GetQueryItems)
+		monitorv1.GET("/users", monitor.GetUsers)
 	}
 
 	alert := api.NewAlert()

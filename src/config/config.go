@@ -25,6 +25,7 @@ type Config struct {
 	RuleFilePath     string `alias:"RULE_FILE_PATH"`
 	RuleFileInterval string `alias:"RULE_FILE_INTERVAL"`
 	QueryExprPATH    string `alias:"QUERY_EXPR_PATH"`
+	QueryPrefix      string `alias:"QUERY_PREFIX"`
 }
 
 var c *Config
