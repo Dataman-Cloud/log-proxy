@@ -3,6 +3,8 @@
     <p ng-show="$stateParams.app">应用: <em>{/$stateParams.app/}</em></p>
     <p ng-show="$stateParams.task">实例: <em>{/$stateParams.task/}</em></p>
     <p ng-show="$stateParams.source">来源: <em>{/$stateParams.source/}</em></p>
+    <a ng-show="vm.infiniteLogs.items" href="" class="btn btn-primary"
+       ng-click="vm.downloadFile(vm.infiniteLogs.items)">Download</a>
 </div>
 
 <md-virtual-repeat-container id="vertical-container" style="min-height: 515px;" md-top-index="vm.offsetIndex">

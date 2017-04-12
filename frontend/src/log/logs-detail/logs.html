@@ -5,6 +5,7 @@
     <p ng-show="$stateParams.source">来源: <em>{/$stateParams.source/}</em></p>
     <p ng-show="$stateParams.from">起始时间: <em>{/$stateParams.from | date: 'yyyy-MM-dd HH:mm'/}</em></p>
     <p ng-show="$stateParams.to">结束时间: <em>{/$stateParams.to | date: 'yyyy-MM-dd HH:mm'/}</em></p>
+    <a ng-show="vm.infiniteLogs.items.length" href="" class="btn btn-primary" ng-click="vm.downloadFile(vm.infiniteLogs.items)">Download</a>
 </div>
 
 <p ng-show="!vm.infiniteLogs.items.length">未查询到日志</p>

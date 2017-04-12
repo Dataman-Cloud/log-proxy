@@ -3,7 +3,7 @@
     angular.module('app')
         .controller('LogContextCtrl', LogContextCtrl);
     /* @ngInject */
-    function LogContextCtrl(logBackend, $stateParams, $timeout) {
+    function LogContextCtrl(logBackend, $stateParams, $timeout, logDownload) {
         var self = this;
 
         self.contextQueryObj = {
@@ -55,6 +55,12 @@
             }
         };
 
+        self.downloadFile = downloadFile;
+
+        function downloadFile(logs) {
+            self.fileName = logs[0].clusterid+'-'+logs[0].appid;
+            logDownload.downloadFile(self.fileName, logs);
+        }
         activate();
 
         function activate() {
