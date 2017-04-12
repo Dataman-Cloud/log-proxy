@@ -580,3 +580,30 @@ return
 ```
 success
 ```
+
+
+#### 新增 AppID 和 CMDB server ID 的对应关系
+```
+v1/alert/cmdb
+```
+
+for example 
+
+```
+curl -XPOST http://192.168.59.3:5098/v1/alert/cmdb 
+'
+{
+	"appid":"ack",
+	"cmdbAppid":"sdadsa"
+}
+'
+```
+
+return 
+
+```
+{
+  "code": 0,
+  "data": "success"
+}
+```
