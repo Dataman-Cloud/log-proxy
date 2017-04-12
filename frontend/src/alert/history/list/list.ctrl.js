@@ -17,6 +17,7 @@
         self.form = {
             cluster: $stateParams.cluster || '',
             app: $stateParams.app || '',
+            keyword: $stateParams.keyword,
             start: moment().subtract(self.timePeriod, 'minutes').unix(),
             end: moment().unix(),
             page: 1,

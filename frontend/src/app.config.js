@@ -108,7 +108,7 @@
                 controller: 'AlertKeywordsCtrl as vm'
             })
             .state('home.alerthistory', {
-                url: '/alerthistory?cluster&app',
+                url: '/alerthistory?cluster&app&keyword',
                 templateUrl: '/src/alert/history/list/list.html',
                 controller: 'AlertHistoriesCtrl as vm'
             })
