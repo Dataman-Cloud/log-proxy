@@ -511,6 +511,18 @@ func (alert *Alert) CreateCmdbServer(ctx *gin.Context) {
 	return
 }
 
+func (alert *Alert) GetCmdbServer(ctx *gin.Context) {
+	appID := ctx.Param("appid")
+	cmdb, err := alert.Store.GetCmdbServer(appID)
+	if err != nil {
+		utils.ErrorResponse(ctx, utils.NewError(ParamError, err))
+		return
+	}
+
+	utils.Ok(ctx, cmdb)
+	return
+}
+
 /*
 // AlertRuleFilesMaintainer keep the rule files sync with db
 func (alert *Alert) AlertRuleFilesMaintainer() {
