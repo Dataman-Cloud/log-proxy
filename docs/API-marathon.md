@@ -1,5 +1,63 @@
 # Logging/Monitoring Proxy API Guide
 
+## Configuration
+
+#### Get the configuration
+
+```GET /v1/config```
+- path: /v1/config
+- HTTP Method: GET
+- URL Params: Null
+- Query Params: Null
+
+获取配置
+```
+curl -X GET http://127.0.0.1:5098/v1/config
+{
+  "code": 0,
+  "data": {
+    "ID": 1,
+    "CreatedAt": "2017-04-13T19:20:01+08:00",
+    "UpdatedAt": "2017-04-13T19:20:41+08:00",
+    "DeletedAt": null,
+    "cama_cmdb_default_app_id": "shurenyuncmdb",
+    "cama_notifaction_addr": "127.0.0.1:8030",
+    "cama_notifaction_templ": "notifcation_templ"
+  }
+}
+```
+
+#### Update the configuration
+
+```GET /v1/config```
+- path: /v1/config
+- HTTP Method: PUT
+- URL Params: Null
+- Query Params: Null
+
+获取配置
+```
+curl -X PUT http://127.0.0.1:5098/v1/config -d '{
+  "cama_cmdb_default_app_id": "shurenyuncmdb",
+  "cama_notifaction_addr": "127.0.0.1:8030",
+  "cama_notifaction_templ": "notifcation_templ"
+}'
+return:
+{
+  "code": 0,
+  "data": {
+    "ID": 1,
+    "CreatedAt": "2017-04-13T19:20:01+08:00",
+    "UpdatedAt": "2017-04-13T19:20:41+08:00",
+    "DeletedAt": null,
+    "cama_cmdb_default_app_id": "shurenyuncmdb",
+    "cama_notifaction_addr": "127.0.0.1:8030",
+    "cama_notifaction_templ": "notifcation_templ"
+  }
+}
+```
+
+
 ## Monitoring
 
 ### Metric(监控数据)

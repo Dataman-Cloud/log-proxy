@@ -12,24 +12,24 @@ import (
 
 // Config defines the conf info
 type Config struct {
-	Addr             string `require:"true" alias:"ADDR"`
-	EsURL            string `require:"true" alias:"ES_URL"`
-	SearchDebug      bool   `alias:"SEARCH_DEBUG"`
-	PrometheusURL    string `require:"true" alias:"PROMETHEUS_URL"`
-	AlertManagerURL  string `require:"true" alias:"ALERTMANAGER_URL"`
-	FrontendPath     string `alias:"FRONTEND_PATH"`
-	MarathonURL      string `alias:"MARATHON_URL"`
-	NotificationURL  string `alias:"NOTIFICATION_URL"`
-	DbDSN            string `alias:"DB_DSN"`
-	DbDriver         string `alias:"DB_DRIVER"`
-	RuleFilePath     string `alias:"RULE_FILE_PATH"`
-	RuleFileInterval string `alias:"RULE_FILE_INTERVAL"`
-	BorgUser         string `alias:"BORG_USER"`
-	BorgPassword     string `alias:"BORG_PASSWORD"`
-	BorgURL          string `alias:"BORG_URL"`
-	QueryExprPATH    string `alias:"QUERY_EXPR_PATH"`
-	SryFramework     string `alias:"SRY_FRAMEWORK"`
-	CmdbDefaultAppID string `alias:"CMDB_DEFAULT_APPID"`
+	Addr                string `require:"true" alias:"ADDR"`
+	EsURL               string `require:"true" alias:"ES_URL"`
+	SearchDebug         bool   `alias:"SEARCH_DEBUG"`
+	PrometheusURL       string `require:"true" alias:"PROMETHEUS_URL"`
+	AlertManagerURL     string `require:"true" alias:"ALERTMANAGER_URL"`
+	FrontendPath        string `alias:"FRONTEND_PATH"`
+	MarathonURL         string `alias:"MARATHON_URL"`
+	NotificationURL     string `alias:"NOTIFICATION_URL"`
+	DbDSN               string `alias:"DB_DSN"`
+	DbDriver            string `alias:"DB_DRIVER"`
+	RuleFilePath        string `alias:"RULE_FILE_PATH"`
+	RuleFileInterval    string `alias:"RULE_FILE_INTERVAL"`
+	BorgUser            string `alias:"BORG_USER"`
+	BorgPassword        string `alias:"BORG_PASSWORD"`
+	BorgURL             string `alias:"BORG_URL"`
+	QueryExprPATH       string `alias:"QUERY_EXPR_PATH"`
+	CmdbDefaultAppID    string `alias:"CAMA_CMDB_DEFAULT_APPID"`
+	CamaNotifactionADDR string `alias:"CAMA_NOTIFCATION_ADDR"`
 }
 
 const (
