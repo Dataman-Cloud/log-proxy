@@ -17,13 +17,20 @@
             <div flex class="form-item">
                 <label class="requirement">应用</label>
                 <md-select id="appName" name="app" placeholder="选择应用" ng-model="vm.form.app" md-on-open="vm.loadApps()"
-                           data-required="required" ng-disabled="!vm.form.cluster">
+                           data-required="required" ng-disabled="!vm.form.cluster" ng-change="vm.getCmdb()">
                     <md-option id="app{/$index/}" ng-value="key" ng-repeat="(key, value) in vm.apps track by $index">
                         {/key/}
                     </md-option>
                 </md-select>
                 <p class="error-info help-info-bottom"
                    data-ng-show="staticForm.app.$error.required && !staticForm.app.$pristine">应用名称不能为空</p>
+            </div>
+
+            <div flex class="form-item" ng-if="vm.target === 'create'">
+                <label class="requirement">CMDB</label>
+                <input id="CMDB" name="cmdb" type="text" ng-model="vm.form.cmdbAppid" data-required="required">
+                <p class="error-info help-info-bottom"
+                   data-ng-show="staticForm.cmdb.$error.required && !staticForm.cmdb.$pristine">CMDB不能为空</p>
             </div>
 
             <div flex class="form-item">

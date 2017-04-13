@@ -3,7 +3,7 @@
     angular.module('app')
         .controller('CreateAlertKeywordCtrl', CreateAlertKeywordCtrl);
     /* @ngInject */
-    function CreateAlertKeywordCtrl(alertBackend, $state, target, alert, Notification, logBackend) {
+    function CreateAlertKeywordCtrl(alertBackend, $state, target, alert, Notification, logBackend, $q) {
         var alert = alert.data || {};
 
         var self = this;
@@ -13,7 +13,9 @@
             cluster: alert.cluster,
             app: alert.app,
             source: alert.source || '',
-            keyword: alert.keyword || ''
+            keyword: alert.keyword || '',
+            cmdbAppid: ''
+
         };
 
         self.clusters = {};
@@ -23,9 +25,9 @@
         self.loadClusters = loadClusters;
         self.loadApps = loadApps;
         self.loadSources = loadSources;
-
         self.create = create;
         self.update = update;
+        self.getCmdb = getCmdb;
 
         activate();
 
@@ -45,7 +47,7 @@
             if (self.form.cluster) {
                 logBackend.apps(self.form.cluster).get(function (data) {
                     self.apps = data.data;
-                })
+                });
             }
         }
 
@@ -61,9 +63,17 @@
         }
 
         function create() {
-            alertBackend.alerts().save(self.form, function (data) {
+            var obj = {
+                appid: self.form.appid,
+                cmdbAppid: self.form.cmdbAppid
+            };
+            $q.all({
+                cmdbs: alertBackend.cmdbs().save(obj),
+                alerts:alertBackend.alerts().save(self.form)
+            }).then(function (arr) {
                 Notification.success('创建成功');
-                $state.go('home.alertkeyword', null, {reload: true})
+                $state.go('home.alertkeyword', null, {reload: true});
+                
             });
         }
 
@@ -73,6 +83,13 @@
                 Notification.success('更新成功');
                 $state.go('home.alertkeyword', null, {reload: true})
             });
+        }
+
+        function getCmdb() {
+            alertBackend.cmdb(self.form.app).get(function (data) {
+                self.form.cmdbAppid = data.data.cmdbAppid;
+                self.form.appid = data.data.appid;
+            })
         }
     }
 })();

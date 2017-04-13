@@ -16,7 +16,9 @@
             apps: apps,
             silences: silences,
             silence: silence,
-            historyAck: historyAck
+            historyAck: historyAck,
+            cmdb: cmdb,
+            cmdbs: cmdbs
         };
 
         function alerts(data) {
@@ -77,7 +79,7 @@
             });
         }
 
-        function historyAck(data){
+        function historyAck(data) {
             var paramObj = data || {};
             return $resource(BACKEND_URL_BASE.defaultBase + '/v1/log/alerts/:id', {
                 id: paramObj.id,
@@ -90,6 +92,22 @@
                 size: paramObj.size
             }, {
                 'pupdate': {method: 'PATCH'}
+            })
+        }
+
+        function cmdb(appid) {
+            return $resource(BACKEND_URL_BASE.defaultBase + '/v1/alert/cmdb/:appid', {appid: appid}, {
+                'get': {method: 'get'}
+            });
+        }
+
+        function cmdbs(data){
+            var paramObj = data || {};
+            return $resource(BACKEND_URL_BASE.defaultBase + '/v1/alert/cmdb',{
+                cmdbAppid: paramObj.cmdbAppid,
+                appid: paramObj.appid
+            },{
+                'save': {method: 'POST' }
             })
         }
     }
