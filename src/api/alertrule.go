@@ -494,6 +494,23 @@ func (alert *Alert) GetAlertEvents(ctx *gin.Context) {
 	utils.Ok(ctx, result)
 }
 
+func (alert *Alert) CreateCmdbServer(ctx *gin.Context) {
+	var cmdb models.CmdbServer
+
+	if err := ctx.BindJSON(&cmdb); err != nil {
+		utils.ErrorResponse(ctx, utils.NewError(ParamError, err))
+		return
+	}
+
+	if err := alert.Store.CreateCmdbServer(&cmdb); err != nil {
+		utils.ErrorResponse(ctx, utils.NewError(ParamError, err))
+		return
+	}
+
+	utils.Ok(ctx, "success")
+	return
+}
+
 /*
 // AlertRuleFilesMaintainer keep the rule files sync with db
 func (alert *Alert) AlertRuleFilesMaintainer() {

@@ -26,4 +26,6 @@ type Store interface {
 	GetLogAlertClusters(start, end string) ([]*models.LogAlertClusters, error)
 	GetLogAlertApps(cluster, start, end string) ([]*models.LogAlertApps, error)
 	AckLogAlertEvent(ID string) error
+	CreateCmdbServer(cmdb *models.CmdbServer) error
+	GetCmdbServer(appID string) (*models.CmdbServer, error)
 }
