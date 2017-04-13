@@ -7,7 +7,7 @@
         .controller('CreateMonitorAlertCtrl', CreateMonitorAlertCtrl);
     /* @ngInject */
 
-    function CreateMonitorAlertCtrl(target, monitorAlertBackend, Notification, $state, rule) {
+    function CreateMonitorAlertCtrl(target, monitorAlertBackend, Notification, $state, rule, alertBackend, $q) {
         var self = this;
 
         var rule = rule.data || {};
@@ -18,7 +18,7 @@
         self.apps = [];
         self.indicators = [];
         self.unit = [];
-        
+
         self.form = {
             class: rule.class || '',
             name: rule.name || '',
@@ -29,7 +29,8 @@
             pending: rule.pending || '',
             aggregation: rule.aggregation || '',
             comparison: rule.comparison || '',
-            threshold: rule.threshold || ''
+            threshold: rule.threshold || '',
+            cmdbAppid: ''
         };
 
         self.loadClusters = loadClusters;
@@ -37,6 +38,7 @@
         self.loadIndicators = loadIndicators;
         self.create = create;
         self.update = update;
+        self.getCmdb = getCmdb;
 
         activate();
 
@@ -74,10 +76,17 @@
 
         //创建
         function create() {
-            monitorAlertBackend.rules().save(self.form, function (data) {
+            var obj = {
+                appid: self.form.appid,
+                cmdbAppid: self.form.cmdbAppid
+            };
+            $q.all({
+                cmdbs: alertBackend.cmdbs().save(obj),
+                alerts:monitorAlertBackend.rules().save(self.form)
+            }).then(function (arr) {
                 Notification.success('创建成功');
-                $state.go('home.monitorAlert', null, {reload: true})
-            })
+                $state.go('home.monitorAlert', null, {reload: true});
+            });
         }
 
         // 更新
@@ -87,6 +96,13 @@
                 Notification.success('更新成功');
                 $state.go('home.monitorAlert', null, {reload: true})
             });
+        }
+
+        function getCmdb() {
+            alertBackend.cmdb(self.form.app).get(function (data) {
+                self.form.cmdbAppid = data.data.cmdbAppid;
+                self.form.appid = data.data.appid;
+            })
         }
     }
 })();
