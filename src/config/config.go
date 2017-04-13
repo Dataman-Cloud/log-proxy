@@ -29,6 +29,7 @@ type Config struct {
 	BorgURL          string `alias:"BORG_URL"`
 	QueryExprPATH    string `alias:"QUERY_EXPR_PATH"`
 	SryFramework     string `alias:"SRY_FRAMEWORK"`
+	CmdbDefaultAppID string `alias:"CMDB_DEFAULT_APPID"`
 }
 
 const (

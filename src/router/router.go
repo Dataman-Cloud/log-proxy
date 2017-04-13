@@ -98,6 +98,7 @@ func Router(middlewares ...gin.HandlerFunc) *gin.Engine {
 		alertv1.PUT("/events/:id", alert.AckAlertEvent)
 		alertv1.GET("/events", alert.GetAlertEvents)
 		alertv1.POST("/cmdb", alert.CreateCmdbServer)
+		alertv1.GET("/cmdb/:appid", alert.GetCmdbServer)
 	}
 	//alert.AlertRuleFilesMaintainer()
 
