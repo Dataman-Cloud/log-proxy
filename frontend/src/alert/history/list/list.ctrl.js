@@ -3,7 +3,7 @@
     angular.module('app')
         .controller('AlertHistoriesCtrl', AlertHistoriesCtrl);
     /* @ngInject */
-    function AlertHistoriesCtrl(alertBackend, $stateParams, moment) {
+    function AlertHistoriesCtrl(alertBackend, $stateParams, moment, Notification, $state) {
         var self = this;
 
         self.timePeriod = 60;
@@ -44,6 +44,7 @@
         self.loadApps = loadApps;
         self.onPaginate = onPaginate;
         self.searchHistory = searchHistory;
+        self.isAck = isAck;
 
         activate();
 
@@ -122,6 +123,17 @@
                 self.startTime = null;
                 self.endTime = null;
             }
+        }
+
+        function isAck(history) {
+            var obj = {
+                action: 'ack'
+            };
+            alertBackend.historyAck({id: history.id}).pupdate(obj, function (data) {
+                history.ack=true;
+                Notification.success('操作成功');
+            });
+
         }
     }
 })();

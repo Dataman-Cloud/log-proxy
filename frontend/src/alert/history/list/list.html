@@ -64,6 +64,7 @@
                     <th md-column>集群</th>
                     <th md-column>关键词</th>
                     <th md-column>摘要</th>
+                    <th md-column>操作</th>
                 </tr>
                 </thead>
                 <tbody md-body>
@@ -82,6 +83,20 @@
                     </td>
                     <td md-cell>
                         {/history.message/}
+                    </td>
+                    <td md-cell>
+                        <div class="action" layout="row" ng-if="history.ack">
+                            <md-button data-ng-disabled="history.ack" aria-label="delete" class="md-raised"
+                                       data-ng-click="vm.isAck(history)">
+                                已处理
+                            </md-button>
+                        </div>
+                        <div class="action" layout="row" ng-if="!history.ack">
+                            <md-button data-ng-disabled="history.ack" aria-label="delete" class="md-raised"
+                                       data-ng-click="vm.isAck(history)">
+                                未处理
+                            </md-button>
+                        </div>
                     </td>
                 </tr>
                 </tbody>

@@ -15,7 +15,8 @@
             clusters: clusters,
             apps: apps,
             silences: silences,
-            silence: silence
+            silence: silence,
+            historyAck: historyAck
         };
 
         function alerts(data) {
@@ -74,6 +75,22 @@
             return $resource(BACKEND_URL_BASE.defaultBase + '/v1/monitor/silence/:id', {id: id}, {
                 'update': {method: 'PUT'}
             });
+        }
+
+        function historyAck(data){
+            var paramObj = data || {};
+            return $resource(BACKEND_URL_BASE.defaultBase + '/v1/log/alerts/:id', {
+                id: paramObj.id,
+                clusterid: paramObj.clusterid,
+                appid: paramObj.appid,
+                ack: paramObj.ack,
+                start: paramObj.start,
+                end: paramObj.end,
+                page: paramObj.page,
+                size: paramObj.size
+            }, {
+                'pupdate': {method: 'PATCH'}
+            })
         }
     }
 })();
