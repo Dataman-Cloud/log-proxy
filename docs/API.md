@@ -607,3 +607,27 @@ return
   "data": "success"
 }
 ```
+
+
+#### 查询app对应的cmdbAppid
+```
+/v1/alert/cmdb/:appid
+```
+
+创建报警规则时需要标注当前app对应的广发自己应用平台的appid, 下拉选中app后调用此接口获取对应的CMDBAPIID
+
+for example 
+
+```
+http://192.168.59.3:5098/v1/alert/cmdb/ac
+```
+return
+```
+{
+  "code": 0,
+  "data": {
+    "cmdbAppid": "ac",
+    "appid": "shurenyun"
+  }
+}
+```
