@@ -5,13 +5,14 @@ import (
 	"html/template"
 	"strings"
 
+	"github.com/Dataman-Cloud/log-proxy/src/config"
 	"github.com/Dataman-Cloud/log-proxy/src/models"
 	"github.com/prometheus/common/log"
 )
 
 const camaEventTempl = `集群{{ .Cluster }}应用{{ .App }}的{{ .Indicator }}{{ .Judgement }}{{.Operator}}{{.JudgeValue}}`
 
-func Event2Cama(event *models.Event) *models.CamaEvent {
+func Event2CamaEvent(event *models.Event) *models.CamaEvent {
 	var recover int
 	if event.Ack == true {
 		recover = 1
@@ -21,8 +22,8 @@ func Event2Cama(event *models.Event) *models.CamaEvent {
 	camaEvent := &models.CamaEvent{
 		ID:        event.AlertName,
 		Channel:   "DOCKER",
-		FirstTime: event.CreatedAt,
-		LastTime:  event.UpdatedAt,
+		FirstTime: event.CreatedAt.Format(config.CamaTimeFormatString),
+		LastTime:  event.UpdatedAt.Format(config.CamaTimeFormatString),
 		Recover:   recover,
 		Merger:    event.Count,
 		Node:      "",
@@ -36,20 +37,46 @@ func Event2Cama(event *models.Event) *models.CamaEvent {
 
 func Event2Desc(event *models.Event) string {
 	camaEventDesc := &models.CamaEventDesc{
-		Cluster:   event.Cluster,
-		App:       event.App,
-		Indicator: event.Indicator,
+		Cluster: event.Cluster,
+		App:     event.App,
 	}
-	camaEventDesc.Judgement = strings.Split(event.Judgement, " ")[0]
-	camaEventDesc.Operator = strings.Split(event.Judgement, " ")[1]
+	indicator := event.Indicator
+	switch indicator {
+	case "cpu_usage":
+		camaEventDesc.Indicator = "CPU使用率"
+	case "mem_usage":
+		camaEventDesc.Indicator = "内存占用率"
+	case "tomcat_thread_count":
+		camaEventDesc.Indicator = "Tomcat线程数"
+	}
+
+	judge := strings.Split(event.Judgement, " ")[0]
+	switch judge {
+	case "max":
+		camaEventDesc.Judgement = "最大值"
+	case "min":
+		camaEventDesc.Judgement = "最小值"
+	case "avg":
+		camaEventDesc.Judgement = "平均值"
+	case "sum":
+		camaEventDesc.Judgement = "总和"
+	}
+	operater := strings.Split(event.Judgement, " ")[1]
+	switch operater {
+	case ">":
+		camaEventDesc.Operator = "大于"
+	case "<":
+		camaEventDesc.Operator = "小于"
+	case "==":
+		camaEventDesc.Operator = "等于"
+	}
 	camaEventDesc.JudgeValue = strings.Split(event.Judgement, " ")[2]
 
 	t := template.Must(template.New("camaEventTempl").Parse(camaEventTempl))
 	var buf bytes.Buffer
-	err = t.Execute(&buf, camaEventDesc)
+	err := t.Execute(&buf, camaEventDesc)
 	if err != nil {
 		log.Errorln("executing templta: ", err)
-		return err
 	}
 
 	return buf.String()

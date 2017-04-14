@@ -1,8 +1,10 @@
 package api
 
 import (
+	"bytes"
 	"container/list"
 	"errors"
+	"html/template"
 
 	"github.com/Dataman-Cloud/log-proxy/src/config"
 	"github.com/Dataman-Cloud/log-proxy/src/models"
@@ -259,12 +261,18 @@ func (s *Search) ConvertLogAlertToCamaEvent(alertEvent *models.LogAlertEvent, ev
 		return nil, err
 	}
 
+	t := template.Must(template.New("camaEventTempl").Parse(camaEventTempl))
+	var buf bytes.Buffer
+	if err := t.Execute(&buf, alertEvent); err != nil {
+		return nil, err
+	}
+
 	camaEvent := &models.CamaEvent{
 		Channel:   "DOCKER",
 		Recover:   eventType,
 		ServerNo:  cmdbServer.CmdbAppID,
 		Merger:    1,
-		EventDesc: "",
+		EventDesc: buf.String(),
 		Level:     5,
 		FirstTime: alertEvent.LogTime.Format(config.CamaTimeFormatString),
 		LastTime:  alertEvent.LogTime.Format(config.CamaTimeFormatString),

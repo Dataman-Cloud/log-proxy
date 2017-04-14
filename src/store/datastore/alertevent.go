@@ -94,3 +94,19 @@ func (db *datastore) ListEvents(page models.Page, options map[string]interface{}
 
 	return map[string]interface{}{"count": count, "events": result}, nil
 }
+
+func (db *datastore) GetEventByAlertName(alertname string) (models.Event, error) {
+	var result models.Event
+	err := db.Table("events").
+		Where("alert_name = ? ", alertname).
+		First(&result).Error
+	return result, err
+}
+
+func (db *datastore) GetEventByID(ID int) (models.Event, error) {
+	var result models.Event
+	err := db.Table("events").
+		Where("id = ? ", ID).
+		First(&result).Error
+	return result, err
+}

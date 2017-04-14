@@ -14,9 +14,11 @@ import (
 
 	"github.com/Dataman-Cloud/log-proxy/src/config"
 	"github.com/Dataman-Cloud/log-proxy/src/models"
+	"github.com/Dataman-Cloud/log-proxy/src/service"
 	"github.com/Dataman-Cloud/log-proxy/src/store"
 	"github.com/Dataman-Cloud/log-proxy/src/store/datastore"
 	"github.com/Dataman-Cloud/log-proxy/src/utils"
+	"github.com/Dataman-Cloud/log-proxy/src/utils/camaalert"
 	"github.com/Dataman-Cloud/log-proxy/src/utils/database"
 	"github.com/Dataman-Cloud/log-proxy/src/utils/prometheusrule"
 
@@ -422,14 +424,20 @@ func (alert *Alert) ReceiveAlertEvent(ctx *gin.Context) {
 			utils.ErrorResponse(ctx, utils.NewError(ReceiveEventError, err))
 			return
 		}
+		if err := alert.SendAlertEventToCama(event); err != nil {
+			log.Errorf("Failed to send the alert to cama with %v", err)
+		}
+		fmt.Println("Event Receiver: ", event)
 	}
-
 	utils.Ok(ctx, map[string]string{"status": "success"})
 }
 
 // AckAlertEvent mark the alert evnet ACK
 func (alert *Alert) AckAlertEvent(ctx *gin.Context) {
-	var err error
+	var (
+		event models.Event
+		err   error
+	)
 	pk, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
 		utils.ErrorResponse(ctx, utils.NewError(AckEventError, err))
@@ -454,6 +462,15 @@ func (alert *Alert) AckAlertEvent(ctx *gin.Context) {
 		if err = alert.Store.AckEvent(pk, cluster, app); err != nil {
 			utils.ErrorResponse(ctx, utils.NewError(AckEventError, err))
 			return
+		}
+		// send to cama
+		event, err = alert.Store.GetEventByID(pk)
+		if err != nil {
+			utils.ErrorResponse(ctx, utils.NewError(AckEventError, err))
+			return
+		}
+		if err = alert.SendAlertEventToCama(&event); err != nil {
+			log.Errorf("Failed to send the alert to cama with %v", err)
 		}
 		utils.Ok(ctx, map[string]string{"status": "success"})
 	}
@@ -525,194 +542,23 @@ func (alert *Alert) GetCmdbServer(ctx *gin.Context) {
 	return
 }
 
-/*
-// AlertRuleFilesMaintainer keep the rule files sync with db
-func (alert *Alert) AlertRuleFilesMaintainer() {
-	c := cron.New()
-	interval := fmt.Sprintf("@every %s", alert.Interval)
-	c.AddFunc(interval, func() { alert.UpdateAlertRuleFiles() })
-	c.Start()
-	log.Infof("The alert files will be check in %s", alert.Interval)
-	alert.UpdateAlertRuleFiles()
-}
-
-// UpdateAlertRuleFiles update the rule files
-func (alert *Alert) UpdateAlertRuleFiles() {
+func (alert *Alert) SendAlertEventToCama(event *models.Event) error {
 	var (
-		rules     []*models.Rule
-		files     map[string]interface{}
-		ruleNames []*models.RuleOperation
-		err       error
+		result models.Event
 	)
-	reloadReady := false
-
-	path := alert.RulesPath
-
-	rules, err = alert.Store.GetAlertRules()
+	cmdbServer, err := alert.Store.GetCmdbServer(event.App)
 	if err != nil {
-		log.Errorf("Rule File Update Error: %v", err)
-		return
-	}
-
-	ruleNames = make([]*models.RuleOperation, 0)
-	for _, rule := range rules {
-		ruleOps := models.NewRuleOperation()
-		ruleOps.Rule = rule
-		ruleOps.File = fmt.Sprintf("%s-%s.rule", rule.Name, rule.Alert)
-
-		t := template.Must(template.New("ruleTempl").Parse(ruleTempl))
-		var buf bytes.Buffer
-		err = t.Execute(&buf, rule)
-		if err != nil {
-			log.Errorf("Rule File Update Error: %v", err)
-			return
-		}
-		h := md5.New()
-		io.WriteString(h, buf.String())
-		ruleOps.MD5 = h.Sum(nil)
-		ruleNames = append(ruleNames, ruleOps)
-	}
-
-	files = make(map[string]interface{})
-	files, err = getFilelist(path)
-	if err != nil {
-		log.Errorf("Rule File Update Error: %v", err)
-		fmt.Println(err)
-		return
-	}
-
-	var createRule, deleteRule []*models.RuleOperation
-	countRuleNames := len(ruleNames)
-	countFiles := len(files)
-	if countRuleNames == 0 && countFiles != 0 {
-		for k := range files {
-			ruleOps := models.NewRuleOperation()
-			ruleOps.File = k
-			deleteRule = append(deleteRule, ruleOps)
-		}
-	} else if countFiles == 0 {
-		for _, ruleName := range ruleNames {
-			createRule = append(createRule, ruleName)
-			delete(files, ruleName.File)
-		}
-	} else {
-		for _, ruleName := range ruleNames {
-			if files[ruleName.File] == nil {
-				createRule = append(createRule, ruleName)
-			} else if !bytes.Equal(files[ruleName.File].([]byte), ruleName.MD5) {
-				createRule = append(createRule, ruleName)
-			}
-			delete(files, ruleName.File)
-		}
-	}
-
-	if len(files) != 0 {
-		for k := range files {
-			ruleOps := models.NewRuleOperation()
-			ruleOps.File = k
-			deleteRule = append(deleteRule, ruleOps)
-		}
-	}
-
-	if len(createRule) != 0 {
-		for _, ruleOps := range createRule {
-			err := updateFileByAction(path, ruleOps, ruleFileUpdate)
-			if err != nil {
-				log.Errorf("Rule File Update Error: %v", err)
-				return
-			}
-		}
-		reloadReady = true
-	}
-
-	if len(deleteRule) != 0 {
-		for _, ruleOps := range deleteRule {
-			err := updateFileByAction(path, ruleOps, ruleFileDelete)
-			if err != nil {
-				log.Errorf("Rule File Delete Error: %v", err)
-				return
-			}
-		}
-		reloadReady = true
-	}
-
-	if reloadReady {
-		err := alert.ReloadPrometheusConf()
-		if err != nil {
-			log.Errorf("Rule File Update Error: %v", err)
-			return
-		}
-		log.Infof("Reload prometheus conf.")
-	}
-
-	log.Infof("No rules Changed")
-}
-
-func getFilelist(path string) (map[string]interface{}, error) {
-	files := make(map[string]interface{})
-	err := filepath.Walk(path, func(path string, f os.FileInfo, err error) error {
-		if f == nil {
-			return err
-		}
-		if f.IsDir() {
-			return nil
-		}
-		md5, _ := getFileMD5value(path)
-		files[f.Name()] = md5
-		return nil
-	})
-	if err != nil {
-		return nil, err
-	}
-	return files, err
-}
-
-func getFileMD5value(file string) ([]byte, error) {
-	f, err := os.Open(file)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-
-	fileContent, err := ioutil.ReadFile(file)
-	if err != nil {
-		return nil, err
-	}
-	var buf bytes.Buffer
-	buf.Write(fileContent)
-
-	h := md5.New()
-	io.WriteString(h, buf.String())
-	return h.Sum(nil), err
-}
-
-func updateFileByAction(path string, ruleOps *models.RuleOperation, action string) error {
-	file := fmt.Sprintf("%s/%s", path, ruleOps.File)
-
-	if action == ruleFileDelete {
-		err := os.Remove(file)
-		if err != nil {
-			return err
-		}
-		log.Infof("deleted rule file %s", ruleOps.File)
-		return nil
-	}
-
-	f, err := os.Create(file)
-	defer f.Close()
-	if err != nil {
-		fmt.Println(err)
 		return err
 	}
-	t := template.Must(template.New("ruleTempl").Parse(ruleTempl))
-	var buf bytes.Buffer
-	err = t.Execute(&buf, ruleOps.Rule)
+	result, err = alert.Store.GetEventByAlertName(event.AlertName)
 	if err != nil {
-		log.Errorln("executing templta: ", err)
-		return err
+		return fmt.Errorf("Failed to get event from db with %v", err)
 	}
-	f.WriteString(buf.String())
-	log.Infof("updated rule file %s", ruleOps.File)
+
+	camaEvent := camaalert.Event2CamaEvent(&result)
+	camaEvent.ServerNo = cmdbServer.CmdbAppID
+
+	service.SendCamaEvent(camaEvent)
+	fmt.Println("Event Send: ", camaEvent)
 	return nil
 }
-*/
