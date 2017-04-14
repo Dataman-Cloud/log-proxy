@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/Dataman-Cloud/log-proxy/src/models"
+	"github.com/Dataman-Cloud/log-proxy/src/service"
 	"github.com/Dataman-Cloud/log-proxy/src/utils"
 
 	"github.com/Sirupsen/logrus"
@@ -46,8 +47,37 @@ func (s *Search) ReceiverLog(ctx *gin.Context) {
 		if err := s.Store.CreateLogAlertEvent(&event); err != nil {
 			logrus.Errorf("create log alert event got error: %s", err.Error())
 		}
+
+		go s.SendLogAlertEventToCama(&event)
+
 	}
 
 	utils.Ok(ctx, "ok")
 	return
+}
+
+func (s *Search) SendLogAlertEventToCama(event *models.LogAlertEvent) {
+	camaEvent, err := s.ConvertLogAlertToCamaEvent(event, 0)
+	if err != nil {
+		logrus.Errorf("conver event to cama event failed. Error: %s", err.Error())
+		return
+	}
+
+	service.SendCamaEvent(camaEvent)
+}
+
+func (s *Search) SendLogAlertAckEventToCama(ID string) {
+	event, err := s.Store.GetLogAlertEvent(ID)
+	if err != nil {
+		logrus.Errorf("get event failed. Error: %s", err.Error())
+		return
+	}
+
+	camaEvent, err := s.ConvertLogAlertToCamaEvent(event, 1)
+	if err != nil {
+		logrus.Errorf("conver event to cama event failed. Error: %s", err.Error())
+		return
+	}
+
+	service.SendCamaEvent(camaEvent)
 }

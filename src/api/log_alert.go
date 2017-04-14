@@ -241,6 +241,8 @@ func (s *Search) HandleLogAlertEvent(ctx *gin.Context) {
 			utils.ErrorResponse(ctx, utils.NewError(ParamError, err))
 			return
 		}
+
+		go s.SendLogAlertAckEventToCama(ctx.Param("id"))
 	} else {
 		utils.ErrorResponse(ctx, utils.NewError(ParamError, errors.New("invalid action"+handleInfo.Action)))
 		return
@@ -248,4 +250,22 @@ func (s *Search) HandleLogAlertEvent(ctx *gin.Context) {
 
 	utils.Ok(ctx, "success")
 	return
+}
+
+func (s *Search) ConvertLogAlertToCamaEvent(alertEvent *models.LogAlertEvent, eventType int) (*models.CamaEvent, error) {
+	cmdbServer, err := s.Store.GetCmdbServer(alertEvent.App)
+	if err != nil {
+		return nil, err
+	}
+
+	camaEvent := &models.CamaEvent{
+		Channel:   "DOCKER",
+		Recover:   eventType,
+		ServerNo:  cmdbServer.CmdbAppID,
+		Merger:    1,
+		EventDesc: "",
+		Level:     5,
+	}
+
+	return camaEvent, nil
 }

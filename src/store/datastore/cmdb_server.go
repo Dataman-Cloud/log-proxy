@@ -18,7 +18,7 @@ func (db *datastore) GetCmdbServer(appID string) (*models.CmdbServer, error) {
 	var cmdb models.CmdbServer
 
 	if db.Where("cmdb_servers.app_id = ?", appID).First(&cmdb).RecordNotFound() {
-		return &models.CmdbServer{appID, config.GetConfig().CmdbDefaultAppID}, nil
+		return &models.CmdbServer{AppID: appID, CmdbAppID: config.GetConfig().CmdbDefaultAppID}, nil
 	}
 
 	if err := db.Where("cmdb_servers.app_id = ?", appID).First(&cmdb).Error; err != nil {
