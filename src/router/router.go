@@ -102,13 +102,6 @@ func Router(middlewares ...gin.HandlerFunc) *gin.Engine {
 	}
 	//alert.AlertRuleFilesMaintainer()
 
-	conf := api.NewConf()
-	confv1 := r.Group("/v1/config")
-	{
-		confv1.PUT("", conf.UpdateConf)
-		confv1.GET("", conf.GetConf)
-	}
-
 	staticRouter := r.Group("/ui")
 	{
 		staticRouter.GET("/*filepath", func(ctx *gin.Context) {

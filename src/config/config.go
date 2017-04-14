@@ -10,6 +10,10 @@ import (
 	"strings"
 )
 
+const (
+	CamaTimeFormatString = "20060101010000"
+)
+
 // Config defines the conf info
 type Config struct {
 	Addr                string `require:"true" alias:"ADDR"`

@@ -21,7 +21,6 @@ func main() {
 	flag.Parse()
 	config.InitConfig(*configFile)
 	datastore.InitDB(config.GetConfig().DbDriver, config.GetConfig().DbDSN)
-	datastore.InitConf()
 	expr.Exprs(config.GetConfig().QueryExprPATH)
 
 	log.Infof("http server: %s start...", config.GetConfig().Addr)
