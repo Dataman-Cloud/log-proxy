@@ -56,7 +56,7 @@
 
             //about log
             .state('home.logbase', {
-                url: '/logbase?cluster&app&task&source&from&to&keyword&conj',
+                url: '/logbase?cluster&app&task&source&from&to&keyword&conj&start&end',
                 templateUrl: '/src/log/logbase.html',
                 controller: 'LogBaseCtrl as vm'
             })

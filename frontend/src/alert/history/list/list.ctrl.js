@@ -45,6 +45,7 @@
         self.onPaginate = onPaginate;
         self.searchHistory = searchHistory;
         self.isAck = isAck;
+        self.infoContext = infoContext;
 
         activate();
 
@@ -130,10 +131,22 @@
                 action: 'ack'
             };
             alertBackend.historyAck({id: history.id}).pupdate(obj, function (data) {
-                history.ack=true;
+                history.ack = true;
                 Notification.success('操作成功');
             });
 
+        }
+
+        function infoContext(history) {
+            $state.go('home.logbase.logcontext', {
+                app: history.appid,
+                task: history.taskid,
+                source: history.path,
+                offset: history.offset,
+                cluster: history.clusterid,
+                start: moment(history.logtime+'').subtract(1,'h').unix()*1000,  // 1 小时前
+                end: moment(history.logtime+'').add(1,'h').unix()*1000  // 1 小时后
+            })
         }
     }
 })();
