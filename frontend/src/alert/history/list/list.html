@@ -59,12 +59,13 @@
             <table md-table id="user-list-table">
                 <thead md-head>
                 <tr md-row>
-                    <th md-column>时间</th>
+                    <th md-column style="width: 150px;">时间</th>
                     <th md-column>应用</th>
                     <th md-column>集群</th>
                     <th md-column>关键词</th>
-                    <th md-column>摘要</th>
+                    <th md-column style="width: 500px;">摘要</th>
                     <th md-column>操作</th>
+                    <th md-column style="width: 50px;">上下文</th>
                 </tr>
                 </thead>
                 <tbody md-body>
@@ -97,6 +98,9 @@
                                 未处理
                             </md-button>
                         </div>
+                    </td>
+                    <td md-cell>
+                        <a id="alertContext{/$index/}" ng-click="vm.infoContext(history)">>>></a>
                     </td>
                 </tr>
                 </tbody>
