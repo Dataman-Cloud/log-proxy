@@ -4,6 +4,7 @@ import (
 	"container/list"
 	"errors"
 
+	"github.com/Dataman-Cloud/log-proxy/src/config"
 	"github.com/Dataman-Cloud/log-proxy/src/models"
 	"github.com/Dataman-Cloud/log-proxy/src/utils"
 
@@ -265,6 +266,8 @@ func (s *Search) ConvertLogAlertToCamaEvent(alertEvent *models.LogAlertEvent, ev
 		Merger:    1,
 		EventDesc: "",
 		Level:     5,
+		FirstTime: alertEvent.LogTime.Format(config.CamaTimeFormatString),
+		LastTime:  alertEvent.LogTime.Format(config.CamaTimeFormatString),
 	}
 
 	return camaEvent, nil

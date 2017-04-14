@@ -5,7 +5,6 @@ import (
 	"github.com/Dataman-Cloud/log-proxy/src/store"
 	"github.com/Dataman-Cloud/log-proxy/src/utils/database"
 
-	log "github.com/Sirupsen/logrus"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
@@ -29,14 +28,6 @@ func InitDB(driver, dsn string) store.Store {
 	db.LogMode(false)
 
 	return From(db)
-}
-
-func InitConf() {
-	ds := From(database.GetDB())
-	err := ds.SetDefaultConf()
-	if err != nil {
-		log.Fatalf("Set Default conf in database with err : %v", err)
-	}
 }
 
 func From(db *gorm.DB) store.Store {

@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/Dataman-Cloud/log-proxy/src/config"
 	"github.com/Dataman-Cloud/log-proxy/src/models"
 )
 
@@ -87,11 +88,12 @@ func Event2Cama(event *models.Event) *models.CamaEvent {
 	} else {
 		recover = 0
 	}
-	camaEvent := &models.CamaEvent{
+
+	return &models.CamaEvent{
 		ID:        event.AlertName,
 		Channel:   "DOCKER",
-		FirstTime: event.CreatedAt,
-		LastTime:  event.UpdatedAt,
+		FirstTime: event.CreatedAt.Format(config.CamaTimeFormatString),
+		LastTime:  event.UpdatedAt.Format(config.CamaTimeFormatString),
 		Recover:   recover,
 		Merger:    event.Count,
 		Node:      "",
