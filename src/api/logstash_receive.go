@@ -14,6 +14,7 @@ import (
 const (
 	LogAlertRuleEnabled  = "Enabled"
 	LogAlertRuleDisabled = "Disabled"
+	camaEventTempl       = `{{ .Cluster }}集群的应用:{{ .App }}出发日志报警, 日志信息: {{.Message}}`
 )
 
 // ReceiverLog receive log data from logstash
