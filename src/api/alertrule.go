@@ -405,9 +405,11 @@ func (alert *Alert) ReceiveAlertEvent(ctx *gin.Context) {
 		event := &models.Event{
 			AlertName: labels["alertname"].(string),
 			Severity:  labels["severity"].(string),
+			Indicator: labels["indicator"].(string),
 			Cluster:   labels["container_label_VCLUSTER"].(string),
 			App:       labels["container_label_APP_ID"].(string),
 			Task:      labels["container_env_mesos_task_id"].(string),
+			Judgement: labels["judgement"].(string),
 			//UserName:    labels["container_label_USER_NAME"].(string),
 			//GroupName:   labels["container_label_GROUP_NAME"].(string),
 			ContainerID:   labels["id"].(string),
