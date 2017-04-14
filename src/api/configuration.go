@@ -21,8 +21,7 @@ func NewConf() *Conf {
 
 func (c *Conf) UpdateConf(ctx *gin.Context) {
 	var (
-		data models.Configuration
-		err  error
+		err error
 	)
 	conf := models.NewConfiguration()
 	if err = ctx.BindJSON(&conf); err != nil {
@@ -34,23 +33,11 @@ func (c *Conf) UpdateConf(ctx *gin.Context) {
 		utils.ErrorResponse(ctx, err)
 		return
 	}
-	data, err = c.Store.GetConf()
-	if err != nil {
-		utils.ErrorResponse(ctx, err)
-		return
-	}
+	data := c.Store.GetConfigFromDB()
 	utils.Ok(ctx, data)
 }
 
 func (c *Conf) GetConf(ctx *gin.Context) {
-	var (
-		data models.Configuration
-		err  error
-	)
-	data, err = c.Store.GetConf()
-	if err != nil {
-		utils.ErrorResponse(ctx, err)
-		return
-	}
+	data := c.Store.GetConfigFromDB()
 	utils.Ok(ctx, data)
 }
