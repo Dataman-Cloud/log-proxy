@@ -29,6 +29,6 @@ type Store interface {
 	CreateCmdbServer(cmdb *models.CmdbServer) error
 	GetCmdbServer(appID string) (*models.CmdbServer, error)
 	UpdateConf(conf *models.Configuration) error
-	GetConf() (models.Configuration, error)
 	SetDefaultConf() error
+	GetConfigFromDB() *models.Configuration
 }

@@ -1,7 +1,6 @@
 package datastore
 
 import (
-	"github.com/Dataman-Cloud/log-proxy/src/config"
 	"github.com/Dataman-Cloud/log-proxy/src/models"
 )
 
@@ -16,9 +15,9 @@ func (db *datastore) CreateCmdbServer(cmdb *models.CmdbServer) error {
 
 func (db *datastore) GetCmdbServer(appID string) (*models.CmdbServer, error) {
 	var cmdb models.CmdbServer
-
+	var camaConfig = db.GetConfigFromDB()
 	if db.Where("cmdb_servers.app_id = ?", appID).First(&cmdb).RecordNotFound() {
-		return &models.CmdbServer{appID, config.GetConfig().CmdbDefaultAppID}, nil
+		return &models.CmdbServer{appID, camaConfig.CamaCmdbDefaultAppID}, nil
 	}
 
 	if err := db.Where("cmdb_servers.app_id = ?", appID).First(&cmdb).Error; err != nil {
