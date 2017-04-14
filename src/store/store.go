@@ -28,4 +28,5 @@ type Store interface {
 	AckLogAlertEvent(ID string) error
 	CreateCmdbServer(cmdb *models.CmdbServer) error
 	GetCmdbServer(appID string) (*models.CmdbServer, error)
+	GetLogAlertEvent(ID string) (*models.LogAlertEvent, error)
 }

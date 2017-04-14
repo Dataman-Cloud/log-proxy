@@ -56,6 +56,12 @@ func (db *datastore) GetLogAlertEvents(options map[string]interface{}, page mode
 	return map[string]interface{}{"count": count, "events": events}, nil
 }
 
+func (db *datastore) GetLogAlertEvent(ID string) (*models.LogAlertEvent, error) {
+	var event models.LogAlertEvent
+	err := db.Table("log_alert_events").Where("id = ?", ID).Scan(&event).Error
+	return &event, err
+}
+
 func (db *datastore) DeleteLogAlertEvents(start, end string) error {
 	if start == "" || end == "" {
 		return errors.New("interval start or end time")
