@@ -6,9 +6,11 @@ type Event struct {
 	gorm.Model
 	Count         int    `json:"count"`
 	Severity      string `json:"severity"`
+	Indicator     string `json:"indicator"`
 	Cluster       string `json:"cluster"`
 	App           string `json:"app"`
 	Task          string `json:"task"`
+	Judgement     string `json:"judgement"`
 	UserName      string `json:"user_name"`
 	GroupName     string `json:"group_name"`
 	ContainerID   string `json:"container_id"`

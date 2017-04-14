@@ -79,3 +79,25 @@ func (ruleMap *RuleMapper) GetRuleIndicatorsList() (keys map[string]string) {
 	}
 	return keys
 }
+
+func Event2Cama(event *models.Event) *models.CamaEvent {
+	var recover int
+	if event.Ack == true {
+		recover = 1
+	} else {
+		recover = 0
+	}
+	camaEvent := &models.CamaEvent{
+		ID:        event.AlertName,
+		Channel:   "DOCKER",
+		FirstTime: event.CreatedAt,
+		LastTime:  event.UpdatedAt,
+		Recover:   recover,
+		Merger:    event.Count,
+		Node:      "",
+		NodeAlias: "",
+		ServerNo:  "",
+		EventDesc: event.Description,
+		Level:     5,
+	}
+}
