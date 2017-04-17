@@ -11,15 +11,16 @@ import (
 )
 
 func SendCamaEvent(event *models.CamaEvent) {
-	tcpAddr, err := net.ResolveTCPAddr("tcp4", config.GetConfig().CamaNotifactionADDR)
+	camaAddr := config.GetConfig().CamaNotifactionADDR
+	tcpAddr, err := net.ResolveTCPAddr("tcp4", camaAddr)
 	if err != nil {
-		log.Error("resolve tcp addr failed. Error: ", err)
+		log.Errorf("resolve tcp addr failed. Error: %v", err)
 		return
 	}
 
 	conn, err := net.DialTCP("tcp", nil, tcpAddr)
 	if err != nil {
-		log.Error("DialTCP to %s failed. Error %s: ", tcpAddr.String(), err)
+		log.Errorf("DialTCP to %s failed. Error %s: ", tcpAddr.String(), err)
 		return
 	}
 
@@ -27,14 +28,15 @@ func SendCamaEvent(event *models.CamaEvent) {
 
 	message, err := json.Marshal(event)
 	if err != nil {
-		log.Error("Marshal event failed. Error %s: ", err)
+		log.Errorf("Marshal event failed. Error %s: ", err)
 		return
 	}
 
 	if _, err := conn.Write(message); err != nil {
-		log.Error("write message to conn failed. Error %s: ", err)
+		log.Errorf("write message to conn failed. Error %s: ", err)
 		return
 	}
+	log.Infof("sent alert message to %s", camaAddr)
 
 	return
 }

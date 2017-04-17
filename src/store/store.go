@@ -15,6 +15,8 @@ type Store interface {
 	CreateOrIncreaseEvent(event *models.Event) error
 	AckEvent(pk int, username string, groupname string) error
 	ListEvents(page models.Page, options map[string]interface{}) (map[string]interface{}, error)
+	GetEventByAlertName(alertname string) (models.Event, error)
+	GetEventByID(ID int) (models.Event, error)
 	CreateLogAlertRule(rule *models.LogAlertRule) error
 	UpdateLogAlertRule(rule *models.LogAlertRule) error
 	DeleteLogAlertRule(ID string) error
