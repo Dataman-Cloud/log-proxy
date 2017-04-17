@@ -51,28 +51,36 @@ func Event2Desc(event *models.Event) string {
 		camaEventDesc.Indicator = "Tomcat线程数"
 	}
 
-	judge := strings.Split(event.Judgement, " ")[0]
-	switch judge {
-	case "max":
-		camaEventDesc.Judgement = "最大值"
-	case "min":
-		camaEventDesc.Judgement = "最小值"
-	case "avg":
-		camaEventDesc.Judgement = "平均值"
-	case "sum":
-		camaEventDesc.Judgement = "总和"
-	}
-	operater := strings.Split(event.Judgement, " ")[1]
-	switch operater {
-	case ">":
-		camaEventDesc.Operator = "大于"
-	case "<":
-		camaEventDesc.Operator = "小于"
-	case "==":
-		camaEventDesc.Operator = "等于"
-	}
-	camaEventDesc.JudgeValue = strings.Split(event.Judgement, " ")[2]
+	judgement := strings.Split(event.Judgement, " ")
+	if len(judgement) != 3 {
+		log.Errorf("Failed to convert the event to cama, Judgement is %s", event.Judgement)
+		camaEventDesc.Judgement = "jugement mistake"
+		camaEventDesc.Operator = "operator mistake"
+		camaEventDesc.JudgeValue = "judgeValue mistake"
+	} else {
 
+		judge := strings.Split(event.Judgement, " ")[0]
+		switch judge {
+		case "max":
+			camaEventDesc.Judgement = "最大值"
+		case "min":
+			camaEventDesc.Judgement = "最小值"
+		case "avg":
+			camaEventDesc.Judgement = "平均值"
+		case "sum":
+			camaEventDesc.Judgement = "总和"
+		}
+		operater := strings.Split(event.Judgement, " ")[1]
+		switch operater {
+		case ">":
+			camaEventDesc.Operator = "大于"
+		case "<":
+			camaEventDesc.Operator = "小于"
+		case "==":
+			camaEventDesc.Operator = "等于"
+		}
+		camaEventDesc.JudgeValue = strings.Split(event.Judgement, " ")[2]
+	}
 	t := template.Must(template.New("camaEventTempl").Parse(camaEventTempl))
 	var buf bytes.Buffer
 	err := t.Execute(&buf, camaEventDesc)
