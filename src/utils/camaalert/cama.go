@@ -7,7 +7,8 @@ import (
 
 	"github.com/Dataman-Cloud/log-proxy/src/config"
 	"github.com/Dataman-Cloud/log-proxy/src/models"
-	"github.com/prometheus/common/log"
+
+	log "github.com/Sirupsen/logrus"
 )
 
 const camaEventTempl = `集群{{ .Cluster }}应用{{ .App }}的{{ .Indicator }}{{ .Judgement }}{{.Operator}}{{.JudgeValue}}`
