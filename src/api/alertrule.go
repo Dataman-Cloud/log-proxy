@@ -365,7 +365,8 @@ func (alert *Alert) UpdateAlertFile(rule *models.Rule) error {
 		message string
 	)
 
-	filename := fmt.Sprintf("%s_%s_%s_%s", rule.Class, rule.Name, rule.Cluster, rule.App)
+	app := strings.Replace(rule.App, "-", "_", -1)
+	filename := fmt.Sprintf("%s_%s_%s", rule.Class, rule.Name, app)
 
 	path := alert.RulesPath
 	alertfile := fmt.Sprintf("%s/%s.rule", path, filename)
