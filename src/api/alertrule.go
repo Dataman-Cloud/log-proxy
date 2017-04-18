@@ -394,7 +394,7 @@ func (alert *Alert) ReceiveAlertEvent(ctx *gin.Context) {
 		utils.ErrorResponse(ctx, utils.NewError(ReceiveEventError, err))
 		return
 	}
-
+	log.Infof("Got event from alertmanager: %s", string(data))
 	var m map[string]interface{}
 	err = json.Unmarshal(data, &m)
 	if err != nil {
@@ -428,7 +428,6 @@ func (alert *Alert) ReceiveAlertEvent(ctx *gin.Context) {
 		if err := alert.SendAlertEventToCama(event); err != nil {
 			log.Errorf("Failed to send the alert to cama with %v", err)
 		}
-		fmt.Println("Event Receiver: ", event)
 	}
 	utils.Ok(ctx, map[string]string{"status": "success"})
 }
@@ -559,7 +558,6 @@ func (alert *Alert) SendAlertEventToCama(event *models.Event) error {
 	camaEvent := camaalert.Event2CamaEvent(&result)
 	camaEvent.ServerNo = cmdbServer.CmdbAppID
 
-	service.SendCamaEvent(camaEvent)
-	fmt.Println("Event Send: ", camaEvent)
+	go service.SendCamaEvent(camaEvent)
 	return nil
 }

@@ -54,9 +54,9 @@ func Event2Desc(event *models.Event) string {
 	judgement := strings.Split(event.Judgement, " ")
 	if len(judgement) != 3 {
 		log.Errorf("Failed to convert the event to cama, Judgement is %s", event.Judgement)
-		camaEventDesc.Judgement = "jugement mistake"
-		camaEventDesc.Operator = "operator mistake"
-		camaEventDesc.JudgeValue = "judgeValue mistake"
+		camaEventDesc.Judgement = "jugement"
+		camaEventDesc.Operator = "operator"
+		camaEventDesc.JudgeValue = "value"
 	} else {
 
 		judge := strings.Split(event.Judgement, " ")[0]
