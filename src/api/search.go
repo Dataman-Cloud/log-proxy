@@ -2,6 +2,7 @@ package api
 
 import (
 	"container/list"
+	"encoding/base64"
 	"errors"
 	"strings"
 	"sync"
@@ -126,7 +127,13 @@ func (s *Search) Applications(ctx *gin.Context) {
 
 // Tasks search applications tasks
 func (s *Search) Tasks(ctx *gin.Context) {
-	appName := ctx.Param("app")
+	base64Aid := ctx.Param("app")
+	byteAid, err := base64.StdEncoding.DecodeString(base64Aid)
+	if err != nil {
+		utils.ErrorResponse(ctx, utils.NewError(GetTaskError, err))
+		return
+	}
+	appName := string(byteAid)
 	tasks, err := s.Service.Tasks(ctx.Param("cluster"), appName, ctx.MustGet("page").(models.Page))
 	if err != nil {
 		utils.ErrorResponse(ctx, utils.NewError(GetTaskError, err))
@@ -166,9 +173,16 @@ func (s *Search) Tasks(ctx *gin.Context) {
 
 // Paths search applications paths
 func (s *Search) Source(ctx *gin.Context) {
+	base64Aid := ctx.Param("app")
+	byteAid, err := base64.StdEncoding.DecodeString(base64Aid)
+	if err != nil {
+		utils.ErrorResponse(ctx, utils.NewError(GetTaskError, err))
+		return
+	}
+	appName := string(byteAid)
 	paths, err := s.Service.Source(
 		ctx.Param("cluster"),
-		ctx.Param("app"),
+		appName,
 		ctx.Query("task"),
 		ctx.MustGet("page").(models.Page),
 	)
@@ -181,14 +195,23 @@ func (s *Search) Source(ctx *gin.Context) {
 
 // Index search log by condition
 func (s *Search) Index(ctx *gin.Context) {
-	if ctx.Param("app") == "" {
+	base64Aid := ctx.Param("app")
+
+	if base64Aid == "" {
 		utils.ErrorResponse(ctx, utils.NewError(ParamError, errors.New("app can't be empty")))
 		return
 	}
 
+	byteAid, err := base64.StdEncoding.DecodeString(base64Aid)
+	if err != nil {
+		utils.ErrorResponse(ctx, utils.NewError(IndexError, err))
+		return
+	}
+	appName := string(byteAid)
+
 	results, err := s.Service.Search(
 		ctx.Param("cluster"),
-		ctx.Param("app"),
+		appName,
 		ctx.Query("task"),
 		ctx.Query("path"),
 		ctx.Query("keyword"),
@@ -204,10 +227,19 @@ func (s *Search) Index(ctx *gin.Context) {
 
 // Context search log context
 func (s *Search) Context(ctx *gin.Context) {
-	if ctx.Param("app") == "" {
+	base64Aid := ctx.Param("app")
+
+	if base64Aid == "" {
 		utils.ErrorResponse(ctx, utils.NewError(ParamError, errors.New("app can't be empty")))
 		return
 	}
+
+	byteAid, err := base64.StdEncoding.DecodeString(base64Aid)
+	if err != nil {
+		utils.ErrorResponse(ctx, utils.NewError(IndexError, err))
+		return
+	}
+	appName := string(byteAid)
 
 	if ctx.Query("task") == "" {
 		utils.ErrorResponse(ctx, utils.NewError(ParamError, errors.New("task can't be empty")))
@@ -226,7 +258,7 @@ func (s *Search) Context(ctx *gin.Context) {
 
 	results, err := s.Service.Context(
 		ctx.Param("cluster"),
-		ctx.Param("app"),
+		appName,
 		ctx.Query("task"),
 		ctx.Query("source"),
 		ctx.Query("offset"),
