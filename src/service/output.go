@@ -43,7 +43,7 @@ func SendCamaEvent(event *models.CamaEvent) {
 		head = fmt.Sprintf("00%d", msgLength)
 	case msgLength >= 100 && msgLength < 1000:
 		head = fmt.Sprintf("0%d", msgLength)
-	case msgLength >= 1000:
+	case msgLength >= 1000 && msgLength < 10000:
 		head = fmt.Sprintf("%d", msgLength)
 	default:
 		head = "9999"
