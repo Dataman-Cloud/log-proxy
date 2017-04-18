@@ -96,7 +96,7 @@
         }
 
         function cmdb(appid) {
-            return $resource(BACKEND_URL_BASE.defaultBase + '/v1/alert/cmdb/:appid', {appid: appid}, {
+            return $resource(BACKEND_URL_BASE.defaultBase + '/v1/alert/cmdb/:appid', {appid: btoa(appid)}, {
                 'get': {method: 'get'}
             });
         }

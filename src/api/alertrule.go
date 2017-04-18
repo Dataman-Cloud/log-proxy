@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -531,7 +532,13 @@ func (alert *Alert) CreateCmdbServer(ctx *gin.Context) {
 }
 
 func (alert *Alert) GetCmdbServer(ctx *gin.Context) {
-	appID := ctx.Param("appid")
+	base64Aid := ctx.Param("appid")
+	byteAid, err := base64.StdEncoding.DecodeString(base64Aid)
+	if err != nil {
+		utils.ErrorResponse(ctx, utils.NewError(ParamError, err))
+		return
+	}
+	appID := string(byteAid)
 	cmdb, err := alert.Store.GetCmdbServer(appID)
 	if err != nil {
 		utils.ErrorResponse(ctx, utils.NewError(ParamError, err))

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/base64"
 	"fmt"
 	"net/http"
 
@@ -166,12 +167,19 @@ func (m *Monitor) GetClusterApps(ctx *gin.Context) {
 
 // GetClusters return the items of query metrics
 func (m *Monitor) GetAppsTasks(ctx *gin.Context) {
+	base64Aid := ctx.Param("appid")
+	byteAid, err := base64.StdEncoding.DecodeString(base64Aid)
+	if err != nil {
+		utils.ErrorResponse(ctx, err)
+		return
+	}
+	appName := string(byteAid)
 	param := &models.QueryParameter{
 		Start:   ctx.Query("start"),
 		End:     ctx.Query("end"),
 		Step:    ctx.Query("step"),
 		Cluster: ctx.Param("clusterid"),
-		App:     ctx.Param("appid"),
+		App:     appName,
 	}
 
 	query := &service.Query{

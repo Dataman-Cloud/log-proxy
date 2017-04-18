@@ -49,7 +49,7 @@
             var paramObj = data || {};
             return $resource(BACKEND_URL_BASE.defaultBase + '/v1/monitor/clusters/:cluster/apps/:app/tasks', {
                 cluster: cluster,
-                app: app,
+                app: btoa(app),
                 start: paramObj.start,
                 end: paramObj.end,
                 step: paramObj.step

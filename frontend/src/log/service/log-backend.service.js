@@ -17,7 +17,7 @@
             var paramObj = data || {};
             return $resource(BACKEND_URL_BASE.defaultBase + '/v1/log/clusters/:cluster/apps/:app/index', {
                 cluster: paramObj.cluster,
-                app: paramObj.app,
+                app: btoa(paramObj.app),
                 task: paramObj.task,
                 source: paramObj.source,
                 keyword: paramObj.keyword,
@@ -33,7 +33,7 @@
             var paramObj = data || {};
             return $resource(BACKEND_URL_BASE.defaultBase + '/v1/log/clusters/:cluster/apps/:app/context', {
                 cluster: paramObj.cluster,
-                app: paramObj.app,
+                app: btoa(paramObj.app),
                 task: paramObj.task,
                 source: paramObj.source,
                 offset: paramObj.offset,
@@ -63,7 +63,7 @@
             var paramObj = data || {};
             return $resource(BACKEND_URL_BASE.defaultBase + '/v1/log/clusters/:cluster/apps/:app/tasks', {
                 cluster: cluster,
-                app: app,
+                app: btoa(app),
                 from: paramObj.from,
                 to: paramObj.to
             });
@@ -73,7 +73,7 @@
             var paramObj = data || {};
             return $resource(BACKEND_URL_BASE.defaultBase + '/v1/log/clusters/:cluster/apps/:app/sources', {
                 cluster: paramObj.cluster,
-                app: paramObj.app,
+                app: btoa(paramObj.app),
                 task: paramObj.task,
                 from: paramObj.from,
                 to: paramObj.to
