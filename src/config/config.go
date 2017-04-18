@@ -8,6 +8,7 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+	"encoding/base64"
 )
 
 const (
@@ -104,5 +105,6 @@ func BorgLoginURL() string {
 }
 
 func BorgAppTasksURL(appName string) string {
-	return c.BorgURL + BorgAPIVersion + "apps/" + appName + "/tasks"
+	base64Id := base64.StdEncoding.EncodeToString([]byte(appName))
+	return c.BorgURL + BorgAPIVersion + "apps/" + base64Id + "/tasks"
 }
