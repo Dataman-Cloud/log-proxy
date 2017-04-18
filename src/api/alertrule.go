@@ -425,7 +425,16 @@ func (alert *Alert) ReceiveAlertEvent(ctx *gin.Context) {
 			utils.ErrorResponse(ctx, utils.NewError(ReceiveEventError, err))
 			return
 		}
-		if err := alert.SendAlertEventToCama(event); err != nil {
+		// send event to cama
+		var (
+			result models.Event
+		)
+		result, err = alert.Store.GetEventByAlertName(event.AlertName)
+		if err != nil {
+			log.Errorf("Failed to get event from db with %v", err)
+		}
+
+		if err := alert.SendAlertEventToCama(&result); err != nil {
 			log.Errorf("Failed to send the alert to cama with %v", err)
 		}
 	}
@@ -435,8 +444,8 @@ func (alert *Alert) ReceiveAlertEvent(ctx *gin.Context) {
 // AckAlertEvent mark the alert evnet ACK
 func (alert *Alert) AckAlertEvent(ctx *gin.Context) {
 	var (
-		event models.Event
-		err   error
+		result models.Event
+		err    error
 	)
 	pk, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
@@ -464,12 +473,12 @@ func (alert *Alert) AckAlertEvent(ctx *gin.Context) {
 			return
 		}
 		// send to cama
-		event, err = alert.Store.GetEventByID(pk)
+		result, err = alert.Store.GetEventByID(pk)
 		if err != nil {
 			utils.ErrorResponse(ctx, utils.NewError(AckEventError, err))
 			return
 		}
-		if err = alert.SendAlertEventToCama(&event); err != nil {
+		if err = alert.SendAlertEventToCama(&result); err != nil {
 			log.Errorf("Failed to send the alert to cama with %v", err)
 		}
 		utils.Ok(ctx, map[string]string{"status": "success"})
@@ -543,19 +552,12 @@ func (alert *Alert) GetCmdbServer(ctx *gin.Context) {
 }
 
 func (alert *Alert) SendAlertEventToCama(event *models.Event) error {
-	var (
-		result models.Event
-	)
 	cmdbServer, err := alert.Store.GetCmdbServer(event.App)
 	if err != nil {
 		return err
 	}
-	result, err = alert.Store.GetEventByAlertName(event.AlertName)
-	if err != nil {
-		return fmt.Errorf("Failed to get event from db with %v", err)
-	}
 
-	camaEvent := camaalert.Event2CamaEvent(&result)
+	camaEvent := camaalert.Event2CamaEvent(event)
 	camaEvent.ServerNo = cmdbServer.CmdbAppID
 
 	go service.SendCamaEvent(camaEvent)
