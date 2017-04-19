@@ -2,13 +2,13 @@ package config
 
 import (
 	"bufio"
+	"encoding/base64"
 	"io"
 	"log"
 	"os"
 	"reflect"
 	"strconv"
 	"strings"
-	"encoding/base64"
 )
 
 const (
