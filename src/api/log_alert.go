@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"container/list"
 	"errors"
-	"html/template"
+	"text/template"
 
 	"github.com/Dataman-Cloud/log-proxy/src/config"
 	"github.com/Dataman-Cloud/log-proxy/src/models"
