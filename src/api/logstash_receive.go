@@ -14,7 +14,7 @@ import (
 const (
 	LogAlertRuleEnabled  = "Enabled"
 	LogAlertRuleDisabled = "Disabled"
-	camaEventTempl       = `{{ .Cluster }}集群的应用:{{ .App }}出发日志报警, 日志信息: {{.Message}}`
+	camaEventTempl       = `{{ .Cluster }}集群的应用:{{ .App }}触发日志报警, 日志信息: {{.Message}}`
 )
 
 // ReceiverLog receive log data from logstash
@@ -48,6 +48,8 @@ func (s *Search) ReceiverLog(ctx *gin.Context) {
 		if err := s.Store.CreateLogAlertEvent(&event); err != nil {
 			logrus.Errorf("create log alert event got error: %s", err.Error())
 		}
+
+		event.Description = rule.Description
 
 		go s.SendLogAlertEventToCama(&event)
 

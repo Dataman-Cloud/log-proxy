@@ -268,6 +268,7 @@ func (s *Search) ConvertLogAlertToCamaEvent(alertEvent *models.LogAlertEvent, ev
 	}
 
 	camaEvent := &models.CamaEvent{
+		ID:        alertEvent.Description,
 		Channel:   "DOCKER",
 		Recover:   eventType,
 		ServerNo:  cmdbServer.CmdbAppID,
