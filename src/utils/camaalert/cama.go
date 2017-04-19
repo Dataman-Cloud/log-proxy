@@ -11,7 +11,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
-const camaEventTempl = `集群{{ .Cluster }}应用{{ .App }}的{{ .Indicator }}{{ .Judgement }}{{.Operator}}{{.JudgeValue}}`
+const camaEventTempl = `集群 {{ .Cluster }} 应用 {{ .App }} 的 {{ .Indicator }} {{ .Judgement }} {{.Operator}} {{.JudgeValue}}`
 
 func Event2CamaEvent(event *models.Event) *models.CamaEvent {
 	var recover int
