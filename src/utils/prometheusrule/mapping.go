@@ -42,7 +42,21 @@ func (ruleMap *RuleMapper) Map2Raw(rule *models.Rule) (*models.RawRule, error) {
 	aggregation := rule.Aggregation
 	comparison := rule.Comparison
 	threshold := strconv.FormatInt(rule.Threshold, 10)
-	judgement := fmt.Sprintf("%s %s %s", aggregation, comparison, threshold)
+	var unit string
+	ruleIndicator, ok := ruleMap.mapper[rule.Indicator]
+	if ok {
+		switch indicator {
+		case "mem_usage":
+			unit = "%"
+		case "cpu_usage":
+			unit = "%"
+		case "tomcat_thread_count":
+			unit = ""
+		}
+	} else {
+		return nil, errors.New("Cannot support monitor indicator: " + rule.Indicator)
+	}
+	judgement := fmt.Sprintf("%s %s %s%s", aggregation, comparison, threshold, unit)
 	duration := rule.Duration
 	labels := fmt.Sprintf(`{ cluster = "%s", app = "%s", value = "{{ $value }}", severity = "%s", indicator = "%s", judgement = "%s", duration = "%s" }`, rule.Cluster, rule.App, serverity, indicator, judgement, duration)
 	annotations := `{ description = "", summary = "" }`
@@ -53,7 +67,7 @@ func (ruleMap *RuleMapper) Map2Raw(rule *models.Rule) (*models.RawRule, error) {
 	raw.Labels = labels
 	raw.Annotations = annotations
 
-	ruleIndicator, ok := ruleMap.mapper[rule.Indicator]
+	ruleIndicator, ok = ruleMap.mapper[rule.Indicator]
 	if ok {
 		templ := ruleIndicator.Templ
 		switch rule.Indicator {
