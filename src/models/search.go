@@ -30,6 +30,7 @@ type LogAlertEvent struct {
 	Cluster     string    `json:"clusterid" binding:"required"`
 	Keyword     string    `json:"keyword"`
 	Ack         bool      `json:"ack" sql:"DEFAULT: false"`
+	Description string    `json:"description"  gorm:"type:longtext"`
 }
 
 type LogAlertRule struct {
