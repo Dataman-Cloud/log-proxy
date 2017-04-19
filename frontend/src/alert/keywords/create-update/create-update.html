@@ -52,6 +52,14 @@
                    data-ng-show="staticForm.keyW.$error.required && !staticForm.keyW.$pristine">关键字不能为空</p>
             </div>
 
+            <div layout="column" class="form-item">
+                <div><label>描述</label></div>
+                <div>
+                    <textarea ng-model="vm.form.description" name="userDescription" id="input-userDescription"
+                              id="userDescription"></textarea>
+                </div>
+            </div>
+
             <div class="form-buttons-footer" layout="column">
                 <md-button id="createW" class="md-raised md-primary" style="width: 100px;"
                            ng-disabled="staticForm.$invalid" ng-if="vm.target === 'create'"

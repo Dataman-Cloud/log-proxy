@@ -14,7 +14,8 @@
             app: alert.app,
             source: alert.source || '',
             keyword: alert.keyword || '',
-            cmdbAppid: ''
+            cmdbAppid: '',
+            description: alert.description || ''
 
         };
 
