@@ -33,14 +33,15 @@ type LogAlertEvent struct {
 }
 
 type LogAlertRule struct {
-	ID        uint64    `json:"id" gorm:"not null; auto_increment"`
-	Cluster   string    `json:"cluster"`
-	App       string    `json:"app"`
-	Keyword   string    `json:"keyword"`
-	Source    string    `json:"source"`
-	Status    string    `json:"status" sql:"DEFAULT:'Enabled'"`
-	CreatedAt time.Time `json:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt"`
+	ID          uint64    `json:"id" gorm:"not null; auto_increment"`
+	Cluster     string    `json:"cluster"`
+	App         string    `json:"app"`
+	Keyword     string    `json:"keyword"`
+	Source      string    `json:"source"`
+	Status      string    `json:"status" sql:"DEFAULT:'Enabled'"`
+	Description string    `json:"description"  gorm:"type:longtext"`
+	CreatedAt   time.Time `json:"createdAt"`
+	UpdatedAt   time.Time `json:"updatedAt"`
 }
 
 type TaskInfo struct {
