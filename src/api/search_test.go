@@ -29,6 +29,7 @@ func startAPIServer(sv *Search) *httptest.Server {
 	v1 := router.Group("/api/v1", func(ctx *gin.Context) { ctx.Set("page", models.Page{}) })
 	{
 		v1.GET("/ping", func(ctx *gin.Context) { sv.Ping(ctx) })
+		v1.GET("clusters", func(ctx *gin.Context) { sv.Clusters(ctx) })
 		v1.GET("/applications", func(ctx *gin.Context) {
 			sv.Applications(ctx)
 		})
@@ -225,6 +226,32 @@ func TestPing(t *testing.T) {
 	baseURL = sr.URL
 	se := startAPIServer(GetSearch())
 	resp, err := http.Get(se.URL + "/api/v1/ping")
+	if err == nil && resp.StatusCode == 200 {
+		t.Log("success")
+	} else {
+		t.Error("faild")
+	}
+}
+
+func TestClusters(t *testing.T) {
+	sr := startErrorClient()
+	config.GetConfig().EsURL = sr.URL
+	baseURL = sr.URL
+	s = GetSearch()
+	se := startAPIServer(s)
+	resp, err := http.Get(se.URL + "/api/v1/clusters")
+	if err == nil && resp.StatusCode == 503 {
+		t.Log("success")
+	} else {
+		t.Error("faild")
+	}
+
+	sr = startHTTPServer()
+	config.GetConfig().EsURL = sr.URL
+	baseURL = sr.URL
+	s = GetSearch()
+	se = startAPIServer(s)
+	resp, err = http.Get(se.URL + "/api/v1/clusters")
 	if err == nil && resp.StatusCode == 200 {
 		t.Log("success")
 	} else {

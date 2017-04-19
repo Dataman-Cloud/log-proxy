@@ -45,7 +45,19 @@ func getp(ctx *gin.Context) {
 }
 
 func app(ctx *gin.Context) {
-	data := `{"took":137,"_scroll_id":"","hits":{"total":6,"max_score":0,"hits":[]},"suggest":null,"aggregations":{"apps":{"doc_count_error_upper_bound":0,"sum_other_doc_count":0,"buckets":[{"key":"test-web","doc_count":6}]}},"timed_out":false,"terminated_early":false,"_shards":{"total":5,"successful":5,"failed":0}}`
+	data := `{"took":137,"_scroll_id":"","hits":{"total":6,"max_score":0,"hits":[]},"suggest":null,
+			  "aggregations":{
+				"apps":{
+					"doc_count_error_upper_bound":0,
+					"sum_other_doc_count":0,
+					"buckets":[{"key":"test-web","doc_count":6}]
+				},
+				"clusters":{
+					"doc_count_error_upper_bound":0,
+					"sum_other_doc_count":0,
+					"buckets":[{"key":"test-web","doc_count":6}]
+				}
+			},"timed_out":false,"terminated_early":false,"_shards":{"total":5,"successful":5,"failed":0}}`
 	var info elastic.SearchResult
 	json.Unmarshal([]byte(data), &info)
 
@@ -91,6 +103,11 @@ func TestNewEsService(t *testing.T) {
 	} else {
 		t.Error("faild")
 	}
+}
+
+func TestClusters(t *testing.T) {
+	service := NewEsService([]string{baseURL})
+	service.Clusters(models.Page{})
 }
 
 func TestApplications(t *testing.T) {
