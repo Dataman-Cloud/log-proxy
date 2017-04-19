@@ -112,7 +112,7 @@ func TestClusters(t *testing.T) {
 
 func TestApplications(t *testing.T) {
 	service := NewEsService([]string{baseURL})
-	service.Applications(models.Page{})
+	service.Applications("test", models.Page{})
 }
 
 func TestTasks(t *testing.T) {

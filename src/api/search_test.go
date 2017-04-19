@@ -30,7 +30,7 @@ func startAPIServer(sv *Search) *httptest.Server {
 	{
 		v1.GET("/ping", func(ctx *gin.Context) { sv.Ping(ctx) })
 		v1.GET("clusters", func(ctx *gin.Context) { sv.Clusters(ctx) })
-		v1.GET("/applications", func(ctx *gin.Context) {
+		v1.GET("/clusters/:cluster/apps", func(ctx *gin.Context) {
 			sv.Applications(ctx)
 		})
 		v1.GET("/tasks/:app", func(ctx *gin.Context) { sv.Tasks(ctx) })
@@ -102,7 +102,39 @@ func getp(ctx *gin.Context) {
 }
 
 func app(ctx *gin.Context) {
-	data := `{"took":137,"_scroll_id":"","hits":{"total":6,"max_score":0,"hits":[]},"suggest":null,"aggregations":{"apps":{"doc_count_error_upper_bound":0,"sum_other_doc_count":0,"buckets":[{"key":"test-web","doc_count":6}]}},"timed_out":false,"terminated_early":false,"_shards":{"total":5,"successful":5,"failed":0}}`
+	data := `
+	{
+    "took":137,
+    "_scroll_id":"",
+    "hits":{
+        "total":6,
+        "max_score":0,
+        "hits":[
+
+        ]
+    },
+    "suggest":null,
+    "aggregations":{
+        "apps":{
+            "doc_count_error_upper_bound":0,
+            "sum_other_doc_count":0,
+            "buckets":[
+                {
+                    "key":"test-web",
+                    "doc_count":6
+                }
+            ]
+        }
+    },
+    "timed_out":false,
+    "terminated_early":false,
+    "_shards":{
+        "total":5,
+        "successful":5,
+        "failed":0
+    }
+}
+`
 	var info elastic.SearchResult
 	json.Unmarshal([]byte(data), &info)
 
@@ -110,7 +142,87 @@ func app(ctx *gin.Context) {
 }
 
 func webs(ctx *gin.Context) {
-	data := `{"took":15,"_scroll_id":"","hits":{"total":6,"max_score":0,"hits":[{"_score":0.1825316,"_index":"dataman-test-2016-12-13","_type":"dataman-test-web","_id":"AVj3kWyMIIGpJqE63T3m","_uid":"","_timestamp":0,"_ttl":600680748,"_routing":"","_parent":"","_version":null,"sort":null,"highlight":{"message":["192.168.1.98 - - [13/Dec/2016:17:33:31 +0000] \"@dataman-highlighted-field@GET@/dataman-highlighted-field@ / HTTP/1.1\" 304 0 \"-\" \"Mozilla/5.0 (Macintosh"]},"_source":{"message":"192.168.1.98 - - [13/Dec/2016:17:33:31 +0000] \"GET / HTTP/1.1\" 304 0 \"-\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.80 Safari/537.36\" \"-\"\n","@version":"1","@timestamp":"2016-12-13T09:44:07.282Z","host":"192.168.1.63","port":33762,"containerid":"55f3c919563f276b0566a8a2bb01167d24a7498a18a72d556fa8f630c5956958","logtime":"2016-12-14T01:33:35.421815898+08:00","path":"stdout","offset":1481650415421815800,"app":"test-web","user":"4","task":"test-web.ac4616e4-c02b-11e6-9030-024245dc84c8","groupid":"1","clusterid":"test"},"fields":null,"_explanation":null,"matched_queries":null,"inner_hits":null}]},"suggest":null,"aggregations":{"tasks":{"doc_count_error_upper_bound":0,"sum_other_doc_count":0,"buckets":[{"key":"test-web.ac4616e4-c02b-11e6-9030-024245dc84c8","doc_count":6}]},"paths":{"doc_count_error_upper_bound":0,"sum_other_doc_count":0,"buckets":[{"key":"test-web.ac4616e4-c02b-11e6-9030-024245dc84c8","doc_count":6}]}},"timed_out":false,"terminated_early":false,"_shards":{"total":5,"successful":5,"failed":0}}`
+	data := `
+	{
+    "took":15,
+    "_scroll_id":"",
+    "hits":{
+        "total":6,
+        "max_score":0,
+        "hits":[
+            {
+                "_score":0.1825316,
+                "_index":"dataman-test-2016-12-13",
+                "_type":"dataman-test-web",
+                "_id":"AVj3kWyMIIGpJqE63T3m",
+                "_uid":"",
+                "_timestamp":0,
+                "_ttl":600680748,
+                "_routing":"",
+                "_parent":"",
+                "_version":null,
+                "sort":null,
+                "highlight":{
+                    "message":[
+                        "192.168.1.98 - - [13/Dec/2016:17:33:31 +0000] "@dataman-highlighted-field@GET@/dataman-highlighted-field@ / HTTP/1.1" 304 0 "-" "Mozilla/5.0 (Macintosh"
+                    ]
+                },
+                "_source":{
+                    "message":"192.168.1.98 - - [13/Dec/2016:17:33:31 +0000] "GET / HTTP/1.1" 304 0 "-" "Mozilla/5.0
+						(Macintosh; Intel Mac OS X 10_11_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.80 Safari/537.36" "-" ",
+                    "@version":"1",
+                    "@timestamp":"2016-12-13T09:44:07.282Z",
+                    "host":"192.168.1.63",
+                    "port":33762,
+                    "containerid":"55f3c919563f276b0566a8a2bb01167d24a7498a18a72d556fa8f630c5956958",
+                    "logtime":"2016-12-14T01:33:35.421815898+08:00",
+                    "path":"stdout",
+                    "offset":1481650415421815800,
+                    "app":"test-web",
+                    "user":"4",
+                    "task":"test-web.ac4616e4-c02b-11e6-9030-024245dc84c8",
+                    "groupid":"1",
+                    "clusterid":"test"
+                },
+                "fields":null,
+                "_explanation":null,
+                "matched_queries":null,
+                "inner_hits":null
+            }
+        ]
+    },
+    "suggest":null,
+    "aggregations":{
+        "tasks":{
+            "doc_count_error_upper_bound":0,
+            "sum_other_doc_count":0,
+            "buckets":[
+                {
+                    "key":"test-web.ac4616e4-c02b-11e6-9030-024245dc84c8",
+                    "doc_count":6
+                }
+            ]
+        },
+        "paths":{
+            "doc_count_error_upper_bound":0,
+            "sum_other_doc_count":0,
+            "buckets":[
+                {
+                    "key":"test-web.ac4616e4-c02b-11e6-9030-024245dc84c8",
+                    "doc_count":6
+                }
+            ]
+        }
+    },
+    "timed_out":false,
+    "terminated_early":false,
+    "_shards":{
+        "total":5,
+        "successful":5,
+        "failed":0
+    }
+}`
+
 	var info elastic.SearchResult
 	json.Unmarshal([]byte(data), &info)
 
@@ -265,7 +377,7 @@ func TestApplications(t *testing.T) {
 	baseURL = sr.URL
 	s = GetSearch()
 	se := startAPIServer(s)
-	resp, err := http.Get(se.URL + "/api/v1/applications")
+	resp, err := http.Get(se.URL + "/api/v1/clusters/test/apps")
 	if err == nil && resp.StatusCode == 503 {
 		t.Log("success")
 	} else {
@@ -277,7 +389,7 @@ func TestApplications(t *testing.T) {
 	baseURL = sr.URL
 	s = GetSearch()
 	se = startAPIServer(s)
-	resp, err = http.Get(se.URL + "/api/v1/applications")
+	resp, err = http.Get(se.URL + "/api/v1/clusters/test/apps")
 	if err == nil && resp.StatusCode == 200 {
 		t.Log("success")
 	} else {

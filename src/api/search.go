@@ -115,7 +115,8 @@ func (s *Search) Clusters(ctx *gin.Context) {
 
 // Applications get all applications
 func (s *Search) Applications(ctx *gin.Context) {
-	apps, err := s.Service.Applications(ctx.MustGet("page").(models.Page))
+	cluster := ctx.Param("cluster")
+	apps, err := s.Service.Applications(cluster, ctx.MustGet("page").(models.Page))
 	if err != nil {
 		utils.ErrorResponse(ctx, utils.NewError(GetAppsError, err))
 		return

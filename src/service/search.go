@@ -89,10 +89,10 @@ func (s *SearchService) Clusters(page models.Page) (map[string]int64, error) {
 }
 
 // Applications get all applications
-// This function destroy now.
-func (s *SearchService) Applications(page models.Page) (map[string]int64, error) {
+func (s *SearchService) Applications(cluster string, page models.Page) (map[string]int64, error) {
 	bquery := elastic.NewBoolQuery().
-		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte(page.RangeFrom).Lte(page.RangeTo).Format("epoch_millis"))
+		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte(page.RangeFrom).Lte(page.RangeTo).Format("epoch_millis")).
+		Must(elastic.NewTermQuery("DM_VCLUSTER", cluster))
 
 	apps := make(map[string]int64)
 	result, err := s.ESClient.Search().
@@ -101,7 +101,7 @@ func (s *SearchService) Applications(page models.Page) (map[string]int64, error)
 		Query(bquery).
 		Aggregation("apps", elastic.
 			NewTermsAggregation().
-			Field("app").
+			Field("DM_APP_ID").
 			Size(0).
 			OrderByCountDesc()).
 		Pretty(true).
