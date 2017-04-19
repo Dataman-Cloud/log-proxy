@@ -421,7 +421,7 @@ func (alert *Alert) ReceiveAlertEvent(ctx *gin.Context) {
 			Description:   annotations["description"].(string),
 			Summary:       annotations["summary"].(string),
 		}
-		if err := alert.Store.CreateOrIncreaseEvent(event); err != nil {
+		if err = alert.Store.CreateOrIncreaseEvent(event); err != nil {
 			utils.ErrorResponse(ctx, utils.NewError(ReceiveEventError, err))
 			return
 		}
@@ -475,8 +475,7 @@ func (alert *Alert) AckAlertEvent(ctx *gin.Context) {
 		// send to cama
 		result, err = alert.Store.GetEventByID(pk)
 		if err != nil {
-			utils.ErrorResponse(ctx, utils.NewError(AckEventError, err))
-			return
+			log.Errorf("Failed to get event from db with %v", err)
 		}
 		if err = alert.SendAlertEventToCama(&result); err != nil {
 			log.Errorf("Failed to send the alert to cama with %v", err)
