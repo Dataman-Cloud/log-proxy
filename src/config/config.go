@@ -2,7 +2,6 @@ package config
 
 import (
 	"bufio"
-	"encoding/base64"
 	"io"
 	"log"
 	"os"
