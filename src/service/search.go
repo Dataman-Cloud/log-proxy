@@ -51,6 +51,43 @@ func NewEsService(url []string) *SearchService {
 	}
 }
 
+func (s *SearchService) Clusters(page models.Page) (map[string]int64, error) {
+	bquery := elastic.NewBoolQuery().
+		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte(page.RangeFrom).Lte(page.RangeTo).Format("epoch_millis"))
+
+	clusters := make(map[string]int64)
+	result, err := s.ESClient.Search().
+		Index("dataman-*").
+		SearchType("count").
+		Query(bquery).
+		Aggregation("clusters", elastic.
+			NewTermsAggregation().
+			Field("DM_VCLUSTER").
+			Size(0).
+			OrderByCountDesc()).
+		Pretty(true).
+		Do()
+
+	if err != nil && err.(*elastic.Error).Status == http.StatusNotFound {
+		return nil, nil
+	}
+
+	if err != nil {
+		log.Errorf("query clusters got error: %v", err)
+		return clusters, err
+	}
+
+	agg, found := result.Aggregations.Terms("clusters")
+	if !found {
+		return clusters, nil
+	}
+
+	for _, bucket := range agg.Buckets {
+		clusters[fmt.Sprint(bucket.Key)] = bucket.DocCount
+	}
+	return clusters, nil
+}
+
 // Applications get all applications
 // This function destroy now.
 func (s *SearchService) Applications(page models.Page) (map[string]int64, error) {
