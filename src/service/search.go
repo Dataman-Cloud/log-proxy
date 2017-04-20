@@ -153,23 +153,22 @@ func (s *SearchService) Slots(cluster, app string, page models.Page) (map[string
 }
 
 // Tasks get application tasks
-func (s *SearchService) Tasks(appName, user string, page models.Page) (map[string]int64, error) {
+func (s *SearchService) Tasks(cluster, app, slot string, page models.Page) (map[string]int64, error) {
+	var querys []elastic.Query
+	querys = append(querys, elastic.NewTermQuery("DM_VCLUSTER", cluster))
+	querys = append(querys, elastic.NewTermQuery("DM_APP_ID", app))
+	querys = append(querys, elastic.NewTermQuery("DM_SLOT_INDEX", slot))
 	bquery := elastic.NewBoolQuery().
 		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte(page.RangeFrom).Lte(page.RangeTo).Format("epoch_millis")).
-		Must(elastic.NewTermQuery("app", appName))
+		Must(querys...)
 
 	//Index("dataman-*").
 	tasks := make(map[string]int64)
 	result, err := s.ESClient.Search().
-		Index("dataman-*-"+utils.ParseDate(page.RangeFrom, page.RangeTo)).
-		Type("dataman-"+user+"-"+appName).
-		Query(bquery).
+		Index("dataman-*").
 		SearchType("count").
-		Aggregation("tasks", elastic.
-			NewTermsAggregation().
-			Field("task").
-			Size(0).
-			OrderByCountDesc()).
+		Query(bquery).
+		Aggregation("tasks", elastic.NewTermsAggregation().Field("DM_TASK_ID").Size(0).OrderByCountDesc()).
 		Pretty(true).
 		Do()
 
@@ -178,7 +177,6 @@ func (s *SearchService) Tasks(appName, user string, page models.Page) (map[strin
 	}
 
 	if err != nil {
-		log.Errorf("get app %s tasks error: %v", appName, err)
 		return tasks, err
 	}
 

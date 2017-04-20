@@ -61,6 +61,11 @@ func app(ctx *gin.Context) {
 					"doc_count_error_upper_bound":0,
 					"sum_other_doc_count":0,
 					"buckets":[{"key":"test-web","doc_count":6}]
+				},
+				"tasks":{
+					"doc_count_error_upper_bound":0,
+					"sum_other_doc_count":0,
+					"buckets":[{"key":"test-web","doc_count":6}]
 				}
 			},"timed_out":false,"terminated_early":false,"_shards":{"total":5,"successful":5,"failed":0}}`
 	var info elastic.SearchResult
@@ -127,7 +132,7 @@ func TestSlots(t *testing.T) {
 
 func TestTasks(t *testing.T) {
 	service := NewEsService([]string{baseURL})
-	service.Tasks("test-web", "user", models.Page{})
+	service.Tasks("test-web", "test", "test", models.Page{})
 }
 
 func TestPath(t *testing.T) {

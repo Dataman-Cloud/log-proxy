@@ -142,7 +142,10 @@ func (s *Search) Slots(ctx *gin.Context) {
 
 // Tasks search applications tasks
 func (s *Search) Tasks(ctx *gin.Context) {
-	tasks, err := s.Service.Tasks(ctx.Param("app"), ctx.Query("user"), ctx.MustGet("page").(models.Page))
+	cluster := ctx.Param("cluster")
+	app := ctx.Param("app")
+	slot := ctx.Param("slot")
+	tasks, err := s.Service.Tasks(cluster, app, slot, ctx.MustGet("page").(models.Page))
 	if err != nil {
 		utils.ErrorResponse(ctx, utils.NewError(GetTaskError, err))
 		return
