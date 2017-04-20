@@ -176,21 +176,33 @@ func (s *Search) Sources(ctx *gin.Context) {
 	utils.Ok(ctx, sources)
 }
 
-// Index search log by condition
-func (s *Search) Index(ctx *gin.Context) {
-	if ctx.Query("app") == "" {
-		utils.ErrorResponse(ctx, utils.NewError(ParamError, errors.New("app can't be empty")))
-		return
+func (s *Search) Search(ctx *gin.Context) {
+	cluster := ctx.Param("cluster")
+	app := ctx.Param("app")
+
+	options := make(map[string]interface{})
+	options["page"] = ctx.MustGet("page")
+	if ctx.Query("slot") != "" {
+		options["slot"] = ctx.Query("slot")
 	}
 
-	results, err := s.Service.Search(
-		ctx.Query("cluster"),
-		ctx.Query("user"),
-		ctx.Query("app"),
-		ctx.Query("task"),
-		ctx.Query("path"),
-		ctx.Query("keyword"),
-		ctx.MustGet("page").(models.Page))
+	if ctx.Query("task") != "" {
+		options["task"] = ctx.Query("task")
+	}
+
+	if ctx.Query("source") != "" {
+		options["source"] = ctx.Query("source")
+	}
+
+	if ctx.Query("keyword") != "" {
+		options["keyword"] = ctx.Query("keyword")
+	}
+
+	if ctx.Query("conj") != "" {
+		options["conj"] = ctx.Query("conj")
+	}
+
+	results, err := s.Service.Search(cluster, app, options)
 	if err != nil {
 		utils.ErrorResponse(ctx, utils.NewError(IndexError, err))
 		return
