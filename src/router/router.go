@@ -29,6 +29,7 @@ func Router(middlewares ...gin.HandlerFunc) *gin.Engine {
 		logv1.GET("/ping", s.Ping)
 		logv1.GET("/clusters", s.Clusters)
 		logv1.GET("/clusters/:cluster/apps", s.Applications)
+		logv1.GET("/clusters/:cluster/apps/:app/slots", s.Slots)
 		logv1.GET("/tasks/:app", s.Tasks)
 		logv1.GET("/paths/:app", s.Paths)
 		logv1.GET("/index", s.Index)

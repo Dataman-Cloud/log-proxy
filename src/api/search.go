@@ -43,6 +43,8 @@ const (
 	GetLogError = "503-11010"
 
 	GetClustersError = "503-11011"
+
+	GetSlotsError = "503-11012"
 )
 
 // Search search client struct
@@ -124,9 +126,22 @@ func (s *Search) Applications(ctx *gin.Context) {
 	utils.Ok(ctx, apps)
 }
 
+func (s *Search) Slots(ctx *gin.Context) {
+	cluster := ctx.Param("cluster")
+	app := ctx.Param("app")
+
+	slots, err := s.Service.Slots(cluster, app, ctx.MustGet("page").(models.Page))
+	if err != nil {
+		utils.ErrorResponse(ctx, utils.NewError(GetSlotsError, err))
+		return
+	}
+
+	utils.Ok(ctx, slots)
+	return
+}
+
 // Tasks search applications tasks
 func (s *Search) Tasks(ctx *gin.Context) {
-
 	tasks, err := s.Service.Tasks(ctx.Param("app"), ctx.Query("user"), ctx.MustGet("page").(models.Page))
 	if err != nil {
 		utils.ErrorResponse(ctx, utils.NewError(GetTaskError, err))

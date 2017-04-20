@@ -60,11 +60,7 @@ func (s *SearchService) Clusters(page models.Page) (map[string]int64, error) {
 		Index("dataman-*").
 		SearchType("count").
 		Query(bquery).
-		Aggregation("clusters", elastic.
-			NewTermsAggregation().
-			Field("DM_VCLUSTER").
-			Size(0).
-			OrderByCountDesc()).
+		Aggregation("clusters", elastic.NewTermsAggregation().Field("DM_VCLUSTER").Size(0).OrderByCountDesc()).
 		Pretty(true).
 		Do()
 
@@ -99,11 +95,7 @@ func (s *SearchService) Applications(cluster string, page models.Page) (map[stri
 		Index("dataman-*").
 		SearchType("count").
 		Query(bquery).
-		Aggregation("apps", elastic.
-			NewTermsAggregation().
-			Field("DM_APP_ID").
-			Size(0).
-			OrderByCountDesc()).
+		Aggregation("apps", elastic.NewTermsAggregation().Field("DM_APP_ID").Size(0).OrderByCountDesc()).
 		Pretty(true).
 		Do()
 
@@ -127,8 +119,40 @@ func (s *SearchService) Applications(cluster string, page models.Page) (map[stri
 	return apps, nil
 }
 
+func (s *SearchService) Slots(cluster, app string, page models.Page) (map[string]int64, error) {
+	bQuery := elastic.NewBoolQuery().
+		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte(page.RangeFrom).Lte(page.RangeTo).Format("epoch_millis")).
+		Must(elastic.NewTermsQuery("DM_VCLUSTER", cluster), elastic.NewTermQuery("DM_APP_ID", app))
+
+	slots := make(map[string]int64)
+	result, err := s.ESClient.Search().
+		Index("dataman-*").
+		SearchType("count").
+		Query(bQuery).
+		Aggregation("slots", elastic.NewTermsAggregation().Field("DM_SLOT_INDEX").Size(0).OrderByCountDesc()).
+		Pretty(true).
+		Do()
+
+	if err != nil {
+		if err.(*elastic.Error).Status == http.StatusNotFound {
+			return slots, nil
+		}
+		return slots, err
+	}
+
+	agg, found := result.Aggregations.Terms("slots")
+	if !found {
+		return slots, nil
+	}
+
+	for _, bucket := range agg.Buckets {
+		slots[fmt.Sprint(bucket.Key)] = bucket.DocCount
+	}
+
+	return slots, nil
+}
+
 // Tasks get application tasks
-// This function destroy now.
 func (s *SearchService) Tasks(appName, user string, page models.Page) (map[string]int64, error) {
 	bquery := elastic.NewBoolQuery().
 		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte(page.RangeFrom).Lte(page.RangeTo).Format("epoch_millis")).

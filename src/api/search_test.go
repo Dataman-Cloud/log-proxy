@@ -29,10 +29,9 @@ func startAPIServer(sv *Search) *httptest.Server {
 	v1 := router.Group("/api/v1", func(ctx *gin.Context) { ctx.Set("page", models.Page{}) })
 	{
 		v1.GET("/ping", func(ctx *gin.Context) { sv.Ping(ctx) })
-		v1.GET("clusters", func(ctx *gin.Context) { sv.Clusters(ctx) })
-		v1.GET("/clusters/:cluster/apps", func(ctx *gin.Context) {
-			sv.Applications(ctx)
-		})
+		v1.GET("/clusters", func(ctx *gin.Context) { sv.Clusters(ctx) })
+		v1.GET("/clusters/:cluster/apps", func(ctx *gin.Context) { sv.Applications(ctx) })
+		v1.GET("/clusters/:cluster/apps/:app/slots", func(ctx *gin.Context) { sv.Slots(ctx) })
 		v1.GET("/tasks/:app", func(ctx *gin.Context) { sv.Tasks(ctx) })
 		v1.GET("/paths/:app", func(ctx *gin.Context) { sv.Paths(ctx) })
 		v1.GET("/index", func(ctx *gin.Context) { sv.Index(ctx) })
@@ -395,7 +394,32 @@ func TestApplications(t *testing.T) {
 	} else {
 		t.Error("faild")
 	}
+}
 
+func TestSlots(t *testing.T) {
+	sr := startErrorClient()
+	config.GetConfig().EsURL = sr.URL
+	baseURL = sr.URL
+	s = GetSearch()
+	se := startAPIServer(s)
+	resp, err := http.Get(se.URL + "/api/v1/clusters/test/apps/test/slots")
+	if err == nil && resp.StatusCode == 503 {
+		t.Log("success")
+	} else {
+		t.Error("faild")
+	}
+
+	sr = startHTTPServer()
+	config.GetConfig().EsURL = sr.URL
+	baseURL = sr.URL
+	s = GetSearch()
+	se = startAPIServer(s)
+	resp, err = http.Get(se.URL + "/api/v1/clusters/test/apps/test/slots")
+	if err == nil && resp.StatusCode == 200 {
+		t.Log("success")
+	} else {
+		t.Error("faild")
+	}
 }
 
 func TestTasks(t *testing.T) {
