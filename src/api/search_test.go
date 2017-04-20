@@ -32,8 +32,8 @@ func startAPIServer(sv *Search) *httptest.Server {
 		v1.GET("/clusters", func(ctx *gin.Context) { sv.Clusters(ctx) })
 		v1.GET("/clusters/:cluster/apps", func(ctx *gin.Context) { sv.Applications(ctx) })
 		v1.GET("/clusters/:cluster/apps/:app/slots", func(ctx *gin.Context) { sv.Slots(ctx) })
-		v1.GET("/tasks/:app", func(ctx *gin.Context) { sv.Tasks(ctx) })
-		v1.GET("/paths/:app", func(ctx *gin.Context) { sv.Paths(ctx) })
+		v1.GET("/clusters/:cluster/apps/:app/slots/:slot/tasks", func(ctx *gin.Context) { sv.Tasks(ctx) })
+		v1.GET("/clusters/:cluster/apps/:app/sources", func(ctx *gin.Context) { sv.Sources(ctx) })
 		v1.GET("/index", func(ctx *gin.Context) { sv.Index(ctx) })
 		v1.GET("/context", func(ctx *gin.Context) { sv.Context(ctx) })
 	}
@@ -423,12 +423,24 @@ func TestSlots(t *testing.T) {
 }
 
 func TestTasks(t *testing.T) {
-	sr := startHTTPServer()
+	sr := startErrorClient()
 	config.GetConfig().EsURL = sr.URL
 	baseURL = sr.URL
 	s = GetSearch()
 	se := startAPIServer(s)
-	resp, err := http.Get(se.URL + "/api/v1/tasks/test")
+	resp, err := http.Get(se.URL + "/api/v1/clusters/test/apps/test/slots/0/tasks")
+	if err == nil && resp.StatusCode == 503 {
+		t.Log("success")
+	} else {
+		t.Error("faild")
+	}
+
+	sr = startHTTPServer()
+	config.GetConfig().EsURL = sr.URL
+	baseURL = sr.URL
+	s = GetSearch()
+	se = startAPIServer(s)
+	resp, err = http.Get(se.URL + "/api/v1/clusters/test/apps/test/slots/0/tasks")
 	if err == nil && resp.StatusCode == 200 {
 		t.Log("success")
 	} else {
@@ -436,13 +448,25 @@ func TestTasks(t *testing.T) {
 	}
 }
 
-func TestPaths(t *testing.T) {
-	sr := startHTTPServer()
+func TestSources(t *testing.T) {
+	sr := startErrorClient()
 	config.GetConfig().EsURL = sr.URL
 	baseURL = sr.URL
 	s = GetSearch()
 	se := startAPIServer(s)
-	resp, err := http.Get(se.URL + "/api/v1/paths/test")
+	resp, err := http.Get(se.URL + "/api/v1/clusters/test/apps/test/sources?slot=0&task=test")
+	if err == nil && resp.StatusCode == 503 {
+		t.Log("success")
+	} else {
+		t.Error("faild")
+	}
+
+	sr = startHTTPServer()
+	config.GetConfig().EsURL = sr.URL
+	baseURL = sr.URL
+	s = GetSearch()
+	se = startAPIServer(s)
+	resp, err = http.Get(se.URL + "/api/v1/clusters/test/apps/test/sources?slot=0&task=test")
 	if err == nil && resp.StatusCode == 200 {
 		t.Log("success")
 	} else {

@@ -66,6 +66,11 @@ func app(ctx *gin.Context) {
 					"doc_count_error_upper_bound":0,
 					"sum_other_doc_count":0,
 					"buckets":[{"key":"test-web","doc_count":6}]
+				},
+				"sources":{
+					"doc_count_error_upper_bound":0,
+					"sum_other_doc_count":0,
+					"buckets":[{"key":"test-web","doc_count":6}]
 				}
 			},"timed_out":false,"terminated_early":false,"_shards":{"total":5,"successful":5,"failed":0}}`
 	var info elastic.SearchResult
@@ -135,9 +140,13 @@ func TestTasks(t *testing.T) {
 	service.Tasks("test-web", "test", "test", models.Page{})
 }
 
-func TestPath(t *testing.T) {
+func TestSources(t *testing.T) {
 	service := NewEsService([]string{baseURL})
-	service.Paths("cluster", "user", "test-web", "test-web.ac4616e4-c02b-11e6-9030-024245dc84c8", models.Page{})
+	opts := make(map[string]interface{})
+	opts["slot"] = "0"
+	opts["task"] = "test"
+	opts["page"] = models.Page{}
+	service.Sources("cluster", "app", opts)
 }
 
 func TestSearch(t *testing.T) {

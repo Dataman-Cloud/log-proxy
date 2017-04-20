@@ -154,19 +154,26 @@ func (s *Search) Tasks(ctx *gin.Context) {
 }
 
 // Paths search applications paths
-func (s *Search) Paths(ctx *gin.Context) {
-	paths, err := s.Service.Paths(
-		ctx.Query("cluster"),
-		ctx.Query("user"),
-		ctx.Param("app"),
-		ctx.Query("task"),
-		ctx.MustGet("page").(models.Page),
-	)
+func (s *Search) Sources(ctx *gin.Context) {
+	cluster := ctx.Param("cluster")
+	app := ctx.Param("app")
+
+	options := make(map[string]interface{})
+	options["page"] = ctx.MustGet("page")
+	if ctx.Query("slot") != "" {
+		options["slot"] = ctx.Query("slot")
+	}
+
+	if ctx.Query("task") != "" {
+		options["task"] = ctx.Query("task")
+	}
+
+	sources, err := s.Service.Sources(cluster, app, options)
 	if err != nil {
 		utils.ErrorResponse(ctx, utils.NewError(GetTaskError, err))
 		return
 	}
-	utils.Ok(ctx, paths)
+	utils.Ok(ctx, sources)
 }
 
 // Index search log by condition

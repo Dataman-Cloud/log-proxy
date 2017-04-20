@@ -191,34 +191,33 @@ func (s *SearchService) Tasks(cluster, app, slot string, page models.Page) (map[
 	return tasks, nil
 }
 
-// Paths get application paths
-func (s *SearchService) Paths(cluster, user, appName, taskID string, page models.Page) (map[string]int64, error) {
-	paths := make(map[string]int64)
+func (s *SearchService) Sources(cluster, app string, opts map[string]interface{}) (map[string]int64, error) {
+	sources := make(map[string]int64)
 	var querys []elastic.Query
-	querys = append(querys, elastic.NewTermQuery("cluster", cluster))
-	querys = append(querys, elastic.NewTermQuery("user", user))
-	querys = append(querys, elastic.NewTermQuery("app", appName))
-	if taskID != "" {
-		querys = append(querys, elastic.NewTermsQuery("task", utils.ParseTask(taskID)))
+	querys = append(querys, elastic.NewTermQuery("DM_VCLUSTER", cluster))
+	querys = append(querys, elastic.NewTermQuery("DM_APP_ID", app))
+
+	slot, ok := opts["slot"]
+	if ok {
+		querys = append(querys, elastic.NewTermsQuery("DM_SLOT_INDEX", slot))
 	}
 
+	task, ok := opts["task"]
+	if ok {
+		querys = append(querys, elastic.NewTermsQuery("DM_TASK_ID", task))
+	}
+
+	page := opts["page"].(models.Page)
+
 	bquery := elastic.NewBoolQuery().
-		Filter(
-			elastic.NewRangeQuery("logtime.timestamp").
-				Gte(page.RangeFrom).
-				Lte(page.RangeTo).Format("epoch_millis")).
+		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte(page.RangeFrom).Lte(page.RangeTo).Format("epoch_millis")).
 		Must(querys...)
 
 	result, err := s.ESClient.Search().
-		Index("dataman-*-"+utils.ParseDate(page.RangeFrom, page.RangeTo)).
-		Type("dataman-"+user+"-"+appName).
-		Query(bquery).
+		Index("dataman-*").
 		SearchType("count").
-		Aggregation("paths", elastic.
-			NewTermsAggregation().
-			Field("path").
-			Size(0).
-			OrderByCountDesc()).
+		Query(bquery).
+		Aggregation("sources", elastic.NewTermsAggregation().Field("path").Size(0).OrderByCountDesc()).
 		Pretty(true).
 		Do()
 
@@ -227,20 +226,19 @@ func (s *SearchService) Paths(cluster, user, appName, taskID string, page models
 	}
 
 	if err != nil {
-		log.Errorf("get app %s paths error: %v", appName, err)
-		return paths, err
+		return sources, err
 	}
 
-	agg, found := result.Aggregations.Terms("paths")
+	agg, found := result.Aggregations.Terms("sources")
 	if !found {
-		return paths, nil
+		return sources, nil
 	}
 
 	for _, bucket := range agg.Buckets {
-		paths[fmt.Sprint(bucket.Key)] = bucket.DocCount
+		sources[fmt.Sprint(bucket.Key)] = bucket.DocCount
 	}
 
-	return paths, nil
+	return sources, nil
 }
 
 // Search search log by condition
