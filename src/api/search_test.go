@@ -35,7 +35,7 @@ func startAPIServer(sv *Search) *httptest.Server {
 		v1.GET("/clusters/:cluster/apps/:app/slots/:slot/tasks", func(ctx *gin.Context) { sv.Tasks(ctx) })
 		v1.GET("/clusters/:cluster/apps/:app/sources", func(ctx *gin.Context) { sv.Sources(ctx) })
 		v1.GET("/clusters/:cluster/apps/:app/search", func(ctx *gin.Context) { sv.Search(ctx) })
-		v1.GET("/context", func(ctx *gin.Context) { sv.Context(ctx) })
+		v1.GET("/clusters/:cluster/apps/:app/context", func(ctx *gin.Context) { sv.Context(ctx) })
 	}
 
 	vr := router.Group("/v1/receive")
@@ -503,43 +503,29 @@ func TestSearch(t *testing.T) {
 }
 
 func TestContext(t *testing.T) {
-	sr := startHTTPServer()
+	sr := startErrorClient()
 	config.GetConfig().EsURL = sr.URL
 	baseURL = sr.URL
 	s = GetSearch()
 	se := startAPIServer(s)
-	resp, err := http.Get(se.URL + "/api/v1/context")
-	if err == nil && resp.StatusCode == 400 {
+	resp, err := http.Get(se.URL + "/api/v1/clusters/test/apps/test/context?slot=0&task=test")
+	if err == nil && resp.StatusCode == 503 {
 		t.Log("success")
 	} else {
 		t.Error("faild")
 	}
 
-	resp, err = http.Get(se.URL + "/api/v1/context?app=test")
-	if err == nil && resp.StatusCode == 400 {
-		t.Log("success")
-	} else {
-		t.Error("faild")
-	}
-
-	resp, err = http.Get(se.URL + "/api/v1/context?app=test&task=test")
-	if err == nil && resp.StatusCode == 400 {
-		t.Log("success")
-	} else {
-		t.Error("faild")
-	}
-
-	resp, err = http.Get(se.URL + "/api/v1/context?app=test&task=test&path=app")
-	if err == nil && resp.StatusCode == 400 {
-		t.Log("success")
-	} else {
-		t.Error("faild")
-	}
-
-	resp, err = http.Get(se.URL + "/api/v1/context?app=test&task=test&path=app&offset=100")
+	sr = startHTTPServer()
+	config.GetConfig().EsURL = sr.URL
+	baseURL = sr.URL
+	s = GetSearch()
+	se = startAPIServer(s)
+	resp, err = http.Get(se.URL +
+		"/api/v1/clusters/mola/apps/test/context?slot=0&keyword=GET&source=stderr&conj=or&task=test-task&offset=12313131310000")
 	if err == nil && resp.StatusCode == 200 {
 		t.Log("success")
 	} else {
+		t.Log(err, resp.StatusCode)
 		t.Error("faild")
 	}
 }

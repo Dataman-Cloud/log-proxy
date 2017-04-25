@@ -33,7 +33,7 @@ func Router(middlewares ...gin.HandlerFunc) *gin.Engine {
 		logv1.GET("/clusters/:cluster/apps/:app/slots/:slot/tasks", s.Tasks)
 		logv1.GET("/clusters/:cluster/apps/:app/sources", s.Sources)
 		logv1.GET("/clusters/:cluster/apps/:app/search", s.Search)
-		logv1.GET("/context", s.Context)
+		logv1.GET("/clusters/:cluster/apps/:app/context", s.Context)
 
 		logv1.GET("/keyword", s.GetAlerts)
 		logv1.POST("/keyword", s.CreateAlert)

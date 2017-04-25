@@ -2,7 +2,6 @@ package api
 
 import (
 	"container/list"
-	"errors"
 	"strings"
 	"sync"
 
@@ -213,34 +212,28 @@ func (s *Search) Search(ctx *gin.Context) {
 
 // Context search log context
 func (s *Search) Context(ctx *gin.Context) {
-	if ctx.Query("app") == "" {
-		utils.ErrorResponse(ctx, utils.NewError(ParamError, errors.New("app can't be empty")))
-		return
+	cluster := ctx.Param("cluster")
+	app := ctx.Param("app")
+
+	options := make(map[string]interface{})
+	options["page"] = ctx.MustGet("page")
+	if ctx.Query("slot") != "" {
+		options["slot"] = ctx.Query("slot")
 	}
 
-	if ctx.Query("task") == "" {
-		utils.ErrorResponse(ctx, utils.NewError(ParamError, errors.New("task can't be empty")))
-		return
+	if ctx.Query("task") != "" {
+		options["task"] = ctx.Query("task")
 	}
 
-	if ctx.Query("path") == "" {
-		utils.ErrorResponse(ctx, utils.NewError(ParamError, errors.New("path can't be empty")))
-		return
+	if ctx.Query("source") != "" {
+		options["source"] = ctx.Query("source")
 	}
 
-	if ctx.Query("offset") == "" {
-		utils.ErrorResponse(ctx, utils.NewError(ParamError, errors.New("offset can't be empty")))
-		return
+	if ctx.Query("offset") != "" {
+		options["offset"] = ctx.Query("offset")
 	}
 
-	results, err := s.Service.Context(
-		ctx.Query("cluster"),
-		ctx.Query("user"),
-		ctx.Query("app"),
-		ctx.Query("task"),
-		ctx.Query("path"),
-		ctx.Query("offset"),
-		ctx.MustGet("page").(models.Page))
+	results, err := s.Service.Context(cluster, app, options)
 	if err != nil {
 		utils.ErrorResponse(ctx, utils.NewError(IndexError, err))
 		return
