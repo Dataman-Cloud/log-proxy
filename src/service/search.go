@@ -12,7 +12,6 @@ import (
 
 	"github.com/Dataman-Cloud/log-proxy/src/config"
 	"github.com/Dataman-Cloud/log-proxy/src/models"
-	"github.com/Dataman-Cloud/log-proxy/src/utils"
 
 	log "github.com/Sirupsen/logrus"
 	"gopkg.in/olivere/elastic.v3"
@@ -153,23 +152,22 @@ func (s *SearchService) Slots(cluster, app string, page models.Page) (map[string
 }
 
 // Tasks get application tasks
-func (s *SearchService) Tasks(appName, user string, page models.Page) (map[string]int64, error) {
+func (s *SearchService) Tasks(cluster, app, slot string, page models.Page) (map[string]int64, error) {
+	var querys []elastic.Query
+	querys = append(querys, elastic.NewTermQuery("DM_VCLUSTER", cluster))
+	querys = append(querys, elastic.NewTermQuery("DM_APP_ID", app))
+	querys = append(querys, elastic.NewTermQuery("DM_SLOT_INDEX", slot))
 	bquery := elastic.NewBoolQuery().
 		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte(page.RangeFrom).Lte(page.RangeTo).Format("epoch_millis")).
-		Must(elastic.NewTermQuery("app", appName))
+		Must(querys...)
 
 	//Index("dataman-*").
 	tasks := make(map[string]int64)
 	result, err := s.ESClient.Search().
-		Index("dataman-*-"+utils.ParseDate(page.RangeFrom, page.RangeTo)).
-		Type("dataman-"+user+"-"+appName).
-		Query(bquery).
+		Index("dataman-*").
 		SearchType("count").
-		Aggregation("tasks", elastic.
-			NewTermsAggregation().
-			Field("task").
-			Size(0).
-			OrderByCountDesc()).
+		Query(bquery).
+		Aggregation("tasks", elastic.NewTermsAggregation().Field("DM_TASK_ID").Size(0).OrderByCountDesc()).
 		Pretty(true).
 		Do()
 
@@ -178,7 +176,6 @@ func (s *SearchService) Tasks(appName, user string, page models.Page) (map[strin
 	}
 
 	if err != nil {
-		log.Errorf("get app %s tasks error: %v", appName, err)
 		return tasks, err
 	}
 
@@ -193,34 +190,33 @@ func (s *SearchService) Tasks(appName, user string, page models.Page) (map[strin
 	return tasks, nil
 }
 
-// Paths get application paths
-func (s *SearchService) Paths(cluster, user, appName, taskID string, page models.Page) (map[string]int64, error) {
-	paths := make(map[string]int64)
+func (s *SearchService) Sources(cluster, app string, opts map[string]interface{}) (map[string]int64, error) {
+	sources := make(map[string]int64)
 	var querys []elastic.Query
-	querys = append(querys, elastic.NewTermQuery("cluster", cluster))
-	querys = append(querys, elastic.NewTermQuery("user", user))
-	querys = append(querys, elastic.NewTermQuery("app", appName))
-	if taskID != "" {
-		querys = append(querys, elastic.NewTermsQuery("task", utils.ParseTask(taskID)))
+	querys = append(querys, elastic.NewTermQuery("DM_VCLUSTER", cluster))
+	querys = append(querys, elastic.NewTermQuery("DM_APP_ID", app))
+
+	slot, ok := opts["slot"]
+	if ok {
+		querys = append(querys, elastic.NewTermsQuery("DM_SLOT_INDEX", slot))
 	}
 
+	task, ok := opts["task"]
+	if ok {
+		querys = append(querys, elastic.NewTermsQuery("DM_TASK_ID", task))
+	}
+
+	page := opts["page"].(models.Page)
+
 	bquery := elastic.NewBoolQuery().
-		Filter(
-			elastic.NewRangeQuery("logtime.timestamp").
-				Gte(page.RangeFrom).
-				Lte(page.RangeTo).Format("epoch_millis")).
+		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte(page.RangeFrom).Lte(page.RangeTo).Format("epoch_millis")).
 		Must(querys...)
 
 	result, err := s.ESClient.Search().
-		Index("dataman-*-"+utils.ParseDate(page.RangeFrom, page.RangeTo)).
-		Type("dataman-"+user+"-"+appName).
-		Query(bquery).
+		Index("dataman-*").
 		SearchType("count").
-		Aggregation("paths", elastic.
-			NewTermsAggregation().
-			Field("path").
-			Size(0).
-			OrderByCountDesc()).
+		Query(bquery).
+		Aggregation("sources", elastic.NewTermsAggregation().Field("path").Size(0).OrderByCountDesc()).
 		Pretty(true).
 		Do()
 
@@ -229,39 +225,56 @@ func (s *SearchService) Paths(cluster, user, appName, taskID string, page models
 	}
 
 	if err != nil {
-		log.Errorf("get app %s paths error: %v", appName, err)
-		return paths, err
+		return sources, err
 	}
 
-	agg, found := result.Aggregations.Terms("paths")
+	agg, found := result.Aggregations.Terms("sources")
 	if !found {
-		return paths, nil
+		return sources, nil
 	}
 
 	for _, bucket := range agg.Buckets {
-		paths[fmt.Sprint(bucket.Key)] = bucket.DocCount
+		sources[fmt.Sprint(bucket.Key)] = bucket.DocCount
 	}
 
-	return paths, nil
+	return sources, nil
 }
 
 // Search search log by condition
-func (s *SearchService) Search(cluster, user, app, task, source, keyword string, page models.Page) (map[string]interface{}, error) {
-	data := make(map[string]interface{})
-
+func (s *SearchService) Search(cluster, app string, opts map[string]interface{}) (map[string]interface{}, error) {
 	sort := false
+	page := opts["page"].(models.Page)
 	var querys []elastic.Query
-	querys = append(querys, elastic.NewTermQuery("cluster", cluster))
-	querys = append(querys, elastic.NewTermQuery("user", user))
-	if task != "" {
-		querys = append(querys, elastic.NewTermsQuery("task", utils.ParseTask(task)))
+	querys = append(querys, elastic.NewTermQuery("DM_VCLUSTER", cluster))
+	querys = append(querys, elastic.NewTermQuery("DM_APP_ID", app))
+
+	slot, ok := opts["slot"]
+	if ok {
+		querys = append(querys, elastic.NewTermsQuery("DM_SLOT_INDEX", slot))
 	}
-	if source != "" {
-		querys = append(querys, elastic.NewTermsQuery("path", strings.Split(source, ",")))
+
+	task, ok := opts["task"]
+	if ok {
+		querys = append(querys, elastic.NewTermQuery("DM_TASK_ID", task))
 	}
-	if keyword != "" {
+
+	source, ok := opts["source"]
+	if ok {
+		querys = append(querys, elastic.NewTermQuery("path", source))
+	}
+
+	keyword, ok := opts["keyword"]
+	if ok {
 		sort = true
-		querys = append(querys, elastic.NewQueryStringQuery("message:"+keyword).AnalyzeWildcard(true))
+
+		keywordStr := keyword.(string)
+		conj, ok := opts["conj"]
+		if ok && strings.ToLower(conj.(string)) == "or" {
+			keyword = strings.Join(strings.Split(keywordStr, " "), " OR ")
+		} else {
+			keyword = strings.Join(strings.Split(keywordStr, " "), " AND ")
+		}
+		querys = append(querys, elastic.NewQueryStringQuery("message:"+keywordStr).AnalyzeWildcard(true))
 	}
 
 	bquery := elastic.NewBoolQuery().
@@ -269,12 +282,15 @@ func (s *SearchService) Search(cluster, user, app, task, source, keyword string,
 		Must(querys...)
 
 	result, err := s.ESClient.Search().
-		Index("dataman-"+cluster+"-"+utils.ParseDate(page.RangeFrom, page.RangeTo)).
-		Type("dataman-"+user+"-"+app).
+		Index("dataman-*").
 		Query(bquery).
 		Sort("logtime.sort", sort).
 		Highlight(elastic.NewHighlight().Field("message").PreTags(`@dataman-highlighted-field@`).PostTags(`@/dataman-highlighted-field@`)).
-		From(page.PageFrom).Size(page.PageSize).Pretty(true).IgnoreUnavailable(true).Do()
+		From(page.PageFrom).
+		Size(page.PageSize).
+		Pretty(true).
+		IgnoreUnavailable(true).
+		Do()
 
 	if err != nil && err.(*elastic.Error).Status == http.StatusNotFound {
 		return nil, nil
@@ -284,19 +300,25 @@ func (s *SearchService) Search(cluster, user, app, task, source, keyword string,
 		return nil, err
 	}
 
-	var results []map[string]interface{}
-	for _, hit := range result.Hits.Hits {
-		data := make(map[string]interface{})
-		json.Unmarshal(*hit.Source, &data)
-		if len(hit.Highlight["message"]) > 0 {
-			str := html.EscapeString(hit.Highlight["message"][0])
-			str = strings.Replace(str, "@dataman-highlighted-field@", "<mark>", -1)
-			str = strings.Replace(str, "@/dataman-highlighted-field@", "</mark>", -1)
-			data["message"] = str
+	var logs []map[string]interface{}
+
+	if result.Hits != nil {
+		for _, hit := range result.Hits.Hits {
+			logContent := make(map[string]interface{})
+			json.Unmarshal(*hit.Source, &logContent)
+			if len(hit.Highlight["message"]) > 0 {
+				str := html.EscapeString(hit.Highlight["message"][0])
+				str = strings.Replace(str, "@dataman-highlighted-field@", "<mark>", -1)
+				str = strings.Replace(str, "@/dataman-highlighted-field@", "</mark>", -1)
+				logContent["message"] = str
+			}
+
+			logs = append(logs, logContent)
 		}
-		results = append(results, data)
 	}
-	data["results"] = results
+
+	data := make(map[string]interface{})
+	data["results"] = logs
 	data["count"] = result.Hits.TotalHits
 
 	return data, nil

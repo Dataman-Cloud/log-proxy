@@ -142,7 +142,10 @@ func (s *Search) Slots(ctx *gin.Context) {
 
 // Tasks search applications tasks
 func (s *Search) Tasks(ctx *gin.Context) {
-	tasks, err := s.Service.Tasks(ctx.Param("app"), ctx.Query("user"), ctx.MustGet("page").(models.Page))
+	cluster := ctx.Param("cluster")
+	app := ctx.Param("app")
+	slot := ctx.Param("slot")
+	tasks, err := s.Service.Tasks(cluster, app, slot, ctx.MustGet("page").(models.Page))
 	if err != nil {
 		utils.ErrorResponse(ctx, utils.NewError(GetTaskError, err))
 		return
@@ -151,36 +154,55 @@ func (s *Search) Tasks(ctx *gin.Context) {
 }
 
 // Paths search applications paths
-func (s *Search) Paths(ctx *gin.Context) {
-	paths, err := s.Service.Paths(
-		ctx.Query("cluster"),
-		ctx.Query("user"),
-		ctx.Param("app"),
-		ctx.Query("task"),
-		ctx.MustGet("page").(models.Page),
-	)
+func (s *Search) Sources(ctx *gin.Context) {
+	cluster := ctx.Param("cluster")
+	app := ctx.Param("app")
+
+	options := make(map[string]interface{})
+	options["page"] = ctx.MustGet("page")
+	if ctx.Query("slot") != "" {
+		options["slot"] = ctx.Query("slot")
+	}
+
+	if ctx.Query("task") != "" {
+		options["task"] = ctx.Query("task")
+	}
+
+	sources, err := s.Service.Sources(cluster, app, options)
 	if err != nil {
 		utils.ErrorResponse(ctx, utils.NewError(GetTaskError, err))
 		return
 	}
-	utils.Ok(ctx, paths)
+	utils.Ok(ctx, sources)
 }
 
-// Index search log by condition
-func (s *Search) Index(ctx *gin.Context) {
-	if ctx.Query("app") == "" {
-		utils.ErrorResponse(ctx, utils.NewError(ParamError, errors.New("app can't be empty")))
-		return
+func (s *Search) Search(ctx *gin.Context) {
+	cluster := ctx.Param("cluster")
+	app := ctx.Param("app")
+
+	options := make(map[string]interface{})
+	options["page"] = ctx.MustGet("page")
+	if ctx.Query("slot") != "" {
+		options["slot"] = ctx.Query("slot")
 	}
 
-	results, err := s.Service.Search(
-		ctx.Query("cluster"),
-		ctx.Query("user"),
-		ctx.Query("app"),
-		ctx.Query("task"),
-		ctx.Query("path"),
-		ctx.Query("keyword"),
-		ctx.MustGet("page").(models.Page))
+	if ctx.Query("task") != "" {
+		options["task"] = ctx.Query("task")
+	}
+
+	if ctx.Query("source") != "" {
+		options["source"] = ctx.Query("source")
+	}
+
+	if ctx.Query("keyword") != "" {
+		options["keyword"] = ctx.Query("keyword")
+	}
+
+	if ctx.Query("conj") != "" {
+		options["conj"] = ctx.Query("conj")
+	}
+
+	results, err := s.Service.Search(cluster, app, options)
 	if err != nil {
 		utils.ErrorResponse(ctx, utils.NewError(IndexError, err))
 		return

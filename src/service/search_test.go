@@ -45,24 +45,122 @@ func getp(ctx *gin.Context) {
 }
 
 func app(ctx *gin.Context) {
-	data := `{"took":137,"_scroll_id":"","hits":{"total":6,"max_score":0,"hits":[]},"suggest":null,
-			  "aggregations":{
-				"apps":{
-					"doc_count_error_upper_bound":0,
-					"sum_other_doc_count":0,
-					"buckets":[{"key":"test-web","doc_count":6}]
+	data := `
+	{
+    "took":137,
+    "_scroll_id":"",
+    "hits":{
+        "total":20,
+        "max_score":null,
+        "hits":[
+            {
+                "_index":"dataman-%{cluster}-2017-04-19",
+                "_type":"dataman-%{user}-%{app}",
+                "_id":"AVuFY41XB1jJ-pLrRrCV",
+                "_score":null,
+                "_ttl":517057719,
+				"highlight":{
+					"message":["aaaaaa","xxxxxhhh"]
 				},
-				"clusters":{
-					"doc_count_error_upper_bound":0,
-					"sum_other_doc_count":0,
-					"buckets":[{"key":"test-web","doc_count":6}]
-				},
-				"slots":{
-					"doc_count_error_upper_bound":0,
-					"sum_other_doc_count":0,
-					"buckets":[{"key":"test-web","doc_count":6}]
-				}
-			},"timed_out":false,"terminated_early":false,"_shards":{"total":5,"successful":5,"failed":0}}`
+                "_source":{
+                    "message":"xxx test aaa keyword ",
+                    "@version":"1",
+                    "@timestamp":"2017-04-19T08:45:45.667Z",
+                    "host":"192.168.1.102",
+                    "port":51208,
+                    "containerid":"f888cae13d80641f0e79db5cdbaa837635f079926dd8204ec33bbb1d9ba2f325",
+                    "DM_VCLUSTER":"mola",
+                    "DM_CLUSTER":"datamanmesos",
+                    "DM_SLOT_INDEX":"0",
+                    "DM_TASK_ID":"0-2xxxxxxxx-yaoyun-datamanmesos-f2969953966e40d08a9fcf2e8ef0bd5f",
+                    "DM_USER":"yaoyun",
+                    "DM_USER_NAME":"yaoyun",
+                    "DM_SLOT_ID":"0-2xxxxxxxx-yaoyun-datamanmesos",
+                    "AAAAAAAAAA":"12344",
+                    "BBBBBBBBBB":"2222222",
+                    "DM_APP_ID":"2xxxxxxxx-yaoyun-datamanmesos",
+                    "DM_APP_NAME":"2xxxxxxxx",
+                    "DM_GROUP_NAME":"yaoyun",
+                    "logtime":"2017-04-19T16:45:45.586140305+08:00",
+                    "path":"stdout",
+                    "offset":1492591545586140400
+                },
+                "fields":{
+                    "logtime.timestamp":[
+                        1492591545586
+                    ],
+                    "@timestamp":[
+                        1492591545667
+                    ]
+                },
+                "sort":[
+                    1492591545667
+                ]
+            }
+        ]
+    },
+    "suggest":null,
+    "aggregations":{
+        "apps":{
+            "doc_count_error_upper_bound":0,
+            "sum_other_doc_count":0,
+            "buckets":[
+                {
+                    "key":"test-web",
+                    "doc_count":6
+                }
+            ]
+        },
+        "clusters":{
+            "doc_count_error_upper_bound":0,
+            "sum_other_doc_count":0,
+            "buckets":[
+                {
+                    "key":"test-web",
+                    "doc_count":6
+                }
+            ]
+        },
+        "slots":{
+            "doc_count_error_upper_bound":0,
+            "sum_other_doc_count":0,
+            "buckets":[
+                {
+                    "key":"test-web",
+                    "doc_count":6
+                }
+            ]
+        },
+        "tasks":{
+            "doc_count_error_upper_bound":0,
+            "sum_other_doc_count":0,
+            "buckets":[
+                {
+                    "key":"test-web",
+                    "doc_count":6
+                }
+            ]
+        },
+        "sources":{
+            "doc_count_error_upper_bound":0,
+            "sum_other_doc_count":0,
+            "buckets":[
+                {
+                    "key":"test-web",
+                    "doc_count":6
+                }
+            ]
+        }
+    },
+    "timed_out":false,
+    "terminated_early":false,
+    "_shards":{
+        "total":5,
+        "successful":5,
+        "failed":0
+    }
+}
+`
 	var info elastic.SearchResult
 	json.Unmarshal([]byte(data), &info)
 
@@ -127,17 +225,28 @@ func TestSlots(t *testing.T) {
 
 func TestTasks(t *testing.T) {
 	service := NewEsService([]string{baseURL})
-	service.Tasks("test-web", "user", models.Page{})
+	service.Tasks("test-web", "test", "test", models.Page{})
 }
 
-func TestPath(t *testing.T) {
+func TestSources(t *testing.T) {
 	service := NewEsService([]string{baseURL})
-	service.Paths("cluster", "user", "test-web", "test-web.ac4616e4-c02b-11e6-9030-024245dc84c8", models.Page{})
+	opts := make(map[string]interface{})
+	opts["slot"] = "0"
+	opts["task"] = "test"
+	opts["page"] = models.Page{}
+	service.Sources("cluster", "app", opts)
 }
 
 func TestSearch(t *testing.T) {
 	service := NewEsService([]string{baseURL})
-	service.Search("cluster", "user", "test-web", "test-web.ac4616e4-c02b-11e6-9030-024245dc84c8", "stdout", "GET", models.Page{})
+	opts := make(map[string]interface{})
+	opts["slot"] = "0"
+	opts["task"] = "test"
+	opts["page"] = models.Page{}
+	opts["keyword"] = "keyword"
+	opts["conj"] = "or"
+	opts["source"] = "stdout"
+	service.Search("cluster", "user", opts)
 }
 
 func TestContext(t *testing.T) {
