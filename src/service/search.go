@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"html"
 	"net/http"
@@ -325,27 +326,45 @@ func (s *SearchService) Search(cluster, app string, opts map[string]interface{})
 }
 
 // Context search log context
-func (s *SearchService) Context(cluster, user, app, task, source, timestamp string, page models.Page) ([]map[string]interface{}, error) {
-	offset, err := strconv.ParseInt(timestamp, 10, 64)
+func (s *SearchService) Context(cluster, app string, opts map[string]interface{}) ([]map[string]interface{}, error) {
+	offset_, ok := opts["offset"]
+	if !ok {
+		return nil, errors.New("offset should not be nil")
+	}
+
+	offset, err := strconv.ParseInt(offset_.(string), 10, 64)
 	if err != nil {
 		return nil, err
 	}
+
+	page := opts["page"].(models.Page)
 	var results []map[string]interface{}
+	var querys []elastic.Query
+	querys = append(querys, elastic.NewTermQuery("DM_VCLUSTER", cluster))
+	querys = append(querys, elastic.NewTermQuery("DM_APP_ID", app))
+
+	slot, ok := opts["slot"]
+	if ok {
+		querys = append(querys, elastic.NewTermsQuery("DM_SLOT_INDEX", slot))
+	}
+
+	task, ok := opts["task"]
+	if ok {
+		querys = append(querys, elastic.NewTermQuery("DM_TASK_ID", task))
+	}
+
+	source, ok := opts["source"]
+	if ok {
+		querys = append(querys, elastic.NewTermQuery("path", source))
+	}
 
 	if page.PageFrom == 0 {
 		bquery := elastic.NewBoolQuery().
 			Filter(elastic.NewRangeQuery("offset").Lt(offset)).
-			Must(
-				elastic.NewTermQuery("cluster", cluster),
-				elastic.NewTermQuery("user", user),
-				elastic.NewTermQuery("app", app),
-				elastic.NewTermQuery("task", task),
-				elastic.NewTermQuery("path", source),
-			)
+			Must(querys...)
 
 		result, err := s.ESClient.Search().
-			Index("dataman-"+cluster+"-"+time.Unix(offset/1e9, 0).Format("2006-01-02")).
-			Type("dataman-"+user+"-"+app).
+			Index("dataman-*").
 			Query(bquery).
 			Sort("logtime.sort", false).
 			From(0).
@@ -370,11 +389,10 @@ func (s *SearchService) Context(cluster, user, app, task, source, timestamp stri
 
 	bquery := elastic.NewBoolQuery().
 		Filter(elastic.NewRangeQuery("offset").Gte(offset)).
-		Must(elastic.NewTermQuery("app", app), elastic.NewTermQuery("task", task), elastic.NewTermQuery("path", source))
+		Must(querys...)
 
 	result, err := s.ESClient.Search().
-		Index("dataman-"+cluster+"-"+time.Unix(offset/1e9, 0).Format("2006-01-02")).
-		Type("dataman-"+user+"-"+app).
+		Index("dataman-*").
 		Query(bquery).
 		Sort("logtime.sort", true).
 		From(page.PageFrom).

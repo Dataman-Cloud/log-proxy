@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 
+	log "github.com/Sirupsen/logrus"
 	"github.com/gin-gonic/gin"
 )
 
@@ -68,6 +69,8 @@ func Update(ctx *gin.Context, data interface{}) {
 func ErrorResponse(ctx *gin.Context, err error) {
 	hcode := http.StatusServiceUnavailable
 	ecode := CodeUndefine
+
+	log.Error("http response with error: ", err)
 
 	e, ok := err.(*Error)
 	if ok {
