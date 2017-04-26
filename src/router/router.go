@@ -24,9 +24,10 @@ func Router(middlewares ...gin.HandlerFunc) *gin.Engine {
 	r.Use(middlewares...)
 
 	s := api.GetSearch()
-	logv1 := r.Group("/v1/log")
+	r.GET("/ping", s.Ping)
+
+	logv1 := r.Group("/v2/log")
 	{
-		logv1.GET("/ping", s.Ping)
 		logv1.GET("/clusters", s.Clusters)
 		logv1.GET("/clusters/:cluster/apps", s.Applications)
 		logv1.GET("/clusters/:cluster/apps/:app/slots", s.Slots)
