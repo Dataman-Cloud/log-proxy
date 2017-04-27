@@ -43,23 +43,6 @@ func startAPIServer(sv *Search) *httptest.Server {
 		vr.POST("/log", receiverlog)
 	}
 
-	v1m := router.Group("/api/v1/monitor", func(ctx *gin.Context) { ctx.Set("page", models.Page{}) })
-	{
-		v1m.POST("/alert", func(ctx *gin.Context) { sv.CreateAlert(ctx) })
-		v1m.GET("/alert", func(ctx *gin.Context) { sv.GetAlerts(ctx) })
-		v1m.GET("/alert/:id", func(ctx *gin.Context) { sv.GetAlert(ctx) })
-		v1m.PUT("/alert", func(ctx *gin.Context) { sv.UpdateAlert(ctx) })
-		v1m.DELETE("/alert/:id", func(ctx *gin.Context) { sv.DeleteAlert(ctx) })
-
-		v1m.GET("/query/items", getQueryItems)
-	}
-	/*
-		v1a := router.Group("/api/v1/alert", func(ctx *gin.Context) { ctx.Set("page", models.Page{}) })
-		{
-			v1a.POST("/rules/", createAlertRule)
-			v1a.GET("/rules/:id", getAlertRule)
-		}
-	*/
 	return httptest.NewServer(router)
 }
 

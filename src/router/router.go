@@ -35,13 +35,6 @@ func Router(middlewares ...gin.HandlerFunc) *gin.Engine {
 		logv1.GET("/clusters/:cluster/apps/:app/sources", s.Sources)
 		logv1.GET("/clusters/:cluster/apps/:app/search", s.Search)
 		logv1.GET("/clusters/:cluster/apps/:app/context", s.Context)
-
-		logv1.GET("/keyword", s.GetAlerts)
-		logv1.POST("/keyword", s.CreateAlert)
-		logv1.PUT("/keyword", s.UpdateAlert)
-		logv1.DELETE("/keyword/:id", s.DeleteAlert)
-		logv1.GET("/keyword/:id", s.GetAlert)
-
 	}
 
 	pv1 := r.Group("/v1/receive")

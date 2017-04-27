@@ -74,26 +74,26 @@ func GetSearch() *Search {
 		registry = true
 	}
 
-	alerts, err := s.Service.GetAlerts(models.Page{
-		PageFrom: 0,
-		PageSize: 1000,
-	})
+	//alerts, err := s.Service.GetAlerts(models.Page{
+	//	PageFrom: 0,
+	//	PageSize: 1000,
+	//})
 
-	if err != nil {
-		return s
-	}
+	//if err != nil {
+	//	return s
+	//}
 
-	s.Kmutex.Lock()
-	defer s.Kmutex.Unlock()
-	if alerts == nil {
-		return s
-	}
-	for _, alert := range alerts["results"].([]models.Alert) {
-		if s.KeywordFilter[alert.AppID+alert.Path] == nil {
-			s.KeywordFilter[alert.AppID+alert.Path] = list.New()
-		}
-		s.KeywordFilter[alert.AppID+alert.Path].PushBack(alert.Keyword)
-	}
+	//s.Kmutex.Lock()
+	//defer s.Kmutex.Unlock()
+	//if alerts == nil {
+	//	return s
+	//}
+	//for _, alert := range alerts["results"].([]models.Alert) {
+	//	if s.KeywordFilter[alert.AppID+alert.Path] == nil {
+	//		s.KeywordFilter[alert.AppID+alert.Path] = list.New()
+	//	}
+	//	s.KeywordFilter[alert.AppID+alert.Path].PushBack(alert.Keyword)
+	//}
 
 	return s
 }
