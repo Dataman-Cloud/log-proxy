@@ -52,6 +52,7 @@ func startAPIServer(sv *Search) *httptest.Server {
 		v1m.DELETE("/alert/:id", func(ctx *gin.Context) { sv.DeleteAlert(ctx) })
 
 		v1m.GET("/query/items", getQueryItems)
+		v1m.GET("/users", getUsers)
 	}
 	/*
 		v1a := router.Group("/api/v1/alert", func(ctx *gin.Context) { ctx.Set("page", models.Page{}) })

@@ -11,7 +11,7 @@ filter:
   task: ""
   fixed: "id=~'/docker/.*', name=~'mesos.*'"
 by:
-  - "container_label_DM_VCLUSTER"
-  - "container_label_DM_USER"
-  - "container_label_DM_APP_NAME"
-  - "container_label_DM_SLOT_ID"
+  cluster: "container_label_DM_VCLUSTER"
+  user: "container_label_DM_USER"
+  app: "container_label_DM_APP_NAME"
+  task: "container_label_DM_SLOT_ID"
