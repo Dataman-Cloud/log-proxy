@@ -2,12 +2,12 @@ package api
 
 import (
 	"net/http"
-	"net/url"
-	"strings"
+	"net/http/httptest"
 	"testing"
 
 	"github.com/Dataman-Cloud/log-proxy/src/utils/prometheusexpr"
 	"github.com/gin-gonic/gin"
+	"github.com/stretchr/testify/assert"
 )
 
 func getQueryItems(ctx *gin.Context) {
@@ -18,13 +18,11 @@ func TestQueryItems(t *testing.T) {
 	path := "../../config/exprs/"
 	prometheusexpr.Exprs(path)
 
-	httpClient := http.DefaultClient
-	u, _ := url.Parse(apiURL)
-	u.Path = strings.TrimRight(u.Path, "/") + "/api/v1/monitor/query/items"
-	_, err := httpClient.Get(u.String())
-	if err == nil {
-		t.Log("success")
-	} else {
-		t.Error("faild")
-	}
+	router := gin.New()
+	router.GET("/api/v1/monitor/query/items", getQueryItems)
+	testServer := httptest.NewServer(router)
+	assert.NotNil(t, testServer)
+	defer testServer.Close()
+	_, err := http.Get(testServer.URL + "/api/v1/monitor/query/items")
+	assert.NoError(t, err)
 }
