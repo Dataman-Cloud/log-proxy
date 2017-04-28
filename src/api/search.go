@@ -8,7 +8,10 @@ import (
 	"github.com/Dataman-Cloud/log-proxy/src/config"
 	"github.com/Dataman-Cloud/log-proxy/src/models"
 	"github.com/Dataman-Cloud/log-proxy/src/service"
+	"github.com/Dataman-Cloud/log-proxy/src/store"
+	"github.com/Dataman-Cloud/log-proxy/src/store/datastore"
 	"github.com/Dataman-Cloud/log-proxy/src/utils"
+	"github.com/Dataman-Cloud/log-proxy/src/utils/database"
 
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus"
@@ -26,15 +29,15 @@ const (
 	GetTaskError = "503-11002"
 	// IndexError search index log error
 	IndexError = "503-11003"
-	// CreateAlertError create keyword error
-	CreateAlertError = "503-11004"
-	// DeleteAlertError delete keyword error
-	DeleteAlertError = "503-11005"
-	// GetAlertError get keyword error
-	GetAlertError = "503-11006"
-	// UpdateAlertError update keyword error
-	UpdateAlertError = "503-11007"
-	// GetEventsError get event history error
+
+	CreateLogAlertRuleError = "503-11004"
+
+	DeleteLogAlertRuleError = "503-11005"
+
+	GetLogAlertRuleError = "503-11006"
+
+	UpdateLogAlertRuleError = "503-11007"
+
 	GetEventsError = "503-11008"
 	// GetPrometheusError get prometheus event error
 	GetPrometheusError = "503-11009"
@@ -49,6 +52,7 @@ const (
 // Search search client struct
 type Search struct {
 	Service       *service.SearchService
+	Store         store.Store
 	KeywordFilter map[string]*list.List
 	Counter       *prometheus.CounterVec
 	Kmutex        *sync.Mutex
@@ -58,6 +62,7 @@ type Search struct {
 func GetSearch() *Search {
 	s := &Search{
 		Service:       service.NewEsService(strings.Split(config.GetConfig().EsURL, ",")),
+		Store:         datastore.From(database.GetDB()),
 		KeywordFilter: make(map[string]*list.List),
 		Counter: prometheus.NewCounterVec(
 			prometheus.CounterOpts{
