@@ -123,6 +123,6 @@ func TestGetLogAlertRules(t *testing.T) {
 		return testdb.RowsFromCSVString(columns, rows), nil
 	})
 
-	_, err := store.GetLogAlertRules(models.Page{})
+	_, err := store.GetLogAlertRules("test", models.Page{})
 	assert.NoError(t, err)
 }
