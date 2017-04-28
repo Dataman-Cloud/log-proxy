@@ -27,10 +27,12 @@ type Alert struct {
 
 type LogAlertRule struct {
 	ID          uint64    `json:"id" gorm:"not null; auto_increment"`
-	Cluster     string    `json:"cluster"`
-	App         string    `json:"app"`
-	Keyword     string    `json:"keyword"`
-	Source      string    `json:"source"`
+	User        string    `json:"user" gorm:"not null"`
+	Group       string    `json:"group" gorm:"not null"`
+	Cluster     string    `json:"cluster" gorm:"not null"`
+	App         string    `json:"app" gorm:"not null"`
+	Keyword     string    `json:"keyword" gorm:"not null"`
+	Source      string    `json:"source" gorm:"not null"`
 	Status      string    `json:"status" sql:"DEFAULT:'Enabled'"`
 	Description string    `json:"description"  gorm:"type:longtext"`
 	CreatedAt   time.Time `json:"createdAt"`
