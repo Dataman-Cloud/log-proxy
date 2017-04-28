@@ -8,7 +8,8 @@ import (
 
 func (db *datastore) CreateLogAlertRule(rule *models.LogAlertRule) error {
 	var result models.LogAlertRule
-	notfound := db.Where("log_alert_rules.app = ? AND log_alert_rules.source = ? AND log_alert_rules.keyword = ?",
+	notfound := db.Where("log_alert_rules.app = ? AND log_alert_rules.source = ? AND log_alert_rules.keyword = ? "+
+		"AND log_alert_rules.user = ? AND log_alert_rules.group = ?",
 		rule.App, rule.Source, rule.Keyword).
 		First(&result).
 		RecordNotFound()
@@ -44,13 +45,13 @@ func (db *datastore) GetLogAlertRule(ID string) (models.LogAlertRule, error) {
 	return result, err
 }
 
-func (db *datastore) GetLogAlertRules(page models.Page) (map[string]interface{}, error) {
+func (db *datastore) GetLogAlertRules(group string, page models.Page) (map[string]interface{}, error) {
 	var (
 		count int
 		rules []*models.LogAlertRule
 	)
 
-	if err := db.Table("log_alert_rules").Find(&rules).Count(&count).Error; err != nil {
+	if err := db.Table("log_alert_rules").Where("log_alert_rules = ?", group).Find(&rules).Count(&count).Error; err != nil {
 		return nil, err
 	}
 
