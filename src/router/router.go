@@ -24,6 +24,8 @@ func Router(middlewares ...gin.HandlerFunc) *gin.Engine {
 	r.Use(middlewares...)
 
 	s := api.GetSearch()
+	s.InitLogKeywordFilter()
+
 	r.GET("/ping", s.Ping)
 
 	logRouter := r.Group("/v2/log")

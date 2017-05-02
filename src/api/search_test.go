@@ -2,7 +2,7 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -11,7 +11,11 @@ import (
 
 	"github.com/Dataman-Cloud/log-proxy/src/config"
 	"github.com/Dataman-Cloud/log-proxy/src/models"
+	mock_store "github.com/Dataman-Cloud/log-proxy/src/store/mock_datastore"
+
 	"github.com/gin-gonic/gin"
+	"github.com/golang/mock/gomock"
+	"github.com/stretchr/testify/assert"
 	"gopkg.in/olivere/elastic.v3"
 )
 
@@ -23,6 +27,47 @@ var (
 	mo      *Monitor
 	al      *Alert
 )
+
+func TestGetLogAlertRuleIndex(t *testing.T) {
+	rule := models.LogAlertRule{
+		Group:  "g",
+		User:   "u",
+		App:    "a",
+		Source: "s",
+	}
+
+	ruleIndex := getLogAlertRuleIndex(rule)
+	assert.Equal(t, ruleIndex, "g-u-a-s")
+}
+
+func TestInitLogAlertFilter(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockStore := mock_store.NewMockStore(mockCtrl)
+	s := GetSearch()
+	s.Store = mockStore
+
+	rule := models.LogAlertRule{
+		App:     "app",
+		Cluster: "cluster",
+		Keyword: "key",
+		Source:  "stdout",
+		User:    "user",
+		Group:   "group",
+	}
+
+	rules := []*models.LogAlertRule{&rule}
+	result := map[string]interface{}{"rules": rules}
+	mockStore.EXPECT().GetLogAlertRules(gomock.Any(), gomock.Any()).Return(result, nil).Times(1)
+	s.InitLogKeywordFilter()
+
+	mockStore.EXPECT().GetLogAlertRules(gomock.Any(), gomock.Any()).Return(nil, nil).Times(1)
+	s.InitLogKeywordFilter()
+
+	mockStore.EXPECT().GetLogAlertRules(gomock.Any(), gomock.Any()).Return(nil, errors.New("test")).Times(1)
+	s.InitLogKeywordFilter()
+}
 
 func startAPIServer(sv *Search) *httptest.Server {
 	router := gin.New()
@@ -285,7 +330,6 @@ func querySliences(ctx *gin.Context) {
 	data := `{"status":"success","data":{"silences":[],"totalSilences":0}}`
 	var result map[string]interface{}
 	json.Unmarshal([]byte(data), &result)
-	fmt.Printf("%v\n", result)
 	ctx.JSON(http.StatusOK, result)
 }
 
@@ -293,7 +337,6 @@ func querySlience(ctx *gin.Context) {
 	data := `{"status":"success","data":{"silences":[],"totalSilences":0}}`
 	var result map[string]interface{}
 	json.Unmarshal([]byte(data), &result)
-	fmt.Printf("%v\n", result)
 	ctx.JSON(http.StatusOK, result)
 }
 

@@ -13,8 +13,8 @@ import (
 	"github.com/Dataman-Cloud/log-proxy/src/utils"
 	"github.com/Dataman-Cloud/log-proxy/src/utils/database"
 
+	log "github.com/Sirupsen/logrus"
 	"github.com/gin-gonic/gin"
-	"github.com/prometheus/client_golang/prometheus"
 )
 
 // registry prometheus registry counter
@@ -54,53 +54,46 @@ type Search struct {
 	Service       *service.SearchService
 	Store         store.Store
 	KeywordFilter map[string]*list.List
-	Counter       *prometheus.CounterVec
-	Kmutex        *sync.Mutex
+	Kmutex        sync.RWMutex
 }
 
 // GetSearch new search client
 func GetSearch() *Search {
-	s := &Search{
+	return &Search{
 		Service:       service.NewEsService(strings.Split(config.GetConfig().EsURL, ",")),
 		Store:         datastore.From(database.GetDB()),
 		KeywordFilter: make(map[string]*list.List),
-		Counter: prometheus.NewCounterVec(
-			prometheus.CounterOpts{
-				Name: "log_keyword",
-				Help: "log keyword counter",
-			},
-			[]string{"app", "task", "path", "keyword", "user", "cluster"},
-		),
-		Kmutex: new(sync.Mutex),
+	}
+}
+
+func (s *Search) InitLogKeywordFilter() {
+	opts := map[string]interface{}{}
+	rules, err := s.Store.GetLogAlertRules(opts, models.Page{PageFrom: 0, PageSize: 10000})
+	if err != nil {
+		log.Errorf("get log alert ruels forn store failed. Error: %+v", err)
+		return
 	}
 
-	if !registry {
-		prometheus.MustRegister(s.Counter)
-		registry = true
+	s.Kmutex.Lock()
+	defer s.Kmutex.Unlock()
+
+	if rules == nil {
+		return
 	}
 
-	//alerts, err := s.Service.GetAlerts(models.Page{
-	//	PageFrom: 0,
-	//	PageSize: 1000,
-	//})
+	for _, rule := range rules["rules"].([]*models.LogAlertRule) {
+		ruleIndex := getLogAlertRuleIndex(*rule)
+		if s.KeywordFilter[ruleIndex] == nil {
+			s.KeywordFilter[ruleIndex] = list.New()
+		}
+		s.KeywordFilter[ruleIndex].PushBack(rule.Keyword)
+	}
 
-	//if err != nil {
-	//	return s
-	//}
+	return
+}
 
-	//s.Kmutex.Lock()
-	//defer s.Kmutex.Unlock()
-	//if alerts == nil {
-	//	return s
-	//}
-	//for _, alert := range alerts["results"].([]models.Alert) {
-	//	if s.KeywordFilter[alert.AppID+alert.Path] == nil {
-	//		s.KeywordFilter[alert.AppID+alert.Path] = list.New()
-	//	}
-	//	s.KeywordFilter[alert.AppID+alert.Path].PushBack(alert.Keyword)
-	//}
-
-	return s
+func getLogAlertRuleIndex(r models.LogAlertRule) string {
+	return r.Group + "-" + r.User + "-" + r.App + "-" + r.Source
 }
 
 // Ping ping
