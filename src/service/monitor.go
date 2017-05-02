@@ -24,6 +24,8 @@ const (
 	QUERYPATH = "/api/v1/query"
 	//OKRESULT define the value of status field in response
 	OKRESULT = "success"
+
+	FILTER = "id=~'/docker/.*', name=~'mesos.*', state='running'"
 )
 
 func isInArray(array []string, value string) bool {
@@ -183,6 +185,75 @@ func (query *Query) QueryMetric() (*models.QueryRangeResult, error) {
 	result.Expr = query.Expr
 	log.Infoln("QueryMetric: result", result)
 	return result, nil
+}
+
+// GetQueryApps set the Query exprs by utils.Expr
+func (query *Query) GetQueryApps() ([]string, error) {
+	start, end := timeRange(query.Start, query.End)
+	query.Start = start
+	query.End = end
+	query.Expr = fmt.Sprintf("count(container_tasks_state{%s, container_label_DM_LOG_TAG!='ignore'}) by (container_label_DM_APP_ID)", FILTER)
+
+	response, request, err := query.getExprResponse()
+	if err != nil {
+		return nil, err
+	}
+
+	var result *models.QueryRangeResult
+	err = json.Unmarshal(response, &result)
+	if err != nil {
+		err = fmt.Errorf("Failed to parse the response from %s", request)
+		return nil, err
+	}
+
+	if result.Status != OKRESULT {
+		err := fmt.Errorf("%s", result.Error)
+		return nil, err
+	}
+	var list = make([]string, 0)
+
+	for _, originData := range result.Data.Result {
+		app := originData.Metric.ContainerLabelAppID
+		if !isInArray(list, app) {
+			list = append(list, app)
+		}
+	}
+
+	return list, nil
+}
+
+// GetQueryAppTasks set the Query exprs by utils.Expr
+func (query *Query) GetQueryAppTasks() ([]string, error) {
+	start, end := timeRange(query.Start, query.End)
+	query.Start = start
+	query.End = end
+	query.Expr = fmt.Sprintf("count(container_tasks_state{container_label_DM_APP_ID='%s', %s, container_label_DM_LOG_TAG!='ignore'}) by (container_label_DM_SLOT_INDEX)", query.App, FILTER)
+	response, request, err := query.getExprResponse()
+	if err != nil {
+		return nil, err
+	}
+
+	var result *models.QueryRangeResult
+	err = json.Unmarshal(response, &result)
+	if err != nil {
+		err = fmt.Errorf("Failed to parse the response from %s", request)
+		return nil, err
+	}
+
+	if result.Status != OKRESULT {
+		err := fmt.Errorf("%s", result.Error)
+		return nil, err
+	}
+	var list = make([]string, 0)
+
+	for _, originData := range result.Data.Result {
+		task := originData.Metric.ContainerLabelSlot
+		if !isInArray(list, task) {
+			list = append(list, task)
+		}
+	}
+
+	return list, nil
 }
 
 func timeRange(start, end string) (string, string) {

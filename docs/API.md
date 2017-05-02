@@ -4,16 +4,63 @@
 
 ### Metric(监控数据)
 
-#### Get the metric values (CPU/Memory/Network/Filesystem)
+#### Get the apps
 
-```GET /v1/monitor/query/items```
+```
+GET /v1/monitor/apps
+```
+- path: /v1/monitor/apps
+- HTTP Method: GET
+- URL Params: Null
+- Query Params: Null
+For example:
+```
+http://127.0.0.1:5098/v1/monitor/apps
+```
+return
+```
+{
+  "code": 0,
+  "data": [
+    "web-zdou-datamanmesos"
+  ]
+}
+```
+
+#### Get the tasks of app
+
+```
+GET /v1/monitor/apps/:appid/tasks
+```
+- path: /v1/monitor/apps/:appid/tasks
+- HTTP Method: GET
+- URL Params: Null
+- Query Params: Null
+For example:
+```
+http://127.0.0.1:5098/v1/monitor/apps/web-zdou-datamanmesos/tasks
+```
+return
+```
+{
+  "code": 0,
+  "data": [
+    "0"
+  ]
+}
+```
+
+#### Get the metric values
+
+```
+GET /v1/monitor/query/items
+```
 - path: /v1/monitor/query
 - HTTP Method: GET
 - URL Params: Null
 - Query Params: Null
 
 For example:
-
 ```
 http://127.0.0.1:5098/v1/monitor/query/items
 ```
@@ -30,7 +77,9 @@ return
 ```
 
 
-```GET /v1/monitor/query```
+```
+GET /v1/monitor/query
+```
 - path: /v1/monitor/query
 - HTTP Method: GET
 - URL Params: Null

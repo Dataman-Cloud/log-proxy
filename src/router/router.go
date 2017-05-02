@@ -53,6 +53,9 @@ func Router(middlewares ...gin.HandlerFunc) *gin.Engine {
 	{
 		monitorv1.GET("/query", monitor.Query)
 		monitorv1.GET("/query/items", monitor.GetQueryItems)
+		monitorv1.GET("/apps", monitor.GetApps)
+		monitorv1.GET("/apps/:appid/tasks", monitor.GetAppsTasks)
+
 	}
 
 	alert := api.NewAlert()
