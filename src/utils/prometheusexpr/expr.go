@@ -33,12 +33,10 @@ func NewExpr() *Expr {
 
 // Filter define the fileter labels
 type Filter struct {
-	Cluster string `json:"cluster"`
-	User    string `json:"user"`
-	App     string `json:"app"`
-	Slot    string `json:"slot"`
-	Task    string `json:"task"`
-	Fixed   string `json:"fixed"`
+	App   string `json:"app"`
+	Slot  string `json:"slot"`
+	Task  string `json:"task"`
+	Fixed string `json:"fixed"`
 }
 
 // Exprs get the exprs from files

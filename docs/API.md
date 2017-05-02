@@ -4,80 +4,56 @@
 
 ### Metric(监控数据)
 
-
 #### Get the metric values (CPU/Memory/Network/Filesystem)
+
+```GET /v1/monitor/query/items```
+- path: /v1/monitor/query
+- HTTP Method: GET
+- URL Params: Null
+- Query Params: Null
+
+For example:
+
+```
+http://127.0.0.1:5098/v1/monitor/query/items
+```
+return
+```
+{
+  "code": 0,
+  "data": [
+    "CPU使用率",
+    "内存使用字节数",
+    "内存分配字节数"
+  ]
+}
+```
+
 
 ```GET /v1/monitor/query```
 - path: /v1/monitor/query
 - HTTP Method: GET
 - URL Params: Null
-- Query Params: metric, clusterid, userid, appid, taskid, start, end, step, expr
-  - metric=[cpu/memory/memory_usage/memory_total/network_rx/network_tx/fs_read/fs_write]: the metric string.
-  - clusterid=<string>: the name of cluster.
-  - userid=<string>: the name of user.
-  - appid=<string>: the name of application.
-  - taskid=<number>: the id string of the task instance, support format as "1,2,3" and "1-3"
-  - start=<2016-12-02T00:00:01.781Z>: the start time of the query range.
-  - end=<2016-12-02T00:00:01.781Z>: the end time of the query range.
+- Query Params: metric, app, task, start, end, step, expr
+  - metric=[从API /v1/monitor/query/items拿到的列表]: the metric string.
+  - app=<string>: the name of application.
+  - task=<number>: the id string of the app slot ID
+  - start=<1493708502>: the start time of the query range.
+  - end=<1493708502>: the end time of the query range.
   - step=<duration>: Query resolution step width.
   - expr=<string>: Prometheus expression query string. it is conflict with metric.
 
 For example:
 
 Get the metrics by Expr, Refer to "https://prometheus.io/docs/querying/api/"
+
 ```
-http://127.0.0.1:5098/v1/monitor/query?expr=avg(irate(container_cpu_usage_seconds_total{container_label_APP_ID='work-web',id=~'/docker/.*',name=~'mesos.*'}[5m])) by (container_label_VCLUSTER, container_label_APP_ID)&start=2016-12-05T00:00:01.781Z&end=2016-12-05T00:01:00.781Z&step=30s
+http://127.0.0.1:5098/v1/monitor/query?expr=avg(irate(container_cpu_usage_seconds_total{container_label_APP_ID='work-web',id=~'/docker/.*',name=~'mesos.*'}[5m])) by (container_label_VCLUSTER, container_label_APP_ID)&start=1493708502&end=1493708502&step=30s
 ```
 
 Get the metrics by URL
 ```
-http://127.0.0.1:5098/v1/monitor/query?start=1483942403&end=1483942403&step=30s&metric=memory&appid=nginx0051-xcm-datamanmesos&clusterid=datamanmesos&userid=xcm&taskid=1-3
-```
-
-#### Get the info of clusters, cluster, application
-
-```GET /v1/monitor/info```
-
-- path: /v1/monitor/applications
-- HTTP Method: GET
-- URL Params: Null
-- Query Params: clusterid, appid
-  - clusterid=<string>: the name of cluster.
-  - userid=<string>: the name of user.
-  - appid=<string>: the name of application.
-
-For example:
-Get the info of Clusters
-```
-http://127.0.0.1:5098/v1/monitor/info
-```
-Get the info of cluster
-```
-http://127.0.0.1:5098/v1/monitor/info?clusterid=work
-```
-Get the info of application
-```
-http://127.0.0.1:5098/v1/monitor/info?clusterid=datamanmesos&userid=xcm&appid=nginx0051-xcm-datamanmesos
-```
-
-#### Get the metric data of nodes
-
-```GET /v1/monitor/nodes```
-
-- path: /v1/monitor/nodes
-- HTTP Method: GET
-- URL Params: Null
-- Query Params: nodeid
-  - nodeid=<string>: the IP address of node.
-
-For example:
-Get the metric data of all nodes
-```
-http://127.0.0.1:5098/v1/monitor/nodes
-```
-Get the metric data of one node
-```
-http://127.0.0.1:5098/v1/monitor/nodes?nodeid=192.168.1.101
+http://127.0.0.1:5098/v1/monitor/query?start=1483942403&end=1483942403&step=30s&metric=CPU使用率&app=web-zdou-datamanmesos&task=0
 ```
 
 ### AlertManager API

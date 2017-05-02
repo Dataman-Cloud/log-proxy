@@ -1,25 +1,29 @@
 package service
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
+	"net/url"
 	"sort"
+	"strconv"
+	"strings"
+	"time"
 
 	"github.com/Dataman-Cloud/log-proxy/src/models"
 	"github.com/Dataman-Cloud/log-proxy/src/utils/prometheusexpr"
+
+	log "github.com/Sirupsen/logrus"
 )
 
 const (
-	cpuUsage      = "cpu"
-	memPercentage = "memory"
-	memUsage      = "memory_usage"
-	memTotal      = "memory_total"
-	networkRX     = "network_rx"
-	networkTX     = "network_tx"
-	fsRead        = "fs_read"
-	fsWrite       = "fs_write"
-	fsUsage       = "fs_usage"
-	fsLimit       = "fs_limit"
+	// QUERYRANGEPATH define the query_range path of prometheus
+	QUERYRANGEPATH = "/api/v1/query_range"
+	// QUERYPATH define the query path of prometheus
+	QUERYPATH = "/api/v1/query"
+	//OKRESULT define the value of status field in response
+	OKRESULT = "success"
 )
 
 func isInArray(array []string, value string) bool {
@@ -51,7 +55,7 @@ func SetQueryExprsList() map[string]string {
 
 func makeExprString(expr *prometheusexpr.Expr) string {
 	var filter, byItems, queryExpr string
-	filter = fmt.Sprintf("%s, %s, %s, %s, %s", expr.Filter.User, expr.Filter.Cluster, expr.Filter.App, expr.Filter.Slot, expr.Filter.Fixed)
+	filter = fmt.Sprintf("%s, %s, %s", expr.Filter.App, expr.Filter.Slot, expr.Filter.Fixed)
 	for n, v := range expr.By {
 		if n != len(expr.By)-1 {
 			byItems = byItems + v + ", "
@@ -80,4 +84,124 @@ func (query *Query) GetQueryItemList() []string {
 	}
 	sort.Strings(list)
 	return list
+}
+
+// getQueryMetricExpr return the expr string
+func (query *Query) getQueryMetricExpr() string {
+	tmpl := query.ExprTmpl[query.Metric]
+	app := query.App
+	task := query.Task
+	exprTempl := fmt.Sprintf(tmpl, app, task)
+	return exprTempl
+}
+
+// QueryExpr return the result by calling function getExprResponse
+func (query *Query) QueryExpr() (*models.QueryExprResult, error) {
+	start, end := timeRange(query.Start, query.End)
+	query.Start = start
+	query.End = end
+
+	response, request, err := query.getExprResponse()
+	if err != nil {
+		return nil, err
+	}
+
+	var result *models.QueryExprResult
+	err = json.Unmarshal(response, &result)
+	if err != nil {
+		err = fmt.Errorf("Failed to parse the response from %s", request)
+		return nil, err
+	}
+	result.Expr = query.Expr
+	return result, nil
+}
+
+// getExprResponse set the request url/query parameter and then
+// return the result by query from Prometheus
+func (query *Query) getExprResponse() ([]byte, string, error) {
+	u, err := url.Parse(query.PromServer)
+	if err != nil {
+		return nil, "", err
+	}
+	u.Path = strings.TrimRight(u.Path, "/") + query.Path
+	q := u.Query()
+	q.Set("query", query.Expr)
+	if query.Path == QUERYRANGEPATH {
+		q.Set("start", query.Start)
+		q.Set("end", query.End)
+		if query.Step == "" {
+			q.Set("step", "30s")
+		} else {
+			q.Set("step", query.Step)
+		}
+	} else if query.Path == QUERYPATH {
+	}
+	u.RawQuery = q.Encode()
+	resp, err := query.HTTPClient.Get(u.String())
+	if err != nil {
+		err = fmt.Errorf("Failed to get response from %s", u.String())
+		return nil, u.String(), err
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, u.String(), err
+	}
+
+	log.Infof("prometheus qurey result by url: %s", u.String())
+	//log.Infof("prometheus qurey expr: %s", query.Expr)
+	return body, u.String(), nil
+}
+
+func (query *Query) QueryMetric() (*models.QueryRangeResult, error) {
+	// if start/end as "", set them as now
+	start, end := timeRange(query.Start, query.End)
+	query.Start = start
+	query.End = end
+
+	query.Expr = query.getQueryMetricExpr()
+	response, request, err := query.getExprResponse()
+	if err != nil {
+		log.Infoln("QueryMetric: err", err)
+		return nil, err
+	}
+	log.Infoln("QueryMetric: request", request)
+
+	var result *models.QueryRangeResult
+	err = json.Unmarshal(response, &result)
+	if err != nil {
+		err = fmt.Errorf("Failed to parse the response from %s", request)
+		return nil, err
+	}
+
+	if result.Status != OKRESULT {
+		err := fmt.Errorf("%s", result.Error)
+		return nil, err
+	}
+
+	result.Expr = query.Expr
+	log.Infoln("QueryMetric: result", result)
+	return result, nil
+}
+
+func timeRange(start, end string) (string, string) {
+	const (
+		OFFSET = "0m"
+	)
+	if start == "" && end == "" {
+		endtime := time.Now()
+		starttime := timeOffset(endtime, OFFSET)
+		return timetoString(endtime), timetoString(starttime)
+	}
+	return start, end
+}
+
+func timetoString(t time.Time) string {
+	return strconv.FormatInt(t.Unix(), 10)
+}
+
+func timeOffset(t time.Time, offset string) time.Time {
+	duration, _ := time.ParseDuration(offset)
+	return t.Add(duration)
 }

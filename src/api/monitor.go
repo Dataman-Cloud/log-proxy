@@ -1,6 +1,11 @@
 package api
 
 import (
+	"fmt"
+	"net/http"
+
+	"github.com/Dataman-Cloud/log-proxy/src/config"
+	"github.com/Dataman-Cloud/log-proxy/src/models"
 	"github.com/Dataman-Cloud/log-proxy/src/service"
 	"github.com/Dataman-Cloud/log-proxy/src/utils"
 
@@ -22,4 +27,68 @@ func (m *Monitor) GetQueryItems(ctx *gin.Context) {
 		ExprTmpl: service.SetQueryExprsList(),
 	}
 	utils.Ok(ctx, query.GetQueryItemList())
+}
+
+// Query return the results of quering from prometheus
+func (m *Monitor) Query(ctx *gin.Context) {
+	param := &models.QueryParameter{
+		Metric: ctx.Query("metric"),
+		App:    ctx.Query("app"),
+		Task:   ctx.Query("task"),
+		Start:  ctx.Query("start"),
+		End:    ctx.Query("end"),
+		Step:   ctx.Query("step"),
+		Expr:   ctx.Query("expr"),
+	}
+
+	if param.Metric != "" && param.Expr != "" {
+		err := fmt.Errorf("The paramter confict between metric and expr")
+		utils.ErrorResponse(ctx, err)
+		return
+	}
+
+	if param.Metric == "" && param.Expr == "" {
+		err := fmt.Errorf("The paramter metric or expr required")
+		utils.ErrorResponse(ctx, err)
+		return
+	}
+
+	if param.Metric != "" && param.App == "" {
+		err := fmt.Errorf("The paramter metric and app required")
+		utils.ErrorResponse(ctx, err)
+		return
+	}
+	if param.Expr != "" {
+		query := &service.Query{
+			ExprTmpl:       service.SetQueryExprsList(),
+			HTTPClient:     http.DefaultClient,
+			PromServer:     config.GetConfig().PrometheusURL,
+			Path:           service.QUERYRANGEPATH,
+			QueryParameter: param,
+		}
+		data, err := query.QueryExpr()
+		if err != nil {
+			utils.ErrorResponse(ctx, err)
+			return
+		}
+		utils.Ok(ctx, data)
+		return
+	}
+
+	if param.Metric != "" {
+		query := &service.Query{
+			ExprTmpl:       service.SetQueryExprsList(),
+			HTTPClient:     http.DefaultClient,
+			PromServer:     config.GetConfig().PrometheusURL,
+			Path:           service.QUERYRANGEPATH,
+			QueryParameter: param,
+		}
+		data, err := query.QueryMetric()
+		if err != nil {
+			utils.ErrorResponse(ctx, err)
+			return
+		}
+		utils.Ok(ctx, data)
+		return
+	}
 }
