@@ -161,3 +161,31 @@ func TestGetLogAlertRules(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, resp.StatusCode, http.StatusServiceUnavailable)
 }
+
+func TestDeleteLogAlertRule(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockStore := mock_store.NewMockStore(mockCtrl)
+	s := Search{Store: mockStore}
+
+	router := gin.New()
+	router.DELETE("/rules/:id", s.DeleteLogAlertRule)
+	testServer := httptest.NewServer(router)
+	assert.NotNil(t, testServer)
+	defer testServer.Close()
+
+	mockStore.EXPECT().DeleteLogAlertRule(gomock.Any()).Return(nil).Times(1)
+	req, err := http.NewRequest("DELETE", testServer.URL+"/rules/1", nil)
+	assert.Nil(t, err)
+	resp, err := http.DefaultClient.Do(req)
+	assert.Nil(t, err)
+	assert.Equal(t, resp.StatusCode, http.StatusOK)
+
+	mockStore.EXPECT().DeleteLogAlertRule(gomock.Any()).Return(errors.New("test")).Times(1)
+	req, err = http.NewRequest("DELETE", testServer.URL+"/rules/1", nil)
+	assert.Nil(t, err)
+	resp, err = http.DefaultClient.Do(req)
+	assert.Nil(t, err)
+	assert.Equal(t, resp.StatusCode, http.StatusServiceUnavailable)
+}

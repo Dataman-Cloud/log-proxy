@@ -66,3 +66,13 @@ func (s *Search) GetLogAlertRules(ctx *gin.Context) {
 	utils.Ok(ctx, rules)
 	return
 }
+
+func (s *Search) DeleteLogAlertRule(ctx *gin.Context) {
+	if err := s.Store.DeleteLogAlertRule(ctx.Param("id")); err != nil {
+		utils.ErrorResponse(ctx, utils.NewError(DeleteLogAlertRuleError, err))
+		return
+	}
+
+	utils.Ok(ctx, "success")
+	return
+}
