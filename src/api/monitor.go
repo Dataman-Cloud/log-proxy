@@ -92,3 +92,53 @@ func (m *Monitor) Query(ctx *gin.Context) {
 		return
 	}
 }
+
+// GetApps return the items of query metrics
+func (m *Monitor) GetApps(ctx *gin.Context) {
+	param := &models.QueryParameter{
+		Start: ctx.Query("start"),
+		End:   ctx.Query("end"),
+		Step:  ctx.Query("step"),
+	}
+
+	query := &service.Query{
+		ExprTmpl:       service.SetQueryExprsList(),
+		HTTPClient:     http.DefaultClient,
+		PromServer:     config.GetConfig().PrometheusURL,
+		Path:           service.QUERYRANGEPATH,
+		QueryParameter: param,
+	}
+
+	data, err := query.GetQueryApps()
+	if err != nil {
+		utils.ErrorResponse(ctx, err)
+		return
+	}
+	utils.Ok(ctx, data)
+}
+
+// GetAppsTasks return the items of query metrics
+func (m *Monitor) GetAppsTasks(ctx *gin.Context) {
+	param := &models.QueryParameter{
+		Start:   ctx.Query("start"),
+		End:     ctx.Query("end"),
+		Step:    ctx.Query("step"),
+		Cluster: ctx.Param("clusterid"),
+		App:     ctx.Param("appid"),
+	}
+
+	query := &service.Query{
+		ExprTmpl:       service.SetQueryExprsList(),
+		HTTPClient:     http.DefaultClient,
+		PromServer:     config.GetConfig().PrometheusURL,
+		Path:           service.QUERYRANGEPATH,
+		QueryParameter: param,
+	}
+
+	data, err := query.GetQueryAppTasks()
+	if err != nil {
+		utils.ErrorResponse(ctx, err)
+		return
+	}
+	utils.Ok(ctx, data)
+}

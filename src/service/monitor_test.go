@@ -258,3 +258,181 @@ func TestQueryMetricErrorServer(t *testing.T) {
 		t.Errorf("Expect err is not nil, got %v", err)
 	}
 }
+
+func TestQueryApps(t *testing.T) {
+	path := "../../config/exprs/"
+	prometheusexpr.Exprs(path)
+
+	server := setup()
+	defer teardown()
+	query := initQuery()
+	query.PromServer = server
+	mux.HandleFunc(query.Path, func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		c := getContentOfFile("tests/query.apps.response.json")
+		fmt.Fprint(w, string(c))
+	})
+	expect := "web-zdou-datamanmesos"
+	data, err := query.GetQueryApps()
+	if data[0] != expect {
+		t.Errorf("Expect got %s, but got %s", expect, data[0])
+	}
+	if err != nil {
+		t.Errorf("Expect err is nil, got %v", err)
+	}
+}
+
+func TestQueryAppsError(t *testing.T) {
+	path := "../../config/exprs/"
+	prometheusexpr.Exprs(path)
+
+	server := setup()
+	defer teardown()
+	query := initQuery()
+	query.PromServer = server + "err"
+	mux.HandleFunc(query.Path, func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		c := getContentOfFile("tests/query.apps.response.json")
+		fmt.Fprint(w, string(c))
+	})
+	data, err := query.GetQueryApps()
+	if data != nil {
+		t.Errorf("Expect nil, but got %s", data)
+	}
+	if err == nil {
+		t.Errorf("Expect err is not nil, got %v", err)
+	}
+}
+
+func TestQueryAppsErrorResponse(t *testing.T) {
+	path := "../../config/exprs/"
+	prometheusexpr.Exprs(path)
+
+	server := setup()
+	defer teardown()
+	query := initQuery()
+	query.PromServer = server
+	mux.HandleFunc(query.Path, func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		c := getContentOfFile("")
+		fmt.Fprint(w, string(c))
+	})
+	data, err := query.GetQueryApps()
+	if data != nil {
+		t.Errorf("Expect nil, but got %s", data)
+	}
+	if err == nil {
+		t.Errorf("Expect err is not nil, got %v", err)
+	}
+}
+
+func TestQueryAppsErrorResult(t *testing.T) {
+	path := "../../config/exprs/"
+	prometheusexpr.Exprs(path)
+
+	server := setup()
+	defer teardown()
+	query := initQuery()
+	query.PromServer = server
+	mux.HandleFunc(query.Path, func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		c := getContentOfFile("tests/query.default.response.json")
+		fmt.Fprint(w, string(c))
+	})
+	data, err := query.GetQueryApps()
+	if data != nil {
+		t.Errorf("Expect nil, but got %s", data)
+	}
+	if err == nil {
+		t.Errorf("Expect err is not nil, got %v", err)
+	}
+}
+
+func TestQueryAppTasks(t *testing.T) {
+	path := "../../config/exprs/"
+	prometheusexpr.Exprs(path)
+
+	server := setup()
+	defer teardown()
+	query := initQuery()
+	query.PromServer = server
+	mux.HandleFunc(query.Path, func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		c := getContentOfFile("tests/query.tasks.response.json")
+		fmt.Fprint(w, string(c))
+	})
+	expect := "0"
+	data, err := query.GetQueryAppTasks()
+	if data[0] != expect {
+		t.Errorf("Expect got %s, but got %s", expect, data[0])
+	}
+	if err != nil {
+		t.Errorf("Expect err is nil, got %v", err)
+	}
+}
+
+func TestQueryAppTasksError(t *testing.T) {
+	path := "../../config/exprs/"
+	prometheusexpr.Exprs(path)
+
+	server := setup()
+	defer teardown()
+	query := initQuery()
+	query.PromServer = server + "err"
+	mux.HandleFunc(query.Path, func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		c := getContentOfFile("tests/query.apps.response.json")
+		fmt.Fprint(w, string(c))
+	})
+	data, err := query.GetQueryAppTasks()
+	if data != nil {
+		t.Errorf("Expect nil, but got %s", data)
+	}
+	if err == nil {
+		t.Errorf("Expect err is not nil, got %v", err)
+	}
+}
+
+func TestQueryAppTasksErrorResponse(t *testing.T) {
+	path := "../../config/exprs/"
+	prometheusexpr.Exprs(path)
+
+	server := setup()
+	defer teardown()
+	query := initQuery()
+	query.PromServer = server
+	mux.HandleFunc(query.Path, func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		c := getContentOfFile("")
+		fmt.Fprint(w, string(c))
+	})
+	data, err := query.GetQueryAppTasks()
+	if data != nil {
+		t.Errorf("Expect nil, but got %s", data)
+	}
+	if err == nil {
+		t.Errorf("Expect err is not nil, got %v", err)
+	}
+}
+
+func TestQueryAppTasksErrorResult(t *testing.T) {
+	path := "../../config/exprs/"
+	prometheusexpr.Exprs(path)
+
+	server := setup()
+	defer teardown()
+	query := initQuery()
+	query.PromServer = server
+	mux.HandleFunc(query.Path, func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		c := getContentOfFile("tests/query.default.response.json")
+		fmt.Fprint(w, string(c))
+	})
+	data, err := query.GetQueryAppTasks()
+	if data != nil {
+		t.Errorf("Expect nil, but got %s", data)
+	}
+	if err == nil {
+		t.Errorf("Expect err is not nil, got %v", err)
+	}
+}
