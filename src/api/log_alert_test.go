@@ -102,3 +102,62 @@ func TestUpdateLogAlertRule(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, resp.StatusCode, http.StatusServiceUnavailable)
 }
+
+func TestGetLogAlertRule(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockStore := mock_store.NewMockStore(mockCtrl)
+	s := Search{Store: mockStore}
+
+	router := gin.New()
+	router.GET("/rules/:id", s.GetLogAlertRule)
+	testServer := httptest.NewServer(router)
+	assert.NotNil(t, testServer)
+	defer testServer.Close()
+
+	rule := models.LogAlertRule{
+		ID:      1,
+		App:     "app",
+		Cluster: "cluster",
+		Keyword: "key",
+		Source:  "stdout",
+		User:    "user",
+		Group:   "group",
+	}
+
+	mockStore.EXPECT().GetLogAlertRule(gomock.Any()).Return(rule, nil).Times(1)
+	resp, err := http.Get(testServer.URL + "/rules/test")
+	assert.Nil(t, err)
+	assert.Equal(t, resp.StatusCode, http.StatusOK)
+
+	mockStore.EXPECT().GetLogAlertRule(gomock.Any()).Return(rule, errors.New("test")).Times(1)
+	resp, err = http.Get(testServer.URL + "/rules/test")
+	assert.Nil(t, err)
+	assert.Equal(t, resp.StatusCode, http.StatusServiceUnavailable)
+}
+
+func TestGetLogAlertRules(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockStore := mock_store.NewMockStore(mockCtrl)
+	s := Search{Store: mockStore}
+
+	router := gin.New()
+	router.GET("/rules", func(ctx *gin.Context) { ctx.Set("page", models.Page{}) }, s.GetLogAlertRules)
+	testServer := httptest.NewServer(router)
+	assert.NotNil(t, testServer)
+	defer testServer.Close()
+
+	rules := map[string]interface{}{"test": 0}
+	mockStore.EXPECT().GetLogAlertRules(gomock.Any(), gomock.Any()).Return(rules, nil).Times(1)
+	resp, err := http.Get(testServer.URL + "/rules?group=test")
+	assert.Nil(t, err)
+	assert.Equal(t, resp.StatusCode, http.StatusOK)
+
+	mockStore.EXPECT().GetLogAlertRules(gomock.Any(), gomock.Any()).Return(rules, errors.New("test")).Times(1)
+	resp, err = http.Get(testServer.URL + "/rules?group=test")
+	assert.Nil(t, err)
+	assert.Equal(t, resp.StatusCode, http.StatusServiceUnavailable)
+}

@@ -45,17 +45,17 @@ func (db *datastore) GetLogAlertRule(ID string) (models.LogAlertRule, error) {
 	return result, err
 }
 
-func (db *datastore) GetLogAlertRules(group string, page models.Page) (map[string]interface{}, error) {
+func (db *datastore) GetLogAlertRules(opts map[string]interface{}, page models.Page) (map[string]interface{}, error) {
 	var (
 		count int
 		rules []*models.LogAlertRule
 	)
 
-	if err := db.Table("log_alert_rules").Where("log_alert_rules = ?", group).Find(&rules).Count(&count).Error; err != nil {
+	if err := db.Table("log_alert_rules").Where(opts).Find(&rules).Count(&count).Error; err != nil {
 		return nil, err
 	}
 
-	if err := db.Table("log_alert_rules").Offset(page.PageFrom).Limit(page.PageSize).
+	if err := db.Table("log_alert_rules").Where(opts).Offset(page.PageFrom).Limit(page.PageSize).
 		Scan(&rules).Error; err != nil {
 		return nil, err
 	}
