@@ -39,7 +39,7 @@ func Router(middlewares ...gin.HandlerFunc) *gin.Engine {
 		logRouter.POST("/alert/rules", s.CreateLogAlertRule)
 		//logRouter.GET("/alert/rules", s.GetLogAlertRules)
 		//logRouter.GET("/alert/rules/:id", s.GetLogAlertRule)
-		//logRouter.PUT("/alert/rules/:id", s.UpdateLogAlertRule)
+		logRouter.PUT("/alert/rules/:id", s.UpdateLogAlertRule)
 		//logRouter.DELETE("/alert/rules/:id", s.DeleteLogAlertRule)
 	}
 

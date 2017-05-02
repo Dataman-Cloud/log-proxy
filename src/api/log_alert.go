@@ -22,3 +22,19 @@ func (s *Search) CreateLogAlertRule(ctx *gin.Context) {
 	utils.Ok(ctx, rule)
 	return
 }
+
+func (s *Search) UpdateLogAlertRule(ctx *gin.Context) {
+	var rule models.LogAlertRule
+	if err := ctx.BindJSON(&rule); err != nil {
+		utils.ErrorResponse(ctx, utils.NewError(UpdateLogAlertRuleError, err))
+		return
+	}
+
+	if err := s.Store.UpdateLogAlertRule(&rule); err != nil {
+		utils.ErrorResponse(ctx, utils.NewError(UpdateLogAlertRuleError, err))
+		return
+	}
+
+	utils.Ok(ctx, rule)
+	return
+}
