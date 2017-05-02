@@ -2,7 +2,7 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -11,7 +11,11 @@ import (
 
 	"github.com/Dataman-Cloud/log-proxy/src/config"
 	"github.com/Dataman-Cloud/log-proxy/src/models"
+	mock_store "github.com/Dataman-Cloud/log-proxy/src/store/mock_datastore"
+
 	"github.com/gin-gonic/gin"
+	"github.com/golang/mock/gomock"
+	"github.com/stretchr/testify/assert"
 	"gopkg.in/olivere/elastic.v3"
 )
 
@@ -23,6 +27,47 @@ var (
 	mo      *Monitor
 	al      *Alert
 )
+
+func TestGetLogAlertRuleIndex(t *testing.T) {
+	rule := models.LogAlertRule{
+		Group:  "g",
+		User:   "u",
+		App:    "a",
+		Source: "s",
+	}
+
+	ruleIndex := getLogAlertRuleIndex(rule)
+	assert.Equal(t, ruleIndex, "g-u-a-s")
+}
+
+func TestInitLogAlertFilter(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockStore := mock_store.NewMockStore(mockCtrl)
+	s := GetSearch()
+	s.Store = mockStore
+
+	rule := models.LogAlertRule{
+		App:     "app",
+		Cluster: "cluster",
+		Keyword: "key",
+		Source:  "stdout",
+		User:    "user",
+		Group:   "group",
+	}
+
+	rules := []*models.LogAlertRule{&rule}
+	result := map[string]interface{}{"rules": rules}
+	mockStore.EXPECT().GetLogAlertRules(gomock.Any(), gomock.Any()).Return(result, nil).Times(1)
+	s.InitLogKeywordFilter()
+
+	mockStore.EXPECT().GetLogAlertRules(gomock.Any(), gomock.Any()).Return(nil, nil).Times(1)
+	s.InitLogKeywordFilter()
+
+	mockStore.EXPECT().GetLogAlertRules(gomock.Any(), gomock.Any()).Return(nil, errors.New("test")).Times(1)
+	s.InitLogKeywordFilter()
+}
 
 func startAPIServer(sv *Search) *httptest.Server {
 	router := gin.New()
@@ -58,14 +103,6 @@ func startHTTPServer() *httptest.Server {
 	router := gin.New()
 	router.HEAD("/", func(ctx *gin.Context) { ctx.String(200, "") })
 	router.GET("/_nodes/http", nodes)
-	router.POST("/:index/dataman-test-web", webs)
-	router.POST("/:index/dataman-test-web/_search", task)
-	router.POST("/:index/dataman-prometheus/*action", pro)
-	router.POST("/:index/dataman-alerts/*action", alerts)
-	router.POST("/:index/_search", app)
-	router.GET("/.dataman-prometheus/dataman-prometheus/AVj3kWyMIIGpJqE63T3m", getp)
-	router.GET("/.dataman-alerts/dataman-alerts/test", getp)
-	router.DELETE("/.dataman-alerts/dataman-alerts/test", getp)
 	router.GET("/api/v1/query_rang", queryResult)
 	router.GET("/api/v1/alerts", queryAlerts)
 	router.GET("/api/v1/alerts/groups", queryAlertsGroups)
@@ -123,127 +160,6 @@ func app(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, info)
 }
 
-func webs(ctx *gin.Context) {
-	data := `
-	{
-    "took":15,
-    "_scroll_id":"",
-    "hits":{
-        "total":6,
-        "max_score":0,
-        "hits":[
-            {
-                "_score":0.1825316,
-                "_index":"dataman-test-2016-12-13",
-                "_type":"dataman-test-web",
-                "_id":"AVj3kWyMIIGpJqE63T3m",
-                "_uid":"",
-                "_timestamp":0,
-                "_ttl":600680748,
-                "_routing":"",
-                "_parent":"",
-                "_version":null,
-                "sort":null,
-                "highlight":{
-                    "message":[
-                        "192.168.1.98 - - [13/Dec/2016:17:33:31 +0000] "@dataman-highlighted-field@GET@/dataman-highlighted-field@ / HTTP/1.1" 304 0 "-" "Mozilla/5.0 (Macintosh"
-                    ]
-                },
-                "_source":{
-                    "message":"192.168.1.98 - - [13/Dec/2016:17:33:31 +0000] "GET / HTTP/1.1" 304 0 "-" "Mozilla/5.0
-						(Macintosh; Intel Mac OS X 10_11_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.80 Safari/537.36" "-" ",
-                    "@version":"1",
-                    "@timestamp":"2016-12-13T09:44:07.282Z",
-                    "host":"192.168.1.63",
-                    "port":33762,
-                    "containerid":"55f3c919563f276b0566a8a2bb01167d24a7498a18a72d556fa8f630c5956958",
-                    "logtime":"2016-12-14T01:33:35.421815898+08:00",
-                    "path":"stdout",
-                    "offset":1481650415421815800,
-                    "app":"test-web",
-                    "user":"4",
-                    "task":"test-web.ac4616e4-c02b-11e6-9030-024245dc84c8",
-                    "groupid":"1",
-                    "clusterid":"test"
-                },
-                "fields":null,
-                "_explanation":null,
-                "matched_queries":null,
-                "inner_hits":null
-            }
-        ]
-    },
-    "suggest":null,
-    "aggregations":{
-        "tasks":{
-            "doc_count_error_upper_bound":0,
-            "sum_other_doc_count":0,
-            "buckets":[
-                {
-                    "key":"test-web.ac4616e4-c02b-11e6-9030-024245dc84c8",
-                    "doc_count":6
-                }
-            ]
-        },
-        "paths":{
-            "doc_count_error_upper_bound":0,
-            "sum_other_doc_count":0,
-            "buckets":[
-                {
-                    "key":"test-web.ac4616e4-c02b-11e6-9030-024245dc84c8",
-                    "doc_count":6
-                }
-            ]
-        }
-    },
-    "timed_out":false,
-    "terminated_early":false,
-    "_shards":{
-        "total":5,
-        "successful":5,
-        "failed":0
-    }
-}`
-
-	var info elastic.SearchResult
-	json.Unmarshal([]byte(data), &info)
-
-	ctx.JSON(http.StatusOK, info)
-}
-
-func alerts(ctx *gin.Context) {
-	data := `{"took":15,"_scroll_id":"","hits":{"total":6,"max_score":0,"hits":[{"_score":0.1825316,"_index":"dataman-test-2016-12-13","_type":"dataman-test-web","_id":"AVj3kWyMIIGpJqE63T3m","_uid":"","_timestamp":0,"_ttl":600680748,"_routing":"","_parent":"","_version":null,"sort":null,"highlight":{"message":["192.168.1.98 - - [13/Dec/2016:17:33:31 +0000] \"@dataman-highlighted-field@GET@/dataman-highlighted-field@ / HTTP/1.1\" 304 0 \"-\" \"Mozilla/5.0 (Macintosh"]},"_source":{"message":"192.168.1.98 - - [13/Dec/2016:17:33:31 +0000] \"GET / HTTP/1.1\" 304 0 \"-\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.80 Safari/537.36\" \"-\"\n","@version":"1","@timestamp":"2016-12-13T09:44:07.282Z","host":"192.168.1.63","port":33762,"containerid":"55f3c919563f276b0566a8a2bb01167d24a7498a18a72d556fa8f630c5956958","logtime":"2016-12-14T01:33:35.421815898+08:00","path":"stdout","offset":1481650415421815800,"app":"test-web","user":"4","task":"test-web.ac4616e4-c02b-11e6-9030-024245dc84c8","groupid":"1","clusterid":"test"},"fields":null,"_explanation":null,"matched_queries":null,"inner_hits":null}]},"suggest":null,"aggregations":{"tasks":{"doc_count_error_upper_bound":0,"sum_other_doc_count":0,"buckets":[{"key":"test-web.ac4616e4-c02b-11e6-9030-024245dc84c8","doc_count":6}]},"paths":{"doc_count_error_upper_bound":0,"sum_other_doc_count":0,"buckets":[{"key":"test-web.ac4616e4-c02b-11e6-9030-024245dc84c8","doc_count":6}]}},"timed_out":false,"terminated_early":false,"_shards":{"total":5,"successful":5,"failed":0}}`
-	var info elastic.SearchResult
-	json.Unmarshal([]byte(data), &info)
-
-	ctx.JSON(http.StatusOK, info)
-}
-
-func pro(ctx *gin.Context) {
-	data := `{"took":15,"_scroll_id":"","hits":{"total":6,"max_score":0,"hits":[{"_score":0.1825316,"_index":"dataman-test-2016-12-13","_type":"dataman-test-web","_id":"AVj3kWyMIIGpJqE63T3m","_uid":"","_timestamp":0,"_ttl":600680748,"_routing":"","_parent":"","_version":null,"sort":null,"highlight":{"message":["192.168.1.98 - - [13/Dec/2016:17:33:31 +0000] \"@dataman-highlighted-field@GET@/dataman-highlighted-field@ / HTTP/1.1\" 304 0 \"-\" \"Mozilla/5.0 (Macintosh"]},"_source":{"message":"192.168.1.98 - - [13/Dec/2016:17:33:31 +0000] \"GET / HTTP/1.1\" 304 0 \"-\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.80 Safari/537.36\" \"-\"\n","@version":"1","@timestamp":"2016-12-13T09:44:07.282Z","host":"192.168.1.63","port":33762,"containerid":"55f3c919563f276b0566a8a2bb01167d24a7498a18a72d556fa8f630c5956958","logtime":"2016-12-14T01:33:35.421815898+08:00","path":"stdout","offset":1481650415421815800,"app":"test-web","user":"4","task":"test-web.ac4616e4-c02b-11e6-9030-024245dc84c8","groupid":"1","clusterid":"test"},"fields":null,"_explanation":null,"matched_queries":null,"inner_hits":null}]},"suggest":null,"aggregations":{"tasks":{"doc_count_error_upper_bound":0,"sum_other_doc_count":0,"buckets":[{"key":"test-web.ac4616e4-c02b-11e6-9030-024245dc84c8","doc_count":6}]},"paths":{"doc_count_error_upper_bound":0,"sum_other_doc_count":0,"buckets":[{"key":"test-web.ac4616e4-c02b-11e6-9030-024245dc84c8","doc_count":6}]}},"timed_out":false,"terminated_early":false,"_shards":{"total":5,"successful":5,"failed":0}}`
-	var info elastic.SearchResult
-	json.Unmarshal([]byte(data), &info)
-
-	ctx.JSON(http.StatusOK, info)
-}
-
-func task(ctx *gin.Context) {
-	data := `{"took":15,"_scroll_id":"","hits":{"total":6,"max_score":0,"hits":[{"_score":0.1825316,"_index":"dataman-test-2016-12-13","_type":"dataman-test-web","_id":"AVj3kWyMIIGpJqE63T3m","_uid":"","_timestamp":0,"_ttl":600680748,"_routing":"","_parent":"","_version":null,"sort":null,"highlight":{"message":["192.168.1.98 - - [13/Dec/2016:17:33:31 +0000] \"@dataman-highlighted-field@GET@/dataman-highlighted-field@ / HTTP/1.1\" 304 0 \"-\" \"Mozilla/5.0 (Macintosh"]},"_source":{"message":"192.168.1.98 - - [13/Dec/2016:17:33:31 +0000] \"GET / HTTP/1.1\" 304 0 \"-\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.80 Safari/537.36\" \"-\"\n","@version":"1","@timestamp":"2016-12-13T09:44:07.282Z","host":"192.168.1.63","port":33762,"containerid":"55f3c919563f276b0566a8a2bb01167d24a7498a18a72d556fa8f630c5956958","logtime":"2016-12-14T01:33:35.421815898+08:00","path":"stdout","offset":1481650415421815800,"app":"test-web","user":"4","task":"test-web.ac4616e4-c02b-11e6-9030-024245dc84c8","groupid":"1","clusterid":"test"},"fields":null,"_explanation":null,"matched_queries":null,"inner_hits":null}]},"suggest":null,"aggregations":{"tasks":{"doc_count_error_upper_bound":0,"sum_other_doc_count":0,"buckets":[{"key":"test-web.ac4616e4-c02b-11e6-9030-024245dc84c8","doc_count":6}]},"paths":{"doc_count_error_upper_bound":0,"sum_other_doc_count":0,"buckets":[{"key":"test-web.ac4616e4-c02b-11e6-9030-024245dc84c8","doc_count":6}]}},"timed_out":false,"terminated_early":false,"_shards":{"total":5,"successful":5,"failed":0}}`
-	var info elastic.SearchResult
-	json.Unmarshal([]byte(data), &info)
-	var m map[string]interface{}
-	json.NewDecoder(ctx.Request.Body).Decode(&m)
-	defer ctx.Request.Body.Close()
-	ss, _ := json.Marshal(m)
-	query := `{"from":0,"highlight":{"fields":{"message":{}},"post_tags":["@/dataman-highlighted-field@"],"pre_tags":["@dataman-highlighted-field@"]},"query":{"bool":{"filter":{"range":{"logtime.timestamp":{"format":"epoch_millis","from":null,"include_lower":true,"include_upper":true,"to":null}}}}},"size":0}`
-	if string(ss) == query {
-		ctx.JSON(http.StatusServiceUnavailable, info)
-		return
-	}
-	ctx.JSON(http.StatusOK, info)
-
-}
-
 func nodes(ctx *gin.Context) {
 	u, _ := url.Parse(baseURL)
 	data := `{"cluster_name":"elasticsearch","nodes":{"Ijb_-48ZQYmEnQ0a5BnXAw":{"name":"Choice","transport_address":"172.17.0.5:9300","host":"172.17.0.5","ip":"172.17.0.5","version":"2.4.1","build":"c67dc32","http_address":"` + u.Host + `","http":{"bound_address":["[::]:9200"],"publish_address":"172.17.0.5:9200","max_content_length_in_bytes":104857600}}}}`
@@ -285,7 +201,6 @@ func querySliences(ctx *gin.Context) {
 	data := `{"status":"success","data":{"silences":[],"totalSilences":0}}`
 	var result map[string]interface{}
 	json.Unmarshal([]byte(data), &result)
-	fmt.Printf("%v\n", result)
 	ctx.JSON(http.StatusOK, result)
 }
 
@@ -293,7 +208,6 @@ func querySlience(ctx *gin.Context) {
 	data := `{"status":"success","data":{"silences":[],"totalSilences":0}}`
 	var result map[string]interface{}
 	json.Unmarshal([]byte(data), &result)
-	fmt.Printf("%v\n", result)
 	ctx.JSON(http.StatusOK, result)
 }
 

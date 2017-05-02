@@ -30,27 +30,9 @@ func (s *Search) ReceiverLog(ctx *gin.Context) {
 		return
 	}
 
-	task, ok := m["task"]
-	if !ok {
-		utils.ErrorResponse(ctx, utils.NewError(GetLogError, "not found task"))
-		return
-	}
-
 	path, ok := m["path"]
 	if !ok {
 		utils.ErrorResponse(ctx, utils.NewError(GetLogError, "not found path"))
-		return
-	}
-
-	user, ok := m["user"]
-	if !ok {
-		utils.ErrorResponse(ctx, utils.NewError(GetLogError, "not found user"))
-		return
-	}
-
-	cluster, ok := m["cluster"]
-	if !ok {
-		utils.ErrorResponse(ctx, utils.NewError(GetLogError, "not found cluster"))
 		return
 	}
 
@@ -69,15 +51,6 @@ func (s *Search) ReceiverLog(ctx *gin.Context) {
 		if strings.Index(message.(string), e.Value.(string)) == -1 {
 			continue
 		}
-
-		s.Counter.WithLabelValues(
-			app.(string),
-			task.(string),
-			path.(string),
-			e.Value.(string),
-			user.(string),
-			cluster.(string),
-		).Inc()
 	}
 
 	utils.Ok(ctx, "ok")

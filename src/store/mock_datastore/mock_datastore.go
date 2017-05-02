@@ -185,8 +185,8 @@ func (_mr *_MockStoreRecorder) GetLogAlertRule(arg0 interface{}) *gomock.Call {
 	return _mr.mock.ctrl.RecordCall(_mr.mock, "GetLogAlertRule", arg0)
 }
 
-func (_m *MockStore) GetLogAlertRules(group string, page models.Page) (map[string]interface{}, error) {
-	ret := _m.ctrl.Call(_m, "GetLogAlertRules", group, page)
+func (_m *MockStore) GetLogAlertRules(opts map[string]interface{}, page models.Page) (map[string]interface{}, error) {
+	ret := _m.ctrl.Call(_m, "GetLogAlertRules", opts, page)
 	ret0, _ := ret[0].(map[string]interface{})
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
