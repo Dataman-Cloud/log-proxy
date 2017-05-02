@@ -16,4 +16,9 @@ type Store interface {
 	AckEvent(pk int, username string, groupname string) error
 	ListAckedEvent(page models.Page, username string, groupname string) map[string]interface{}
 	ListUnackedEvent(page models.Page, username string, groupname string) map[string]interface{}
+	CreateLogAlertRule(rule *models.LogAlertRule) error
+	UpdateLogAlertRule(rule *models.LogAlertRule) error
+	DeleteLogAlertRule(ID string) error
+	GetLogAlertRule(ID string) (models.LogAlertRule, error)
+	GetLogAlertRules(group string, page models.Page) (map[string]interface{}, error)
 }
