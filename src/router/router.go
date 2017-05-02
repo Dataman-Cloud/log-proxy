@@ -45,6 +45,7 @@ func Router(middlewares ...gin.HandlerFunc) *gin.Engine {
 	monitor := api.NewMonitor()
 	monitorv1 := r.Group("/v1/monitor")
 	{
+		monitorv1.GET("/query", monitor.Query)
 		monitorv1.GET("/query/items", monitor.GetQueryItems)
 	}
 
