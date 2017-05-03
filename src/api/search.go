@@ -47,6 +47,9 @@ const (
 	GetClustersError = "503-11011"
 
 	GetSlotsError = "503-11012"
+
+	GetLogAlertEventsError = "503-11013"
+	GetLogAlertAppsError   = "503-11014"
 )
 
 // Search search client struct
@@ -86,14 +89,14 @@ func (s *Search) InitLogKeywordFilter() {
 		if s.KeywordFilter[ruleIndex] == nil {
 			s.KeywordFilter[ruleIndex] = list.New()
 		}
-		s.KeywordFilter[ruleIndex].PushBack(rule.Keyword)
+		s.KeywordFilter[ruleIndex].PushBack(*rule)
 	}
 
 	return
 }
 
 func getLogAlertRuleIndex(r models.LogAlertRule) string {
-	return r.Group + "-" + r.User + "-" + r.App + "-" + r.Source
+	return r.Group + "-" + r.App + "-" + r.Source
 }
 
 // Ping ping

@@ -134,3 +134,63 @@ func (s *Search) DeleteLogAlertRule(ctx *gin.Context) {
 	utils.Ok(ctx, "success")
 	return
 }
+
+func (s *Search) GetLogAlertEvents(ctx *gin.Context) {
+	options := make(map[string]interface{})
+	if ctx.Query("group") != "" {
+		options["group"] = ctx.Query("group")
+	}
+
+	if ctx.Query("app") != "" {
+		options["app"] = ctx.Query("app")
+	}
+
+	events, err := s.Store.GetLogAlertEvents(options, ctx.MustGet("page").(models.Page))
+	if err != nil {
+		utils.ErrorResponse(ctx, utils.NewError(GetLogAlertEventsError, err))
+		return
+	}
+
+	utils.Ok(ctx, events)
+	return
+}
+
+func (s *Search) GetLogAlertApps(ctx *gin.Context) {
+	options := make(map[string]interface{})
+	if ctx.Query("group") != "" {
+		options["group"] = ctx.Query("group")
+	}
+
+	apps, err := s.Store.GetLogAlertApps(options, ctx.MustGet("page").(models.Page))
+	if err != nil {
+		utils.ErrorResponse(ctx, utils.NewError(GetLogAlertAppsError, err))
+		return
+	}
+
+	utils.Ok(ctx, apps)
+	return
+}
+
+func (s *Search) LogAlertEventAction(ctx *gin.Context) {
+	var handleInfo struct {
+		Action string `json:action`
+	}
+
+	if err := ctx.BindJSON(&handleInfo); err != nil {
+		utils.ErrorResponse(ctx, utils.NewError(ParamError, err))
+		return
+	}
+
+	if handleInfo.Action == "ack" {
+		if err := s.Store.AckLogAlertEvent(ctx.Param("id")); err != nil {
+			utils.ErrorResponse(ctx, utils.NewError(ParamError, err))
+			return
+		}
+	} else {
+		utils.ErrorResponse(ctx, utils.NewError(ParamError, errors.New("invalid action"+handleInfo.Action)))
+		return
+	}
+
+	utils.Ok(ctx, "success")
+	return
+}
