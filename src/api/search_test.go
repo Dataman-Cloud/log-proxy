@@ -37,7 +37,7 @@ func TestGetLogAlertRuleIndex(t *testing.T) {
 	}
 
 	ruleIndex := getLogAlertRuleIndex(rule)
-	assert.Equal(t, ruleIndex, "g-u-a-s")
+	assert.Equal(t, ruleIndex, "g-a-s")
 }
 
 func TestInitLogAlertFilter(t *testing.T) {
@@ -81,11 +81,6 @@ func startAPIServer(sv *Search) *httptest.Server {
 		v1.GET("/clusters/:cluster/apps/:app/sources", func(ctx *gin.Context) { sv.Sources(ctx) })
 		v1.GET("/clusters/:cluster/apps/:app/search", func(ctx *gin.Context) { sv.Search(ctx) })
 		v1.GET("/clusters/:cluster/apps/:app/context", func(ctx *gin.Context) { sv.Context(ctx) })
-	}
-
-	vr := router.Group("/v1/receive")
-	{
-		vr.POST("/log", receiverlog)
 	}
 
 	return httptest.NewServer(router)

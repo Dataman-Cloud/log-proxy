@@ -9,8 +9,8 @@ import (
 func (db *datastore) CreateLogAlertRule(rule *models.LogAlertRule) error {
 	var result models.LogAlertRule
 	notfound := db.Where("log_alert_rules.app = ? AND log_alert_rules.source = ? AND log_alert_rules.keyword = ? "+
-		"AND log_alert_rules.user = ? AND log_alert_rules.group = ?",
-		rule.App, rule.Source, rule.Keyword, rule.User, rule.Group).
+		"AND log_alert_rules.group = ?",
+		rule.App, rule.Source, rule.Keyword, rule.Group).
 		First(&result).
 		RecordNotFound()
 	if !notfound {

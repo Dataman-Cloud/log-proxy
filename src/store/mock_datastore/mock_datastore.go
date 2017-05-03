@@ -195,3 +195,56 @@ func (_m *MockStore) GetLogAlertRules(opts map[string]interface{}, page models.P
 func (_mr *_MockStoreRecorder) GetLogAlertRules(arg0, arg1 interface{}) *gomock.Call {
 	return _mr.mock.ctrl.RecordCall(_mr.mock, "GetLogAlertRules", arg0, arg1)
 }
+
+func (_m *MockStore) GetLogAlertApps(opts map[string]interface{}, page models.Page) ([]*models.LogAlertApps, error) {
+	ret := _m.ctrl.Call(_m, "GetLogAlertApps", opts, page)
+	ret0, _ := ret[0].([]*models.LogAlertApps)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+func (_mr *_MockStoreRecorder) GetLogAlertApps(arg0, arg1 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCall(_mr.mock, "GetLogAlertApps", arg0, arg1)
+}
+
+func (_m *MockStore) AckLogAlertEvent(ID string) error {
+	ret := _m.ctrl.Call(_m, "AckLogAlertEvent", ID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+func (_mr *_MockStoreRecorder) AckLogAlertEvent(arg0 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCall(_mr.mock, "AckLogAlertEvent", arg0)
+}
+
+func (_m *MockStore) GetLogAlertEvent(ID string) (*models.LogAlertEvent, error) {
+	ret := _m.ctrl.Call(_m, "GetLogAlertEvent", ID)
+	ret0, _ := ret[0].(*models.LogAlertEvent)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+func (_mr *_MockStoreRecorder) GetLogAlertEvent(arg0 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCall(_mr.mock, "GetLogAlertEvent", arg0)
+}
+
+func (_m *MockStore) GetLogAlertEvents(opts map[string]interface{}, page models.Page) (map[string]interface{}, error) {
+	ret := _m.ctrl.Call(_m, "GetLogAlertEvents", opts, page)
+	ret0, _ := ret[0].(map[string]interface{})
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+func (_mr *_MockStoreRecorder) GetLogAlertEvents(arg0, arg1 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCall(_mr.mock, "GetLogAlertEvents", arg0, arg1)
+}
+
+func (_m *MockStore) CreateLogAlertEvent(event *models.LogAlertEvent) error {
+	ret := _m.ctrl.Call(_m, "CreateLogAlertEvent", event)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+func (_mr *_MockStoreRecorder) CreateLogAlertEvent(arg0 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCall(_mr.mock, "CreateLogAlertEvent", arg0)
+}

@@ -93,7 +93,7 @@ func (s *Search) InitLogKeywordFilter() {
 }
 
 func getLogAlertRuleIndex(r models.LogAlertRule) string {
-	return r.Group + "-" + r.User + "-" + r.App + "-" + r.Source
+	return r.Group + "-" + r.App + "-" + r.Source
 }
 
 // Ping ping

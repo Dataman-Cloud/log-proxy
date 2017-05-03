@@ -44,7 +44,7 @@ type LogAlertEvent struct {
 	ContainerID string    `json:"containerid"`
 	Message     string    `json:"message" gorm:"type:longtext" binding:"required"`
 	LogTime     time.Time `json:"logtime" binding:"required"`
-	Path        string    `json:"path" binding:"required"`
+	Source      string    `json:"path" binding:"required"`
 	Offset      int64     `json:"offset" binding:"required"`
 	Slot        string    `json:"DM_SLOT_INDEX" binding:"required"`
 	App         string    `json:"DM_APP_ID" binding:"required"`

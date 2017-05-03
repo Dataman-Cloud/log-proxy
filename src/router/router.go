@@ -43,7 +43,7 @@ func Router(middlewares ...gin.HandlerFunc) *gin.Engine {
 		logRouter.GET("/alert/rules/:id", s.GetLogAlertRule)
 		logRouter.PUT("/alert/rules/:id", s.UpdateLogAlertRule)
 		logRouter.DELETE("/alert/rules/:id", s.DeleteLogAlertRule)
-		logRouter.POST("/receive", s.ReceiverLog)
+		logRouter.POST("/receive", s.ReceiveLog)
 	}
 
 	monitor := api.NewMonitor()
