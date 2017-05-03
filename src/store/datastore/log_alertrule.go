@@ -62,3 +62,63 @@ func (db *datastore) GetLogAlertRules(opts map[string]interface{}, page models.P
 
 	return map[string]interface{}{"count": count, "rules": rules}, nil
 }
+
+func (db *datastore) CreateLogAlertEvent(event *models.LogAlertEvent) error {
+	return db.Save(event).Error
+}
+
+func (db *datastore) GetLogAlertEvents(opts map[string]interface{}, page models.Page) (map[string]interface{}, error) {
+	var (
+		count  int
+		events []*models.LogAlertEvent
+	)
+
+	query := db.Table("log_alert_events")
+	if page.RangeFrom != nil {
+		query = query.Where("log_time >= ?", page.RangeFrom)
+	}
+
+	if page.RangeTo != nil {
+		query = query.Where("log_time <= ?", page.RangeTo)
+	}
+
+	if err := query.Where(opts).Find(&events).Count(&count).Error; err != nil {
+		return nil, err
+	}
+
+	if err := query.Where(opts).Offset(page.PageFrom).Limit(page.PageSize).Order("log_time desc").
+		Scan(&events).Error; err != nil {
+		return nil, err
+	}
+
+	return map[string]interface{}{"count": count, "events": events}, nil
+}
+
+func (db *datastore) GetLogAlertEvent(ID string) (*models.LogAlertEvent, error) {
+	var event models.LogAlertEvent
+	err := db.Table("log_alert_events").Where("id = ?", ID).Scan(&event).Error
+	return &event, err
+}
+
+func (db *datastore) AckLogAlertEvent(ID string) error {
+	return db.Table("log_alert_events").Where("id = ?", ID).Updates(map[string]interface{}{"ack": true}).Error
+}
+
+func (db *datastore) GetLogAlertApps(opts map[string]interface{}, page models.Page) ([]*models.LogAlertApps, error) {
+	var apps []*models.LogAlertApps
+
+	query := db.Table("log_alert_events").Select("DISTINCT(log_alert_events.app)")
+	if page.RangeFrom != nil {
+		query = query.Where("log_time >= ?", page.RangeFrom)
+	}
+
+	if page.RangeTo != nil {
+		query = query.Where("log_time <= ?", page.RangeTo)
+	}
+
+	if err := query.Where(opts).Scan(&apps).Error; err != nil {
+		return nil, err
+	}
+
+	return apps, nil
+}

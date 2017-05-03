@@ -2,6 +2,7 @@ package datastore
 
 import (
 	"database/sql/driver"
+	"errors"
 	"testing"
 
 	"github.com/Dataman-Cloud/log-proxy/src/models"
@@ -125,4 +126,91 @@ func TestGetLogAlertRules(t *testing.T) {
 
 	_, err := store.GetLogAlertRules(map[string]interface{}{"test": "test"}, models.Page{})
 	assert.NoError(t, err)
+}
+
+func TestCreateLogAlertEvent(t *testing.T) {
+	db, _ := gorm.Open("testdb", "")
+	assert.NotNil(t, db)
+	store := &datastore{db}
+
+	testdb.SetExecWithArgsFunc(func(query string, args []driver.Value) (result driver.Result, err error) {
+		return testResult{1, 1}, nil
+	})
+
+	err := store.CreateLogAlertEvent(&models.LogAlertEvent{})
+	assert.Nil(t, err)
+}
+
+func TestGetLogAlertEvents(t *testing.T) {
+	db, _ := gorm.Open("testdb", "")
+	assert.NotNil(t, db)
+	store := &datastore{db}
+
+	testdb.SetQueryWithArgsFunc(func(query string, args []driver.Value) (driver.Rows, error) {
+		columns := []string{"count"}
+		rows := "1"
+		return testdb.RowsFromCSVString(columns, rows), nil
+	})
+
+	_, err := store.GetLogAlertEvents(map[string]interface{}{"test": "test"}, models.Page{RangeFrom: 0, RangeTo: 10})
+	assert.NoError(t, err)
+
+	testdb.SetQueryWithArgsFunc(func(query string, args []driver.Value) (driver.Rows, error) {
+		columns := []string{"count"}
+		rows := "1"
+		return testdb.RowsFromCSVString(columns, rows), errors.New("test")
+	})
+	_, err = store.GetLogAlertEvents(map[string]interface{}{"test": "test"}, models.Page{RangeFrom: 0, RangeTo: 10})
+	assert.NotNil(t, err)
+}
+
+func TestGetLogAlertEvent(t *testing.T) {
+	db, _ := gorm.Open("testdb", "")
+	assert.NotNil(t, db)
+	store := &datastore{db}
+
+	testdb.SetQueryWithArgsFunc(func(query string, args []driver.Value) (driver.Rows, error) {
+		columns := []string{"count"}
+		rows := "1"
+		return testdb.RowsFromCSVString(columns, rows), nil
+	})
+
+	_, err := store.GetLogAlertEvent("test")
+	assert.NoError(t, err)
+}
+
+func TestAckLogAlertEvent(t *testing.T) {
+	db, _ := gorm.Open("testdb", "")
+	assert.NotNil(t, db)
+	store := &datastore{db}
+
+	testdb.SetExecWithArgsFunc(func(query string, args []driver.Value) (result driver.Result, err error) {
+		return testResult{1, 1}, nil
+	})
+
+	err := store.AckLogAlertEvent("test")
+	assert.Nil(t, err)
+}
+
+func TestGetLogAlertApps(t *testing.T) {
+	db, _ := gorm.Open("testdb", "")
+	assert.NotNil(t, db)
+	store := &datastore{db}
+
+	testdb.SetQueryWithArgsFunc(func(query string, args []driver.Value) (driver.Rows, error) {
+		columns := []string{"count"}
+		rows := "1"
+		return testdb.RowsFromCSVString(columns, rows), nil
+	})
+
+	_, err := store.GetLogAlertApps(map[string]interface{}{"test": "test"}, models.Page{RangeFrom: 0, RangeTo: 10})
+	assert.NoError(t, err)
+
+	testdb.SetQueryWithArgsFunc(func(query string, args []driver.Value) (driver.Rows, error) {
+		columns := []string{"count"}
+		rows := "1"
+		return testdb.RowsFromCSVString(columns, rows), errors.New("test")
+	})
+	_, err = store.GetLogAlertApps(map[string]interface{}{"test": "test"}, models.Page{RangeFrom: 0, RangeTo: 10})
+	assert.NotNil(t, err)
 }

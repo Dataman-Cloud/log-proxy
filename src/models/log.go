@@ -39,6 +39,24 @@ type LogAlertRule struct {
 	UpdatedAt   time.Time `json:"updatedAt"`
 }
 
+type LogAlertEvent struct {
+	ID          uint64    `json:"id" gorm:"not null; auto_increment"`
+	ContainerID string    `json:"containerid"`
+	Message     string    `json:"message" gorm:"type:longtext" binding:"required"`
+	LogTime     time.Time `json:"logtime" binding:"required"`
+	Path        string    `json:"path" binding:"required"`
+	Offset      int64     `json:"offset" binding:"required"`
+	Slot        string    `json:"DM_SLOT_INDEX" binding:"required"`
+	App         string    `json:"DM_APP_ID" binding:"required"`
+	User        string    `json:"DM_USER" binding:"required"`
+	Task        string    `json:"DM_TASK_ID" binding:"required"`
+	Group       string    `json:"DM_GROUP_NAME" binding:"required"`
+	Cluster     string    `json:"DM_VCLUSTER" binding:"required"`
+	Keyword     string    `json:"keyword"`
+	Ack         bool      `json:"ack" sql:"DEFAULT: false"`
+	Description string    `json:"description"  gorm:"type:longtext"`
+}
+
 const (
 	TaskRunning string = "running"
 	TaskDied    string = "died"

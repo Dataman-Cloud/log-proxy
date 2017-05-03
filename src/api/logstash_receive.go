@@ -18,27 +18,26 @@ func (s *Search) ReceiverLog(ctx *gin.Context) {
 	}
 
 	var m map[string]interface{}
-	err = json.Unmarshal(data, &m)
-	if err != nil {
+	if err := json.Unmarshal(data, &m); err != nil {
 		utils.ErrorResponse(ctx, utils.NewError(GetLogError, err))
 		return
 	}
 
-	app, ok := m["app"]
+	app, ok := m["DM_GROUP_NAME"]
 	if !ok {
-		utils.ErrorResponse(ctx, utils.NewError(GetLogError, "not found app"))
+		utils.ErrorResponse(ctx, utils.NewError(GetLogError, "log group not found"))
 		return
 	}
 
-	path, ok := m["path"]
+	path, ok := m["DM_APP_ID"]
 	if !ok {
-		utils.ErrorResponse(ctx, utils.NewError(GetLogError, "not found path"))
+		utils.ErrorResponse(ctx, utils.NewError(GetLogError, "log appid not found"))
 		return
 	}
 
 	message, ok := m["message"]
 	if !ok {
-		utils.ErrorResponse(ctx, utils.NewError(GetLogError, "not found message"))
+		utils.ErrorResponse(ctx, utils.NewError(GetLogError, "log message not found"))
 		return
 	}
 
