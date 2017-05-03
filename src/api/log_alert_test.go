@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"container/list"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -21,7 +22,10 @@ func TestCreateLogAlertRule(t *testing.T) {
 	defer mockCtrl.Finish()
 
 	mockStore := mock_store.NewMockStore(mockCtrl)
-	s := Search{Store: mockStore}
+	s := Search{
+		Store:         mockStore,
+		KeywordFilter: make(map[string]*list.List),
+	}
 
 	router := gin.New()
 	router.POST("/rules", s.CreateLogAlertRule)
@@ -41,15 +45,26 @@ func TestCreateLogAlertRule(t *testing.T) {
 	ruleMetaData, err := json.Marshal(rule)
 	assert.Nil(t, err)
 
+	// test success condition
 	mockStore.EXPECT().CreateLogAlertRule(gomock.Any()).Return(nil).Times(1)
 	resp, err := http.Post(testServer.URL+"/rules", "application/json", bytes.NewReader(ruleMetaData))
 	assert.Nil(t, err)
 	assert.Equal(t, resp.StatusCode, http.StatusOK)
 
+	// test binJSON error
 	resp, err = http.Post(testServer.URL+"/rules", "application/json", bytes.NewReader([]byte("xxxxx")))
 	assert.Nil(t, err)
 	assert.Equal(t, resp.StatusCode, http.StatusBadRequest)
 
+	// test for duplicate keyword
+	resp, err = http.Post(testServer.URL+"/rules", "application/json", bytes.NewReader(ruleMetaData))
+	assert.Nil(t, err)
+	assert.Equal(t, resp.StatusCode, http.StatusServiceUnavailable)
+
+	// test db return error
+	rule.Group = "group1"
+	ruleMetaData, err = json.Marshal(rule)
+	assert.Nil(t, err)
 	mockStore.EXPECT().CreateLogAlertRule(gomock.Any()).Return(errors.New("test")).Times(1)
 	resp, err = http.Post(testServer.URL+"/rules", "application/json", bytes.NewReader(ruleMetaData))
 	assert.Nil(t, err)
@@ -61,7 +76,10 @@ func TestUpdateLogAlertRule(t *testing.T) {
 	defer mockCtrl.Finish()
 
 	mockStore := mock_store.NewMockStore(mockCtrl)
-	s := Search{Store: mockStore}
+	s := Search{
+		Store:         mockStore,
+		KeywordFilter: make(map[string]*list.List),
+	}
 
 	router := gin.New()
 	router.PUT("/rules/:id", s.UpdateLogAlertRule)
@@ -82,6 +100,7 @@ func TestUpdateLogAlertRule(t *testing.T) {
 	ruleMetaData, err := json.Marshal(rule)
 	assert.Nil(t, err)
 
+	// test success condition 1: keyword filter was empty
 	mockStore.EXPECT().UpdateLogAlertRule(gomock.Any()).Return(nil).Times(1)
 	req, err := http.NewRequest("PUT", testServer.URL+"/rules/1", bytes.NewReader(ruleMetaData))
 	assert.Nil(t, err)
@@ -89,12 +108,25 @@ func TestUpdateLogAlertRule(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, resp.StatusCode, http.StatusOK)
 
+	// test success condition 2: keyword filter was not empty
+	ruleIndex := getLogAlertRuleIndex(rule)
+	s.KeywordFilter[ruleIndex] = list.New()
+	s.KeywordFilter[ruleIndex].PushBack(rule)
+	mockStore.EXPECT().UpdateLogAlertRule(gomock.Any()).Return(nil).Times(1)
+	req, err = http.NewRequest("PUT", testServer.URL+"/rules/1", bytes.NewReader(ruleMetaData))
+	assert.Nil(t, err)
+	resp, err = http.DefaultClient.Do(req)
+	assert.Nil(t, err)
+	assert.Equal(t, resp.StatusCode, http.StatusOK)
+
+	// test error with bindJSON error
 	req, err = http.NewRequest("PUT", testServer.URL+"/rules/1", bytes.NewReader([]byte("xxxxxx")))
 	assert.Nil(t, err)
 	resp, err = http.DefaultClient.Do(req)
 	assert.Nil(t, err)
 	assert.Equal(t, resp.StatusCode, http.StatusBadRequest)
 
+	// test error with db update error
 	mockStore.EXPECT().UpdateLogAlertRule(gomock.Any()).Return(errors.New("test")).Times(1)
 	req, err = http.NewRequest("PUT", testServer.URL+"/rules/1", bytes.NewReader(ruleMetaData))
 	assert.Nil(t, err)
@@ -167,7 +199,10 @@ func TestDeleteLogAlertRule(t *testing.T) {
 	defer mockCtrl.Finish()
 
 	mockStore := mock_store.NewMockStore(mockCtrl)
-	s := Search{Store: mockStore}
+	s := Search{
+		Store:         mockStore,
+		KeywordFilter: make(map[string]*list.List),
+	}
 
 	router := gin.New()
 	router.DELETE("/rules/:id", s.DeleteLogAlertRule)
@@ -175,6 +210,17 @@ func TestDeleteLogAlertRule(t *testing.T) {
 	assert.NotNil(t, testServer)
 	defer testServer.Close()
 
+	rule := models.LogAlertRule{
+		App:     "app",
+		Cluster: "cluster",
+		Keyword: "key",
+		Source:  "stdout",
+		User:    "user",
+		Group:   "group",
+	}
+
+	// test success condition 1: keyword map was empty
+	mockStore.EXPECT().GetLogAlertRule(gomock.Any()).Return(rule, nil).Times(1)
 	mockStore.EXPECT().DeleteLogAlertRule(gomock.Any()).Return(nil).Times(1)
 	req, err := http.NewRequest("DELETE", testServer.URL+"/rules/1", nil)
 	assert.Nil(t, err)
@@ -182,6 +228,28 @@ func TestDeleteLogAlertRule(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, resp.StatusCode, http.StatusOK)
 
+	// test succsess condition 2: keyword map was not empty
+	ruleIndex := getLogAlertRuleIndex(rule)
+	s.KeywordFilter[ruleIndex] = list.New()
+	s.KeywordFilter[ruleIndex].PushBack(rule)
+	mockStore.EXPECT().GetLogAlertRule(gomock.Any()).Return(rule, nil).Times(1)
+	mockStore.EXPECT().DeleteLogAlertRule(gomock.Any()).Return(nil).Times(1)
+	req, err = http.NewRequest("DELETE", testServer.URL+"/rules/1", nil)
+	assert.Nil(t, err)
+	resp, err = http.DefaultClient.Do(req)
+	assert.Nil(t, err)
+	assert.Equal(t, resp.StatusCode, http.StatusOK)
+
+	// test get rule error
+	mockStore.EXPECT().GetLogAlertRule(gomock.Any()).Return(rule, errors.New("test")).Times(1)
+	req, err = http.NewRequest("DELETE", testServer.URL+"/rules/1", nil)
+	assert.Nil(t, err)
+	resp, err = http.DefaultClient.Do(req)
+	assert.Nil(t, err)
+	assert.Equal(t, resp.StatusCode, http.StatusServiceUnavailable)
+
+	// test delete error
+	mockStore.EXPECT().GetLogAlertRule(gomock.Any()).Return(rule, nil).Times(1)
 	mockStore.EXPECT().DeleteLogAlertRule(gomock.Any()).Return(errors.New("test")).Times(1)
 	req, err = http.NewRequest("DELETE", testServer.URL+"/rules/1", nil)
 	assert.Nil(t, err)
