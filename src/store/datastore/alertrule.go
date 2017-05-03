@@ -2,6 +2,7 @@ package datastore
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/Dataman-Cloud/log-proxy/src/models"
 )
@@ -41,18 +42,18 @@ func (db *datastore) GetAlertRule(id uint64) (models.Rule, error) {
 	return result, err
 }
 
-func (db *datastore) GetAlertRuleByName(name, alert string) (models.Rule, error) {
+func (db *datastore) GetAlertRuleByName(name string) (models.Rule, error) {
 	var result models.Rule
 	err := db.Table("rules").
-		Where("name = ? AND alert = ?", name, alert).
+		Where("name = ?", name).
 		Scan(&result).Error
 	return result, err
 }
 
 func (db *datastore) CreateAlertRule(rule *models.Rule) error {
-
 	var result models.Rule
-	notfound := db.Where("rules.name = ? AND rules.alert = ?", rule.Name, rule.Alert).
+	fmt.Println("datastore CreateAlertRule", rule.Name)
+	notfound := db.Where("rules.Name = ?", rule.Name).
 		First(&result).
 		RecordNotFound()
 	if !notfound {
@@ -64,15 +65,15 @@ func (db *datastore) CreateAlertRule(rule *models.Rule) error {
 
 func (db *datastore) UpdateAlertRule(rule *models.Rule) error {
 	var result models.Rule
-	notfound := db.Where("rules.name = ? AND rules.alert = ?", rule.Name, rule.Alert).
+	notfound := db.Where("rules.Name = ?", rule.Name).
 		First(&result).
 		RecordNotFound()
 	if notfound {
 		return errors.New("The rule not found")
 	}
 	return db.Model(rule).
-		Where("rules.name = ? AND rules.alert = ?", rule.Name, rule.Alert).
-		Omit("name, alert").
+		Where("rules.Name = ?", rule.Name).
+		Omit("name").
 		Updates(rule).Error
 }
 

@@ -1,115 +1,46 @@
 package api
 
 import (
-	"bytes"
-	"crypto/md5"
-	"encoding/json"
-	"errors"
-	"fmt"
-	"io"
-	"io/ioutil"
-	"net/http"
-	"net/url"
-	"os"
-	"path/filepath"
-	"strconv"
-	"strings"
-	"text/template"
-
-	"github.com/Dataman-Cloud/log-proxy/src/config"
 	"github.com/Dataman-Cloud/log-proxy/src/models"
-	"github.com/Dataman-Cloud/log-proxy/src/store"
-	"github.com/Dataman-Cloud/log-proxy/src/store/datastore"
+	"github.com/Dataman-Cloud/log-proxy/src/service"
 	"github.com/Dataman-Cloud/log-proxy/src/utils"
-	"github.com/Dataman-Cloud/log-proxy/src/utils/database"
 
-	log "github.com/Sirupsen/logrus"
 	"github.com/gin-gonic/gin"
-	"github.com/robfig/cron"
 )
 
 const (
 	// ReceiveEventError code
 	ReceiveEventError = "503-21000"
-	// ReceiveEventError code
+	// AckEventError code
 	AckEventError = "503-21001"
-
-	// PromtheusReloadPath path string
-	PromtheusReloadPath = "/-/reload"
-
-	ruleTempl = `# This rule was updated by {{ .Name }}
-  ALERT {{.Alert}}
-  IF {{ .Expr }}
-  FOR {{ .Duration }}
-  LABELS {{ .Labels }}
-  ANNOTATIONS {description="{{ .Description }}", summary="{{ .Summary }}"}
-`
-	ruleFileUpdate = "update"
-	ruleFileDelete = "delete"
-	ruleInterval   = "1m"
 )
 
-type Alert struct {
-	Store      store.Store
-	HTTPClient *http.Client
-	PromServer string
-	Interval   string
-	RulesPath  string
-}
-
-// NewAlert init the struct Alert
-func NewAlert() *Alert {
-	interval := config.GetConfig().RuleFileInterval
-	if interval == "" {
-		interval = ruleInterval
-	}
-
-	return &Alert{
-		Store:      datastore.From(database.GetDB()),
-		HTTPClient: http.DefaultClient,
-		PromServer: config.GetConfig().PrometheusURL,
-		Interval:   interval,
-		RulesPath:  config.GetConfig().RuleFilePath,
-	}
+// GetAlertIndicators return the alert rule indicator list
+func (m *Monitor) GetAlertIndicators(ctx *gin.Context) {
+	utils.Ok(ctx, service.NewAlert().Indicators)
 }
 
 // CreateAlertRule create the alert rule in Database
-func (alert *Alert) CreateAlertRule(ctx *gin.Context) {
-
+func (m *Monitor) CreateAlertRule(ctx *gin.Context) {
 	var (
-		rule *models.Rule
-		data models.Rule
+		data *models.Rule
 		err  error
 	)
+	rule := models.NewRule()
 	if err = ctx.BindJSON(&rule); err != nil {
 		utils.ErrorResponse(ctx, err)
 		return
 	}
-	if v := rule.Name; v == "" {
-		utils.ErrorResponse(ctx, errors.New("not found Name string"))
-		return
-	}
-	err = alert.Store.CreateAlertRule(rule)
+	alert := service.NewAlert()
+	data, err = alert.CreateAlertRule(rule)
 	if err != nil {
 		utils.ErrorResponse(ctx, err)
 		return
 	}
-
-	data, err = alert.Store.GetAlertRuleByName(rule.Name, rule.Alert)
-	if err != nil {
-		utils.ErrorResponse(ctx, err)
-		return
-	}
-
-	err = alert.WriteAlertFile(rule)
-	if err != nil {
-		utils.ErrorResponse(ctx, err)
-		return
-	}
-
 	utils.Ok(ctx, data)
 }
 
+/*
 // DeleteAlertRule delete the rule by id and name from DB and files
 func (alert *Alert) DeleteAlertRule(ctx *gin.Context) {
 	var (
@@ -578,3 +509,4 @@ func updateFileByAction(path string, ruleOps *models.RuleOperation, action strin
 	log.Infof("updated rule file %s", ruleOps.File)
 	return nil
 }
+*/

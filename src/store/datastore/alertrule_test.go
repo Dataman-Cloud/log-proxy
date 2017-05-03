@@ -90,14 +90,14 @@ func TestGetAlertRuleByName(t *testing.T) {
     `
 		return testdb.RowsFromCSVString(columns, result), nil
 	})
-	result, err := store.GetAlertRuleByName("user1", "alert")
+	result, err := store.GetAlertRuleByName("alert")
 	assert.Equal(t, "user1", result.Name, "Get the rule name is user1")
 	assert.Nil(t, err)
 
 	testdb.SetQueryFunc(func(query string) (driver.Rows, error) {
 		return nil, errors.New("db error")
 	})
-	_, err = store.GetAlertRuleByName("user1", "alert")
+	_, err = store.GetAlertRuleByName("alert")
 	assert.NotNil(t, err)
 }
 
@@ -119,8 +119,7 @@ func TestCreateAlertRule(t *testing.T) {
 	})
 
 	rule := &models.Rule{
-		Name:  "user2",
-		Alert: "alert",
+		Name: "user2",
 	}
 	err := store.CreateAlertRule(rule)
 	assert.Nil(t, err)
@@ -148,8 +147,7 @@ func TestUpdateAlertRule(t *testing.T) {
 	})
 
 	rule := &models.Rule{
-		Name:  "user2",
-		Alert: "alert",
+		Name: "user2",
 	}
 	err := store.UpdateAlertRule(rule)
 	assert.NotNil(t, err)
