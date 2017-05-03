@@ -89,7 +89,7 @@ func (s *Search) InitLogKeywordFilter() {
 		if s.KeywordFilter[ruleIndex] == nil {
 			s.KeywordFilter[ruleIndex] = list.New()
 		}
-		s.KeywordFilter[ruleIndex].PushBack(rule.Keyword)
+		s.KeywordFilter[ruleIndex].PushBack(*rule)
 	}
 
 	return
