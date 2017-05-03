@@ -47,6 +47,9 @@ const (
 	GetClustersError = "503-11011"
 
 	GetSlotsError = "503-11012"
+
+	GetLogAlertEventsError = "503-11013"
+	GetLogAlertAppsError   = "503-11014"
 )
 
 // Search search client struct

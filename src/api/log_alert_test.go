@@ -257,3 +257,97 @@ func TestDeleteLogAlertRule(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, resp.StatusCode, http.StatusServiceUnavailable)
 }
+
+func TestGetLogAlertEvents(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockStore := mock_store.NewMockStore(mockCtrl)
+	s := Search{Store: mockStore}
+
+	router := gin.New()
+	router.GET("/events", func(ctx *gin.Context) { ctx.Set("page", models.Page{}) }, s.GetLogAlertEvents)
+	testServer := httptest.NewServer(router)
+	assert.NotNil(t, testServer)
+	defer testServer.Close()
+
+	results := map[string]interface{}{"test": 1}
+	mockStore.EXPECT().GetLogAlertEvents(gomock.Any(), gomock.Any()).Return(results, nil).Times(1)
+	resp, err := http.Get(testServer.URL + "/events?group=test&app=test")
+	assert.Nil(t, err)
+	assert.Equal(t, resp.StatusCode, http.StatusOK)
+
+	mockStore.EXPECT().GetLogAlertEvents(gomock.Any(), gomock.Any()).Return(nil, errors.New("test")).Times(1)
+	resp, err = http.Get(testServer.URL + "/events")
+	assert.Nil(t, err)
+	assert.Equal(t, resp.StatusCode, http.StatusServiceUnavailable)
+}
+
+func TestGetLogAlertApps(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockStore := mock_store.NewMockStore(mockCtrl)
+	s := Search{Store: mockStore}
+
+	router := gin.New()
+	router.GET("/apps", func(ctx *gin.Context) { ctx.Set("page", models.Page{}) }, s.GetLogAlertApps)
+	testServer := httptest.NewServer(router)
+	assert.NotNil(t, testServer)
+	defer testServer.Close()
+
+	mockStore.EXPECT().GetLogAlertApps(gomock.Any(), gomock.Any()).Return([]*models.LogAlertApps{}, nil).Times(1)
+	resp, err := http.Get(testServer.URL + "/apps?group=test")
+	assert.Nil(t, err)
+	assert.Equal(t, resp.StatusCode, http.StatusOK)
+
+	mockStore.EXPECT().GetLogAlertApps(gomock.Any(), gomock.Any()).Return(nil, errors.New("test")).Times(1)
+	resp, err = http.Get(testServer.URL + "/apps")
+	assert.Nil(t, err)
+	assert.Equal(t, resp.StatusCode, http.StatusServiceUnavailable)
+}
+
+func TestLogAlertEventAction(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockStore := mock_store.NewMockStore(mockCtrl)
+	s := Search{Store: mockStore}
+
+	router := gin.New()
+	router.PATCH("/events/:id", s.LogAlertEventAction)
+	testServer := httptest.NewServer(router)
+	assert.NotNil(t, testServer)
+	defer testServer.Close()
+
+	// test success condition
+	mockStore.EXPECT().AckLogAlertEvent(gomock.Any()).Return(nil).Times(1)
+	req, err := http.NewRequest("PATCH", testServer.URL+"/events/1", bytes.NewReader([]byte(`{"action":"ack"}`)))
+	assert.Nil(t, err)
+	resp, err := http.DefaultClient.Do(req)
+	assert.Nil(t, err)
+	assert.Equal(t, resp.StatusCode, http.StatusOK)
+
+	// test db error
+	mockStore.EXPECT().AckLogAlertEvent(gomock.Any()).Return(errors.New("test")).Times(1)
+	req, err = http.NewRequest("PATCH", testServer.URL+"/events/1", bytes.NewReader([]byte(`{"action":"ack"}`)))
+	assert.Nil(t, err)
+	resp, err = http.DefaultClient.Do(req)
+	assert.Nil(t, err)
+	assert.Equal(t, resp.StatusCode, http.StatusBadRequest)
+
+	// test invalid body param
+	req, err = http.NewRequest("PATCH", testServer.URL+"/events/1", bytes.NewReader([]byte("ack")))
+	assert.Nil(t, err)
+	resp, err = http.DefaultClient.Do(req)
+	assert.Nil(t, err)
+	assert.Equal(t, resp.StatusCode, http.StatusBadRequest)
+
+	// test invalid action
+	req, err = http.NewRequest("PATCH", testServer.URL+"/events/1", bytes.NewReader([]byte(`{"action":"test"}`)))
+	assert.Nil(t, err)
+	resp, err = http.DefaultClient.Do(req)
+	assert.Nil(t, err)
+	assert.Equal(t, resp.StatusCode, http.StatusBadRequest)
+
+}
