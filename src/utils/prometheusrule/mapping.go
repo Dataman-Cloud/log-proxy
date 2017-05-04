@@ -29,6 +29,7 @@ func NewRuleMapper() *RuleMapper {
 
 // Map2Raw convert the rule to rawRule
 func (ruleMap *RuleMapper) Map2Raw(rule *models.Rule) (*models.RawRule, error) {
+	group := rule.Group
 	alert := rule.Name
 	pending := rule.Pending
 	serverity := rule.Severity
@@ -46,7 +47,7 @@ func (ruleMap *RuleMapper) Map2Raw(rule *models.Rule) (*models.RawRule, error) {
 	}
 	judgement := fmt.Sprintf("%s %s %s%s", aggregation, comparison, threshold, unit)
 	duration := rule.Duration
-	labels := fmt.Sprintf(`{ app = "%s", value = "{{ $value }}", severity = "%s", indicator = "%s", judgement = "%s", duration = "%s" }`, rule.App, serverity, indicator, judgement, duration)
+	labels := fmt.Sprintf(`{ group = "%s", app = "%s", value = "{{ $value }}", severity = "%s", indicator = "%s", judgement = "%s", duration = "%s" }`, group, rule.App, serverity, indicator, judgement, duration)
 	annotations := `{ description = "", summary = "" }`
 
 	raw := models.RawRule{}

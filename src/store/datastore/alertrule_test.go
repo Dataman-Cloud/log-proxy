@@ -30,29 +30,55 @@ func TestListAlertRules(t *testing.T) {
 	store := &datastore{db}
 
 	testdb.SetQueryFunc(func(query string) (driver.Rows, error) {
-		columns := []string{"id", "name", "alert"}
+		columns := []string{"id", "name"}
 		result := `
-    1, user1, alert
+    1, user1
     `
 		return testdb.RowsFromCSVString(columns, result), nil
 	})
 
 	page := models.Page{}
-	result, err := store.ListAlertRules(page, "user1")
+	result, err := store.ListAlertRules(page, "user1", "")
 	assert.Nil(t, err)
 	assert.NotNil(t, result)
 
-	result, err = store.ListAlertRules(page, "")
+	result, err = store.ListAlertRules(page, "", "")
 	assert.Nil(t, err)
 	assert.NotNil(t, result)
 
 	testdb.SetQueryFunc(func(query string) (driver.Rows, error) {
 		return nil, errors.New("db error")
 	})
-	_, err = store.ListAlertRules(page, "user1")
+	_, err = store.ListAlertRules(page, "user1", "")
 	assert.NotNil(t, err)
 
-	_, err = store.ListAlertRules(page, "")
+	_, err = store.ListAlertRules(page, "", "")
+	assert.NotNil(t, err)
+
+	_, err = store.ListAlertRules(page, "user1", "app")
+	assert.NotNil(t, err)
+}
+
+func TestGetAlertRules(t *testing.T) {
+	db, _ := gorm.Open("testdb", "")
+	store := &datastore{db}
+
+	testdb.SetQueryFunc(func(query string) (driver.Rows, error) {
+		columns := []string{"id", "name"}
+		result := `
+    1, user1
+    `
+		return testdb.RowsFromCSVString(columns, result), nil
+	})
+	result, err := store.GetAlertRules()
+
+	assert.NotNil(t, result)
+	assert.Nil(t, err)
+
+	testdb.SetQueryFunc(func(query string) (driver.Rows, error) {
+		return nil, errors.New("db error")
+	})
+	_, err = store.GetAlertRule(1)
 	assert.NotNil(t, err)
 }
 
@@ -61,9 +87,9 @@ func TestGetAlertRule(t *testing.T) {
 	store := &datastore{db}
 
 	testdb.SetQueryFunc(func(query string) (driver.Rows, error) {
-		columns := []string{"id", "name", "alert"}
+		columns := []string{"id", "name"}
 		result := `
-    1, user1, alert
+    1, user1
     `
 		return testdb.RowsFromCSVString(columns, result), nil
 	})
@@ -84,20 +110,20 @@ func TestGetAlertRuleByName(t *testing.T) {
 	store := &datastore{db}
 
 	testdb.SetQueryFunc(func(query string) (driver.Rows, error) {
-		columns := []string{"id", "name", "alert"}
+		columns := []string{"id", "name"}
 		result := `
-    1, user1, alert
+    1, user1
     `
 		return testdb.RowsFromCSVString(columns, result), nil
 	})
-	result, err := store.GetAlertRuleByName("alert")
+	result, err := store.GetAlertRuleByName("user1")
 	assert.Equal(t, "user1", result.Name, "Get the rule name is user1")
 	assert.Nil(t, err)
 
 	testdb.SetQueryFunc(func(query string) (driver.Rows, error) {
 		return nil, errors.New("db error")
 	})
-	_, err = store.GetAlertRuleByName("alert")
+	_, err = store.GetAlertRuleByName("user1")
 	assert.NotNil(t, err)
 }
 
@@ -106,10 +132,10 @@ func TestCreateAlertRule(t *testing.T) {
 	store := &datastore{db}
 
 	testdb.SetQueryWithArgsFunc(func(query string, args []driver.Value) (driver.Rows, error) {
-		columns := []string{"id", "name", "alert"}
+		columns := []string{"id", "name"}
 		rows := ""
-		if args[0] == "user1" && args[1] == "alert" {
-			rows = "1, user1, alert"
+		if args[0] == "user1" {
+			rows = "1, user1"
 		}
 		return testdb.RowsFromCSVString(columns, rows), nil
 	})
@@ -134,10 +160,10 @@ func TestUpdateAlertRule(t *testing.T) {
 	store := &datastore{db}
 
 	testdb.SetQueryWithArgsFunc(func(query string, args []driver.Value) (driver.Rows, error) {
-		columns := []string{"id", "name", "alert"}
+		columns := []string{"id", "name"}
 		rows := ""
-		if args[0] == "user1" && args[1] == "alert" {
-			rows = "1, user1, alert"
+		if args[0] == "user1" {
+			rows = "1, user1"
 		}
 		return testdb.RowsFromCSVString(columns, rows), nil
 	})
@@ -150,14 +176,14 @@ func TestUpdateAlertRule(t *testing.T) {
 		Name: "user2",
 	}
 	err := store.UpdateAlertRule(rule)
-	assert.NotNil(t, err)
+	assert.Nil(t, err)
 
 	rule.Name = "user1"
 	err = store.UpdateAlertRule(rule)
 	assert.Nil(t, err)
 }
 
-func TestDeleteAlertRuleByIDName(t *testing.T) {
+func TestDeleteAlertRuleByID(t *testing.T) {
 	db, _ := gorm.Open("testdb", "")
 	store := &datastore{db}
 
@@ -165,14 +191,13 @@ func TestDeleteAlertRuleByIDName(t *testing.T) {
 		return testResult{1, 1}, nil
 	})
 
-	_, err := store.DeleteAlertRuleByIDName(uint64(1), "user1")
+	_, err := store.DeleteAlertRuleByID(uint64(1))
 	assert.Nil(t, err)
 
 	testdb.SetExecWithArgsFunc(func(query string, args []driver.Value) (result driver.Result, err error) {
 		return nil, errors.New("db error")
 	})
 
-	_, err = store.DeleteAlertRuleByIDName(uint64(1), "user2")
+	_, err = store.DeleteAlertRuleByID(uint64(1))
 	assert.NotNil(t, err)
-
 }

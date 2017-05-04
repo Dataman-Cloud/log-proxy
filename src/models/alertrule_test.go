@@ -9,3 +9,19 @@ func TestNewRuleOperation(t *testing.T) {
 		t.Log("success")
 	}
 }
+
+func TestNewRule(t *testing.T) {
+	if NewRule() == nil {
+		t.Error("faild")
+	} else {
+		t.Log("success")
+	}
+}
+
+func TestNewRulesList(t *testing.T) {
+	if NewRulesList() == nil {
+		t.Error("faild")
+	} else {
+		t.Log("success")
+	}
+}

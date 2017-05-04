@@ -25,5 +25,5 @@ var tomcatThreadPool = &models.Indicator{
 	Name:  "tomcat_thread_count",
 	Alias: "Tomcat线程数",
 	Templ: "%s(tomcat_threadpool_currentthreadcount{" + filter + "}) by (container_label_DM_APP_ID) keep_common %s %s",
-	Unit:  "个",
+	Unit:  "",
 }

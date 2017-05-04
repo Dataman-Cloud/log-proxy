@@ -105,16 +105,252 @@ Get the metrics by URL
 http://127.0.0.1:5098/v1/monitor/query?start=1483942403&end=1483942403&step=30s&metric=CPU使用率&app=web-zdou-datamanmesos&task=0
 ```
 
-### AlertManager API
+## Alert
 
-#### 获取当前活动的报警
-`GET /v1/monitor/alerts`
+### 报警规则
 
-#### 获取当前活动的报警，分组
-`GET /v1/monitor/alerts/groups`
+#### 获取报警规则中报警指标
 
-#### 获取AlertManager的状态信息
-`GET /v1/monitor/alerts/status`
+```GET /v1/alert/indicators```
+- path: /v1/alert/indicators
+- HTTP Method: GET
+- URL Params: Null
+- Query Params: Null
+
+For example:
+
+```
+http://127.0.0.1:5098/v1/alert/indicators
+```
+return
+```
+{
+  "code": 0,
+  "data": {
+    "CPU使用百分比": "%",
+    "Tomcat线程数": "",
+    "内存使用百分比": "%"
+  }
+}
+```
+
+#### 新建报警规则
+
+```POST /v1/alert/rules```
+- path: /v1/alert/rules
+- HTTP Method: POST
+- URL Params: Null
+- Query Params: Null
+
+For example:
+
+创建规则，创建的时候不要加status这个字段的值
+```
+curl -X POST "http://127.0.0.1:5098/v1/alert/rules" -d '{
+    "group": "dev",
+    "app": "web-zdou-datamanmesos",
+    "indicator": "CPU使用百分比",
+    "severity": "warning",
+    "pending": "2m",
+    "aggregation": "max",
+    "comparison": ">",
+    "threshold": 60  
+}  
+return
+{
+  "code": 0,
+  "data": {
+    "ID": 1,
+    "CreatedAt": "2017-05-05T10:40:46+08:00",
+    "UpdatedAt": "2017-05-05T10:40:45.662149083+08:00",
+    "name": "web_zdou_datamanmesos_cpu_usage_warning",
+    "group": "dev",
+    "app": "web-zdou-datamanmesos",
+    "severity": "warning",
+    "indicator": "CPU使用百分比",
+    "status": "Enabled",
+    "pending": "2m",
+    "duration": "5m",
+    "aggregation": "max",
+    "comparison": ">",
+    "threshold": 60,
+    "unit": "%"
+  }
+}
+```
+
+#### 获取报警规则列表
+``` GET /v1/alert/rules```
+- path: /v1/alert/rules
+- HTTP Method: GET
+- URL Params:
+- Query Params: group, app
+
+For example:
+
+- 获取所有规则：
+```
+http://127.0.0.1:5098/v1/alert/rules
+```
+- 获取某个组的规则
+```
+http://127.0.0.1:5098/v1/alert/rules?group=dev
+```
+- 获取某个应用的规则
+```
+http://127.0.0.1:5098/v1/alert/rules?group=dev&app=web-zdou-datamanmesos
+```
+return
+```
+{
+  "code": 0,
+  "data": {
+    "count": 1,
+    "rules": [
+      {
+        "ID": 1,
+        "CreatedAt": "2017-05-05T12:21:29+08:00",
+        "UpdatedAt": "2017-05-05T12:21:29+08:00",
+        "name": "web_zdou_datamanmesos_cpu_usage_warning",
+        "group": "dev",
+        "app": "web-zdou-datamanmesos",
+        "severity": "warning",
+        "indicator": "CPU使用百分比",
+        "status": "Enabled",
+        "pending": "2m",
+        "duration": "5m",
+        "aggregation": "max",
+        "comparison": ">",
+        "threshold": 60,
+        "unit": "%"
+      }
+    ]
+  }
+}
+```
+#### 获取单个报警规则
+
+```GET /v1/alert/rules/:id```
+- path: /v1/alert/rules/:id
+- HTTP Method: GET
+- URL Params:
+  - id=<string>: the ID of the rule
+- Query Params: Null
+
+For example:
+
+Get one alert rule by id
+```
+http://127.0.0.1:5098/v1/alert/rules/1
+```
+return
+```
+{
+  "code": 0,
+  "data": {
+    "ID": 1,
+    "CreatedAt": "2017-05-05T12:21:29+08:00",
+    "UpdatedAt": "2017-05-05T12:21:29+08:00",
+    "name": "web_zdou_datamanmesos_cpu_usage_warning",
+    "group": "dev",
+    "app": "web-zdou-datamanmesos",
+    "severity": "warning",
+    "indicator": "CPU使用百分比",
+    "status": "Enabled",
+    "pending": "2m",
+    "duration": "5m",
+    "aggregation": "max",
+    "comparison": ">",
+    "threshold": 60,
+    "unit": "%"
+  }
+}
+```
+
+#### 更新报警规则
+
+```PUT /v1/alert/rules/:id```
+- path: /v1/alert/rules/:id
+- HTTP Method: PUT
+- URL Params:
+  - id=<string>: the ID of the rule
+- Query Params: Null
+
+For example:
+
+更新报警规则
+```
+curl -X PUT "http://127.0.0.1:5098/v1/alert/rules/1" -d '{
+    "group": "dev",
+    "pending": "1m",
+    "aggregation": "max",
+    "comparison": ">",
+    "threshold": 60,
+    "status": "Enabled"  
+    }'
+```
+更新报警规则状态，报警规则分三种状态:
+- Uninitialized 未初始化
+- Enabled 活跃
+- Disabled 暂停
+
+```
+curl -X PUT "http://127.0.0.1:5098/v1/alert/rules/1" -d '{
+    "group": "Undefine",
+    "pending": "1m",
+    "aggregation": "max",
+    "comparison": ">",
+    "threshold": 60,
+    "status": "Enabled"  
+    }'
+```
+return
+```
+{
+  "code": 0,
+  "data": {
+    "ID": 1,
+    "CreatedAt": "2017-05-04T14:01:36+08:00",
+    "UpdatedAt": "2017-05-05T10:13:59+08:00",
+    "name": "work_nginx_mem_usage_warning",
+    "group": "Undefine",
+    "app": "work-nginx",
+    "severity": "warning",
+    "indicator": "内存使用百分比",
+    "status": "Enabled",
+    "pending": "1m",
+    "duration": "5m",
+    "aggregation": "max",
+    "comparison": ">",
+    "threshold": 60,
+    "unit": "%"
+  }
+}
+```
+
+#### 删除报警规则
+
+```DELETE /v1/alert/rules/:id```
+- path: /v1/alert/rules/:id
+- HTTP Method: DELETE
+- URL Params: Null
+- Query Params: Null
+
+For example:
+
+Delete the alert rule
+
+```
+curl -X DELETE "http://127.0.0.1:5098/v1/alert/rules/1?group=dev"
+
+```
+return
+```
+{
+  "code": 0,
+  "data": "success"
+}
+```
 
 ## 日志
 

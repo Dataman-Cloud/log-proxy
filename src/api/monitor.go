@@ -7,6 +7,7 @@ import (
 	"github.com/Dataman-Cloud/log-proxy/src/config"
 	"github.com/Dataman-Cloud/log-proxy/src/models"
 	"github.com/Dataman-Cloud/log-proxy/src/service"
+	"github.com/Dataman-Cloud/log-proxy/src/service/alertservice"
 	"github.com/Dataman-Cloud/log-proxy/src/utils"
 
 	"github.com/gin-gonic/gin"
@@ -14,11 +15,14 @@ import (
 
 // Monitor struct
 type Monitor struct {
+	Alert service.Alerter
 }
 
 // NewMonitor init the struct monitor
 func NewMonitor() *Monitor {
-	return &Monitor{}
+	return &Monitor{
+		Alert: alertservice.NewAlert(),
+	}
 }
 
 // GetQueryItems return the items of query metrics

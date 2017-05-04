@@ -29,15 +29,15 @@ func (_m *MockStore) EXPECT() *_MockStoreRecorder {
 	return _m.recorder
 }
 
-func (_m *MockStore) ListAlertRules(page models.Page, user string) (map[string]interface{}, error) {
-	ret := _m.ctrl.Call(_m, "ListAlertRules", page, user)
-	ret0, _ := ret[0].(map[string]interface{})
+func (_m *MockStore) ListAlertRules(page models.Page, group string, app string) (*models.RulesList, error) {
+	ret := _m.ctrl.Call(_m, "ListAlertRules", page, group, app)
+	ret0, _ := ret[0].(*models.RulesList)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-func (_mr *_MockStoreRecorder) ListAlertRules(arg0, arg1 interface{}) *gomock.Call {
-	return _mr.mock.ctrl.RecordCall(_mr.mock, "ListAlertRules", arg0, arg1)
+func (_mr *_MockStoreRecorder) ListAlertRules(arg0, arg1, arg2 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCall(_mr.mock, "ListAlertRules", arg0, arg1, arg2)
 }
 
 func (_m *MockStore) GetAlertRule(id uint64) (models.Rule, error) {
@@ -93,15 +93,15 @@ func (_mr *_MockStoreRecorder) UpdateAlertRule(arg0 interface{}) *gomock.Call {
 	return _mr.mock.ctrl.RecordCall(_mr.mock, "UpdateAlertRule", arg0)
 }
 
-func (_m *MockStore) DeleteAlertRuleByIDName(id uint64, name string) (int64, error) {
-	ret := _m.ctrl.Call(_m, "DeleteAlertRuleByIDName", id, name)
+func (_m *MockStore) DeleteAlertRuleByID(id uint64) (int64, error) {
+	ret := _m.ctrl.Call(_m, "DeleteAlertRuleByID", id)
 	ret0, _ := ret[0].(int64)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-func (_mr *_MockStoreRecorder) DeleteAlertRuleByIDName(arg0, arg1 interface{}) *gomock.Call {
-	return _mr.mock.ctrl.RecordCall(_mr.mock, "DeleteAlertRuleByIDName", arg0, arg1)
+func (_mr *_MockStoreRecorder) DeleteAlertRuleByID(arg0 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCall(_mr.mock, "DeleteAlertRuleByID", arg0)
 }
 
 func (_m *MockStore) CreateOrIncreaseEvent(event *models.Event) error {

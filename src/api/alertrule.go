@@ -1,8 +1,10 @@
 package api
 
 import (
+	"fmt"
+	"strconv"
+
 	"github.com/Dataman-Cloud/log-proxy/src/models"
-	"github.com/Dataman-Cloud/log-proxy/src/service"
 	"github.com/Dataman-Cloud/log-proxy/src/utils"
 
 	"github.com/gin-gonic/gin"
@@ -17,7 +19,7 @@ const (
 
 // GetAlertIndicators return the alert rule indicator list
 func (m *Monitor) GetAlertIndicators(ctx *gin.Context) {
-	utils.Ok(ctx, service.NewAlert().Indicators)
+	utils.Ok(ctx, m.Alert.GetAlertIndicators())
 }
 
 // CreateAlertRule create the alert rule in Database
@@ -31,8 +33,7 @@ func (m *Monitor) CreateAlertRule(ctx *gin.Context) {
 		utils.ErrorResponse(ctx, err)
 		return
 	}
-	alert := service.NewAlert()
-	data, err = alert.CreateAlertRule(rule)
+	data, err = m.Alert.CreateAlertRule(rule)
 	if err != nil {
 		utils.ErrorResponse(ctx, err)
 		return
@@ -40,48 +41,23 @@ func (m *Monitor) CreateAlertRule(ctx *gin.Context) {
 	utils.Ok(ctx, data)
 }
 
-/*
 // DeleteAlertRule delete the rule by id and name from DB and files
-func (alert *Alert) DeleteAlertRule(ctx *gin.Context) {
+func (m *Monitor) DeleteAlertRule(ctx *gin.Context) {
 	var (
-		rowsAffected int64
-		err          error
-		rule         *models.Rule
-		result       models.Rule
+		err   error
+		id    uint64
+		group string
 	)
-	if err = ctx.BindJSON(&rule); err != nil {
-		log.Errorln("DeleteAlertRule: Parse JSON rule error, ", err)
-		utils.ErrorResponse(ctx, err)
+
+	id, err = strconv.ParseUint(ctx.Param("id"), 10, 64)
+	if err != nil {
+		utils.ErrorResponse(ctx, fmt.Errorf("Failed to parse the id: %s", err))
 		return
 	}
+	group = ctx.Query("group")
 
-	rule.ID, err = strconv.ParseUint(ctx.Param("id"), 10, 64)
+	err = m.Alert.DeleteAlertRule(id, group)
 	if err != nil {
-		utils.ErrorResponse(ctx, err)
-		return
-	}
-
-	result, err = alert.Store.GetAlertRule(rule.ID)
-	if err != nil {
-		log.Errorln("DeleteAlertRule: GetAlertRule() error, ", err)
-		utils.ErrorResponse(ctx, err)
-		return
-	}
-
-	rowsAffected, err = alert.Store.DeleteAlertRuleByIDName(rule.ID, rule.Name)
-	if err != nil {
-		log.Errorln("DeleteAlertRule: DeleteAlertRuleByIDName() error, ", err)
-		utils.ErrorResponse(ctx, err)
-		return
-	}
-
-	if rowsAffected == 0 {
-		utils.ErrorResponse(ctx, errors.New("no rule was deleted"))
-	}
-
-	err = alert.RemoveAlertFile(result)
-	if err != nil {
-		log.Errorln("DeleteAlertRule: Delete Alert file error, ", err)
 		utils.ErrorResponse(ctx, err)
 		return
 	}
@@ -90,29 +66,33 @@ func (alert *Alert) DeleteAlertRule(ctx *gin.Context) {
 }
 
 // ListAlertRules list the rules by name with pages.
-func (alert *Alert) ListAlertRules(ctx *gin.Context) {
-	data, err := alert.Store.ListAlertRules(ctx.MustGet("page").(models.Page), ctx.Query("name"))
+func (m *Monitor) ListAlertRules(ctx *gin.Context) {
+	page := ctx.MustGet("page").(models.Page)
+	group := ctx.Query("group")
+	app := ctx.Query("app")
+	data, err := m.Alert.ListAlertRules(page, group, app)
 	if err != nil {
 		utils.ErrorResponse(ctx, err)
 		return
 	}
+
 	utils.Ok(ctx, data)
 }
 
 // GetAlertRule return the info of alert rule by id
-func (alert *Alert) GetAlertRule(ctx *gin.Context) {
+func (m *Monitor) GetAlertRule(ctx *gin.Context) {
 	var (
-		data   models.Rule
-		err    error
-		ruleID uint64
+		data *models.Rule
+		err  error
+		id   uint64
 	)
 
-	ruleID, err = strconv.ParseUint(ctx.Param("id"), 10, 64)
+	id, err = strconv.ParseUint(ctx.Param("id"), 10, 64)
 	if err != nil {
 		utils.ErrorResponse(ctx, err)
 		return
 	}
-	data, err = alert.Store.GetAlertRule(ruleID)
+	data, err = m.Alert.GetAlertRule(id)
 	if err != nil {
 		utils.ErrorResponse(ctx, err)
 		return
@@ -122,121 +102,30 @@ func (alert *Alert) GetAlertRule(ctx *gin.Context) {
 }
 
 // UpdateAlertRule update the alert rule in Database
-func (alert *Alert) UpdateAlertRule(ctx *gin.Context) {
+func (m *Monitor) UpdateAlertRule(ctx *gin.Context) {
 	var (
-		rule *models.Rule
-		data models.Rule
-		err  error
+		rule, data *models.Rule
+		err        error
 	)
 	if err = ctx.BindJSON(&rule); err != nil {
 		utils.ErrorResponse(ctx, err)
 		return
 	}
+	rule.ID, err = strconv.ParseUint(ctx.Param("id"), 10, 64)
+	if err != nil {
+		utils.ErrorResponse(ctx, fmt.Errorf("Failed to parse the id: %s", err))
+		return
+	}
 
-	err = alert.Store.UpdateAlertRule(rule)
+	data, err = m.Alert.UpdateAlertRule(rule)
 	if err != nil {
 		utils.ErrorResponse(ctx, err)
 		return
 	}
-
-	data, err = alert.Store.GetAlertRuleByName(rule.Name, rule.Alert)
-	if err != nil {
-		utils.ErrorResponse(ctx, err)
-		return
-	}
-
-	err = alert.WriteAlertFile(rule)
-	if err != nil {
-		utils.ErrorResponse(ctx, err)
-		return
-	}
-
 	utils.Ok(ctx, data)
 }
 
-// ReloadAlertRuleConf tigger the conf reloading by prometheus api
-func (alert *Alert) ReloadAlertRuleConf(ctx *gin.Context) {
-	var err error
-
-	err = alert.ReloadPrometheusConf()
-	if err != nil {
-		utils.ErrorResponse(ctx, err)
-		return
-	}
-
-	utils.Ok(ctx, "success")
-}
-
-// WriteAlertFile write the alert rule to file
-func (alert *Alert) WriteAlertFile(rule *models.Rule) error {
-	path := alert.RulesPath
-	alertfile := fmt.Sprintf("%s/%s-%s.rule", path, rule.Name, rule.Alert)
-	f, err := os.Create(alertfile)
-	defer f.Close()
-	if err != nil {
-		return err
-	}
-
-	t := template.Must(template.New("ruleTempl").Parse(ruleTempl))
-	var buf bytes.Buffer
-	err = t.Execute(&buf, rule)
-	if err != nil {
-		log.Errorln("executing templta: ", err)
-		return err
-	}
-
-	f.WriteString(buf.String())
-
-	err = alert.ReloadPrometheusConf()
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// RemoveAlertFile remove the rule from the file.
-func (alert *Alert) RemoveAlertFile(rule models.Rule) error {
-	path := alert.RulesPath
-	alertfile := fmt.Sprintf("%s/%s-%s.rule", path, rule.Name, rule.Alert)
-	f, err := os.Create(alertfile)
-	defer f.Close()
-	if err != nil {
-		return err
-	}
-
-	message := fmt.Sprintf("# removed this rule")
-	f.WriteString(message + "\n")
-
-	err = alert.ReloadPrometheusConf()
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// ReloadPrometheusConf reload the conf by calling prometheus api
-func (alert *Alert) ReloadPrometheusConf() error {
-	u, err := url.Parse(alert.PromServer)
-	if err != nil {
-		return err
-	}
-	u.Path = strings.TrimRight(u.Path, "/") + PromtheusReloadPath
-	resp, err := alert.HTTPClient.Post(u.String(), "application/json", nil)
-	if err != nil {
-		err = fmt.Errorf("request to reload prometheus error: %v", err)
-		return err
-	}
-	if resp.StatusCode != 200 {
-		err = fmt.Errorf("Failed to reload the configuration file of prometheus %s, return %d", u.String(), resp.StatusCode)
-		return err
-	}
-	defer resp.Body.Close()
-
-	return nil
-}
-
+/*
 // ReceiveAlertEvent recive the alerts from Alertmanager
 func (alert *Alert) ReceiveAlertEvent(ctx *gin.Context) {
 	data, err := utils.ReadRequestBody(ctx.Request)
