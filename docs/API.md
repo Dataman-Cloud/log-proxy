@@ -353,6 +353,234 @@ return
 }
 ```
 
+### 日志告警
+
+#### 创建日志告警规则
+`POST /log/alert/rules`
+
+For example
+
+```
+curl -XPOST http://localhost:5098/v2/log/alert/rules -d
+'
+{
+	"user": "yaoyun",
+	"group":"yaoyun",
+	"cluster":"ymola",
+	"app":"aaaaaaaaaaa-yaoyun-datamanmesos-3",
+	"keyword":"GET",
+	"source":"stdout"
+}
+'
+```
+
+* 注: user为当前用户, group为当前所在用户组
+
+return
+```
+{
+	"code": 0,
+	"data": {
+		"app": "aaaaaaaaaaa-yaoyun-datamanmesos-3",
+		"cluster": "ymola",
+		"createdAt": "2017-05-04T11:41:33.889755527+08:00",
+		"description": "",
+		"group": "yaoyun",
+		"id": 5,
+		"keyword": "GET",
+		"source": "stdout",
+		"status": "Enabled",
+		"updatedAt": "2017-05-04T11:41:33.889755527+08:00",
+		"user": "yaoyun"
+	}
+}
+```
+
+#### 更新单挑日志告警规则
+`PUT /v2/log/alert/rules/:id`
+For example
+
+```
+curl -XPUT http://localhost:5098/v2/log/alert/rules/1 -d
+'
+{
+	"user": "yaoyun",
+	"group":"yaoyun",
+	"cluster":"ymola",
+	"app":"aaaaaaaaaaa-yaoyun-datamanmesos-3",
+	"keyword":"GET",
+	"source":"stdout"
+}
+'
+```
+
+return
+```
+{
+	"code": 0,
+	"data": {
+		"app": "aaaaaaaaaaa-yaoyun-datamanmesos-3",
+		"cluster": "ymola",
+		"createdAt": "2017-05-04T11:41:33.889755527+08:00",
+		"description": "",
+		"group": "yaoyun",
+		"id": 5,
+		"keyword": "GET",
+		"source": "stdout",
+		"status": "Enabled",
+		"updatedAt": "2017-05-04T11:41:33.889755527+08:00",
+		"user": "yaoyun"
+	}
+}
+```
+
+#### 查询单条报警规则
+`GET /v2/log/alert/rules/:id`
+
+For example
+```
+curl -XPUT http://localhost:5098/v2/log/alert/rules/1
+```
+
+return
+```
+{
+	"code": 0,
+	"data": {
+		"app": "yaoyun-nginx",
+		"cluster": "yaoyun",
+		"createdAt": "2017-04-19T11:50:51+08:00",
+		"description": "sfvsfv威武是否vava",
+		"group": "",
+		"id": 1,
+		"keyword": "werer",
+		"source": "stderr",
+		"status": "Enabled",
+		"updatedAt": "2017-04-19T11:51:06+08:00",
+		"user": ""
+	}
+}
+```
+
+#### 查询报警规则列表
+`GET /v2/log/alert/rules`
+
+For example
+```
+curl -XPUT http://localhost:5098/v2/log/alert/rules?group=test&from=111&to=2222
+```
+
+* group 为用户当前所在的组, from 和 to代表其实和结束时间戳, 单位为秒,分页参数使用之前默认的size和page
+
+return
+```
+{
+	"code": 0,
+	"data": {
+		"count": 5,
+		"rules": [
+			{
+				"app": "yaoyun-nginx",
+				"cluster": "yaoyun",
+				"createdAt": "2017-04-19T11:50:51+08:00",
+				"description": "sfvsfv威武是否vava",
+				"group": "",
+				"id": 1,
+				"keyword": "werer",
+				"source": "stderr",
+				"status": "Enabled",
+				"updatedAt": "2017-04-19T11:51:06+08:00",
+				"user": ""
+			},
+			{
+				"app": "nginx",
+				"cluster": "mola",
+				"createdAt": "2017-04-28T15:24:19+08:00",
+				"description": "",
+				"group": "yaoyun",
+				"id": 2,
+				"keyword": "xxx",
+				"source": "GET",
+				"status": "Enabled",
+				"updatedAt": "2017-04-28T15:24:19+08:00",
+				"user": "yaoyun"
+			}
+		]
+	}
+}
+```
+
+ #### 删除指定的报警规则
+ `DELETE /v2/log/alert/rules/:id`
+
+
+#### 获取报警事件的过滤条件 apps
+`GET /v2/log/alert/apps"`
+
+For example
+```
+curl -XGET http://localhost:5098/v2/log/alert/apps
+```
+
+return 
+```
+{
+    "code":0,
+    "data":[
+        {
+            "app":"aaaaaaaaaaa-yaoyun-datamanmesos"
+        }
+    ]
+}
+```
+
+#### 查询报警事件
+`GET /v2/log/alert/events`
+
+For example
+```
+curl -XGET http://localhost:5098/v2/log/alert/events\?app\=aaaaaaaaaaa-yaoyun-datamanmesos\&group\=yaoyun
+```
+* 注: group 为用户当前所在的组
+
+return
+
+```
+{
+    "code":0,
+    "data":{
+        "count":1,
+        "events":[
+            {
+                "id":1,
+                "containerid":"2101477298d0622d2fb81156ec6ad328c778035dfc528c475f8e1d6908ece819",
+                "message":"192.168.1.146 - - [03/May/2017:08:53:02 +0000] "GET / HTTP/1.1" 304 0 "http://localhost:5013/ui/app/aaaaaaaaaaa-yaoyun-datamanmesos/instance" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36" "-" ",
+                "logtime":"2017-05-03T16:53:04+08:00",
+                "path":"stdout",
+                "offset":1493801584377272300,
+                "DM_SLOT_INDEX":"0",
+                "DM_APP_ID":"aaaaaaaaaaa-yaoyun-datamanmesos",
+                "DM_USER":"yaoyun",
+                "DM_TASK_ID":"0-aaaaaaaaaaa-yaoyun-datamanmesos-1a4cde96aef34c03a8ed9f07dae5ec63",
+                "DM_GROUP_NAME":"yaoyun",
+                "DM_VCLUSTER":"ymola",
+                "keyword":"GET",
+                "ack":false,
+                "description":""
+            }
+        ]
+    }
+}
+```
+
+#### 设置报警事件为一睹
+`PATCH /v2/log/alert/events/:id`
+
+For exmaple
+```
+curl -XPATCH http://localhost:5098/v2/log/alert/events/1 -d '{"action":"ack"}'
+```
+
 
 
 
