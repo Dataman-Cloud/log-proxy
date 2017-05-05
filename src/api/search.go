@@ -44,12 +44,10 @@ const (
 	// GetLogError get log error
 	GetLogError = "503-11010"
 
-	GetClustersError = "503-11011"
+	GetSlotsError = "503-11011"
 
-	GetSlotsError = "503-11012"
-
-	GetLogAlertEventsError = "503-11013"
-	GetLogAlertAppsError   = "503-11014"
+	GetLogAlertEventsError = "503-11012"
+	GetLogAlertAppsError   = "503-11013"
 )
 
 // Search search client struct
@@ -104,21 +102,9 @@ func (s *Search) Ping(ctx *gin.Context) {
 	utils.Ok(ctx, "success")
 }
 
-func (s *Search) Clusters(ctx *gin.Context) {
-	clusters, err := s.Service.Clusters(ctx.MustGet("page").(models.Page))
-	if err != nil {
-		utils.ErrorResponse(ctx, utils.NewError(GetClustersError, err))
-		return
-	}
-
-	utils.Ok(ctx, clusters)
-	return
-}
-
 // Applications get all applications
 func (s *Search) Applications(ctx *gin.Context) {
-	cluster := ctx.Param("cluster")
-	apps, err := s.Service.Applications(cluster, ctx.MustGet("page").(models.Page))
+	apps, err := s.Service.Applications(ctx.MustGet("page").(models.Page))
 	if err != nil {
 		utils.ErrorResponse(ctx, utils.NewError(GetAppsError, err))
 		return
@@ -127,10 +113,8 @@ func (s *Search) Applications(ctx *gin.Context) {
 }
 
 func (s *Search) Slots(ctx *gin.Context) {
-	cluster := ctx.Param("cluster")
 	app := ctx.Param("app")
-
-	slots, err := s.Service.Slots(cluster, app, ctx.MustGet("page").(models.Page))
+	slots, err := s.Service.Slots(app, ctx.MustGet("page").(models.Page))
 	if err != nil {
 		utils.ErrorResponse(ctx, utils.NewError(GetSlotsError, err))
 		return
@@ -142,10 +126,9 @@ func (s *Search) Slots(ctx *gin.Context) {
 
 // Tasks search applications tasks
 func (s *Search) Tasks(ctx *gin.Context) {
-	cluster := ctx.Param("cluster")
 	app := ctx.Param("app")
 	slot := ctx.Param("slot")
-	tasks, err := s.Service.Tasks(cluster, app, slot, ctx.MustGet("page").(models.Page))
+	tasks, err := s.Service.Tasks(app, slot, ctx.MustGet("page").(models.Page))
 	if err != nil {
 		utils.ErrorResponse(ctx, utils.NewError(GetTaskError, err))
 		return
@@ -155,7 +138,6 @@ func (s *Search) Tasks(ctx *gin.Context) {
 
 // Paths search applications paths
 func (s *Search) Sources(ctx *gin.Context) {
-	cluster := ctx.Param("cluster")
 	app := ctx.Param("app")
 
 	options := make(map[string]interface{})
@@ -168,7 +150,7 @@ func (s *Search) Sources(ctx *gin.Context) {
 		options["task"] = ctx.Query("task")
 	}
 
-	sources, err := s.Service.Sources(cluster, app, options)
+	sources, err := s.Service.Sources(app, options)
 	if err != nil {
 		utils.ErrorResponse(ctx, utils.NewError(GetTaskError, err))
 		return
@@ -177,7 +159,6 @@ func (s *Search) Sources(ctx *gin.Context) {
 }
 
 func (s *Search) Search(ctx *gin.Context) {
-	cluster := ctx.Param("cluster")
 	app := ctx.Param("app")
 
 	options := make(map[string]interface{})
@@ -202,7 +183,7 @@ func (s *Search) Search(ctx *gin.Context) {
 		options["conj"] = ctx.Query("conj")
 	}
 
-	results, err := s.Service.Search(cluster, app, options)
+	results, err := s.Service.Search(app, options)
 	if err != nil {
 		utils.ErrorResponse(ctx, utils.NewError(IndexError, err))
 		return
@@ -213,7 +194,6 @@ func (s *Search) Search(ctx *gin.Context) {
 
 // Context search log context
 func (s *Search) Context(ctx *gin.Context) {
-	cluster := ctx.Param("cluster")
 	app := ctx.Param("app")
 
 	options := make(map[string]interface{})
@@ -234,7 +214,7 @@ func (s *Search) Context(ctx *gin.Context) {
 		options["offset"] = ctx.Query("offset")
 	}
 
-	results, err := s.Service.Context(cluster, app, options)
+	results, err := s.Service.Context(app, options)
 	if err != nil {
 		utils.ErrorResponse(ctx, utils.NewError(IndexError, err))
 		return
