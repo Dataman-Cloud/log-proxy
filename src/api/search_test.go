@@ -25,7 +25,6 @@ var (
 	server  *httptest.Server
 	s       *Search
 	mo      *Monitor
-	al      *Alert
 )
 
 func TestGetLogAlertRuleIndex(t *testing.T) {
