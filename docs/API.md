@@ -119,11 +119,11 @@ http://127.0.0.1:5098/v1/monitor/query?start=1483942403&end=1483942403&step=30s&
 ## 日志
 
 ### 获取所有应用
-`GET /v1/search/applications`
+`GET /v2/log/apps`
 
 For example:
 ```
-curl -XGET http://localhost:5098/v1/search/applications
+curl -XGET http://localhost:5098/v2/log/apps
 ```
 
 - Query Params:from, to
@@ -144,12 +144,12 @@ return
 ```
 
 ### 根据应用获取所有实例
-`GET /v1/search/tasks/:appid`
+`GET /v2/log/apps/:app/slots`
 
 For example:
 
 ```
-curl -XGET http://localhost:5098/v1/search/tasks/test
+curl -XGET http://localhost:5098/v2/log/apps/test/slots
 ```
 
 - URL Params: appid
@@ -164,23 +164,45 @@ curl -XGET http://localhost:5098/v1/search/tasks/test
 {
     "code": 0,
     "data": {
-        "cluster1-maliao.e43f85e6-9f7f-11e6-8313-02421fb0085c": 79273
+        "0": 79273
+    }
+}
+```
+
+### 根据应用和实例索引获取所有的实例ID
+`GET /v2/log/apps/:app/slots/:slot/tasks`
+
+For example
+
+```
+curl -XGET http://localhost:5098/v2/log/apps/aaaaaaaaaaa-yaoyun-datamanmesos/slots/0/tasks
+```
+
+return 
+
+```
+{
+    "code": 0,
+    "data": {
+        "0-aaaaaaaaaaa-yaoyun-datamanmesos-1a4cde96aef34c03a8ed9f07dae5ec63": 79273
     }
 }
 ```
 
 ### 根据应用实例获取所有日志来源
-`GET /v1/search/paths/:appid
+`GET /v2/log/apps/:app/sources`
 
-<span id="itm1">For example:</span>
+for example
+
 ```
-curl -XGET http://localhost:5098/v1/search/paths/appid
+curl -XGET http://localhost:5098/v2/log/apps/aaaaaaaaaaa-yaoyun-datamanmesos/sources?slot=0&task=test
 ```
 
-- URL Params: appid
- - appid=test
- - taskid=taskid
-- Query Params:from, to
+- URL Params: app
+ - app=test
+- Query Params: slot, task, from, to
+ - slot=test
+ - task=test
  - from=1478769333000
  - to=1478769333000
 
@@ -198,16 +220,17 @@ curl -XGET http://localhost:5098/v1/search/paths/appid
 
 ### 日志搜索
 
-`GET /v1/search/index`
+`GET /v2/log/apps/:app/search"`
 
 ```
-http://192.168.1.46:5098/v1/search/index?appid=cluster1-maliao&from=now-7d&taskid=cluster1-maliao.e43f85e6-9f7f-11e6-8313-02421fb0085c,cluster1-maliao.e43f85e6-9f7f-11e6-8313-02421fb0085c&path=stdout,stderr&keyword=container
+curl -XGET http://localhost:5098/v2/log/apps/aaaaaaaaaaa-yaoyun-datamanmesos/search\?slot\=0\&keyword\=GET
 ```
-
-- Query Params: appid,taskid,path,keyword,from,to
- - appid=test
- - taskid=tasktest
- - path=stdout
+- URL Params: app
+ - app=test
+- Query Params: slot,task,source,keyword,from,to
+ - slot=test
+ - task=tasktest
+ - source=stdout
  - keyword=test
  - from=now-7d
  - to=now
@@ -216,121 +239,350 @@ return
 
 ```
 {
-"code": 0,
-"data": [
+    "code":0,
+    "data":{
+        "count":11,
+        "results":[
+            {
+                "@timestamp":"2017-05-03T02:17:11.874Z",
+                "@version":"1",
+                "DM_APP_ID":"aaaaaaaaaaa-yaoyun-datamanmesos",
+                "DM_APP_NAME":"aaaaaaaaaaa",
+                "DM_CLUSTER":"datamanmesos",
+                "DM_GROUP_NAME":"yaoyun",
+                "DM_SLOT_ID":"0-aaaaaaaaaaa-yaoyun-datamanmesos",
+                "DM_SLOT_INDEX":"0",
+                "DM_TASK_ID":"0-aaaaaaaaaaa-yaoyun-datamanmesos-1a4cde96aef34c03a8ed9f07dae5ec63",
+                "DM_USER":"yaoyun",
+                "DM_USER_NAME":"yaoyun",
+                "DM_VCLUSTER":"ymola",
+                "containerid":"2101477298d0622d2fb81156ec6ad328c778035dfc528c475f8e1d6908ece819",
+                "host":"192.168.1.102",
+                "logtime":"2017-05-03T02:17:11.83244967Z",
+                "message":"192.168.1.146 - - [03/May/2017:02:17:08 +0000] "<mark>GET</mark> / HTTP/1.1" 304 0 "http://localhost:5013/ui/app",
+                "offset":1493777831832449800,
+                "path":"stdout",
+                "port":44940
+            },
+            {
+                "@timestamp":"2017-05-03T02:20:06.855Z",
+                "@version":"1",
+                "DM_APP_ID":"aaaaaaaaaaa-yaoyun-datamanmesos",
+                "DM_APP_NAME":"aaaaaaaaaaa",
+                "DM_CLUSTER":"datamanmesos",
+                "DM_GROUP_NAME":"yaoyun",
+                "DM_SLOT_ID":"0-aaaaaaaaaaa-yaoyun-datamanmesos",
+                "DM_SLOT_INDEX":"0",
+                "DM_TASK_ID":"0-aaaaaaaaaaa-yaoyun-datamanmesos-1a4cde96aef34c03a8ed9f07dae5ec63",
+                "DM_USER":"yaoyun",
+                "DM_USER_NAME":"yaoyun",
+                "DM_VCLUSTER":"ymola",
+                "containerid":"2101477298d0622d2fb81156ec6ad328c778035dfc528c475f8e1d6908ece819",
+                "host":"192.168.1.102",
+                "logtime":"2017-05-03T02:20:06.850765691Z",
+                "message":"192.168.1.146 - - [03/May/2017:02:20:05 +0000] "<mark>GET</mark> / HTTP/1.1" 304 0 "http://localhost:5013/ui/app",
+                "offset":1493778006850765600,
+                "path":"stdout",
+                "port":45096
+            }
+        ]
+    }
+}
+```
+
+* 注: keyword不为空是关键字搜索, 关键字为空是普通日志搜索
+
+### 日志上下文搜索
+
+`GET /v2/log/apps/:app/context`
+
+For example
+```
+curl -XGET http://localhost:5098/v2/log/apps/aaaaaaaaaaa-yaoyun-datamanmesos/context\?offset\=1493801584377272300
+```
+
+return
+
+```
 {
-"@timestamp": "2016-11-08T10:27:56.759Z",
-"@version": "1",
-"appid": "cluster1-maliao",
-"clusterid": "cluster1",
-"groupid": "9",
-"host": "192.168.1.71",
-"id": "75145e5517b7f2038e39012bc471db59bd8c7dab1b5779075603fdb452fbac27",
-"message": "--container=\"mesos-c62c27ef-c144-4a38-b9fb-684794919bc7-S5.6b08bb27-409c-49fa-9606-7ed56e9d8366\" --docker=\"docker\" --docker_socket=\"/var/run/docker.sock\" --help=\"false\" --initialize_driver_logging=\"true\" --launcher_dir=\"/usr/libexec/mesos\" --logbufsecs=\"0\" --logging_level=\"INFO\" --mapped_directory=\"/mnt/mesos/sandbox\" --quiet=\"false\" --sandbox_directory=\"/data/mesos/slaves/c62c27ef-c144-4a38-b9fb-684794919bc7-S5/frameworks/c62c27ef-c144-4a38-b9fb-684794919bc7-0000/executors/cluster1-maliao.e43f85e6-9f7f-11e6-8313-02421fb0085c/runs/6b08bb27-409c-49fa-9606-7ed56e9d8366\" --stop_timeout=\"0ns\"\n",
-"offset": 1,
-"path": "stdout",
-"port": 39426,
-"taskid": "cluster1-maliao.e43f85e6-9f7f-11e6-8313-02421fb0085c",
-"time": "2016-11-09T02:16:09.405026732+08:00",
-"userid": "23"
-}
-]
+    "code":0,
+    "data":[
+        {
+            "@timestamp":"2017-05-03T02:17:11.874Z",
+            "@version":"1",
+            "DM_APP_ID":"aaaaaaaaaaa-yaoyun-datamanmesos",
+            "DM_APP_NAME":"aaaaaaaaaaa",
+            "DM_CLUSTER":"datamanmesos",
+            "DM_GROUP_NAME":"yaoyun",
+            "DM_SLOT_ID":"0-aaaaaaaaaaa-yaoyun-datamanmesos",
+            "DM_SLOT_INDEX":"0",
+            "DM_TASK_ID":"0-aaaaaaaaaaa-yaoyun-datamanmesos-1a4cde96aef34c03a8ed9f07dae5ec63",
+            "DM_USER":"yaoyun",
+            "DM_USER_NAME":"yaoyun",
+            "DM_VCLUSTER":"ymola",
+            "containerid":"2101477298d0622d2fb81156ec6ad328c778035dfc528c475f8e1d6908ece819",
+            "host":"192.168.1.102",
+            "logtime":"2017-05-03T02:17:11.83244967Z",
+            "message":"192.168.1.146 - - [03/May/2017:02:17:08 +0000] "GET / HTTP/1.1" 304 0 "http://localhost:5013/ui/app/aaaaaaaaaaa-yaoyun-datamanmesos/instance" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36" "-" ",
+            "offset":1493777831832449800,
+            "path":"stdout",
+            "port":44940
+        },
+        {
+            "@timestamp":"2017-05-03T02:20:06.855Z",
+            "@version":"1",
+            "DM_APP_ID":"aaaaaaaaaaa-yaoyun-datamanmesos",
+            "DM_APP_NAME":"aaaaaaaaaaa",
+            "DM_CLUSTER":"datamanmesos",
+            "DM_GROUP_NAME":"yaoyun",
+            "DM_SLOT_ID":"0-aaaaaaaaaaa-yaoyun-datamanmesos",
+            "DM_SLOT_INDEX":"0",
+            "DM_TASK_ID":"0-aaaaaaaaaaa-yaoyun-datamanmesos-1a4cde96aef34c03a8ed9f07dae5ec63",
+            "DM_USER":"yaoyun",
+            "DM_USER_NAME":"yaoyun",
+            "DM_VCLUSTER":"ymola",
+            "containerid":"2101477298d0622d2fb81156ec6ad328c778035dfc528c475f8e1d6908ece819",
+            "host":"192.168.1.102",
+            "logtime":"2017-05-03T02:20:06.850765691Z",
+            "message":"192.168.1.146 - - [03/May/2017:02:20:05 +0000] "GET / HTTP/1.1" 304 0 "http://localhost:5013/ui/app/aaaaaaaaaaa-yaoyun-datamanmesos/instance" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36" "-" ",
+            "offset":1493778006850765600,
+            "path":"stdout",
+            "port":45096
+        }
+    ]
 }
 ```
 
-`GET /v1/search/context?appid=x&taskid=x&path=x&offset=x`
+### 日志告警
+
+#### 创建日志告警规则
+`POST /log/alert/rules`
+
+For example
+
+```
+curl -XPOST http://localhost:5098/v2/log/alert/rules -d
+'
+{
+	"user": "yaoyun",
+	"group":"yaoyun",
+	"cluster":"ymola",
+	"app":"aaaaaaaaaaa-yaoyun-datamanmesos-3",
+	"keyword":"GET",
+	"source":"stdout"
+}
+'
+```
+
+* 注: user为当前用户, group为当前所在用户组
+
+return
+```
+{
+	"code": 0,
+	"data": {
+		"app": "aaaaaaaaaaa-yaoyun-datamanmesos-3",
+		"cluster": "ymola",
+		"createdAt": "2017-05-04T11:41:33.889755527+08:00",
+		"description": "",
+		"group": "yaoyun",
+		"id": 5,
+		"keyword": "GET",
+		"source": "stdout",
+		"status": "Enabled",
+		"updatedAt": "2017-05-04T11:41:33.889755527+08:00",
+		"user": "yaoyun"
+	}
+}
+```
+
+#### 更新单挑日志告警规则
+`PUT /v2/log/alert/rules/:id`
+For example
+
+```
+curl -XPUT http://localhost:5098/v2/log/alert/rules/1 -d
+'
+{
+	"user": "yaoyun",
+	"group":"yaoyun",
+	"cluster":"ymola",
+	"app":"aaaaaaaaaaa-yaoyun-datamanmesos-3",
+	"keyword":"GET",
+	"source":"stdout"
+}
+'
+```
+
+return
+```
+{
+	"code": 0,
+	"data": {
+		"app": "aaaaaaaaaaa-yaoyun-datamanmesos-3",
+		"cluster": "ymola",
+		"createdAt": "2017-05-04T11:41:33.889755527+08:00",
+		"description": "",
+		"group": "yaoyun",
+		"id": 5,
+		"keyword": "GET",
+		"source": "stdout",
+		"status": "Enabled",
+		"updatedAt": "2017-05-04T11:41:33.889755527+08:00",
+		"user": "yaoyun"
+	}
+}
+```
+
+#### 查询单条报警规则
+`GET /v2/log/alert/rules/:id`
+
+For example
+```
+curl -XPUT http://localhost:5098/v2/log/alert/rules/1
+```
+
+return
+```
+{
+	"code": 0,
+	"data": {
+		"app": "yaoyun-nginx",
+		"cluster": "yaoyun",
+		"createdAt": "2017-04-19T11:50:51+08:00",
+		"description": "sfvsfv威武是否vava",
+		"group": "",
+		"id": 1,
+		"keyword": "werer",
+		"source": "stderr",
+		"status": "Enabled",
+		"updatedAt": "2017-04-19T11:51:06+08:00",
+		"user": ""
+	}
+}
+```
+
+#### 查询报警规则列表
+`GET /v2/log/alert/rules`
+
+For example
+```
+curl -XPUT http://localhost:5098/v2/log/alert/rules?group=test&from=111&to=2222
+```
+
+* group 为用户当前所在的组, from 和 to代表其实和结束时间戳, 单位为秒,分页参数使用之前默认的size和page
+
+return
+```
+{
+	"code": 0,
+	"data": {
+		"count": 5,
+		"rules": [
+			{
+				"app": "yaoyun-nginx",
+				"cluster": "yaoyun",
+				"createdAt": "2017-04-19T11:50:51+08:00",
+				"description": "sfvsfv威武是否vava",
+				"group": "",
+				"id": 1,
+				"keyword": "werer",
+				"source": "stderr",
+				"status": "Enabled",
+				"updatedAt": "2017-04-19T11:51:06+08:00",
+				"user": ""
+			},
+			{
+				"app": "nginx",
+				"cluster": "mola",
+				"createdAt": "2017-04-28T15:24:19+08:00",
+				"description": "",
+				"group": "yaoyun",
+				"id": 2,
+				"keyword": "xxx",
+				"source": "GET",
+				"status": "Enabled",
+				"updatedAt": "2017-04-28T15:24:19+08:00",
+				"user": "yaoyun"
+			}
+		]
+	}
+}
+```
+
+ #### 删除指定的报警规则
+ `DELETE /v2/log/alert/rules/:id`
+
+
+#### 获取报警事件的过滤条件 apps
+`GET /v2/log/alert/apps"`
+
+For example
+```
+curl -XGET http://localhost:5098/v2/log/alert/apps
+```
+
+return 
+```
+{
+    "code":0,
+    "data":[
+        {
+            "app":"aaaaaaaaaaa-yaoyun-datamanmesos"
+        }
+    ]
+}
+```
+
+#### 查询报警事件
+`GET /v2/log/alert/events`
+
+For example
+```
+curl -XGET http://localhost:5098/v2/log/alert/events\?app\=aaaaaaaaaaa-yaoyun-datamanmesos\&group\=yaoyun
+```
+* 注: group 为用户当前所在的组
 
 return
 
 ```
 {
-"code": 0,
-"data": [
-{
-"@timestamp": "2016-11-08T10:27:56.759Z",
-"@version": "1",
-"appid": "cluster1-maliao",
-"clusterid": "cluster1",
-"groupid": "9",
-"host": "192.168.1.71",
-"id": "75145e5517b7f2038e39012bc471db59bd8c7dab1b5779075603fdb452fbac27",
-"message": "--container=\"mesos-c62c27ef-c144-4a38-b9fb-684794919bc7-S5.6b08bb27-409c-49fa-9606-7ed56e9d8366\" --docker=\"docker\" --docker_socket=\"/var/run/docker.sock\" --help=\"false\" --initialize_driver_logging=\"true\" --launcher_dir=\"/usr/libexec/mesos\" --logbufsecs=\"0\" --logging_level=\"INFO\" --mapped_directory=\"/mnt/mesos/sandbox\" --quiet=\"false\" --sandbox_directory=\"/data/mesos/slaves/c62c27ef-c144-4a38-b9fb-684794919bc7-S5/frameworks/c62c27ef-c144-4a38-b9fb-684794919bc7-0000/executors/cluster1-maliao.e43f85e6-9f7f-11e6-8313-02421fb0085c/runs/6b08bb27-409c-49fa-9606-7ed56e9d8366\" --stop_timeout=\"0ns\"\n",
-"offset": 1,
-"path": "stdout",
-"port": 39426,
-"taskid": "cluster1-maliao.e43f85e6-9f7f-11e6-8313-02421fb0085c",
-"time": "2016-11-09T02:16:09.405026732+08:00",
-"userid": "23"
+    "code":0,
+    "data":{
+        "count":1,
+        "events":[
+            {
+                "id":1,
+                "containerid":"2101477298d0622d2fb81156ec6ad328c778035dfc528c475f8e1d6908ece819",
+                "message":"192.168.1.146 - - [03/May/2017:08:53:02 +0000] "GET / HTTP/1.1" 304 0 "http://localhost:5013/ui/app/aaaaaaaaaaa-yaoyun-datamanmesos/instance" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36" "-" ",
+                "logtime":"2017-05-03T16:53:04+08:00",
+                "path":"stdout",
+                "offset":1493801584377272300,
+                "DM_SLOT_INDEX":"0",
+                "DM_APP_ID":"aaaaaaaaaaa-yaoyun-datamanmesos",
+                "DM_USER":"yaoyun",
+                "DM_TASK_ID":"0-aaaaaaaaaaa-yaoyun-datamanmesos-1a4cde96aef34c03a8ed9f07dae5ec63",
+                "DM_GROUP_NAME":"yaoyun",
+                "DM_VCLUSTER":"ymola",
+                "keyword":"GET",
+                "ack":false,
+                "description":""
+            }
+        ]
+    }
 }
-]
-}
+```
+
+#### 设置报警事件为一睹
+`PATCH /v2/log/alert/events/:id`
+
+For exmaple
+```
+curl -XPATCH http://localhost:5098/v2/log/alert/events/1 -d '{"action":"ack"}'
 ```
 
 
-GET /v1/search/keyword
 
-return
-
-```
-{"code":0,"data":{"count":4,"results":[{"id":"AVkHBbEQIIGpJqE63UXA","appid":"dsgsdg","keyword":"gdsgsdg","path":"gsdsdgsd","createtime":"2016-12-16T17:45:30.639081077+08:00"},{"id":"AVkV4YfXIIGpJqE63U2b","appid":"6566y6","keyword":"y65y56","path":"y56y6","createtime":"2016-12-19T15:00:19.024077007+08:00"},{"id":"AVkHBV59IIGpJqE63UW_","appid":"sxacsacs111","keyword":"scsacsac","path":"csacasc","createtime":"2016-12-19T17:42:25.092717794+08:00"},{"id":"AVkAeS_LIIGpJqE63UH7","appid":"work-nginxefef","keyword":"GET11","path":"stdout","createtime":"2016-12-19T17:43:11.950277076+08:00"}]}}
-
-```
-
-POST /v1/search/keyword -d '{"period":1,"appid":"test","keyword":"keyword","condition":1,"enable":true}'
-
-return
-
-```
-{"code":0,"data":"create success"}
-```
-
-
-PUT /v1/search/keyword -d '{"id":"x","period":1,"appid":"test","keyword":"keyword","condition":1,"enable":true}'
-
-return
-
-```
-{"code":0,"data":"update success"}
-```
-
-
-DELETE /v1/search/keyword/:id
-
-return
-
-```
-{"code":0,"data":"delete success"}
-```
-
-GET /v1/search/keyword/:id
-
-return
-
-```
-{"code":0,"data":{"id":"AVkAeS_LIIGpJqE63UH7","appid":"work-nginxefef","keyword":"GET11","path":"stdout","createtime":"2016-12-19T17:43:11.950277076+08:00"}}
-
-```
-
-
-GET /v1/search/prometheus
-
-return
-
-```
-{"code":0,"data":{"count":3301,"results":[{"alertname":"DatamanServiceDown","annotations":{"description":"mesos-master of node srymaster1 has been down for more than 1 minutes.","summary":"DatamanService mesos-master down"},"createtime":"2016-12-20T11:14:38.095324531+08:00","endsAt":"2016-12-20T11:13:52.807+08:00","generatorURL":"http://srymaster2:9090/graph#%5B%7B%22expr%22%3A%22consul_catalog_service_node_healthy%7Bservice%21%3D%5C%22alertmanager-vip%5C%22%2Cservice%21%3D%5C%22mysql-vip%5C%22%7D%20%3D%3D%200%22%2C%22tab%22%3A0%7D%5D","id":"AVkaOUWQIIGpJqE63VOl","labels":"{\"alertname\":\"DatamanServiceDown\",\"instance\":\"192.168.1.92:9107\",\"job\":\"consul\",\"node\":\"srymaster1\",\"service\":\"mesos-master\",\"severity\":\"Warning\"}","startsAt":"2016-12-20T11:11:22.807+08:00","status":"resolved"}]}}
-
-```
-
-GET /v1/search/prometheus/:id
-
-return
-
-```
-{"code":0,"data":{"alertname":"DatamanServiceDown","annotations":{"description":"mesos-master of node srymaster1 has been down for more than 1 minutes.","summary":"DatamanService mesos-master down"},"createtime":"2016-12-20T11:14:38.095324531+08:00","endsAt":"2016-12-20T11:13:52.807+08:00","generatorURL":"http://srymaster2:9090/graph#%5B%7B%22expr%22%3A%22consul_catalog_service_node_healthy%7Bservice%21%3D%5C%22alertmanager-vip%5C%22%2Cservice%21%3D%5C%22mysql-vip%5C%22%7D%20%3D%3D%200%22%2C%22tab%22%3A0%7D%5D","labels":"{\"alertname\":\"DatamanServiceDown\",\"instance\":\"192.168.1.92:9107\",\"job\":\"consul\",\"node\":\"srymaster1\",\"service\":\"mesos-master\",\"severity\":\"Warning\"}","startsAt":"2016-12-20T11:11:22.807+08:00","status":"resolved"}}
-
-```
-
-GET /v1/search/mointor
 
 GET /v1/monitor/alerts/groups
 
