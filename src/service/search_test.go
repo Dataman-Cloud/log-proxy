@@ -96,16 +96,6 @@ func app(ctx *gin.Context) {
                 }
             ]
         },
-        "clusters":{
-            "doc_count_error_upper_bound":0,
-            "sum_other_doc_count":0,
-            "buckets":[
-                {
-                    "key":"test-web",
-                    "doc_count":6
-                }
-            ]
-        },
         "slots":{
             "doc_count_error_upper_bound":0,
             "sum_other_doc_count":0,
@@ -207,24 +197,19 @@ func TestNewEsService(t *testing.T) {
 	}
 }
 
-func TestClusters(t *testing.T) {
-	service := NewEsService([]string{baseURL})
-	service.Clusters(models.Page{})
-}
-
 func TestApplications(t *testing.T) {
 	service := NewEsService([]string{baseURL})
-	service.Applications("test", models.Page{})
+	service.Applications(models.Page{})
 }
 
 func TestSlots(t *testing.T) {
 	service := NewEsService([]string{baseURL})
-	service.Slots("test", "test", models.Page{})
+	service.Slots("test", models.Page{})
 }
 
 func TestTasks(t *testing.T) {
 	service := NewEsService([]string{baseURL})
-	service.Tasks("test-web", "test", "test", models.Page{})
+	service.Tasks("test", "test", models.Page{})
 }
 
 func TestSources(t *testing.T) {
@@ -233,7 +218,7 @@ func TestSources(t *testing.T) {
 	opts["slot"] = "0"
 	opts["task"] = "test"
 	opts["page"] = models.Page{}
-	service.Sources("cluster", "app", opts)
+	service.Sources("app", opts)
 }
 
 func TestSearch(t *testing.T) {
@@ -245,7 +230,7 @@ func TestSearch(t *testing.T) {
 	opts["keyword"] = "keyword"
 	opts["conj"] = "or"
 	opts["source"] = "stdout"
-	service.Search("cluster", "user", opts)
+	service.Search("user", opts)
 }
 
 func TestContext(t *testing.T) {
@@ -256,5 +241,5 @@ func TestContext(t *testing.T) {
 	opts["page"] = models.Page{}
 	opts["offset"] = "1123123130000"
 	opts["source"] = "stdout"
-	service.Context("cluster", "app", opts)
+	service.Context("app", opts)
 }

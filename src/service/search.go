@@ -51,44 +51,10 @@ func NewEsService(url []string) *SearchService {
 	}
 }
 
-func (s *SearchService) Clusters(page models.Page) (map[string]int64, error) {
+// Applications get all applications
+func (s *SearchService) Applications(page models.Page) (map[string]int64, error) {
 	bquery := elastic.NewBoolQuery().
 		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte(page.RangeFrom).Lte(page.RangeTo).Format("epoch_millis"))
-
-	clusters := make(map[string]int64)
-	result, err := s.ESClient.Search().
-		Index("dataman-*").
-		SearchType("count").
-		Query(bquery).
-		Aggregation("clusters", elastic.NewTermsAggregation().Field("DM_VCLUSTER").Size(0).OrderByCountDesc()).
-		Pretty(true).
-		Do()
-
-	if err != nil && err.(*elastic.Error).Status == http.StatusNotFound {
-		return nil, nil
-	}
-
-	if err != nil {
-		log.Errorf("query clusters got error: %v", err)
-		return clusters, err
-	}
-
-	agg, found := result.Aggregations.Terms("clusters")
-	if !found {
-		return clusters, nil
-	}
-
-	for _, bucket := range agg.Buckets {
-		clusters[fmt.Sprint(bucket.Key)] = bucket.DocCount
-	}
-	return clusters, nil
-}
-
-// Applications get all applications
-func (s *SearchService) Applications(cluster string, page models.Page) (map[string]int64, error) {
-	bquery := elastic.NewBoolQuery().
-		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte(page.RangeFrom).Lte(page.RangeTo).Format("epoch_millis")).
-		Must(elastic.NewTermQuery("DM_VCLUSTER", cluster))
 
 	apps := make(map[string]int64)
 	result, err := s.ESClient.Search().
@@ -119,10 +85,10 @@ func (s *SearchService) Applications(cluster string, page models.Page) (map[stri
 	return apps, nil
 }
 
-func (s *SearchService) Slots(cluster, app string, page models.Page) (map[string]int64, error) {
+func (s *SearchService) Slots(app string, page models.Page) (map[string]int64, error) {
 	bQuery := elastic.NewBoolQuery().
 		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte(page.RangeFrom).Lte(page.RangeTo).Format("epoch_millis")).
-		Must(elastic.NewTermsQuery("DM_VCLUSTER", cluster), elastic.NewTermQuery("DM_APP_ID", app))
+		Must(elastic.NewTermQuery("DM_APP_ID", app))
 
 	slots := make(map[string]int64)
 	result, err := s.ESClient.Search().
@@ -153,9 +119,8 @@ func (s *SearchService) Slots(cluster, app string, page models.Page) (map[string
 }
 
 // Tasks get application tasks
-func (s *SearchService) Tasks(cluster, app, slot string, page models.Page) (map[string]int64, error) {
+func (s *SearchService) Tasks(app, slot string, page models.Page) (map[string]int64, error) {
 	var querys []elastic.Query
-	querys = append(querys, elastic.NewTermQuery("DM_VCLUSTER", cluster))
 	querys = append(querys, elastic.NewTermQuery("DM_APP_ID", app))
 	querys = append(querys, elastic.NewTermQuery("DM_SLOT_INDEX", slot))
 	bquery := elastic.NewBoolQuery().
@@ -191,10 +156,9 @@ func (s *SearchService) Tasks(cluster, app, slot string, page models.Page) (map[
 	return tasks, nil
 }
 
-func (s *SearchService) Sources(cluster, app string, opts map[string]interface{}) (map[string]int64, error) {
+func (s *SearchService) Sources(app string, opts map[string]interface{}) (map[string]int64, error) {
 	sources := make(map[string]int64)
 	var querys []elastic.Query
-	querys = append(querys, elastic.NewTermQuery("DM_VCLUSTER", cluster))
 	querys = append(querys, elastic.NewTermQuery("DM_APP_ID", app))
 
 	slot, ok := opts["slot"]
@@ -242,11 +206,10 @@ func (s *SearchService) Sources(cluster, app string, opts map[string]interface{}
 }
 
 // Search search log by condition
-func (s *SearchService) Search(cluster, app string, opts map[string]interface{}) (map[string]interface{}, error) {
+func (s *SearchService) Search(app string, opts map[string]interface{}) (map[string]interface{}, error) {
 	sort := false
 	page := opts["page"].(models.Page)
 	var querys []elastic.Query
-	querys = append(querys, elastic.NewTermQuery("DM_VCLUSTER", cluster))
 	querys = append(querys, elastic.NewTermQuery("DM_APP_ID", app))
 
 	slot, ok := opts["slot"]
@@ -326,7 +289,7 @@ func (s *SearchService) Search(cluster, app string, opts map[string]interface{})
 }
 
 // Context search log context
-func (s *SearchService) Context(cluster, app string, opts map[string]interface{}) ([]map[string]interface{}, error) {
+func (s *SearchService) Context(app string, opts map[string]interface{}) ([]map[string]interface{}, error) {
 	offset_, ok := opts["offset"]
 	if !ok {
 		return nil, errors.New("offset should not be nil")
@@ -340,7 +303,6 @@ func (s *SearchService) Context(cluster, app string, opts map[string]interface{}
 	page := opts["page"].(models.Page)
 	var results []map[string]interface{}
 	var querys []elastic.Query
-	querys = append(querys, elastic.NewTermQuery("DM_VCLUSTER", cluster))
 	querys = append(querys, elastic.NewTermQuery("DM_APP_ID", app))
 
 	slot, ok := opts["slot"]

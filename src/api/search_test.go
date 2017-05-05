@@ -74,13 +74,12 @@ func startAPIServer(sv *Search) *httptest.Server {
 	v1 := router.Group("/api/v1", func(ctx *gin.Context) { ctx.Set("page", models.Page{}) })
 	{
 		v1.GET("/ping", func(ctx *gin.Context) { sv.Ping(ctx) })
-		v1.GET("/clusters", func(ctx *gin.Context) { sv.Clusters(ctx) })
-		v1.GET("/clusters/:cluster/apps", func(ctx *gin.Context) { sv.Applications(ctx) })
-		v1.GET("/clusters/:cluster/apps/:app/slots", func(ctx *gin.Context) { sv.Slots(ctx) })
-		v1.GET("/clusters/:cluster/apps/:app/slots/:slot/tasks", func(ctx *gin.Context) { sv.Tasks(ctx) })
-		v1.GET("/clusters/:cluster/apps/:app/sources", func(ctx *gin.Context) { sv.Sources(ctx) })
-		v1.GET("/clusters/:cluster/apps/:app/search", func(ctx *gin.Context) { sv.Search(ctx) })
-		v1.GET("/clusters/:cluster/apps/:app/context", func(ctx *gin.Context) { sv.Context(ctx) })
+		v1.GET("/apps", func(ctx *gin.Context) { sv.Applications(ctx) })
+		v1.GET("/apps/:app/slots", func(ctx *gin.Context) { sv.Slots(ctx) })
+		v1.GET("/apps/:app/slots/:slot/tasks", func(ctx *gin.Context) { sv.Tasks(ctx) })
+		v1.GET("/apps/:app/sources", func(ctx *gin.Context) { sv.Sources(ctx) })
+		v1.GET("/apps/:app/search", func(ctx *gin.Context) { sv.Search(ctx) })
+		v1.GET("/apps/:app/context", func(ctx *gin.Context) { sv.Context(ctx) })
 	}
 
 	return httptest.NewServer(router)
@@ -236,39 +235,13 @@ func TestPing(t *testing.T) {
 	}
 }
 
-func TestClusters(t *testing.T) {
-	sr := startErrorClient()
-	config.GetConfig().EsURL = sr.URL
-	baseURL = sr.URL
-	s = GetSearch()
-	se := startAPIServer(s)
-	resp, err := http.Get(se.URL + "/api/v1/clusters")
-	if err == nil && resp.StatusCode == 503 {
-		t.Log("success")
-	} else {
-		t.Error("faild")
-	}
-
-	sr = startHTTPServer()
-	config.GetConfig().EsURL = sr.URL
-	baseURL = sr.URL
-	s = GetSearch()
-	se = startAPIServer(s)
-	resp, err = http.Get(se.URL + "/api/v1/clusters")
-	if err == nil && resp.StatusCode == 200 {
-		t.Log("success")
-	} else {
-		t.Error("faild")
-	}
-}
-
 func TestApplications(t *testing.T) {
 	sr := startErrorClient()
 	config.GetConfig().EsURL = sr.URL
 	baseURL = sr.URL
 	s = GetSearch()
 	se := startAPIServer(s)
-	resp, err := http.Get(se.URL + "/api/v1/clusters/test/apps")
+	resp, err := http.Get(se.URL + "/api/v1/apps")
 	if err == nil && resp.StatusCode == 503 {
 		t.Log("success")
 	} else {
@@ -280,7 +253,7 @@ func TestApplications(t *testing.T) {
 	baseURL = sr.URL
 	s = GetSearch()
 	se = startAPIServer(s)
-	resp, err = http.Get(se.URL + "/api/v1/clusters/test/apps")
+	resp, err = http.Get(se.URL + "/api/v1/apps")
 	if err == nil && resp.StatusCode == 200 {
 		t.Log("success")
 	} else {
@@ -294,7 +267,7 @@ func TestSlots(t *testing.T) {
 	baseURL = sr.URL
 	s = GetSearch()
 	se := startAPIServer(s)
-	resp, err := http.Get(se.URL + "/api/v1/clusters/test/apps/test/slots")
+	resp, err := http.Get(se.URL + "/api/v1/apps/test/slots")
 	if err == nil && resp.StatusCode == 503 {
 		t.Log("success")
 	} else {
@@ -306,7 +279,7 @@ func TestSlots(t *testing.T) {
 	baseURL = sr.URL
 	s = GetSearch()
 	se = startAPIServer(s)
-	resp, err = http.Get(se.URL + "/api/v1/clusters/test/apps/test/slots")
+	resp, err = http.Get(se.URL + "/api/v1/apps/test/slots")
 	if err == nil && resp.StatusCode == 200 {
 		t.Log("success")
 	} else {
@@ -320,7 +293,7 @@ func TestTasks(t *testing.T) {
 	baseURL = sr.URL
 	s = GetSearch()
 	se := startAPIServer(s)
-	resp, err := http.Get(se.URL + "/api/v1/clusters/test/apps/test/slots/0/tasks")
+	resp, err := http.Get(se.URL + "/api/v1/apps/test/slots/0/tasks")
 	if err == nil && resp.StatusCode == 503 {
 		t.Log("success")
 	} else {
@@ -332,7 +305,7 @@ func TestTasks(t *testing.T) {
 	baseURL = sr.URL
 	s = GetSearch()
 	se = startAPIServer(s)
-	resp, err = http.Get(se.URL + "/api/v1/clusters/test/apps/test/slots/0/tasks")
+	resp, err = http.Get(se.URL + "/api/v1/apps/test/slots/0/tasks")
 	if err == nil && resp.StatusCode == 200 {
 		t.Log("success")
 	} else {
@@ -346,7 +319,7 @@ func TestSources(t *testing.T) {
 	baseURL = sr.URL
 	s = GetSearch()
 	se := startAPIServer(s)
-	resp, err := http.Get(se.URL + "/api/v1/clusters/test/apps/test/sources?slot=0&task=test")
+	resp, err := http.Get(se.URL + "/api/v1/apps/test/sources?slot=0&task=test")
 	if err == nil && resp.StatusCode == 503 {
 		t.Log("success")
 	} else {
@@ -358,7 +331,7 @@ func TestSources(t *testing.T) {
 	baseURL = sr.URL
 	s = GetSearch()
 	se = startAPIServer(s)
-	resp, err = http.Get(se.URL + "/api/v1/clusters/test/apps/test/sources?slot=0&task=test")
+	resp, err = http.Get(se.URL + "/api/v1/apps/test/sources?slot=0&task=test")
 	if err == nil && resp.StatusCode == 200 {
 		t.Log("success")
 	} else {
@@ -372,7 +345,7 @@ func TestSearch(t *testing.T) {
 	baseURL = sr.URL
 	s = GetSearch()
 	se := startAPIServer(s)
-	resp, err := http.Get(se.URL + "/api/v1/clusters/test/apps/test/search?slot=0&task=test")
+	resp, err := http.Get(se.URL + "/api/v1/apps/test/search?slot=0&task=test")
 	if err == nil && resp.StatusCode == 503 {
 		t.Log("success")
 	} else {
@@ -385,7 +358,7 @@ func TestSearch(t *testing.T) {
 	s = GetSearch()
 	se = startAPIServer(s)
 	resp, err = http.Get(se.URL +
-		"/api/v1/clusters/mola/apps/test/search?slot=0&keyword=GET&source=stderr&conj=or&task=test-task")
+		"/api/v1/apps/test/search?slot=0&keyword=GET&source=stderr&conj=or&task=test-task")
 	if err == nil && resp.StatusCode == 200 {
 		t.Log("success")
 	} else {
@@ -400,7 +373,7 @@ func TestContext(t *testing.T) {
 	baseURL = sr.URL
 	s = GetSearch()
 	se := startAPIServer(s)
-	resp, err := http.Get(se.URL + "/api/v1/clusters/test/apps/test/context?slot=0&task=test")
+	resp, err := http.Get(se.URL + "/api/v1/apps/test/context?slot=0&task=test")
 	if err == nil && resp.StatusCode == 503 {
 		t.Log("success")
 	} else {
@@ -413,7 +386,7 @@ func TestContext(t *testing.T) {
 	s = GetSearch()
 	se = startAPIServer(s)
 	resp, err = http.Get(se.URL +
-		"/api/v1/clusters/mola/apps/test/context?slot=0&keyword=GET&source=stderr&conj=or&task=test-task&offset=12313131310000")
+		"/api/v1/apps/test/context?slot=0&keyword=GET&source=stderr&conj=or&task=test-task&offset=12313131310000")
 	if err == nil && resp.StatusCode == 200 {
 		t.Log("success")
 	} else {

@@ -30,13 +30,12 @@ func Router(middlewares ...gin.HandlerFunc) *gin.Engine {
 
 	logRouter := r.Group("/v2/log")
 	{
-		logRouter.GET("/clusters", s.Clusters)
-		logRouter.GET("/clusters/:cluster/apps", s.Applications)
-		logRouter.GET("/clusters/:cluster/apps/:app/slots", s.Slots)
-		logRouter.GET("/clusters/:cluster/apps/:app/slots/:slot/tasks", s.Tasks)
-		logRouter.GET("/clusters/:cluster/apps/:app/sources", s.Sources)
-		logRouter.GET("/clusters/:cluster/apps/:app/search", s.Search)
-		logRouter.GET("/clusters/:cluster/apps/:app/context", s.Context)
+		logRouter.GET("/apps", s.Applications)
+		logRouter.GET("/apps/:app/slots", s.Slots)
+		logRouter.GET("/apps/:app/slots/:slot/tasks", s.Tasks)
+		logRouter.GET("/apps/:app/sources", s.Sources)
+		logRouter.GET("/apps/:app/search", s.Search)
+		logRouter.GET("/apps/:app/context", s.Context)
 
 		logRouter.POST("/alert/rules", s.CreateLogAlertRule)
 		logRouter.GET("/alert/rules", s.GetLogAlertRules)
