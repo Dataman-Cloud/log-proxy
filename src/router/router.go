@@ -67,6 +67,10 @@ func Router(middlewares ...gin.HandlerFunc) *gin.Engine {
 		alertv1.GET("/rules", monitor.ListAlertRules)
 		alertv1.GET("/rules/:id", monitor.GetAlertRule)
 		alertv1.PUT("/rules/:id", monitor.UpdateAlertRule)
+
+		alertv1.POST("/receiver", monitor.ReceiveAlertEvent)
+		alertv1.GET("/events", monitor.GetAlertEvents)
+		alertv1.PUT("/events/:id", monitor.AckAlertEvent)
 		/*
 			alertv1.POST("/rules/conf", alert.ReloadAlertRuleConf)
 			alertv1.POST("/receiver", alert.ReceiveAlertEvent)

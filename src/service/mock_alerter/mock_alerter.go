@@ -146,3 +146,34 @@ func (_m *MockAlerter) UpdateAlertRule(rule *models.Rule) (*models.Rule, error) 
 func (_mr *_MockAlerterRecorder) UpdateAlertRule(arg0 interface{}) *gomock.Call {
 	return _mr.mock.ctrl.RecordCall(_mr.mock, "UpdateAlertRule", arg0)
 }
+
+func (_m *MockAlerter) ReceiveAlertEvent(message map[string]interface{}) error {
+	ret := _m.ctrl.Call(_m, "ReceiveAlertEvent", message)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+func (_mr *_MockAlerterRecorder) ReceiveAlertEvent(arg0 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCall(_mr.mock, "ReceiveAlertEvent", arg0)
+}
+
+func (_m *MockAlerter) GetAlertEvents(page models.Page, options map[string]interface{}) (map[string]interface{}, error) {
+	ret := _m.ctrl.Call(_m, "GetAlertEvents", page, options)
+	ret0, _ := ret[0].(map[string]interface{})
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+func (_mr *_MockAlerterRecorder) GetAlertEvents(arg0, arg1 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCall(_mr.mock, "GetAlertEvents", arg0, arg1)
+}
+
+func (_m *MockAlerter) AckAlertEvent(id int, options map[string]interface{}) error {
+	ret := _m.ctrl.Call(_m, "AckAlertEvent", id, options)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+func (_mr *_MockAlerterRecorder) AckAlertEvent(arg0, arg1 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCall(_mr.mock, "AckAlertEvent", arg0, arg1)
+}
