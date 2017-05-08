@@ -402,6 +402,267 @@ func TestUpdateAlertRuleError(t *testing.T) {
 	assert.Equal(t, http.StatusServiceUnavailable, resp.StatusCode)
 }
 
+func TestReceiveAlertEvent(t *testing.T) {
+	mockCtl := gomock.NewController(t)
+	defer mockCtl.Finish()
+	mockAlerter := mock_alerter.NewMockAlerter(mockCtl)
+
+	m := NewMonitor()
+	m.Alert = mockAlerter
+
+	router := gin.New()
+	router.Use(middleware.CORSMiddleware())
+	router.POST("/alert/receiver", m.ReceiveAlertEvent)
+	testServer := httptest.NewServer(router)
+	assert.NotNil(t, testServer)
+	defer testServer.Close()
+
+	body := []byte(`{"receiver":"mola_webhook","status":"firing","alerts":[{"status":"firing","labels":{"alertname":"web_zdou_datamanmesos_cpu_usage_warning","app":"web-zdou-datamanmesos","container_label_DM_APP_ID":"web-zdou-datamanmesos","container_label_DM_APP_NAME":"web","container_label_DM_CLUSTER":"datamanmesos","container_label_DM_GROUP_NAME":"dev","container_label_DM_SLOT_ID":"0-web-zdou-datamanmesos","container_label_DM_SLOT_INDEX":"0","container_label_DM_TASK_ID":"0-web-zdou-datamanmesos-c19f31f345cd4110924974df54dac683","container_label_DM_USER":"zdou","container_label_DM_USER_NAME":"zdou","container_label_DM_VCLUSTER":"mola","duration":"5m","group":"dev","id":"/docker/4828b086a265a03ce4b34ac3662c6d67d5cb1a5230e1eb77a253b3fd382c1e19","image":"nginx:1.10","indicator":"cpu_usage","instance":"192.168.56.103:5014","job":"cadvisor","judgement":"max \u003e 60%","name":"mesos-3fca175f-7593-46ad-bcc6-2875e089f8b5-S0.c5a378af-7ea7-4cc7-9f80-de748cf0bbe9","severity":"warning","value":"0.01727926502595149"},"annotations":{"description":"","summary":""},"startsAt":"2017-05-06T20:42:27.804+08:00","endsAt":"0001-01-01T00:00:00Z","generatorURL":"http://srymaster1:9090/graph#%5B%7B%22expr%22%3A%22max%28irate%28container_cpu_usage_seconds_total%7Bcontainer_label_DM_APP_ID%3D%5C%22web-zdou-datamanmesos%5C%22%2Ccontainer_label_DM_LOG_TAG%21%3D%5C%22ignore%5C%22%2Cid%3D~%5C%22%2Fdocker%2F.%2A%5C%22%2Cname%3D~%5C%22mesos.%2A%5C%22%7D%5B5m%5D%29%29%20BY%20%28container_label_DM_APP_ID%29%20KEEP_COMMON%20%2A%20100%20%3C%2060%22%2C%22tab%22%3A0%7D%5D"}],"groupLabels":{"alertname":"web_zdou_datamanmesos_cpu_usage_warning"},"commonLabels":{"alertname":"web_zdou_datamanmesos_cpu_usage_warning","app":"web-zdou-datamanmesos","container_label_DM_APP_ID":"web-zdou-datamanmesos","container_label_DM_APP_NAME":"web","container_label_DM_CLUSTER":"datamanmesos","container_label_DM_GROUP_NAME":"dev","container_label_DM_SLOT_ID":"0-web-zdou-datamanmesos","container_label_DM_SLOT_INDEX":"0","container_label_DM_TASK_ID":"0-web-zdou-datamanmesos-c19f31f345cd4110924974df54dac683","container_label_DM_USER":"zdou","container_label_DM_USER_NAME":"zdou","container_label_DM_VCLUSTER":"mola","duration":"5m","group":"dev","id":"/docker/4828b086a265a03ce4b34ac3662c6d67d5cb1a5230e1eb77a253b3fd382c1e19","image":"nginx:1.10","indicator":"cpu_usage","instance":"192.168.56.103:5014","job":"cadvisor","judgement":"max \u003e 60%","name":"mesos-3fca175f-7593-46ad-bcc6-2875e089f8b5-S0.c5a378af-7ea7-4cc7-9f80-de748cf0bbe9","severity":"warning","value":"0.01727926502595149"},"commonAnnotations":{"description":"","summary":""},"externalURL":"http://srymaster1:9093","version":"3","groupKey":9849835813238314749}`)
+
+	req, err := http.NewRequest("POST", testServer.URL+"/alert/receiver", strings.NewReader(string(body)))
+	if err != nil {
+		return
+	}
+	mockAlerter.EXPECT().ReceiveAlertEvent(gomock.Any()).Return(nil).Times(1)
+	//mockAlerter.EXPECT().GetIndicatorName(gomock.Any()).Return("", "", errors.New("err")).Times(1)
+
+	req.Header.Set("Content-Type", "application/json")
+	httpClient := http.DefaultClient
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+}
+
+func TestReceiveAlertEventError(t *testing.T) {
+	mockCtl := gomock.NewController(t)
+	defer mockCtl.Finish()
+	mockAlerter := mock_alerter.NewMockAlerter(mockCtl)
+
+	m := NewMonitor()
+	m.Alert = mockAlerter
+
+	router := gin.New()
+	router.Use(middleware.CORSMiddleware())
+	router.POST("/alert/receiver", m.ReceiveAlertEvent)
+	testServer := httptest.NewServer(router)
+	assert.NotNil(t, testServer)
+	defer testServer.Close()
+
+	body := []byte(`{"receiver":"mola_webhook","status":"firing","alerts":[{"status":"firing","labels":{"alertname":"web_zdou_datamanmesos_cpu_usage_warning","app":"web-zdou-datamanmesos","container_label_DM_APP_ID":"web-zdou-datamanmesos","container_label_DM_APP_NAME":"web","container_label_DM_CLUSTER":"datamanmesos","container_label_DM_GROUP_NAME":"dev","container_label_DM_SLOT_ID":"0-web-zdou-datamanmesos","container_label_DM_SLOT_INDEX":"0","container_label_DM_TASK_ID":"0-web-zdou-datamanmesos-c19f31f345cd4110924974df54dac683","container_label_DM_USER":"zdou","container_label_DM_USER_NAME":"zdou","container_label_DM_VCLUSTER":"mola","duration":"5m","group":"dev","id":"/docker/4828b086a265a03ce4b34ac3662c6d67d5cb1a5230e1eb77a253b3fd382c1e19","image":"nginx:1.10","indicator":"cpu_usage","instance":"192.168.56.103:5014","job":"cadvisor","judgement":"max \u003e 60%","name":"mesos-3fca175f-7593-46ad-bcc6-2875e089f8b5-S0.c5a378af-7ea7-4cc7-9f80-de748cf0bbe9","severity":"warning","value":"0.01727926502595149"},"annotations":{"description":"","summary":""},"startsAt":"2017-05-06T20:42:27.804+08:00","endsAt":"0001-01-01T00:00:00Z","generatorURL":"http://srymaster1:9090/graph#%5B%7B%22expr%22%3A%22max%28irate%28container_cpu_usage_seconds_total%7Bcontainer_label_DM_APP_ID%3D%5C%22web-zdou-datamanmesos%5C%22%2Ccontainer_label_DM_LOG_TAG%21%3D%5C%22ignore%5C%22%2Cid%3D~%5C%22%2Fdocker%2F.%2A%5C%22%2Cname%3D~%5C%22mesos.%2A%5C%22%7D%5B5m%5D%29%29%20BY%20%28container_label_DM_APP_ID%29%20KEEP_COMMON%20%2A%20100%20%3C%2060%22%2C%22tab%22%3A0%7D%5D"}],"groupLabels":{"alertname":"web_zdou_datamanmesos_cpu_usage_warning"},"commonLabels":{"alertname":"web_zdou_datamanmesos_cpu_usage_warning","app":"web-zdou-datamanmesos","container_label_DM_APP_ID":"web-zdou-datamanmesos","container_label_DM_APP_NAME":"web","container_label_DM_CLUSTER":"datamanmesos","container_label_DM_GROUP_NAME":"dev","container_label_DM_SLOT_ID":"0-web-zdou-datamanmesos","container_label_DM_SLOT_INDEX":"0","container_label_DM_TASK_ID":"0-web-zdou-datamanmesos-c19f31f345cd4110924974df54dac683","container_label_DM_USER":"zdou","container_label_DM_USER_NAME":"zdou","container_label_DM_VCLUSTER":"mola","duration":"5m","group":"dev","id":"/docker/4828b086a265a03ce4b34ac3662c6d67d5cb1a5230e1eb77a253b3fd382c1e19","image":"nginx:1.10","indicator":"cpu_usage","instance":"192.168.56.103:5014","job":"cadvisor","judgement":"max \u003e 60%","name":"mesos-3fca175f-7593-46ad-bcc6-2875e089f8b5-S0.c5a378af-7ea7-4cc7-9f80-de748cf0bbe9","severity":"warning","value":"0.01727926502595149"},"commonAnnotations":{"description":"","summary":""},"externalURL":"http://srymaster1:9093","version":"3","groupKey":9849835813238314749}`)
+
+	req, err := http.NewRequest("POST", testServer.URL+"/alert/receiver", strings.NewReader("error"))
+	if err != nil {
+		return
+	}
+	//mockAlerter.EXPECT().GetIndicatorName(gomock.Any()).Return("", "", errors.New("err")).Times(1)
+
+	req.Header.Set("Content-Type", "application/json")
+	httpClient := http.DefaultClient
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusServiceUnavailable, resp.StatusCode)
+
+	req, err = http.NewRequest("POST", testServer.URL+"/alert/receiver", strings.NewReader(string(body)))
+	if err != nil {
+		return
+	}
+	mockAlerter.EXPECT().ReceiveAlertEvent(gomock.Any()).Return(errors.New("Error")).Times(1)
+
+	req.Header.Set("Content-Type", "application/json")
+	httpClient = http.DefaultClient
+	resp, err = httpClient.Do(req)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusServiceUnavailable, resp.StatusCode)
+}
+
+func TestGetAlertEvents(t *testing.T) {
+	mockCtl := gomock.NewController(t)
+	defer mockCtl.Finish()
+	mockAlerter := mock_alerter.NewMockAlerter(mockCtl)
+
+	m := NewMonitor()
+	m.Alert = mockAlerter
+
+	result := make(map[string]interface{})
+	result["count"] = 1
+	result["events"] = make([]interface{}, 0)
+
+	router := gin.New()
+	router.Use(middleware.CORSMiddleware())
+	router.GET("/alert/events", m.GetAlertEvents)
+	testServer := httptest.NewServer(router)
+	assert.NotNil(t, testServer)
+	defer testServer.Close()
+
+	mockAlerter.EXPECT().GetAlertEvents(gomock.Any(), gomock.Any()).Return(result, nil).Times(1)
+
+	resp, err := http.Get(testServer.URL + "/alert/events?ack=false&group=dev&app=app1")
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+}
+
+func TestGetAlertEventsError(t *testing.T) {
+	mockCtl := gomock.NewController(t)
+	defer mockCtl.Finish()
+	mockAlerter := mock_alerter.NewMockAlerter(mockCtl)
+
+	m := NewMonitor()
+	m.Alert = mockAlerter
+
+	result := make(map[string]interface{})
+	result["count"] = 1
+	result["events"] = make([]interface{}, 0)
+
+	router := gin.New()
+	router.Use(middleware.CORSMiddleware())
+	router.GET("/alert/events", m.GetAlertEvents)
+	testServer := httptest.NewServer(router)
+	assert.NotNil(t, testServer)
+	defer testServer.Close()
+
+	mockAlerter.EXPECT().GetAlertEvents(gomock.Any(), gomock.Any()).Return(result, errors.New("err")).Times(1)
+
+	resp, err := http.Get(testServer.URL + "/alert/events?group=dev&app=app1&start=1234567&end=1234567")
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusServiceUnavailable, resp.StatusCode)
+
+	resp, err = http.Get(testServer.URL + "/alert/events?ack=123")
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusServiceUnavailable, resp.StatusCode)
+}
+
+func TestAckAlertEvent(t *testing.T) {
+	mockCtl := gomock.NewController(t)
+	defer mockCtl.Finish()
+	mockAlerter := mock_alerter.NewMockAlerter(mockCtl)
+
+	m := NewMonitor()
+	m.Alert = mockAlerter
+
+	result := make(map[string]interface{})
+	result["count"] = 1
+	result["events"] = make([]interface{}, 0)
+
+	router := gin.New()
+	router.Use(middleware.CORSMiddleware())
+	router.PUT("/alert/events/:id", m.AckAlertEvent)
+	testServer := httptest.NewServer(router)
+	assert.NotNil(t, testServer)
+	defer testServer.Close()
+
+	body := []byte(`{
+  "action":"ack",
+	"group": "dev",
+	"app": "web-zdou-datamanmesos"}`)
+	req, err := http.NewRequest("PUT", testServer.URL+"/alert/events/1", strings.NewReader(string(body)))
+	if err != nil {
+		return
+	}
+	mockAlerter.EXPECT().AckAlertEvent(gomock.Any(), gomock.Any()).Return(nil).Times(1)
+
+	req.Header.Set("Content-Type", "application/json")
+	httpClient := http.DefaultClient
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+}
+
+func TestAckAlertEventError(t *testing.T) {
+	mockCtl := gomock.NewController(t)
+	defer mockCtl.Finish()
+	mockAlerter := mock_alerter.NewMockAlerter(mockCtl)
+
+	m := NewMonitor()
+	m.Alert = mockAlerter
+
+	result := make(map[string]interface{})
+	result["count"] = 1
+	result["events"] = make([]interface{}, 0)
+
+	router := gin.New()
+	router.Use(middleware.CORSMiddleware())
+	router.PUT("/alert/events/:id", m.AckAlertEvent)
+	testServer := httptest.NewServer(router)
+	assert.NotNil(t, testServer)
+	defer testServer.Close()
+
+	body := []byte(`{
+  "action":"ack",
+	"group": "dev",
+	"app": "web-zdou-datamanmesos"}`)
+	req, err := http.NewRequest("PUT", testServer.URL+"/alert/events/abc", strings.NewReader(string(body)))
+	if err != nil {
+		return
+	}
+	req.Header.Set("Content-Type", "application/json")
+	httpClient := http.DefaultClient
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusServiceUnavailable, resp.StatusCode)
+
+	req, err = http.NewRequest("PUT", testServer.URL+"/alert/events/1", strings.NewReader("err"))
+	if err != nil {
+		return
+	}
+	req.Header.Set("Content-Type", "application/json")
+	httpClient = http.DefaultClient
+	resp, err = httpClient.Do(req)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+
+	req, err = http.NewRequest("PUT", testServer.URL+"/alert/events/1", strings.NewReader(string(body)))
+	if err != nil {
+		return
+	}
+	mockAlerter.EXPECT().AckAlertEvent(gomock.Any(), gomock.Any()).Return(errors.New("err")).Times(1)
+
+	req.Header.Set("Content-Type", "application/json")
+	httpClient = http.DefaultClient
+	resp, err = httpClient.Do(req)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusServiceUnavailable, resp.StatusCode)
+}
+
 /*
 
 func TestUpdateAlertRule(t *testing.T) {

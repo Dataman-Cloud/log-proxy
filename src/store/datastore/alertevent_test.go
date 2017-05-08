@@ -11,15 +11,15 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCreateOrIncreaseEvent(t *testing.T) {
+func TestCreateEvent(t *testing.T) {
+	var rows string
 	db, _ := gorm.Open("testdb", "")
 	store := &datastore{db}
 
 	testdb.SetQueryWithArgsFunc(func(query string, args []driver.Value) (driver.Rows, error) {
-		columns := []string{"ack", "severity", "v_cluster", "app", "slot", "container_id", "alert_name"}
-		rows := ""
+		columns := []string{"alertname", "groupname", "app", "task", "ack", "severity"}
 		if args[0] != nil {
-			rows = "0, Warning, wtzhou-VCluster, app-6, slot-5, /docker/aaaxefgh32e2e23rfsda, alert"
+			rows = "web_zdou_datamanmesos_cpu_usage_warning, dev, web-zdou-datamanmesos, 0, 0, warning"
 		}
 		return testdb.RowsFromCSVString(columns, rows), nil
 	})
@@ -29,32 +29,27 @@ func TestCreateOrIncreaseEvent(t *testing.T) {
 	})
 
 	event := &models.Event{
-		Ack:         false,
-		Severity:    "Warning",
-		VCluster:    "wtzhou-VCluster",
-		App:         "app-6",
-		Slot:        "slot-5",
-		ContainerID: "/docker/aaaxefgh32e2e23rfsda",
-		AlertName:   "alert",
-		Description: "description",
+		AlertName: "web_zdou_datamanmesos_cpu_usage_warning",
+		Ack:       false,
+		Group:     "dev",
+		App:       "web-zdou-datamanmesos",
+		Task:      "0",
+		Severity:  "warning",
 	}
 
 	err := store.CreateOrIncreaseEvent(event)
 	assert.Nil(t, err)
 }
 
-func TestAckEvent(t *testing.T) {
-	ID := 1
-	userName := "user1"
-	groupName := "group1"
-
+func TestIncreaseEvent(t *testing.T) {
+	var rows string
 	db, _ := gorm.Open("testdb", "")
 	store := &datastore{db}
+
 	testdb.SetQueryWithArgsFunc(func(query string, args []driver.Value) (driver.Rows, error) {
-		columns := []string{"id", "user_name", "group_name", "ack"}
-		rows := ""
-		if args[1] == "user1" {
-			rows = "1, user1, group1, 0"
+		columns := []string{"alertname", "groupname", "app", "task", "ack", "severity"}
+		if args[0] != nil {
+			rows = ""
 		}
 		return testdb.RowsFromCSVString(columns, rows), nil
 	})
@@ -63,49 +58,69 @@ func TestAckEvent(t *testing.T) {
 		return testResult{1, 1}, nil
 	})
 
-	err := store.AckEvent(ID, userName, groupName)
+	event := &models.Event{
+		AlertName: "web_zdou_datamanmesos_cpu_usage_warning",
+		Group:     "dev",
+		App:       "web-zdou-datamanmesos",
+		Task:      "0",
+		Severity:  "warning",
+	}
+
+	err := store.CreateOrIncreaseEvent(event)
+	assert.Nil(t, err)
+}
+
+func TestAckAlertEvent(t *testing.T) {
+	ID := 1
+	groupName := "dev"
+	app := "web-zdou-datamanmesos"
+
+	db, _ := gorm.Open("testdb", "")
+	store := &datastore{db}
+	testdb.SetQueryWithArgsFunc(func(query string, args []driver.Value) (driver.Rows, error) {
+		columns := []string{"id", "groupname", "app", "ack"}
+		rows := ""
+		if args[1] == "dev" {
+			rows = "1, dev, web-zdou-datamanmesos, 0"
+		}
+		return testdb.RowsFromCSVString(columns, rows), nil
+	})
+
+	testdb.SetExecWithArgsFunc(func(query string, args []driver.Value) (result driver.Result, err error) {
+		return testResult{1, 1}, nil
+	})
+
+	err := store.AckEvent(ID, groupName, app)
 	assert.Nil(t, err)
 
-	err = store.AckEvent(ID, "user2", groupName)
+	err = store.AckEvent(ID, "test", app)
 	assert.NotNil(t, err)
 }
 
-func TestListAckedEvent(t *testing.T) {
+func TestListEvents(t *testing.T) {
+	var rows string
 	page := models.Page{}
-	userName := "user1"
-	groupName := ""
+	page.PageFrom = 0
+	page.PageSize = 100
+
+	options := make(map[string]interface{})
+	options["group"] = "dev"
+	options["app"] = "web-zdou-datamanmesos"
+	options["ack"] = false
+	options["start"] = "1494139284"
+	options["end"] = "1494139315"
 
 	db, _ := gorm.Open("testdb", "")
 	store := &datastore{db}
 
 	testdb.SetQueryWithArgsFunc(func(query string, args []driver.Value) (driver.Rows, error) {
-		columns := []string{"ack", "user_name", "group_name"}
-		rows := ""
-		if args[1] == "user1" {
-			rows = "1, user1, group1"
+		columns := []string{"ack", "groupname", "app"}
+		if args[0] != nil {
+			rows = "0, dev, web-zdou-datamanmesos"
 		}
+
 		return testdb.RowsFromCSVString(columns, rows), nil
 	})
-	data := store.ListAckedEvent(page, userName, groupName)
-	assert.NotNil(t, data)
-}
-
-func TestListUnackedEvent(t *testing.T) {
-	page := models.Page{}
-	userName := "user1"
-	groupName := ""
-
-	db, _ := gorm.Open("testdb", "")
-	store := &datastore{db}
-
-	testdb.SetQueryWithArgsFunc(func(query string, args []driver.Value) (driver.Rows, error) {
-		columns := []string{"ack", "user_name", "group_name"}
-		rows := ""
-		if args[1] == "user1" {
-			rows = "0, user1, group1"
-		}
-		return testdb.RowsFromCSVString(columns, rows), nil
-	})
-	data := store.ListUnackedEvent(page, userName, groupName)
-	assert.NotNil(t, data)
+	data, _ := store.ListEvents(page, options)
+	assert.Nil(t, data)
 }

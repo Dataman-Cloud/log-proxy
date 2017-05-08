@@ -114,8 +114,8 @@ func (_mr *_MockStoreRecorder) CreateOrIncreaseEvent(arg0 interface{}) *gomock.C
 	return _mr.mock.ctrl.RecordCall(_mr.mock, "CreateOrIncreaseEvent", arg0)
 }
 
-func (_m *MockStore) AckEvent(pk int, username string, groupname string) error {
-	ret := _m.ctrl.Call(_m, "AckEvent", pk, username, groupname)
+func (_m *MockStore) AckEvent(ID int, group string, app string) error {
+	ret := _m.ctrl.Call(_m, "AckEvent", ID, group, app)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
@@ -124,24 +124,15 @@ func (_mr *_MockStoreRecorder) AckEvent(arg0, arg1, arg2 interface{}) *gomock.Ca
 	return _mr.mock.ctrl.RecordCall(_mr.mock, "AckEvent", arg0, arg1, arg2)
 }
 
-func (_m *MockStore) ListAckedEvent(page models.Page, username string, groupname string) map[string]interface{} {
-	ret := _m.ctrl.Call(_m, "ListAckedEvent", page, username, groupname)
+func (_m *MockStore) ListEvents(page models.Page, options map[string]interface{}) (map[string]interface{}, error) {
+	ret := _m.ctrl.Call(_m, "ListEvents", page, options)
 	ret0, _ := ret[0].(map[string]interface{})
-	return ret0
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
-func (_mr *_MockStoreRecorder) ListAckedEvent(arg0, arg1, arg2 interface{}) *gomock.Call {
-	return _mr.mock.ctrl.RecordCall(_mr.mock, "ListAckedEvent", arg0, arg1, arg2)
-}
-
-func (_m *MockStore) ListUnackedEvent(page models.Page, username string, groupname string) map[string]interface{} {
-	ret := _m.ctrl.Call(_m, "ListUnackedEvent", page, username, groupname)
-	ret0, _ := ret[0].(map[string]interface{})
-	return ret0
-}
-
-func (_mr *_MockStoreRecorder) ListUnackedEvent(arg0, arg1, arg2 interface{}) *gomock.Call {
-	return _mr.mock.ctrl.RecordCall(_mr.mock, "ListUnackedEvent", arg0, arg1, arg2)
+func (_mr *_MockStoreRecorder) ListEvents(arg0, arg1 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCall(_mr.mock, "ListEvents", arg0, arg1)
 }
 
 func (_m *MockStore) CreateLogAlertRule(rule *models.LogAlertRule) error {

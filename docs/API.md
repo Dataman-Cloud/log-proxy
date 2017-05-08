@@ -352,6 +352,98 @@ return
 }
 ```
 
+### 报警事件
+
+#### 获取报警事件
+
+```GET /v1/alert/events```
+- path: /v1/alert/events
+- HTTP Method: GET
+- URL Params: Null
+- Query Params: Null
+
+For example:
+
+- 获取所有事件
+```
+"http://127.0.0.1:5098/v1/alert/events"
+```
+- 获取所有ACK事件
+```
+"http://127.0.0.1:5098/v1/alert/events?ack=true"
+```
+- 获取用户组的报警事件
+```
+http://127.0.0.1:5098/v1/alert/events?group=dev
+```
+- 获取应用的所有事件
+```
+http://127.0.0.1:5098/v1/alert/events?group=dev&app=web-zdou-datamanmesos&ack=true
+```
+- 按时间获取事件
+```
+http://127.0.0.1:5098/v1/alert/events?start=1490660541&end=1490660542
+```
+return
+```
+{
+  "code": 0,
+  "data": {
+    "count": 1,
+    "events": [
+      {
+        "ID": 13,
+        "CreatedAt": "2017-05-06T21:10:02+08:00",
+        "UpdatedAt": "2017-05-07T10:55:44+08:00",
+        "DeletedAt": null,
+        "alert_name": "web_zdou_datamanmesos_cpu_usage_warning",
+        "group": "dev",
+        "app": "web-zdou-datamanmesos",
+        "task": "0",
+        "severity": "warning",
+        "indicator": "cpu_usage",
+        "judgement": "max > 60%",
+        "container_id": "/docker/4828b086a265a03ce4b34ac3662c6d67d5cb1a5230e1eb77a253b3fd382c1e19",
+        "container_name": "mesos-3fca175f-7593-46ad-bcc6-2875e089f8b5-S0.c5a378af-7ea7-4cc7-9f80-de748cf0bbe9",
+        "ack": true,
+        "value": "0.01727926502595149",
+        "description": "",
+        "summary": "",
+        "count": 823
+      }
+    ]
+  }
+}
+```
+
+### 设置报警事件ACK
+
+```PUT /v1/alert/events/:id```
+- path: /v1/alert/events/
+- HTTP Method: PUT
+- URL Params:
+  - id=<string>, event id
+- Query Params: Null
+
+For example:
+
+Ack the event
+```
+curl -X PUT "http://127.0.0.1:5098/v1/alert/events/1" -d '{
+  "action":"ack",
+	"group": "dev",
+	"app": "web-zdou-datamanmesos"
+  }'
+```
+return
+```
+{
+  "code": 0,
+  "data": {
+    "status": "success"
+  }
+}
+```
 ## 日志
 
 ### 获取所有应用
