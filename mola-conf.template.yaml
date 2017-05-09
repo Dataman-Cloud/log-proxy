@@ -1,0 +1,13 @@
+---
+log-query-options:
+    app: "DM_APP_ID"
+    cluster: "DM_VCLUSTER"
+    slot: "DM_SLOT_INDEX"
+    task: "DM_TASK_ID"
+    user: "DM_USER"
+    group: "DM_GROUP_NAME"
+    offset: "offset"
+    source: "path"
+
+
+    
