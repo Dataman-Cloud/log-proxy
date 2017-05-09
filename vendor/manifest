@@ -282,6 +282,15 @@
 			"notests": true
 		},
 		{
+			"importpath": "golang.org/x/net/context",
+			"repository": "https://go.googlesource.com/net",
+			"vcs": "git",
+			"revision": "feeb485667d1fdabe727840fe00adc22431bc86e",
+			"branch": "master",
+			"path": "context",
+			"notests": true
+		},
+		{
 			"importpath": "gopkg.in/airbrake/gobrake.v2",
 			"repository": "https://gopkg.in/airbrake/gobrake.v2",
 			"vcs": "git",
@@ -294,6 +303,14 @@
 			"repository": "https://gopkg.in/gemnasium/logrus-airbrake-hook.v2",
 			"vcs": "git",
 			"revision": "bfee1239d796830ca346767650cce5ba90d58c57",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "gopkg.in/olivere/elastic.v3",
+			"repository": "https://gopkg.in/olivere/elastic.v3",
+			"vcs": "git",
+			"revision": "eb47340e05b08cae24208569de7240fecde96bd2",
 			"branch": "master",
 			"notests": true
 		}
