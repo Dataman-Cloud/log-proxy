@@ -18,13 +18,13 @@ type Config struct {
 	PrometheusURL    string `require:"true" alias:"PROMETHEUS_URL"`
 	AlertManagerURL  string `require:"true" alias:"ALERTMANAGER_URL"`
 	FrontendPath     string `alias:"FRONTEND_PATH"`
-	MarathonURL      string `alias:"MARATHON_URL"`
 	NotificationURL  string `alias:"NOTIFICATION_URL"`
 	DbDSN            string `alias:"DB_DSN"`
 	DbDriver         string `alias:"DB_DRIVER"`
 	RuleFilePath     string `alias:"RULE_FILE_PATH"`
 	RuleFileInterval string `alias:"RULE_FILE_INTERVAL"`
 	QueryExprPATH    string `alias:"QUERY_EXPR_PATH"`
+	LabelsConfigPath string `alias:"LABELS_CONFIG_PATH"`
 }
 
 var c *Config
