@@ -33,9 +33,9 @@ func TestLogOffsetLabel(t *testing.T) {
 	offset := LogOffsetLabel()
 	assert.Equal(t, offset, "offset")
 
-	tmp := logOptionaLabels
+	tmp := offset
 	defer func() {
-		logOptionaLabels = tmp
+		logOptionaLabels["offset"] = tmp
 	}()
 
 	delete(logOptionaLabels, "offset")
@@ -47,12 +47,96 @@ func TestLogAppLabel(t *testing.T) {
 	app := LogAppLabel()
 	assert.Equal(t, app, "DM_APP_ID")
 
-	tmp := logOptionaLabels
+	tmp := app
 	defer func() {
-		logOptionaLabels = tmp
+		logOptionaLabels["app"] = tmp
 	}()
 
 	delete(logOptionaLabels, "app")
 	app = LogAppLabel()
 	assert.Equal(t, app, "DM_APP_ID")
+}
+
+func TestLogKeywordLabel(t *testing.T) {
+	keyword := LogKeywordLabel()
+	assert.Equal(t, keyword, "keyword")
+
+	tmp := keyword
+	defer func() {
+		logOptionaLabels["keyword"] = tmp
+	}()
+
+	delete(logOptionaLabels, "keyword")
+	keyword = LogKeywordLabel()
+	assert.Equal(t, keyword, "keyword")
+}
+
+func TestLogConjLabel(t *testing.T) {
+	conj := LogConjLabel()
+	assert.Equal(t, conj, "conj")
+
+	tmp := conj
+	defer func() {
+		logOptionaLabels["conj"] = tmp
+	}()
+
+	delete(logOptionaLabels, "conj")
+	conj = LogConjLabel()
+	assert.Equal(t, conj, "conj")
+}
+
+func TestLogMessageLabel(t *testing.T) {
+	message := LogMessageLabel()
+	assert.Equal(t, message, "message")
+
+	tmp := message
+	defer func() {
+		logOptionaLabels["message"] = tmp
+	}()
+
+	delete(logOptionaLabels, "message")
+	message = LogMessageLabel()
+	assert.Equal(t, message, "message")
+}
+
+func TestLogSourceLabel(t *testing.T) {
+	source := LogSourceLabel()
+	assert.Equal(t, source, "path")
+
+	tmp := source
+	defer func() {
+		logOptionaLabels["source"] = tmp
+	}()
+
+	delete(logOptionaLabels, "source")
+	source = LogSourceLabel()
+	assert.Equal(t, source, "path")
+}
+
+func TestLogSlotLabel(t *testing.T) {
+	slot := LogSlotLabel()
+	assert.Equal(t, slot, "DM_SLOT_INDEX")
+
+	tmp := slot
+	defer func() {
+		logOptionaLabels["slot"] = tmp
+	}()
+
+	delete(logOptionaLabels, "slot")
+	slot = LogSlotLabel()
+	assert.Equal(t, slot, "DM_SLOT_INDEX")
+}
+
+func TestLogTaskLabel(t *testing.T) {
+	task := LogTaskLabel()
+	assert.Equal(t, task, "DM_TASK_ID")
+
+	tmp := task
+	defer func() {
+		logOptionaLabels["task"] = tmp
+	}()
+
+	delete(logOptionaLabels, "task")
+	task = LogTaskLabel()
+	assert.Equal(t, task, "DM_TASK_ID")
 }

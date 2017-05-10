@@ -129,7 +129,12 @@ func (s *Search) Slots(ctx *gin.Context) {
 func (s *Search) Tasks(ctx *gin.Context) {
 	app := ctx.Param("app")
 	slot := ctx.Param("slot")
-	tasks, err := s.Service.Tasks(app, slot, ctx.MustGet("page").(models.Page))
+	appLabel := config.LogAppLabel()
+	slotLabel := config.LogSlotLabel()
+	options := config.ConvertRequestQueryParams(ctx.Request.URL.Query())
+	options[appLabel] = app
+	options[slotLabel] = slot
+	tasks, err := s.Service.Tasks(options, ctx.MustGet("page").(models.Page))
 	if err != nil {
 		utils.ErrorResponse(ctx, utils.NewError(GetTaskError, err))
 		return
@@ -140,18 +145,10 @@ func (s *Search) Tasks(ctx *gin.Context) {
 // Paths search applications paths
 func (s *Search) Sources(ctx *gin.Context) {
 	app := ctx.Param("app")
-
-	options := make(map[string]interface{})
-	options["page"] = ctx.MustGet("page")
-	if ctx.Query("slot") != "" {
-		options["slot"] = ctx.Query("slot")
-	}
-
-	if ctx.Query("task") != "" {
-		options["task"] = ctx.Query("task")
-	}
-
-	sources, err := s.Service.Sources(app, options)
+	appLabel := config.LogAppLabel()
+	options := config.ConvertRequestQueryParams(ctx.Request.URL.Query())
+	options[appLabel] = app
+	sources, err := s.Service.Sources(options, ctx.MustGet("page").(models.Page))
 	if err != nil {
 		utils.ErrorResponse(ctx, utils.NewError(GetTaskError, err))
 		return
@@ -161,30 +158,10 @@ func (s *Search) Sources(ctx *gin.Context) {
 
 func (s *Search) Search(ctx *gin.Context) {
 	app := ctx.Param("app")
-
-	options := make(map[string]interface{})
-	options["page"] = ctx.MustGet("page")
-	if ctx.Query("slot") != "" {
-		options["slot"] = ctx.Query("slot")
-	}
-
-	if ctx.Query("task") != "" {
-		options["task"] = ctx.Query("task")
-	}
-
-	if ctx.Query("source") != "" {
-		options["source"] = ctx.Query("source")
-	}
-
-	if ctx.Query("keyword") != "" {
-		options["keyword"] = ctx.Query("keyword")
-	}
-
-	if ctx.Query("conj") != "" {
-		options["conj"] = ctx.Query("conj")
-	}
-
-	results, err := s.Service.Search(app, options)
+	appLabel := config.LogAppLabel()
+	options := config.ConvertRequestQueryParams(ctx.Request.URL.Query())
+	options[appLabel] = app
+	results, err := s.Service.Search(options, ctx.MustGet("page").(models.Page))
 	if err != nil {
 		utils.ErrorResponse(ctx, utils.NewError(IndexError, err))
 		return
