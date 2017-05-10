@@ -119,21 +119,23 @@ func (s *SearchService) Slots(app string, page models.Page) (map[string]int64, e
 }
 
 // Tasks get application tasks
-func (s *SearchService) Tasks(app, slot string, page models.Page) (map[string]int64, error) {
+func (s *SearchService) Tasks(opts map[string]interface{}, page models.Page) (map[string]int64, error) {
 	var querys []elastic.Query
-	querys = append(querys, elastic.NewTermQuery("DM_APP_ID", app))
-	querys = append(querys, elastic.NewTermQuery("DM_SLOT_INDEX", slot))
+	for k, v := range opts {
+		querys = append(querys, elastic.NewTermQuery(k, v))
+	}
 	bquery := elastic.NewBoolQuery().
 		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte(page.RangeFrom).Lte(page.RangeTo).Format("epoch_millis")).
 		Must(querys...)
 
 	//Index("dataman-*").
 	tasks := make(map[string]int64)
+	taskLabel := config.LogTaskLabel()
 	result, err := s.ESClient.Search().
 		Index("dataman-*").
 		SearchType("count").
 		Query(bquery).
-		Aggregation("tasks", elastic.NewTermsAggregation().Field("DM_TASK_ID").Size(0).OrderByCountDesc()).
+		Aggregation("tasks", elastic.NewTermsAggregation().Field(taskLabel).Size(0).OrderByCountDesc()).
 		Pretty(true).
 		Do()
 
@@ -156,23 +158,14 @@ func (s *SearchService) Tasks(app, slot string, page models.Page) (map[string]in
 	return tasks, nil
 }
 
-func (s *SearchService) Sources(app string, opts map[string]interface{}) (map[string]int64, error) {
+func (s *SearchService) Sources(opts map[string]interface{}, page models.Page) (map[string]int64, error) {
 	sources := make(map[string]int64)
 	var querys []elastic.Query
-	querys = append(querys, elastic.NewTermQuery("DM_APP_ID", app))
-
-	slot, ok := opts["slot"]
-	if ok {
-		querys = append(querys, elastic.NewTermsQuery("DM_SLOT_INDEX", slot))
+	for k, v := range opts {
+		querys = append(querys, elastic.NewTermQuery(k, v))
 	}
 
-	task, ok := opts["task"]
-	if ok {
-		querys = append(querys, elastic.NewTermsQuery("DM_TASK_ID", task))
-	}
-
-	page := opts["page"].(models.Page)
-
+	sourceLabel := config.LogSourceLabel()
 	bquery := elastic.NewBoolQuery().
 		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte(page.RangeFrom).Lte(page.RangeTo).Format("epoch_millis")).
 		Must(querys...)
@@ -181,7 +174,7 @@ func (s *SearchService) Sources(app string, opts map[string]interface{}) (map[st
 		Index("dataman-*").
 		SearchType("count").
 		Query(bquery).
-		Aggregation("sources", elastic.NewTermsAggregation().Field("path").Size(0).OrderByCountDesc()).
+		Aggregation("sources", elastic.NewTermsAggregation().Field(sourceLabel).Size(0).OrderByCountDesc()).
 		Pretty(true).
 		Do()
 
@@ -206,39 +199,34 @@ func (s *SearchService) Sources(app string, opts map[string]interface{}) (map[st
 }
 
 // Search search log by condition
-func (s *SearchService) Search(app string, opts map[string]interface{}) (map[string]interface{}, error) {
+func (s *SearchService) Search(opts map[string]interface{}, page models.Page) (map[string]interface{}, error) {
 	sort := false
-	page := opts["page"].(models.Page)
 	var querys []elastic.Query
-	querys = append(querys, elastic.NewTermQuery("DM_APP_ID", app))
 
-	slot, ok := opts["slot"]
-	if ok {
-		querys = append(querys, elastic.NewTermsQuery("DM_SLOT_INDEX", slot))
-	}
-
-	task, ok := opts["task"]
-	if ok {
-		querys = append(querys, elastic.NewTermQuery("DM_TASK_ID", task))
-	}
-
-	source, ok := opts["source"]
-	if ok {
-		querys = append(querys, elastic.NewTermQuery("path", source))
-	}
-
-	keyword, ok := opts["keyword"]
+	messageLabel := config.LogMessageLabel()
+	keywordLabel := config.LogKeywordLabel()
+	keyword, ok := opts[keywordLabel]
 	if ok {
 		sort = true
-
 		keywordStr := keyword.(string)
-		conj, ok := opts["conj"]
+		conjLabel := config.LogConjLabel()
+		conj, ok := opts[conjLabel]
 		if ok && strings.ToLower(conj.(string)) == "or" {
 			keyword = strings.Join(strings.Split(keywordStr, " "), " OR ")
 		} else {
 			keyword = strings.Join(strings.Split(keywordStr, " "), " AND ")
 		}
-		querys = append(querys, elastic.NewQueryStringQuery("message:"+keywordStr).AnalyzeWildcard(true))
+
+		if ok {
+			delete(opts, conjLabel)
+		}
+
+		querys = append(querys, elastic.NewQueryStringQuery(messageLabel+keywordStr).AnalyzeWildcard(true))
+		delete(opts, keywordLabel)
+	}
+
+	for k, v := range opts {
+		querys = append(querys, elastic.NewTermQuery(k, v))
 	}
 
 	bquery := elastic.NewBoolQuery().
@@ -249,7 +237,7 @@ func (s *SearchService) Search(app string, opts map[string]interface{}) (map[str
 		Index("dataman-*").
 		Query(bquery).
 		Sort("logtime.sort", sort).
-		Highlight(elastic.NewHighlight().Field("message").PreTags(`@dataman-highlighted-field@`).PostTags(`@/dataman-highlighted-field@`)).
+		Highlight(elastic.NewHighlight().Field(messageLabel).PreTags(`@dataman-highlighted-field@`).PostTags(`@/dataman-highlighted-field@`)).
 		From(page.PageFrom).
 		Size(page.PageSize).
 		Pretty(true).
@@ -270,11 +258,11 @@ func (s *SearchService) Search(app string, opts map[string]interface{}) (map[str
 		for _, hit := range result.Hits.Hits {
 			logContent := make(map[string]interface{})
 			json.Unmarshal(*hit.Source, &logContent)
-			if len(hit.Highlight["message"]) > 0 {
-				str := html.EscapeString(hit.Highlight["message"][0])
+			if len(hit.Highlight[messageLabel]) > 0 {
+				str := html.EscapeString(hit.Highlight[messageLabel][0])
 				str = strings.Replace(str, "@dataman-highlighted-field@", "<mark>", -1)
 				str = strings.Replace(str, "@/dataman-highlighted-field@", "</mark>", -1)
-				logContent["message"] = str
+				logContent[messageLabel] = str
 			}
 
 			logs = append(logs, logContent)

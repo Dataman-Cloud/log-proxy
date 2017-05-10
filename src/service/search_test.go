@@ -210,28 +210,43 @@ func TestSlots(t *testing.T) {
 
 func TestTasks(t *testing.T) {
 	service := NewEsService([]string{baseURL})
-	service.Tasks("test", "test", models.Page{})
+	opts := make(map[string]interface{})
+	opts["app"] = "test"
+	opts["slot"] = "0"
+	opts["task"] = "test"
+	opts["page"] = models.Page{}
+	_, err := service.Tasks(opts, models.Page{})
+	assert.NoError(t, err)
 }
 
 func TestSources(t *testing.T) {
 	service := NewEsService([]string{baseURL})
 	opts := make(map[string]interface{})
+	opts["app"] = "test"
 	opts["slot"] = "0"
 	opts["task"] = "test"
 	opts["page"] = models.Page{}
-	service.Sources("app", opts)
+	_, err := service.Sources(opts, models.Page{})
+	assert.NoError(t, err)
 }
 
 func TestSearch(t *testing.T) {
 	service := NewEsService([]string{baseURL})
 	opts := make(map[string]interface{})
+	opts["app"] = "test"
 	opts["slot"] = "0"
 	opts["task"] = "test"
-	opts["page"] = models.Page{}
 	opts["keyword"] = "keyword"
 	opts["conj"] = "or"
 	opts["source"] = "stdout"
-	service.Search("user", opts)
+	_, err := service.Search(opts, models.Page{})
+	assert.NoError(t, err)
+
+	// Search will delete keyword
+	opts["keyword"] = "keyword"
+	opts["conj"] = "and"
+	_, err = service.Search(opts, models.Page{})
+	assert.NoError(t, err)
 }
 
 func TestContext(t *testing.T) {

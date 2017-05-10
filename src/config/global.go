@@ -18,6 +18,9 @@ var DefaultLogOptionalLabels = map[string]string{
 	"offset":  "offset",
 	"user":    "DM_USER",
 	"group":   "DM_GROUP_NAME",
+	"message": "message",
+	"conj":    "conj",
+	"keyword": "keyword",
 }
 
 func LoadLogOptionalLabels() {
@@ -62,7 +65,7 @@ func LogOffsetLabel() string {
 		return offset
 	}
 
-	logrus.Debug("log offset not found use default value: offset")
+	logrus.Debug("log offset label not found. use default value: offset")
 	return "offset"
 }
 
@@ -72,6 +75,66 @@ func LogAppLabel() string {
 		return app
 	}
 
-	logrus.Debug("log app not found use default value: DM_APP_ID")
+	logrus.Debug("log app label not found. use default value: DM_APP_ID")
 	return "DM_APP_ID"
+}
+
+func LogKeywordLabel() string {
+	keyword, ok := logOptionaLabels["keyword"]
+	if ok {
+		return keyword
+	}
+
+	logrus.Debug("log keyword label not found. use default value: keyword")
+	return "keyword"
+}
+
+func LogConjLabel() string {
+	conj, ok := logOptionaLabels["conj"]
+	if ok {
+		return conj
+	}
+
+	logrus.Debug("log conj label not found. use default value: conj")
+	return "conj"
+}
+
+func LogMessageLabel() string {
+	message, ok := logOptionaLabels["message"]
+	if ok {
+		return message
+	}
+
+	logrus.Debug("log message label not found. use default value: message")
+	return "message"
+}
+
+func LogSourceLabel() string {
+	source, ok := logOptionaLabels["source"]
+	if ok {
+		return source
+	}
+
+	logrus.Debug("log source label not found. use default value: path")
+	return "path"
+}
+
+func LogTaskLabel() string {
+	task, ok := logOptionaLabels["task"]
+	if ok {
+		return task
+	}
+
+	logrus.Debug("log task label not found. use default valeu: DM_TASK_ID")
+	return "DM_TASK_ID"
+}
+
+func LogSlotLabel() string {
+	slot, ok := logOptionaLabels["slot"]
+	if ok {
+		return slot
+	}
+
+	logrus.Debug("log slot label not found. use default value: DM_SLOT_INDEX")
+	return "DM_SLOT_INDEX"
 }
