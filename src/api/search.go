@@ -53,7 +53,7 @@ const (
 
 // Search search client struct
 type Search struct {
-	Service       *service.SearchService
+	Service       service.LogSearchService
 	Store         store.Store
 	KeywordFilter map[string]*list.List
 	Kmutex        sync.RWMutex

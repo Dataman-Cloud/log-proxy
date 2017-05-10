@@ -53,6 +53,7 @@ func NewEsService(url []string) *SearchService {
 
 // Applications get all applications
 func (s *SearchService) Applications(page models.Page) (map[string]int64, error) {
+	appLabel := config.LogAppLabel()
 	bquery := elastic.NewBoolQuery().
 		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte(page.RangeFrom).Lte(page.RangeTo).Format("epoch_millis"))
 
@@ -61,7 +62,7 @@ func (s *SearchService) Applications(page models.Page) (map[string]int64, error)
 		Index("dataman-*").
 		SearchType("count").
 		Query(bquery).
-		Aggregation("apps", elastic.NewTermsAggregation().Field("DM_APP_ID").Size(0).OrderByCountDesc()).
+		Aggregation("apps", elastic.NewTermsAggregation().Field(appLabel).Size(0).OrderByCountDesc()).
 		Pretty(true).
 		Do()
 
@@ -86,16 +87,18 @@ func (s *SearchService) Applications(page models.Page) (map[string]int64, error)
 }
 
 func (s *SearchService) Slots(app string, page models.Page) (map[string]int64, error) {
+	appLabel := config.LogAppLabel()
+	slotLabel := config.LogSlotLabel()
 	bQuery := elastic.NewBoolQuery().
 		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte(page.RangeFrom).Lte(page.RangeTo).Format("epoch_millis")).
-		Must(elastic.NewTermQuery("DM_APP_ID", app))
+		Must(elastic.NewTermQuery(appLabel, app))
 
 	slots := make(map[string]int64)
 	result, err := s.ESClient.Search().
 		Index("dataman-*").
 		SearchType("count").
 		Query(bQuery).
-		Aggregation("slots", elastic.NewTermsAggregation().Field("DM_SLOT_INDEX").Size(0).OrderByCountDesc()).
+		Aggregation("slots", elastic.NewTermsAggregation().Field(slotLabel).Size(0).OrderByCountDesc()).
 		Pretty(true).
 		Do()
 
