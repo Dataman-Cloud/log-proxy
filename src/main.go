@@ -20,6 +20,7 @@ func main() {
 	configFile := flag.String("config", "env_file", "config file path")
 	flag.Parse()
 	config.InitConfig(*configFile)
+	config.LoadLogOptionalLabels()
 	datastore.InitDB(config.GetConfig().DbDriver, config.GetConfig().DbDSN)
 	err := expr.Exprs(config.GetConfig().QueryExprPATH)
 	if err != nil {

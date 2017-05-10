@@ -44,10 +44,11 @@ const (
 	// GetLogError get log error
 	GetLogError = "503-11010"
 
-	GetSlotsError = "503-11011"
+	GetSlotsError      = "503-11011"
+	GetLogContextError = "503-11012"
 
-	GetLogAlertEventsError = "503-11012"
-	GetLogAlertAppsError   = "503-11013"
+	GetLogAlertEventsError = "503-11013"
+	GetLogAlertAppsError   = "503-11014"
 )
 
 // Search search client struct
@@ -195,28 +196,12 @@ func (s *Search) Search(ctx *gin.Context) {
 // Context search log context
 func (s *Search) Context(ctx *gin.Context) {
 	app := ctx.Param("app")
-
-	options := make(map[string]interface{})
-	options["page"] = ctx.MustGet("page")
-	if ctx.Query("slot") != "" {
-		options["slot"] = ctx.Query("slot")
-	}
-
-	if ctx.Query("task") != "" {
-		options["task"] = ctx.Query("task")
-	}
-
-	if ctx.Query("source") != "" {
-		options["source"] = ctx.Query("source")
-	}
-
-	if ctx.Query("offset") != "" {
-		options["offset"] = ctx.Query("offset")
-	}
-
-	results, err := s.Service.Context(app, options)
+	appLabel := config.LogAppLabel()
+	options := config.ConvertRequestQueryParams(ctx.Request.URL.Query())
+	options[appLabel] = app
+	results, err := s.Service.Context(options, ctx.MustGet("page").(models.Page))
 	if err != nil {
-		utils.ErrorResponse(ctx, utils.NewError(IndexError, err))
+		utils.ErrorResponse(ctx, utils.NewError(GetLogContextError, err))
 		return
 	}
 

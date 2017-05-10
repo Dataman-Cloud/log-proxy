@@ -1,11 +1,13 @@
 package config
 
 import (
+	"net/url"
+
 	"github.com/Sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
-var LogOptionaLabels map[string]string
+var logOptionaLabels map[string]string
 
 var DefaultLogOptionalLabels = map[string]string{
 	"app":     "DM_APP_ID",
@@ -19,7 +21,7 @@ var DefaultLogOptionalLabels = map[string]string{
 }
 
 func LoadLogOptionalLabels() {
-	LogOptionaLabels = DefaultLogOptionalLabels
+	logOptionaLabels = DefaultLogOptionalLabels
 
 	if c == nil || c.LabelsConfigPath == "" {
 		return
@@ -35,8 +37,41 @@ func LoadLogOptionalLabels() {
 		return
 	}
 
-	LogOptionaLabels = viper.GetStringMapString("log-query-options")
+	logOptionaLabels = viper.GetStringMapString("log-query-options")
 
 	logrus.Infof("load log optional labels fron %s success \n", viper.ConfigFileUsed())
+
+	logrus.Infof("the logOptionaLabels used is %+v \n", logOptionaLabels)
 	return
+}
+
+func ConvertRequestQueryParams(values url.Values) map[string]interface{} {
+	result := make(map[string]interface{})
+	for k, v := range values {
+		if label, ok := logOptionaLabels[k]; ok && len(v) > 0 {
+			result[label] = v[0]
+		}
+	}
+
+	return result
+}
+
+func LogOffsetLabel() string {
+	offset, ok := logOptionaLabels["offset"]
+	if ok {
+		return offset
+	}
+
+	logrus.Debug("log offset not found use default value: offset")
+	return "offset"
+}
+
+func LogAppLabel() string {
+	app, ok := logOptionaLabels["app"]
+	if ok {
+		return app
+	}
+
+	logrus.Debug("log app not found use default value: DM_APP_ID")
+	return "DM_APP_ID"
 }

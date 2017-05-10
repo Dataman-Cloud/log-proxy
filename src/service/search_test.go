@@ -10,6 +10,7 @@ import (
 
 	"github.com/Dataman-Cloud/log-proxy/src/config"
 	"github.com/Dataman-Cloud/log-proxy/src/models"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/gin-gonic/gin"
 	"gopkg.in/olivere/elastic.v3"
@@ -236,10 +237,26 @@ func TestSearch(t *testing.T) {
 func TestContext(t *testing.T) {
 	service := NewEsService([]string{baseURL})
 	opts := make(map[string]interface{})
+	opts["app"] = "test"
 	opts["slot"] = "0"
 	opts["task"] = "test"
-	opts["page"] = models.Page{}
 	opts["offset"] = "1123123130000"
 	opts["source"] = "stdout"
-	service.Context("app", opts)
+	_, err := service.Context(opts, models.Page{})
+	assert.NoError(t, err)
+}
+
+func TestContextOffsetError(t *testing.T) {
+	service := NewEsService([]string{baseURL})
+	opts := make(map[string]interface{})
+	opts["app"] = "test"
+	opts["slot"] = "0"
+	opts["task"] = "test"
+	opts["source"] = "stdout"
+	_, err := service.Context(opts, models.Page{})
+	assert.Error(t, err)
+
+	opts["offset"] = "a11111"
+	_, err = service.Context(opts, models.Page{})
+	assert.Error(t, err)
 }

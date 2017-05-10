@@ -206,6 +206,7 @@ func querySlience(ctx *gin.Context) {
 
 func TestMain(m *testing.M) {
 	config.InitConfig("../../env_file.template")
+	config.LoadLogOptionalLabels()
 	server = startHTTPServer()
 	baseURL = server.URL
 	config.GetConfig().EsURL = baseURL
