@@ -724,7 +724,7 @@ return
 }
 ```
 
-#### 更新单挑日志告警规则
+#### 更新单条日志告警规则
 `PUT /v2/log/alert/rules/:id`
 For example
 
@@ -901,7 +901,7 @@ return
 }
 ```
 
-#### 设置报警事件为一睹
+#### 设置报警事件为ACK
 `PATCH /v2/log/alert/events/:id`
 
 For exmaple
