@@ -289,40 +289,28 @@ func (s *SearchService) Search(app string, opts map[string]interface{}) (map[str
 }
 
 // Context search log context
-func (s *SearchService) Context(app string, opts map[string]interface{}) ([]map[string]interface{}, error) {
-	offset_, ok := opts["offset"]
+func (s *SearchService) Context(opts map[string]interface{}, page models.Page) ([]map[string]interface{}, error) {
+	offsetLabel := config.LogOffsetLabel()
+	offset_, ok := opts[offsetLabel]
 	if !ok {
 		return nil, errors.New("offset should not be nil")
 	}
 
+	delete(opts, offsetLabel)
 	offset, err := strconv.ParseInt(offset_.(string), 10, 64)
 	if err != nil {
 		return nil, err
 	}
 
-	page := opts["page"].(models.Page)
 	var results []map[string]interface{}
 	var querys []elastic.Query
-	querys = append(querys, elastic.NewTermQuery("DM_APP_ID", app))
-
-	slot, ok := opts["slot"]
-	if ok {
-		querys = append(querys, elastic.NewTermsQuery("DM_SLOT_INDEX", slot))
-	}
-
-	task, ok := opts["task"]
-	if ok {
-		querys = append(querys, elastic.NewTermQuery("DM_TASK_ID", task))
-	}
-
-	source, ok := opts["source"]
-	if ok {
-		querys = append(querys, elastic.NewTermQuery("path", source))
+	for k, v := range opts {
+		querys = append(querys, elastic.NewTermQuery(k, v))
 	}
 
 	if page.PageFrom == 0 {
 		bquery := elastic.NewBoolQuery().
-			Filter(elastic.NewRangeQuery("offset").Lt(offset)).
+			Filter(elastic.NewRangeQuery(offsetLabel).Lt(offset)).
 			Must(querys...)
 
 		result, err := s.ESClient.Search().
@@ -350,7 +338,7 @@ func (s *SearchService) Context(app string, opts map[string]interface{}) ([]map[
 	}
 
 	bquery := elastic.NewBoolQuery().
-		Filter(elastic.NewRangeQuery("offset").Gte(offset)).
+		Filter(elastic.NewRangeQuery(offsetLabel).Gte(offset)).
 		Must(querys...)
 
 	result, err := s.ESClient.Search().
