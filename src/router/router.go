@@ -37,6 +37,8 @@ func Router(middlewares ...gin.HandlerFunc) *gin.Engine {
 		logRouter.GET("/apps/:app/search", s.Search)
 		logRouter.GET("/apps/:app/context", s.Context)
 
+		logRouter.GET("/everything/:key", s.Everything)
+
 		logRouter.POST("/alert/rules", s.CreateLogAlertRule)
 		logRouter.GET("/alert/rules", s.GetLogAlertRules)
 		logRouter.GET("/alert/rules/:id", s.GetLogAlertRule)

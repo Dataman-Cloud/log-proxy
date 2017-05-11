@@ -140,3 +140,11 @@ func TestLogTaskLabel(t *testing.T) {
 	task = LogTaskLabel()
 	assert.Equal(t, task, "DM_TASK_ID")
 }
+
+func TestGetLogLabel(t *testing.T) {
+	_, err := GetLogLabel("app")
+	assert.NoError(t, err)
+
+	_, err = GetLogLabel("xxxxxxxxxxxxx")
+	assert.Error(t, err)
+}

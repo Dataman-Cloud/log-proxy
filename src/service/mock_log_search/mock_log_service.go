@@ -94,3 +94,14 @@ func (_m *MockLogSearchService) Context(opts map[string]interface{}, page models
 func (_mr *_MockLogSearchServiceRecorder) Context(arg0, arg1 interface{}) *gomock.Call {
 	return _mr.mock.ctrl.RecordCall(_mr.mock, "Context", arg0, arg1)
 }
+
+func (_m *MockLogSearchService) Everything(key string, opt map[string]interface{}, page models.Page) (map[string]int64, error) {
+	ret := _m.ctrl.Call(_m, "Everything", key, opt, page)
+	ret0, _ := ret[0].(map[string]int64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+func (_mr *_MockLogSearchServiceRecorder) Everything(arg0, arg1, arg2 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCall(_mr.mock, "Everything", arg0, arg1, arg2)
+}

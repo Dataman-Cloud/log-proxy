@@ -546,6 +546,22 @@ curl -XGET http://localhost:5098/v2/log/apps/aaaaaaaaaaa-yaoyun-datamanmesos/sou
 }
 ```
 
+
+### 日志查询条件动态查询接口
+`/v2/log/everything/:key`
+
+* 说明: 这个接口可以灵活指定需要查询的指标, 同时可以灵活指定过滤条件, 例如查指定应用/slot内所有的 source
+        用这个接口可以写作 如下方式.
+
+```
+curl -XGET http://localhost:5098/v2/log/everything/source\?app\=aaaaaaaaaaa-yaoyun-datamanmesos\&slot\=0
+```
+
+return 
+```
+{"code":0,"data":{"stdout":3}}
+```
+
 ### 日志搜索
 
 `GET /v2/log/apps/:app/search"`

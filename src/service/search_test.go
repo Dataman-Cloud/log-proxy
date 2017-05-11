@@ -87,7 +87,17 @@ func app(ctx *gin.Context) {
     },
     "suggest":null,
     "aggregations":{
-        "apps":{
+        "app":{
+            "doc_count_error_upper_bound":0,
+            "sum_other_doc_count":0,
+            "buckets":[
+                {
+                    "key":"test-web",
+                    "doc_count":6
+                }
+            ]
+        },
+	   "apps":{
             "doc_count_error_upper_bound":0,
             "sum_other_doc_count":0,
             "buckets":[
@@ -273,5 +283,25 @@ func TestContextOffsetError(t *testing.T) {
 
 	opts["offset"] = "a11111"
 	_, err = service.Context(opts, models.Page{})
+	assert.Error(t, err)
+}
+
+func TestEverthing(t *testing.T) {
+	config.LoadLogOptionalLabels()
+	service := NewEsService([]string{baseURL})
+	opts := make(map[string]interface{})
+	opts["slot"] = "0"
+	opts["task"] = "test"
+	opts["offset"] = "1123123130000"
+	opts["source"] = "stdout"
+	_, err := service.Everything("app", opts, models.Page{})
+	assert.NoError(t, err)
+}
+
+func TestEverthingWitKeyError(t *testing.T) {
+	service := NewEsService([]string{baseURL})
+	opts := make(map[string]interface{})
+	opts["slot"] = "0"
+	_, err := service.Everything("foo-bar", opts, models.Page{})
 	assert.Error(t, err)
 }

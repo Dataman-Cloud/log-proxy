@@ -357,3 +357,46 @@ func (s *SearchService) Context(opts map[string]interface{}, page models.Page) (
 
 	return results, nil
 }
+
+func (s *SearchService) Everything(key string, opts map[string]interface{}, page models.Page) (map[string]int64, error) {
+	var querys []elastic.Query
+	for k, v := range opts {
+		querys = append(querys, elastic.NewTermQuery(k, v))
+	}
+
+	keyLabel, err := config.GetLogLabel(key)
+	if err != nil {
+		return nil, err
+	}
+
+	bquery := elastic.NewBoolQuery().
+		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte(page.RangeFrom).Lte(page.RangeTo).Format("epoch_millis")).
+		Must(querys...)
+
+	tasks := make(map[string]int64)
+	result, err := s.ESClient.Search().
+		Index("dataman-*").
+		SearchType("count").
+		Query(bquery).
+		Aggregation(key, elastic.NewTermsAggregation().Field(keyLabel).Size(0).OrderByCountDesc()).
+		Pretty(true).
+		Do()
+
+	if err != nil && err.(*elastic.Error).Status == http.StatusNotFound {
+		return nil, nil
+	}
+
+	if err != nil {
+		return tasks, err
+	}
+
+	agg, found := result.Aggregations.Terms(key)
+	if !found {
+		return tasks, nil
+	}
+
+	for _, bucket := range agg.Buckets {
+		tasks[fmt.Sprint(bucket.Key)] = bucket.DocCount
+	}
+	return tasks, nil
+}

@@ -183,4 +183,20 @@ func (s *Search) Context(ctx *gin.Context) {
 	}
 
 	utils.Ok(ctx, results)
+	return
+}
+
+// Everything is sweet API for get log filter by gived conditions
+// key is what you want return and must in config.logOptionalLabels
+func (s *Search) Everything(ctx *gin.Context) {
+	key := ctx.Param("key")
+	options := config.ConvertRequestQueryParams(ctx.Request.URL.Query())
+	results, err := s.Service.Everything(key, options, ctx.MustGet("page").(models.Page))
+	if err != nil {
+		utils.ErrorResponse(ctx, utils.NewError(GetLogError, err))
+		return
+	}
+
+	utils.Ok(ctx, results)
+	return
 }
