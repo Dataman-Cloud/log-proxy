@@ -11,6 +11,7 @@ import (
 
 	"github.com/Dataman-Cloud/log-proxy/src/config"
 	"github.com/Dataman-Cloud/log-proxy/src/models"
+	mock_service "github.com/Dataman-Cloud/log-proxy/src/service/mock_log_search"
 	mock_store "github.com/Dataman-Cloud/log-proxy/src/store/mock_datastore"
 
 	"github.com/gin-gonic/gin"
@@ -236,161 +237,139 @@ func TestPing(t *testing.T) {
 }
 
 func TestApplications(t *testing.T) {
-	sr := startErrorClient()
-	config.GetConfig().EsURL = sr.URL
-	baseURL = sr.URL
-	s = GetSearch()
-	se := startAPIServer(s)
-	resp, err := http.Get(se.URL + "/api/v1/apps")
-	if err == nil && resp.StatusCode == 503 {
-		t.Log("success")
-	} else {
-		t.Error("faild")
-	}
+	mockCtl := gomock.NewController(t)
+	defer mockCtl.Finish()
 
-	sr = startHTTPServer()
-	config.GetConfig().EsURL = sr.URL
-	baseURL = sr.URL
-	s = GetSearch()
-	se = startAPIServer(s)
-	resp, err = http.Get(se.URL + "/api/v1/apps")
-	if err == nil && resp.StatusCode == 200 {
-		t.Log("success")
-	} else {
-		t.Error("faild")
-	}
+	mockService := mock_service.NewMockLogSearchService(mockCtl)
+	s := Search{Service: mockService}
+	router := gin.New()
+	router.GET("/v1/apps", func(ctx *gin.Context) { ctx.Set("page", models.Page{}) }, s.Applications)
+	testServer := httptest.NewServer(router)
+	assert.NotNil(t, testServer)
+	defer testServer.Close()
+
+	mockService.EXPECT().Applications(gomock.Any()).Return(nil, errors.New("test")).Times(1)
+	resp, err := http.Get(testServer.URL + "/v1/apps")
+	assert.NoError(t, err)
+	assert.Equal(t, resp.StatusCode, http.StatusServiceUnavailable)
+
+	mockService.EXPECT().Applications(gomock.Any()).Return(nil, nil).Times(1)
+	resp, err = http.Get(testServer.URL + "/v1/apps")
+	assert.NoError(t, err)
+	assert.Equal(t, resp.StatusCode, http.StatusOK)
 }
 
 func TestSlots(t *testing.T) {
-	sr := startErrorClient()
-	config.GetConfig().EsURL = sr.URL
-	baseURL = sr.URL
-	s = GetSearch()
-	se := startAPIServer(s)
-	resp, err := http.Get(se.URL + "/api/v1/apps/test/slots")
-	if err == nil && resp.StatusCode == 503 {
-		t.Log("success")
-	} else {
-		t.Error("faild")
-	}
+	mockCtl := gomock.NewController(t)
+	defer mockCtl.Finish()
 
-	sr = startHTTPServer()
-	config.GetConfig().EsURL = sr.URL
-	baseURL = sr.URL
-	s = GetSearch()
-	se = startAPIServer(s)
-	resp, err = http.Get(se.URL + "/api/v1/apps/test/slots")
-	if err == nil && resp.StatusCode == 200 {
-		t.Log("success")
-	} else {
-		t.Error("faild")
-	}
+	mockService := mock_service.NewMockLogSearchService(mockCtl)
+	s := Search{Service: mockService}
+	router := gin.New()
+	router.GET("/v1/apps/test/slots", func(ctx *gin.Context) { ctx.Set("page", models.Page{}) }, s.Slots)
+	testServer := httptest.NewServer(router)
+	assert.NotNil(t, testServer)
+	defer testServer.Close()
+
+	mockService.EXPECT().Slots(gomock.Any(), gomock.Any()).Return(nil, errors.New("test")).Times(1)
+	resp, err := http.Get(testServer.URL + "/v1/apps/test/slots")
+	assert.NoError(t, err)
+	assert.Equal(t, resp.StatusCode, http.StatusServiceUnavailable)
+
+	mockService.EXPECT().Slots(gomock.Any(), gomock.Any()).Return(nil, nil).Times(1)
+	resp, err = http.Get(testServer.URL + "/v1/apps/test/slots")
+	assert.NoError(t, err)
+	assert.Equal(t, resp.StatusCode, http.StatusOK)
 }
 
 func TestTasks(t *testing.T) {
-	sr := startErrorClient()
-	config.GetConfig().EsURL = sr.URL
-	baseURL = sr.URL
-	s = GetSearch()
-	se := startAPIServer(s)
-	resp, err := http.Get(se.URL + "/api/v1/apps/test/slots/0/tasks")
-	if err == nil && resp.StatusCode == 503 {
-		t.Log("success")
-	} else {
-		t.Error("faild")
-	}
+	mockCtl := gomock.NewController(t)
+	defer mockCtl.Finish()
 
-	sr = startHTTPServer()
-	config.GetConfig().EsURL = sr.URL
-	baseURL = sr.URL
-	s = GetSearch()
-	se = startAPIServer(s)
-	resp, err = http.Get(se.URL + "/api/v1/apps/test/slots/0/tasks")
-	if err == nil && resp.StatusCode == 200 {
-		t.Log("success")
-	} else {
-		t.Error("faild")
-	}
+	mockService := mock_service.NewMockLogSearchService(mockCtl)
+	s := Search{Service: mockService}
+	router := gin.New()
+	router.GET("/v1/apps/test/tasks", func(ctx *gin.Context) { ctx.Set("page", models.Page{}) }, s.Tasks)
+	testServer := httptest.NewServer(router)
+	assert.NotNil(t, testServer)
+	defer testServer.Close()
+
+	mockService.EXPECT().Tasks(gomock.Any(), gomock.Any()).Return(nil, errors.New("test")).Times(1)
+	resp, err := http.Get(testServer.URL + "/v1/apps/test/tasks?slot=0")
+	assert.NoError(t, err)
+	assert.Equal(t, resp.StatusCode, http.StatusServiceUnavailable)
+
+	mockService.EXPECT().Tasks(gomock.Any(), gomock.Any()).Return(nil, nil).Times(1)
+	resp, err = http.Get(testServer.URL + "/v1/apps/test/tasks?slot=0")
+	assert.NoError(t, err)
+	assert.Equal(t, resp.StatusCode, http.StatusOK)
 }
 
 func TestSources(t *testing.T) {
-	sr := startErrorClient()
-	config.GetConfig().EsURL = sr.URL
-	baseURL = sr.URL
-	s = GetSearch()
-	se := startAPIServer(s)
-	resp, err := http.Get(se.URL + "/api/v1/apps/test/sources?slot=0&task=test")
-	if err == nil && resp.StatusCode == 503 {
-		t.Log("success")
-	} else {
-		t.Error("faild")
-	}
+	mockCtl := gomock.NewController(t)
+	defer mockCtl.Finish()
 
-	sr = startHTTPServer()
-	config.GetConfig().EsURL = sr.URL
-	baseURL = sr.URL
-	s = GetSearch()
-	se = startAPIServer(s)
-	resp, err = http.Get(se.URL + "/api/v1/apps/test/sources?slot=0&task=test")
-	if err == nil && resp.StatusCode == 200 {
-		t.Log("success")
-	} else {
-		t.Error("faild")
-	}
+	mockService := mock_service.NewMockLogSearchService(mockCtl)
+	s := Search{Service: mockService}
+	router := gin.New()
+	router.GET("/v1/apps/test/sources", func(ctx *gin.Context) { ctx.Set("page", models.Page{}) }, s.Sources)
+	testServer := httptest.NewServer(router)
+	assert.NotNil(t, testServer)
+	defer testServer.Close()
+
+	mockService.EXPECT().Sources(gomock.Any(), gomock.Any()).Return(nil, errors.New("test")).Times(1)
+	resp, err := http.Get(testServer.URL + "/v1/apps/test/sources?slot=0&task=test")
+	assert.NoError(t, err)
+	assert.Equal(t, resp.StatusCode, http.StatusServiceUnavailable)
+
+	mockService.EXPECT().Sources(gomock.Any(), gomock.Any()).Return(nil, nil).Times(1)
+	resp, err = http.Get(testServer.URL + "/v1/apps/test/sources?slot=0&task=test")
+	assert.NoError(t, err)
+	assert.Equal(t, resp.StatusCode, http.StatusOK)
 }
 
 func TestSearch(t *testing.T) {
-	sr := startErrorClient()
-	config.GetConfig().EsURL = sr.URL
-	baseURL = sr.URL
-	s = GetSearch()
-	se := startAPIServer(s)
-	resp, err := http.Get(se.URL + "/api/v1/apps/test/search?slot=0&task=test")
-	if err == nil && resp.StatusCode == 503 {
-		t.Log("success")
-	} else {
-		t.Error("faild")
-	}
+	mockCtl := gomock.NewController(t)
+	defer mockCtl.Finish()
 
-	sr = startHTTPServer()
-	config.GetConfig().EsURL = sr.URL
-	baseURL = sr.URL
-	s = GetSearch()
-	se = startAPIServer(s)
-	resp, err = http.Get(se.URL +
-		"/api/v1/apps/test/search?slot=0&keyword=GET&source=stderr&conj=or&task=test-task")
-	if err == nil && resp.StatusCode == 200 {
-		t.Log("success")
-	} else {
-		t.Log(err)
-		t.Error("faild")
-	}
+	mockService := mock_service.NewMockLogSearchService(mockCtl)
+	s := Search{Service: mockService}
+	router := gin.New()
+	router.GET("/v1/apps/test/search", func(ctx *gin.Context) { ctx.Set("page", models.Page{}) }, s.Search)
+	testServer := httptest.NewServer(router)
+	assert.NotNil(t, testServer)
+	defer testServer.Close()
+
+	mockService.EXPECT().Search(gomock.Any(), gomock.Any()).Return(nil, errors.New("test")).Times(1)
+	resp, err := http.Get(testServer.URL + "/v1/apps/test/search?slot=0&task=test")
+	assert.NoError(t, err)
+	assert.Equal(t, resp.StatusCode, http.StatusServiceUnavailable)
+
+	mockService.EXPECT().Search(gomock.Any(), gomock.Any()).Return(nil, nil).Times(1)
+	resp, err = http.Get(testServer.URL + "/v1/apps/test/search?slot=0&task=test")
+	assert.NoError(t, err)
+	assert.Equal(t, resp.StatusCode, http.StatusOK)
 }
 
 func TestContext(t *testing.T) {
-	sr := startErrorClient()
-	config.GetConfig().EsURL = sr.URL
-	baseURL = sr.URL
-	s = GetSearch()
-	se := startAPIServer(s)
-	resp, err := http.Get(se.URL + "/api/v1/apps/test/context?slot=0&task=test")
-	if err == nil && resp.StatusCode == 503 {
-		t.Log("success")
-	} else {
-		t.Error("faild")
-	}
+	mockCtl := gomock.NewController(t)
+	defer mockCtl.Finish()
 
-	sr = startHTTPServer()
-	config.GetConfig().EsURL = sr.URL
-	baseURL = sr.URL
-	s = GetSearch()
-	se = startAPIServer(s)
-	resp, err = http.Get(se.URL +
-		"/api/v1/apps/test/context?slot=0&keyword=GET&source=stderr&conj=or&task=test-task&offset=12313131310000")
-	if err == nil && resp.StatusCode == 200 {
-		t.Log("success")
-	} else {
-		t.Log(err, resp.StatusCode)
-		t.Error("faild")
-	}
+	mockService := mock_service.NewMockLogSearchService(mockCtl)
+	s := Search{Service: mockService}
+	router := gin.New()
+	router.GET("/v1/apps/test/context", func(ctx *gin.Context) { ctx.Set("page", models.Page{}) }, s.Context)
+	testServer := httptest.NewServer(router)
+	assert.NotNil(t, testServer)
+	defer testServer.Close()
+
+	mockService.EXPECT().Context(gomock.Any(), gomock.Any()).Return(nil, errors.New("test")).Times(1)
+	resp, err := http.Get(testServer.URL + "/v1/apps/test/context?slot=0&task=test")
+	assert.NoError(t, err)
+	assert.Equal(t, resp.StatusCode, http.StatusServiceUnavailable)
+
+	mockService.EXPECT().Context(gomock.Any(), gomock.Any()).Return(nil, nil).Times(1)
+	resp, err = http.Get(testServer.URL + "/v1/apps/test/context?slot=0&task=test")
+	assert.NoError(t, err)
+	assert.Equal(t, resp.StatusCode, http.StatusOK)
 }
