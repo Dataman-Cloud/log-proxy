@@ -13,18 +13,22 @@ import (
 )
 
 func getQueryItems(ctx *gin.Context) {
+	mo := &Monitor{}
 	mo.GetQueryItems(ctx)
 }
 
 func getQuery(ctx *gin.Context) {
+	mo := &Monitor{}
 	mo.Query(ctx)
 }
 
 func getQueryApps(ctx *gin.Context) {
+	mo := &Monitor{}
 	mo.GetApps(ctx)
 }
 
 func getQueryAppTasks(ctx *gin.Context) {
+	mo := &Monitor{}
 	mo.GetAppsTasks(ctx)
 }
 
