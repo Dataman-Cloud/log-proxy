@@ -8,6 +8,9 @@ log-query-options:
     group: "DM_GROUP_NAME"
     offset: "offset"
     source: "path"
+    message: "message"
+    keyword: "keyword"
+    conj: "conj"
 
 
     
