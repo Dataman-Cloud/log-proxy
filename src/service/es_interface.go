@@ -9,4 +9,5 @@ type LogSearchService interface {
 	Sources(opts map[string]interface{}, page models.Page) (map[string]int64, error)
 	Search(opts map[string]interface{}, page models.Page) (map[string]interface{}, error)
 	Context(opts map[string]interface{}, page models.Page) ([]map[string]interface{}, error)
+	Everything(key string, opt map[string]interface{}, page models.Page) (map[string]int64, error)
 }

@@ -1,6 +1,7 @@
 package config
 
 import (
+	"errors"
 	"net/url"
 
 	"github.com/Sirupsen/logrus"
@@ -137,4 +138,13 @@ func LogSlotLabel() string {
 
 	logrus.Debug("log slot label not found. use default value: DM_SLOT_INDEX")
 	return "DM_SLOT_INDEX"
+}
+
+func GetLogLabel(key string) (string, error) {
+	v, ok := logOptionaLabels[key]
+	if ok {
+		return v, nil
+	}
+
+	return "", errors.New("invalid log label: " + key)
 }

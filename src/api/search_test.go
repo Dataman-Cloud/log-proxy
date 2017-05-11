@@ -215,3 +215,26 @@ func TestContext(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, resp.StatusCode, http.StatusOK)
 }
+
+func TestEverything(t *testing.T) {
+	mockCtl := gomock.NewController(t)
+	defer mockCtl.Finish()
+
+	mockService := mock_service.NewMockLogSearchService(mockCtl)
+	s := Search{Service: mockService}
+	router := gin.New()
+	router.GET("/v1/everything/app", func(ctx *gin.Context) { ctx.Set("page", models.Page{}) }, s.Everything)
+	testServer := httptest.NewServer(router)
+	assert.NotNil(t, testServer)
+	defer testServer.Close()
+
+	mockService.EXPECT().Everything(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil, errors.New("test")).Times(1)
+	resp, err := http.Get(testServer.URL + "/v1/everything/app?slot=0&task=test")
+	assert.NoError(t, err)
+	assert.Equal(t, resp.StatusCode, http.StatusServiceUnavailable)
+
+	mockService.EXPECT().Everything(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil, nil).Times(1)
+	resp, err = http.Get(testServer.URL + "/v1/everything/app?slot=0&task=test")
+	assert.NoError(t, err)
+	assert.Equal(t, resp.StatusCode, http.StatusOK)
+}
