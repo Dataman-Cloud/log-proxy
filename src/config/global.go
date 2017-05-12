@@ -20,8 +20,6 @@ var DefaultLogOptionalLabels = map[string]string{
 	"user":    "DM_USER",
 	"group":   "DM_GROUP_NAME",
 	"message": "message",
-	"conj":    "conj",
-	"keyword": "keyword",
 }
 
 func LoadLogOptionalLabels() {
@@ -81,22 +79,10 @@ func LogAppLabel() string {
 }
 
 func LogKeywordLabel() string {
-	keyword, ok := logOptionaLabels["keyword"]
-	if ok {
-		return keyword
-	}
-
-	logrus.Debug("log keyword label not found. use default value: keyword")
 	return "keyword"
 }
 
 func LogConjLabel() string {
-	conj, ok := logOptionaLabels["conj"]
-	if ok {
-		return conj
-	}
-
-	logrus.Debug("log conj label not found. use default value: conj")
 	return "conj"
 }
 

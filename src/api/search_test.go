@@ -160,7 +160,7 @@ func TestSources(t *testing.T) {
 	defer testServer.Close()
 
 	mockService.EXPECT().Sources(gomock.Any(), gomock.Any()).Return(nil, errors.New("test")).Times(1)
-	resp, err := http.Get(testServer.URL + "/v1/apps/test/sources?slot=0&task=test")
+	resp, err := http.Get(testServer.URL + "/v1/apps/test/sources?slot=0&task=test&keyword=xxxx&conj=yyyy")
 	assert.NoError(t, err)
 	assert.Equal(t, resp.StatusCode, http.StatusServiceUnavailable)
 

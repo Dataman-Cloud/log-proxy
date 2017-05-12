@@ -9,8 +9,6 @@ log-query-options:
     offset: "offset"
     source: "path"
     message: "message"
-    keyword: "keyword"
-    conj: "conj"
 
 
     
