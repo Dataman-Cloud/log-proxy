@@ -73,15 +73,15 @@ func (_mr *_MockLogSearchServiceRecorder) Sources(arg0, arg1 interface{}) *gomoc
 	return _mr.mock.ctrl.RecordCall(_mr.mock, "Sources", arg0, arg1)
 }
 
-func (_m *MockLogSearchService) Search(opts map[string]interface{}, page models.Page) (map[string]interface{}, error) {
-	ret := _m.ctrl.Call(_m, "Search", opts, page)
+func (_m *MockLogSearchService) Search(keyword string, opts map[string]interface{}, page models.Page) (map[string]interface{}, error) {
+	ret := _m.ctrl.Call(_m, "Search", keyword, opts, page)
 	ret0, _ := ret[0].(map[string]interface{})
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-func (_mr *_MockLogSearchServiceRecorder) Search(arg0, arg1 interface{}) *gomock.Call {
-	return _mr.mock.ctrl.RecordCall(_mr.mock, "Search", arg0, arg1)
+func (_mr *_MockLogSearchServiceRecorder) Search(arg0, arg1, arg2 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCall(_mr.mock, "Search", arg0, arg1, arg2)
 }
 
 func (_m *MockLogSearchService) Context(opts map[string]interface{}, page models.Page) ([]map[string]interface{}, error) {

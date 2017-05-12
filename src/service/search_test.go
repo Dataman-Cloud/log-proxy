@@ -249,13 +249,7 @@ func TestSearch(t *testing.T) {
 	opts["keyword"] = "keyword"
 	opts["conj"] = "or"
 	opts["source"] = "stdout"
-	_, err := service.Search(opts, models.Page{})
-	assert.NoError(t, err)
-
-	// Search will delete keyword
-	opts["keyword"] = "keyword"
-	opts["conj"] = "and"
-	_, err = service.Search(opts, models.Page{})
+	_, err := service.Search("a AND b", opts, models.Page{})
 	assert.NoError(t, err)
 }
 

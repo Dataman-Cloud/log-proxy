@@ -202,30 +202,13 @@ func (s *SearchService) Sources(opts map[string]interface{}, page models.Page) (
 }
 
 // Search search log by condition
-func (s *SearchService) Search(opts map[string]interface{}, page models.Page) (map[string]interface{}, error) {
+func (s *SearchService) Search(keyword string, opts map[string]interface{}, page models.Page) (map[string]interface{}, error) {
 	sort := false
 	var querys []elastic.Query
 
 	messageLabel := config.LogMessageLabel()
-	keywordLabel := config.LogKeywordLabel()
-	keyword, ok := opts[keywordLabel]
-	if ok {
-		sort = true
-		keywordStr := keyword.(string)
-		conjLabel := config.LogConjLabel()
-		conj, ok := opts[conjLabel]
-		if ok && strings.ToLower(conj.(string)) == "or" {
-			keyword = strings.Join(strings.Split(keywordStr, " "), " OR ")
-		} else {
-			keyword = strings.Join(strings.Split(keywordStr, " "), " AND ")
-		}
-
-		if ok {
-			delete(opts, conjLabel)
-		}
-
-		querys = append(querys, elastic.NewQueryStringQuery(messageLabel+keywordStr).AnalyzeWildcard(true))
-		delete(opts, keywordLabel)
+	if keyword != "" {
+		querys = append(querys, elastic.NewQueryStringQuery(messageLabel+keyword).AnalyzeWildcard(true))
 	}
 
 	for k, v := range opts {
