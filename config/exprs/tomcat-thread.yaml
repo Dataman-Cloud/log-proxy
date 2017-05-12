@@ -1,8 +1,8 @@
 ---
-name: "Cpu_Usage_Percent"
-aggregation: "avg"
-function: "irate"
-metric: "container_cpu_usage_seconds_total"
+name: "Tomcat_ThreadCount"
+aggregation: "sum"
+function: ""
+metric: "tomcat_threadpool_currentThreadCount"
 filter:
   app: "container_label_DM_APP_ID='%s'"
   slot: "container_label_DM_SLOT_INDEX='%s'"

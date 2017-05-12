@@ -55,7 +55,7 @@ func TestCreateAlertRule(t *testing.T) {
 	rule.App = "work-nginx"
 	rule.Pending = "5s"
 	rule.Severity = "warning"
-	rule.Indicator = "CPU使用百分比"
+	rule.Indicator = "cpu_usage"
 	rule.Aggregation = "max"
 	rule.Comparison = ">"
 	rule.Threshold = 60
@@ -111,7 +111,6 @@ func TestCreateAlertRuleError(t *testing.T) {
 	if err == nil {
 		t.Errorf("Expect error is not nil, but got %v", err)
 	}
-
 	// test wrong indicator
 	rule.App = "work-nginx"
 	rule.Pending = "5s"
@@ -132,7 +131,7 @@ func TestCreateAlertRuleError(t *testing.T) {
 	rule.App = "work-nginx"
 	rule.Pending = "5s"
 	rule.Severity = "warning"
-	rule.Indicator = "CPU使用百分比"
+	rule.Indicator = "cpu_usage"
 	rule.Aggregation = "max"
 	rule.Comparison = ">"
 	rule.Threshold = 60
@@ -153,7 +152,7 @@ func TestCreateAlertRuleError(t *testing.T) {
 	rule.App = "work-nginx"
 	rule.Pending = "5s"
 	rule.Severity = "warning"
-	rule.Indicator = "CPU使用百分比"
+	rule.Indicator = "cpu_usage"
 	rule.Aggregation = "max"
 	rule.Comparison = ">"
 	rule.Threshold = 60
@@ -175,7 +174,7 @@ func TestCreateAlertRuleError(t *testing.T) {
 	rule.App = "work-nginx"
 	rule.Pending = "5s"
 	rule.Severity = "warning"
-	rule.Indicator = "CPU使用百分比"
+	rule.Indicator = "cpu_usage"
 	rule.Aggregation = "max"
 	rule.Comparison = ">"
 	rule.Threshold = 60
@@ -229,7 +228,7 @@ func TestIsValidRuleFile(t *testing.T) {
 	rule.App = "app"
 	rule.Pending = "5s"
 	rule.Severity = "warning"
-	rule.Indicator = "CPU使用百分比"
+	rule.Indicator = "cpu_usage"
 	err = isValidRuleFile(rule)
 	if err == nil {
 		t.Errorf("Expect error is not nil, but got %v", err)
@@ -238,7 +237,7 @@ func TestIsValidRuleFile(t *testing.T) {
 	rule.App = "app"
 	rule.Pending = "5s"
 	rule.Severity = "warning"
-	rule.Indicator = "CPU使用百分比"
+	rule.Indicator = "cpu_usage"
 	rule.Aggregation = "max"
 	err = isValidRuleFile(rule)
 	if err == nil {
@@ -248,7 +247,7 @@ func TestIsValidRuleFile(t *testing.T) {
 	rule.App = "app"
 	rule.Pending = "5s"
 	rule.Severity = "warning"
-	rule.Indicator = "CPU使用百分比"
+	rule.Indicator = "cpu_usage"
 	rule.Aggregation = "max"
 	rule.Comparison = ""
 	err = isValidRuleFile(rule)
@@ -281,7 +280,7 @@ func TestDeleteAlertRule(t *testing.T) {
 	rule.App = "work-nginx"
 	rule.Pending = "5s"
 	rule.Severity = "warning"
-	rule.Indicator = "CPU使用百分比"
+	rule.Indicator = "cpu_usage"
 	rule.Aggregation = "max"
 	rule.Comparison = ">"
 	rule.Threshold = 60
@@ -323,7 +322,7 @@ func TestDeleteAlertRuleError(t *testing.T) {
 	rule.App = "work-nginx"
 	rule.Pending = "5s"
 	rule.Severity = "warning"
-	rule.Indicator = "CPU使用百分比"
+	rule.Indicator = "cpu_usage"
 	rule.Aggregation = "max"
 	rule.Comparison = ">"
 	rule.Threshold = 60

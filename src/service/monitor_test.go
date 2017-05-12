@@ -73,8 +73,8 @@ func TestGetQueryItemList(t *testing.T) {
 		ExprTmpl: SetQueryExprsList(),
 	}
 	items := query.GetQueryItemList()
-	if items[0] != "CPU使用率" {
-		t.Errorf("Expect the first item is CPU使用率, but got %s", items[0])
+	if items[0] != "Cpu_Usage_Percent" {
+		t.Errorf("Expect the first item is Cpu_Usage_Percent, but got %s", items[0])
 	}
 }
 
@@ -97,7 +97,7 @@ func TestGetQueryMetricExpr(t *testing.T) {
 	prometheusexpr.Exprs(path)
 
 	query := initQuery()
-	query.QueryParameter.Metric = "CPU使用率"
+	query.QueryParameter.Metric = "Cpu_Usage_Percent"
 	query.QueryParameter.App = "dataman-app"
 	query.QueryParameter.Task = "0"
 
@@ -155,7 +155,7 @@ func TestQueryMetric(t *testing.T) {
 	defer teardown()
 	query := initQuery()
 	query.PromServer = server
-	query.Metric = "CPU使用率"
+	query.Metric = "Cpu_Usage_Percent"
 	query.QueryParameter.App = "web-zdou-datamanmesos"
 	query.QueryParameter.Task = "0"
 	query.QueryParameter.Start = "1493697155"
@@ -183,7 +183,7 @@ func TestQueryMetricError(t *testing.T) {
 	defer teardown()
 	query := initQuery()
 	query.PromServer = server
-	query.Metric = "CPU使用率"
+	query.Metric = "Cpu_Usage_Percent"
 	query.QueryParameter.App = "web-zdou-datamanmesos"
 	query.QueryParameter.Task = "0"
 	query.QueryParameter.Start = "1493697155"
@@ -211,7 +211,7 @@ func TestQueryMetricErrorResult(t *testing.T) {
 	defer teardown()
 	query := initQuery()
 	query.PromServer = server
-	query.Metric = "CPU使用率"
+	query.Metric = "Cpu_Usage_Percent"
 	query.QueryParameter.App = "web-zdou-datamanmesos"
 	query.QueryParameter.Task = "0"
 	query.QueryParameter.Start = "1493697155"
@@ -239,7 +239,7 @@ func TestQueryMetricErrorServer(t *testing.T) {
 	defer teardown()
 	query := initQuery()
 	query.PromServer = server + "err"
-	query.Metric = "CPU使用率"
+	query.Metric = "Cpu_Usage_Percent"
 	query.QueryParameter.App = "web-zdou-datamanmesos"
 	query.QueryParameter.Task = "0"
 	query.QueryParameter.Start = "1493697155"
