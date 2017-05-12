@@ -182,13 +182,13 @@ func TestSearch(t *testing.T) {
 	assert.NotNil(t, testServer)
 	defer testServer.Close()
 
-	mockService.EXPECT().Search(gomock.Any(), gomock.Any()).Return(nil, errors.New("test")).Times(1)
-	resp, err := http.Get(testServer.URL + "/v1/apps/test/search?slot=0&task=test")
+	mockService.EXPECT().Search(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil, errors.New("test")).Times(1)
+	resp, err := http.Get(testServer.URL + "/v1/apps/test/search?slot=0&task=test&keyword=xxx&conj=or")
 	assert.NoError(t, err)
 	assert.Equal(t, resp.StatusCode, http.StatusServiceUnavailable)
 
-	mockService.EXPECT().Search(gomock.Any(), gomock.Any()).Return(nil, nil).Times(1)
-	resp, err = http.Get(testServer.URL + "/v1/apps/test/search?slot=0&task=test")
+	mockService.EXPECT().Search(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil, nil).Times(1)
+	resp, err = http.Get(testServer.URL + "/v1/apps/test/search?slot=0&task=test&keyword=xxx&conj=and")
 	assert.NoError(t, err)
 	assert.Equal(t, resp.StatusCode, http.StatusOK)
 }
