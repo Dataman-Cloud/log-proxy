@@ -58,31 +58,11 @@ func TestLogAppLabel(t *testing.T) {
 }
 
 func TestLogKeywordLabel(t *testing.T) {
-	keyword := LogKeywordLabel()
-	assert.Equal(t, keyword, "keyword")
-
-	tmp := keyword
-	defer func() {
-		logOptionaLabels["keyword"] = tmp
-	}()
-
-	delete(logOptionaLabels, "keyword")
-	keyword = LogKeywordLabel()
-	assert.Equal(t, keyword, "keyword")
+	assert.Equal(t, LogKeywordLabel(), "keyword")
 }
 
 func TestLogConjLabel(t *testing.T) {
-	conj := LogConjLabel()
-	assert.Equal(t, conj, "conj")
-
-	tmp := conj
-	defer func() {
-		logOptionaLabels["conj"] = tmp
-	}()
-
-	delete(logOptionaLabels, "conj")
-	conj = LogConjLabel()
-	assert.Equal(t, conj, "conj")
+	assert.Equal(t, LogConjLabel(), "conj")
 }
 
 func TestLogMessageLabel(t *testing.T) {

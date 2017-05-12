@@ -161,6 +161,16 @@ func (s *Search) Search(ctx *gin.Context) {
 	appLabel := config.LogAppLabel()
 	options := config.ConvertRequestQueryParams(ctx.Request.URL.Query())
 	options[appLabel] = app
+	keywordLabel := config.LogKeywordLabel()
+	if ctx.Query(keywordLabel) != "" {
+		options[keywordLabel] = ctx.Query(keywordLabel)
+	}
+
+	conjLabel := config.LogConjLabel()
+	if ctx.Query(conjLabel) != "" {
+		options[conjLabel] = ctx.Query(conjLabel)
+	}
+
 	results, err := s.Service.Search(options, ctx.MustGet("page").(models.Page))
 	if err != nil {
 		utils.ErrorResponse(ctx, utils.NewError(IndexError, err))
