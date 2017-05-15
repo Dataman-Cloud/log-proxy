@@ -33,6 +33,8 @@ func LoadLogOptionalLabels() {
 	logrus.Info("Init log optional labels by config file....")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath(".")
+	viper.AddConfigPath("./config")
+	viper.AddConfigPath("/dataman")
 	viper.SetConfigName(c.LabelsConfigPath)
 
 	if err := viper.ReadInConfig(); err != nil {
