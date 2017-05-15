@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Dataman-Cloud/log-proxy/src/config"
 	"github.com/Dataman-Cloud/log-proxy/src/models"
 	"github.com/Dataman-Cloud/log-proxy/src/utils/prometheusexpr"
 
@@ -25,7 +26,8 @@ const (
 	//OKRESULT define the value of status field in response
 	OKRESULT = "success"
 
-	FILTER = "id=~'/docker/.*', name=~'mesos.*', state='running'"
+	FILTER      = "id=~'/docker/.*', name=~'mesos.*', state='running'"
+	lablePrefix = "container_label_"
 )
 
 func isInArray(array []string, value string) bool {
@@ -189,10 +191,13 @@ func (query *Query) QueryMetric() (*models.QueryRangeResult, error) {
 
 // GetQueryApps set the Query exprs by utils.Expr
 func (query *Query) GetQueryApps() ([]string, error) {
+	appLabel := fmt.Sprintf("%s%s", lablePrefix, config.LogAppLabel())
+	byLabels := fmt.Sprintf("( %s )", appLabel)
+
 	start, end := timeRange(query.Start, query.End)
 	query.Start = start
 	query.End = end
-	query.Expr = fmt.Sprintf("count(container_tasks_state{%s, container_label_DM_LOG_TAG!='ignore'}) by (container_label_DM_APP_ID)", FILTER)
+	query.Expr = fmt.Sprintf("count(container_tasks_state{%s, container_label_DM_LOG_TAG!='ignore'}) by %s", FILTER, byLabels)
 
 	response, request, err := query.getExprResponse()
 	if err != nil {
@@ -224,10 +229,15 @@ func (query *Query) GetQueryApps() ([]string, error) {
 
 // GetQueryAppTasks set the Query exprs by utils.Expr
 func (query *Query) GetQueryAppTasks() ([]string, error) {
+	appLabel := fmt.Sprintf("%s%s", lablePrefix, config.LogAppLabel())
+	slotLabel := fmt.Sprintf("%s%s", lablePrefix, config.LogSlotLabel())
+	filter := appLabel + "=\"%s\", container_label_DM_LOG_TAG!=\"ignore\", " + FILTER
+	byLabels := fmt.Sprintf("( %s )", slotLabel)
+
 	start, end := timeRange(query.Start, query.End)
 	query.Start = start
 	query.End = end
-	query.Expr = fmt.Sprintf("count(container_tasks_state{container_label_DM_APP_ID='%s', %s, container_label_DM_LOG_TAG!='ignore'}) by (container_label_DM_SLOT_INDEX)", query.App, FILTER)
+	query.Expr = fmt.Sprintf("count(container_tasks_state{%s}) by %s", filter, byLabels)
 	response, request, err := query.getExprResponse()
 	if err != nil {
 		return nil, err

@@ -3,11 +3,16 @@ package alertservice
 import (
 	"fmt"
 
+	"github.com/Dataman-Cloud/log-proxy/src/config"
 	"github.com/Dataman-Cloud/log-proxy/src/models"
 )
 
+const lablePrefix = "container_label_"
+
 // ReceiveAlertEvent recive the alerts from Alertmanager
 func (alert *Alert) ReceiveAlertEvent(message map[string]interface{}) error {
+	slotLabel := fmt.Sprintf("%s%s", lablePrefix, config.LogSlotLabel())
+
 	var err error
 	for _, item := range message["alerts"].([]interface{}) {
 		labels := item.(map[string]interface{})["labels"].(map[string]interface{})
@@ -18,7 +23,7 @@ func (alert *Alert) ReceiveAlertEvent(message map[string]interface{}) error {
 			App:           labels["app"].(string),
 			Indicator:     labels["indicator"].(string),
 			Severity:      labels["severity"].(string),
-			Task:          labels["container_label_DM_SLOT_INDEX"].(string),
+			Task:          labels[slotLabel].(string),
 			Judgement:     labels["judgement"].(string),
 			ContainerID:   labels["id"].(string),
 			ContainerName: labels["name"].(string),
