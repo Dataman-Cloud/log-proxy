@@ -159,7 +159,7 @@ func (s *Search) Sources(ctx *gin.Context) {
 func (s *Search) Search(ctx *gin.Context) {
 	keyword := ctx.Query(config.LogKeywordLabel())
 	if keyword != "" {
-		if strings.ToLower(ctx.Query(config.LogConjLabel())) == "" {
+		if strings.ToLower(ctx.Query(config.LogConjLabel())) == "or" {
 			keyword = strings.Join(strings.Split(keyword, " "), " OR ")
 		} else {
 			keyword = strings.Join(strings.Split(keyword, " "), " AND ")
