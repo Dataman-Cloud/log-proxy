@@ -208,7 +208,7 @@ func (s *SearchService) Search(keyword string, opts map[string]interface{}, page
 
 	messageLabel := config.LogMessageLabel()
 	if keyword != "" {
-		querys = append(querys, elastic.NewQueryStringQuery(messageLabel+keyword).AnalyzeWildcard(true))
+		querys = append(querys, elastic.NewQueryStringQuery(messageLabel+":"+keyword).AnalyzeWildcard(true))
 	}
 
 	for k, v := range opts {
