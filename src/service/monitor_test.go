@@ -46,7 +46,7 @@ func getContentOfFile(fileName string) []byte {
 
 func TestIsInArray(t *testing.T) {
 	value := "test"
-	values := make([]string, 0)
+	values := make([]interface{}, 0)
 	values = append(values, "test")
 	if !isInArray(values, value) {
 		t.Error("Expect get true, but get false")

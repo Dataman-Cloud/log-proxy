@@ -7,11 +7,9 @@ import (
 	"github.com/Dataman-Cloud/log-proxy/src/models"
 )
 
-const lablePrefix = "container_label_"
-
 // ReceiveAlertEvent recive the alerts from Alertmanager
 func (alert *Alert) ReceiveAlertEvent(message map[string]interface{}) error {
-	slotLabel := fmt.Sprintf("%s%s", lablePrefix, config.LogSlotLabel())
+	slotLabel := config.MonitorSlotLabel()
 
 	var err error
 	for _, item := range message["alerts"].([]interface{}) {

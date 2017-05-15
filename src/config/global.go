@@ -20,6 +20,7 @@ var DefaultLogOptionalLabels = map[string]string{
 	"user":    "DM_USER",
 	"group":   "DM_GROUP_NAME",
 	"message": "message",
+	"tag":     "DM_LOG_TAG",
 }
 
 func LoadLogOptionalLabels() {
@@ -133,4 +134,36 @@ func GetLogLabel(key string) (string, error) {
 	}
 
 	return "", errors.New("invalid log label: " + key)
+}
+
+const lablePrefix = "container_label_"
+
+func MonitorAppLabel() string {
+	app, ok := logOptionaLabels["app"]
+	if ok {
+		return lablePrefix + app
+	}
+
+	logrus.Debug("App app label not found. use default value: DM_APP_ID")
+	return lablePrefix + "DM_APP_ID"
+}
+
+func MonitorSlotLabel() string {
+	slot, ok := logOptionaLabels["slot"]
+	if ok {
+		return lablePrefix + slot
+	}
+
+	logrus.Debug("log slot label not found. use default value: DM_SLOT_INDEX")
+	return lablePrefix + "DM_SLOT_INDEX"
+}
+
+func LogTagLabel() string {
+	tag, ok := logOptionaLabels["tag"]
+	if ok {
+		return lablePrefix + tag
+	}
+
+	logrus.Debug("log slot label not found. use default value: DM_LOG_TAG")
+	return lablePrefix + "DM_LOG_TAG"
 }

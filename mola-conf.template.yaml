@@ -9,6 +9,4 @@ log-query-options:
     offset: "offset"
     source: "path"
     message: "message"
-
-
-    
+    tag: "DM_LOG_TAG"

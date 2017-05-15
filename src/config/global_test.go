@@ -128,3 +128,45 @@ func TestGetLogLabel(t *testing.T) {
 	_, err = GetLogLabel("xxxxxxxxxxxxx")
 	assert.Error(t, err)
 }
+
+func TestMonitorAppLabel(t *testing.T) {
+	app := MonitorAppLabel()
+	assert.Equal(t, app, "container_label_DM_APP_ID")
+
+	tmp := app
+	defer func() {
+		logOptionaLabels["app"] = tmp
+	}()
+
+	delete(logOptionaLabels, "app")
+	app = MonitorAppLabel()
+	assert.Equal(t, app, "container_label_DM_APP_ID")
+}
+
+func TestMonitorSlotLabel(t *testing.T) {
+	slot := MonitorSlotLabel()
+	assert.Equal(t, slot, "container_label_DM_SLOT_INDEX")
+
+	tmp := slot
+	defer func() {
+		logOptionaLabels["slot"] = tmp
+	}()
+
+	delete(logOptionaLabels, "slot")
+	slot = MonitorSlotLabel()
+	assert.Equal(t, slot, "container_label_DM_SLOT_INDEX")
+}
+
+func TestLogTagLabel(t *testing.T) {
+	tag := LogTagLabel()
+	assert.Equal(t, tag, "container_label_DM_LOG_TAG")
+
+	tmp := tag
+	defer func() {
+		logOptionaLabels["tag"] = tmp
+	}()
+
+	delete(logOptionaLabels, "tag")
+	tag = LogTagLabel()
+	assert.Equal(t, tag, "container_label_DM_LOG_TAG")
+}
