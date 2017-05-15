@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Dataman-Cloud/log-proxy/src/config"
 	"github.com/Dataman-Cloud/log-proxy/src/models"
 	"github.com/Dataman-Cloud/log-proxy/src/utils/prometheusexpr"
 
@@ -28,7 +29,7 @@ const (
 	FILTER = "id=~'/docker/.*', name=~'mesos.*', state='running'"
 )
 
-func isInArray(array []string, value string) bool {
+func isInArray(array []interface{}, value interface{}) bool {
 	for _, valueInList := range array {
 		if value == valueInList {
 			return true
@@ -151,6 +152,7 @@ func (query *Query) getExprResponse() ([]byte, string, error) {
 		return nil, u.String(), err
 	}
 
+	log.Infof("prometheus qurey result by expr: %s", query.Expr)
 	log.Infof("prometheus qurey result by url: %s", u.String())
 	//log.Infof("prometheus qurey expr: %s", query.Expr)
 	return body, u.String(), nil
@@ -188,11 +190,16 @@ func (query *Query) QueryMetric() (*models.QueryRangeResult, error) {
 }
 
 // GetQueryApps set the Query exprs by utils.Expr
-func (query *Query) GetQueryApps() ([]string, error) {
+func (query *Query) GetQueryApps() ([]interface{}, error) {
+	appLabel := config.MonitorAppLabel()
+	tagLabel := config.LogTagLabel()
+	byLabels := fmt.Sprintf("( %s )", appLabel)
+	filter := tagLabel + "!=\"ignore\", " + FILTER
+
 	start, end := timeRange(query.Start, query.End)
 	query.Start = start
 	query.End = end
-	query.Expr = fmt.Sprintf("count(container_tasks_state{%s, container_label_DM_LOG_TAG!='ignore'}) by (container_label_DM_APP_ID)", FILTER)
+	query.Expr = fmt.Sprintf("count(container_tasks_state{%s}) by %s", filter, byLabels)
 
 	response, request, err := query.getExprResponse()
 	if err != nil {
@@ -210,10 +217,10 @@ func (query *Query) GetQueryApps() ([]string, error) {
 		err := fmt.Errorf("%s", result.Error)
 		return nil, err
 	}
-	var list = make([]string, 0)
+	var list = make([]interface{}, 0)
 
 	for _, originData := range result.Data.Result {
-		app := originData.Metric.ContainerLabelAppID
+		app := originData.Metric[appLabel]
 		if !isInArray(list, app) {
 			list = append(list, app)
 		}
@@ -223,11 +230,19 @@ func (query *Query) GetQueryApps() ([]string, error) {
 }
 
 // GetQueryAppTasks set the Query exprs by utils.Expr
-func (query *Query) GetQueryAppTasks() ([]string, error) {
+func (query *Query) GetQueryAppTasks() ([]interface{}, error) {
+	appLabel := config.MonitorAppLabel()
+	slotLabel := config.MonitorSlotLabel()
+	tagLabel := config.LogTagLabel()
+
+	filter := appLabel + "=\"%s\"," + tagLabel + "!=\"ignore\", " + FILTER
+	byLabels := fmt.Sprintf("( %s )", slotLabel)
+	templ := fmt.Sprintf("count(container_tasks_state{%s}) by %s", filter, byLabels)
+
 	start, end := timeRange(query.Start, query.End)
 	query.Start = start
 	query.End = end
-	query.Expr = fmt.Sprintf("count(container_tasks_state{container_label_DM_APP_ID='%s', %s, container_label_DM_LOG_TAG!='ignore'}) by (container_label_DM_SLOT_INDEX)", query.App, FILTER)
+	query.Expr = fmt.Sprintf(templ, query.App)
 	response, request, err := query.getExprResponse()
 	if err != nil {
 		return nil, err
@@ -244,10 +259,10 @@ func (query *Query) GetQueryAppTasks() ([]string, error) {
 		err := fmt.Errorf("%s", result.Error)
 		return nil, err
 	}
-	var list = make([]string, 0)
+	var list = make([]interface{}, 0)
 
 	for _, originData := range result.Data.Result {
-		task := originData.Metric.ContainerLabelSlot
+		task := originData.Metric[slotLabel]
 		if !isInArray(list, task) {
 			list = append(list, task)
 		}

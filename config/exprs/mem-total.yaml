@@ -1,5 +1,5 @@
 ---
-name: "内存分配字节数"
+name: "Memory_Limit_Bytes"
 aggregation: "sum"
 function: ""
 metric: "container_spec_memory_limit_bytes"

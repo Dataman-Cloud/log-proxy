@@ -78,16 +78,16 @@ func (ruleMap *RuleMapper) Map2Raw(rule *models.Rule) (*models.RawRule, error) {
 
 func (ruleMap *RuleMapper) GetRuleIndicators() map[string]*models.Indicator {
 	var ruleIndicators = make(map[string]*models.Indicator)
-	ruleIndicators[cpuUsagePercent.Alias] = cpuUsagePercent
-	ruleIndicators[memUsagePercent.Alias] = memUsagePercent
-	ruleIndicators[tomcatThreadPool.Alias] = tomcatThreadPool
+	ruleIndicators["cpu_usage"] = RuleIndicator("cpu_usage")
+	ruleIndicators["mem_usage"] = RuleIndicator("mem_usage")
+	ruleIndicators["tomcat_thread_count"] = RuleIndicator("tomcat_thread_count")
 	return ruleIndicators
 }
 
 func (ruleMap *RuleMapper) GetRuleIndicatorsInName() map[string]*models.Indicator {
 	var ruleIndicators = make(map[string]*models.Indicator)
-	ruleIndicators[cpuUsagePercent.Name] = cpuUsagePercent
-	ruleIndicators[memUsagePercent.Name] = memUsagePercent
-	ruleIndicators[tomcatThreadPool.Name] = tomcatThreadPool
+	ruleIndicators["cpu_usage"] = RuleIndicator("cpu_usage")
+	ruleIndicators["mem_usage"] = RuleIndicator("mem_usage")
+	ruleIndicators["tomcat_thread_count"] = RuleIndicator("tomcat_thread_count")
 	return ruleIndicators
 }

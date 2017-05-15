@@ -42,8 +42,8 @@ type Data struct {
 
 // Result is the sub in Data
 type Result struct {
-	Metric *Metric         `json:"metric"`
-	Values [][]interface{} `json:"values"`
+	Metric map[string]interface{} `json:"metric"`
+	Values [][]interface{}        `json:"values"`
 }
 
 // Metric is the sub in Result

@@ -1,5 +1,5 @@
 ---
-name: "内存使用字节数"
+name: "Memory_Usage_Bytes"
 aggregation: "sum"
 function: ""
 metric: "container_memory_usage_bytes"

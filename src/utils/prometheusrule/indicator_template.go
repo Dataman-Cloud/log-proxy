@@ -1,29 +1,39 @@
 package prometheusrule
 
 import (
+	"fmt"
+
+	"github.com/Dataman-Cloud/log-proxy/src/config"
 	"github.com/Dataman-Cloud/log-proxy/src/models"
 )
 
-var filter = "id=~\"/docker/.*\", name=~\"mesos.*\", container_label_DM_APP_ID=\"%s\", container_label_DM_LOG_TAG!=\"ignore\""
+func RuleIndicator(name string) *models.Indicator {
+	var filter, appLabel, slotLabel, tagLabel, unit, templ string
+	appLabel = config.MonitorAppLabel()
+	slotLabel = config.MonitorSlotLabel()
+	tagLabel = config.LogTagLabel()
 
-var cpuUsagePercent = &models.Indicator{
-	Name:  "cpu_usage",
-	Alias: "CPU使用百分比",
-	Templ: "%s(irate(container_cpu_usage_seconds_total{" + filter + "}[%s])) by (container_label_DM_APP_ID) keep_common * 100 %s %s",
-	Unit:  "%",
-}
+	baseFilter := "id=~\"/docker/.*\", name=~\"mesos.*\""
+	filter = appLabel + "=\"%s\", " + tagLabel + "!=\"ignore\", " + baseFilter
+	byLabels := fmt.Sprintf("( %s, %s )", appLabel, slotLabel)
+	switch name {
+	case "cpu_usage":
+		templ = "%s(irate(container_cpu_usage_seconds_total{" + filter + "}[%s])) by" + byLabels + " keep_common * 100 %s %s"
+		unit = "%"
+	case "mem_usage":
+		templ = "%s(container_memory_usage_bytes{" + filter +
+			"} / container_spec_memory_limit_bytes{" + filter + "}) by" + byLabels + " keep_common * 100 %s %s"
+		unit = "%"
+	case "tomcat_thread_count":
+		templ = "%s(tomcat_threadpool_currentthreadcount{" + filter + "}) by" + byLabels + " keep_common %s %s"
+		unit = ""
+	}
 
-var memUsagePercent = &models.Indicator{
-	Name:  "mem_usage",
-	Alias: "内存使用百分比",
-	Templ: "%s(container_memory_usage_bytes{" + filter +
-		"} / container_spec_memory_limit_bytes{" + filter + "}) by (container_label_DM_APP_ID) keep_common * 100 %s %s",
-	Unit: "%",
-}
-
-var tomcatThreadPool = &models.Indicator{
-	Name:  "tomcat_thread_count",
-	Alias: "Tomcat线程数",
-	Templ: "%s(tomcat_threadpool_currentthreadcount{" + filter + "}) by (container_label_DM_APP_ID) keep_common %s %s",
-	Unit:  "",
+	indicator := &models.Indicator{
+		Name:  name,
+		Alias: name,
+		Unit:  unit,
+		Templ: templ,
+	}
+	return indicator
 }
