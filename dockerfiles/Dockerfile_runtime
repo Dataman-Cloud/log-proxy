@@ -8,9 +8,7 @@ ADD bin/mola /dataman/mola
 ADD frontend /dataman/frontend
 ADD env_file.template /dataman/env_file
 ADD config/exprs/* /dataman/exprs/
-
-VOLUME /dataman/rules
-VOLUME /dataman/exprs
+ADD config/mola-conf.template.yaml /dataman/labels-define.yaml
 
 WORKDIR dataman
 
