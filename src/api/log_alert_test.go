@@ -101,6 +101,7 @@ func TestUpdateLogAlertRule(t *testing.T) {
 	assert.Nil(t, err)
 
 	// test success condition 1: keyword filter was empty
+	mockStore.EXPECT().GetLogAlertRule(gomock.Any()).Return(rule, nil).Times(1)
 	mockStore.EXPECT().UpdateLogAlertRule(gomock.Any()).Return(nil).Times(1)
 	req, err := http.NewRequest("PUT", testServer.URL+"/rules/1", bytes.NewReader(ruleMetaData))
 	assert.Nil(t, err)
@@ -112,6 +113,7 @@ func TestUpdateLogAlertRule(t *testing.T) {
 	ruleIndex := getLogAlertRuleIndex(rule)
 	s.KeywordFilter[ruleIndex] = list.New()
 	s.KeywordFilter[ruleIndex].PushBack(rule)
+	mockStore.EXPECT().GetLogAlertRule(gomock.Any()).Return(rule, nil).Times(1)
 	mockStore.EXPECT().UpdateLogAlertRule(gomock.Any()).Return(nil).Times(1)
 	req, err = http.NewRequest("PUT", testServer.URL+"/rules/1", bytes.NewReader(ruleMetaData))
 	assert.Nil(t, err)
@@ -126,7 +128,16 @@ func TestUpdateLogAlertRule(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, resp.StatusCode, http.StatusBadRequest)
 
+	// test get old rule error
+	mockStore.EXPECT().GetLogAlertRule(gomock.Any()).Return(rule, errors.New("test")).Times(1)
+	req, err = http.NewRequest("PUT", testServer.URL+"/rules/1", bytes.NewReader(ruleMetaData))
+	assert.Nil(t, err)
+	resp, err = http.DefaultClient.Do(req)
+	assert.Nil(t, err)
+	assert.Equal(t, resp.StatusCode, http.StatusServiceUnavailable)
+
 	// test error with db update error
+	mockStore.EXPECT().GetLogAlertRule(gomock.Any()).Return(rule, nil).Times(1)
 	mockStore.EXPECT().UpdateLogAlertRule(gomock.Any()).Return(errors.New("test")).Times(1)
 	req, err = http.NewRequest("PUT", testServer.URL+"/rules/1", bytes.NewReader(ruleMetaData))
 	assert.Nil(t, err)
