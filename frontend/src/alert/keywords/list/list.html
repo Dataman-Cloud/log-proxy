@@ -1,5 +1,5 @@
 <div class="alarm-strategy-list" layout="column">
-    <h2>告警规则</h2>
+    <h2>日志告警规则</h2>
     <div class="panel">
         <div layout="row" layout-align="end start">
             <md-button id="newWords" class="md-raised md-primary" ui-sref="home.alertKeywordCreate">
@@ -34,23 +34,41 @@
                     </td>
                     <td md-cell>
                         <div class="action" layout="row">
-                            <md-button aria-label="delete" class="md-raised"
-                                       data-ng-click="vm.deleteKeyword(keyword.id)">
-                                删除
-                            </md-button>
-                            <md-button aria-label="update" class="md-raised"
-                                       data-ui-sref="home.alertKeywordUpdate({id: keyword.id})">更新
-                            </md-button>
-                            <md-button aria-label="update" class="md-raised" ng-if="keyword.status === 'Disabled'"
-                                       ng-click="vm.activateAlarm(keyword)">激活
-                            </md-button>
-                            <md-button aria-label="update" class="md-raised" ng-if="keyword.status === 'Enabled'"
-                                       ng-click="vm.activateAlarm(keyword)">停止
-                            </md-button>
-                            <md-button aria-label="update" class="md-raised"
-                                       data-ui-sref="home.alerthistory({cluster: keyword.cluster, app: keyword.app, keyword: keyword.keyword})">
-                                查看历史
-                            </md-button>
+                          <md-button aria-label="update" class="md-raised" style="height:20px;margin-top:8px;"
+                                     data-ui-sref="home.alerthistory({cluster: keyword.cluster, app: keyword.app, keyword: keyword.keyword})">
+                                     查看历史
+                          </md-button>
+                            <md-menu md-offset="0 -5" >
+                              <md-button aria-label='more' class="md-icon-menu" ng-click="$mdOpenMenu($event)">
+                                  <i class='fa fa-ellipsis-h'></i>
+                              </md-button>
+                              <md-menu-content width="2">
+                                <md-menu-item  ng-if="keyword.status === 'Disabled'">
+                                  <md-button aria-label="update" class="md-raised"
+                                             ng-click="vm.activateAlarm(keyword)">
+                                             启动
+                                  </md-button>
+                                </md-menu-item>
+                                <md-menu-item ng-if="keyword.status === 'Enabled'">
+                                  <md-button aria-label="update" class="md-raised"
+                                             ng-click="vm.activateAlarm(keyword)">
+                                             暂停
+                                  </md-button>
+                                </md-menu-item>
+                                <md-menu-item>
+                                <md-button aria-label="update" class="md-raised"
+                                           data-ui-sref="home.alertKeywordUpdate({id: keyword.id})">
+                                           更新
+                                </md-button>
+                              </md-menu-item>
+                              <md-menu-item>
+                                  <md-button aria-label="delete" class="md-raised"
+                                               data-ng-click="vm.deleteKeyword(keyword.id)">
+                                               删除
+                                  </md-button>
+                                </md-menu-item>
+                              </md-menu-content>
+                            </md-menu>
                         </div>
                     </td>
                 </tr>

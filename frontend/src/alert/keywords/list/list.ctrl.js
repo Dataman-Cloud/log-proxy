@@ -10,8 +10,8 @@
         var self = this;
 
         self.ALERT_STATUS = {
-            Enabled: '激活',
-            Disabled: '未激活'
+            Enabled: '已启用',
+            Disabled: '已暂停'
         };
 
         self.count = 0;
