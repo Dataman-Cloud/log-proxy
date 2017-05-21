@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"container/list"
 	"errors"
+	"strconv"
 	"text/template"
 
 	"github.com/Dataman-Cloud/log-proxy/src/config"
@@ -119,6 +120,12 @@ func (s *Search) UpdateLogAlertRule(ctx *gin.Context) {
 		utils.ErrorResponse(ctx, utils.NewError(ParamError, err))
 	}
 
+	oldRule, err := s.Store.GetLogAlertRule(strconv.FormatUint(alertRule.ID, 10))
+	if err != nil {
+		utils.ErrorResponse(ctx, utils.NewError(UpdateAlertError, err))
+		return
+	}
+
 	if err := s.Store.UpdateLogAlertRule(&alertRule); err != nil {
 		utils.ErrorResponse(ctx, utils.NewError(UpdateAlertError, err))
 		return
@@ -129,7 +136,7 @@ func (s *Search) UpdateLogAlertRule(ctx *gin.Context) {
 	s.Kmutex.Lock()
 	if s.KeywordFilter[ruleIndex] != nil {
 		for e := s.KeywordFilter[ruleIndex].Front(); e != nil; e = e.Next() {
-			if e.Value.(models.LogAlertRule).Keyword == alertRule.Keyword {
+			if e.Value.(models.LogAlertRule).Keyword == oldRule.Keyword {
 				s.KeywordFilter[ruleIndex].Remove(e)
 				s.KeywordFilter[ruleIndex].PushBack(alertRule)
 				break
