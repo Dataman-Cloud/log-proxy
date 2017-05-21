@@ -411,15 +411,15 @@ func (alert *Alert) ReceiveAlertEvent(ctx *gin.Context) {
 			Indicator: labels["indicator"].(string),
 			Cluster:   labels["container_label_VCLUSTER"].(string),
 			App:       labels["container_label_APP_ID"].(string),
-			Task:      labels["container_env_mesos_task_id"].(string),
+			//Task:      labels["container_env_mesos_task_id"].(string),
 			Judgement: labels["judgement"].(string),
 			//UserName:    labels["container_label_USER_NAME"].(string),
 			//GroupName:   labels["container_label_GROUP_NAME"].(string),
-			ContainerID:   labels["id"].(string),
-			ContainerName: labels["name"].(string),
-			Value:         labels["value"].(string),
-			Description:   annotations["description"].(string),
-			Summary:       annotations["summary"].(string),
+			//ContainerID:   labels["id"].(string),
+			//ContainerName: labels["name"].(string),
+			Value:       labels["value"].(string),
+			Description: annotations["description"].(string),
+			Summary:     annotations["summary"].(string),
 		}
 		if err = alert.Store.CreateOrIncreaseEvent(event); err != nil {
 			utils.ErrorResponse(ctx, utils.NewError(ReceiveEventError, err))

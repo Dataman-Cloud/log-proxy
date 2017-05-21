@@ -12,14 +12,13 @@
             <table md-table id="user-list-table">
                 <thead md-head>
                 <tr md-row>
-                    <th md-column>报警组</th>
                     <th md-column>报警名称</th>
                     <th md-column>集群</th>
                     <th md-column>应用</th>
-                    <th md-column>报警延迟</th>
                     <th md-column>报警指标</th>
                     <th md-column>报警级别</th>
                     <th md-column>监控阀值</th>
+                    <th md-column>描述</th>
                     <th md-column>创建时间</th>
                     <th md-column>更新时间</th>
                     <th md-column>操作</th>
@@ -29,9 +28,6 @@
                 <tr md-row
                     ng-repeat="rule in vm.rules track by $index">
                     <td md-cell>
-                        {/rule.class/}
-                    </td>
-                    <td md-cell>
                         {/rule.name/}
                     </td>
                     <td md-cell>
@@ -39,9 +35,6 @@
                     </td>
                     <td md-cell>
                         {/rule.app/}
-                    </td>
-                    <td md-cell>
-                        {/rule.pending/}
                     </td>
                     <td md-cell>
                         {/rule.indicator/}
@@ -55,6 +48,9 @@
                         <span>{/rule.threshold/}</span>
                         <span data-ng-if="rule.indicator === 'cpu_usage'">%</span>
                         <span data-ng-if="rule.indicator === 'mem_usage'">%</span>
+                    </td>
+                    <td md-cell>
+                        {/rule.description/}
                     </td>
                     <td md-cell>
                         {/rule.CreatedAt | date:" yyyy-MM-dd HH:mm:ss"/}

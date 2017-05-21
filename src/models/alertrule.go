@@ -39,14 +39,16 @@ type Rule struct {
 	Aggregation string    `json:"aggregation"` // max, min, avg, sum, count
 	Comparison  string    `json:"comparison"`
 	Threshold   int64     `json:"threshold"`
+	Description string    `json:"description"`
 }
 
 func NewRule() *Rule {
 	return &Rule{
-		Class:     "mola",
-		Status:    "Uninit", //uninit, Enabled, Disabled
-		Duration:  "5m",
-		Threshold: int64(0),
+		Class:       "mola",
+		Status:      "Uninit", //uninit, Enabled, Disabled
+		Duration:    "5m",
+		Threshold:   int64(0),
+		Description: "",
 	}
 }
 
