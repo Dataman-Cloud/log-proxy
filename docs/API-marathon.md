@@ -203,7 +203,8 @@ curl -X POST "http://127.0.0.1:5098/v1/alert/rules" -d '{
        "severity": "warning",
        "aggregation": "max",
        "comparison": ">",
-       "Threshold": 60,
+       "threshold": 60,
+       "description": ""
   }  
   return
   {
@@ -225,7 +226,8 @@ curl -X POST "http://127.0.0.1:5098/v1/alert/rules" -d '{
     "severity": "warning",
     "aggregation": "max",
     "comparison": ">",
-    "threshold": 60
+    "threshold": 60,
+    "description": "18611780814"
     }
   }
 ```
@@ -278,7 +280,8 @@ return
         "severity": "warning",
         "aggregation": "max",
         "comparison": ">",
-        "threshold": 60
+        "threshold": 60,
+        "description": "18611780814"
       }
     ]
   }
@@ -349,7 +352,8 @@ curl -X PUT "http://127.0.0.1:5098/v1/alert/rules/1" -d '{
        "severity": "warning",
        "aggregation": "max",
        "comparison": ">",
-       "Threshold": 60
+       "threshold": 60,
+       "description": "18611780814"
   }'
 ```
 更新报警规则状态，报警规则分三种状态:
@@ -387,7 +391,8 @@ return
     "severity": "warning",
     "aggregation": "max",
     "comparison": ">",
-    "threshold": 60
+    "threshold": 60,
+    "description": ""
   }
 }
 ```

@@ -50,10 +50,11 @@
                 <tr md-row>
                     <th md-column>创建时间</th>
                     <th md-column>更新时间</th>
-                    <th md-column>报警名称</th>
                     <th md-column>集群</th>
                     <th md-column>应用</th>
                     <th md-column>告警级别</th>
+                    <th md-column>监控指标</th>
+                    <th md-column>监控阀值</th>
                     <th md-column>次数</th>
                     <th md-column>值</th>
                     <th md-column>操作</th>
@@ -68,9 +69,6 @@
                         {/event.UpdatedAt | date:" yyyy-MM-dd HH:mm:ss"/}
                     </td>
                     <td md-cell>
-                        {/event.alert_name/}
-                    </td>
-                    <td md-cell>
                         {/event.cluster/}
                     </td>
                     <td md-cell>
@@ -78,6 +76,12 @@
                     </td>
                     <td md-cell>
                         {/event.severity/}
+                    </td>
+                    <td md-cell>
+                        {/event.indicator/}
+                    </td>
+                    <td md-cell>
+                        {/event.judgement/}
                     </td>
                     <td md-cell>
                         {/event.count/}

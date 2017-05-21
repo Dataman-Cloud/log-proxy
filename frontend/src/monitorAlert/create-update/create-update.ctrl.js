@@ -10,7 +10,8 @@
     function CreateMonitorAlertCtrl(target, monitorAlertBackend, Notification, $state, rule, alertBackend, $q) {
         var self = this;
 
-        var rule = rule.data || {};
+        var ruleobj = rule.data || {};
+        
 
         self.target = target;
 
@@ -20,17 +21,19 @@
         self.unit = [];
 
         self.form = {
-            class: rule.class || '',
-            name: rule.name || '',
-            cluster: rule.cluster || '',
-            app: rule.app || '',
-            severity: rule.severity || '',
-            indicator: rule.indicator || '',
-            pending: rule.pending || '',
-            aggregation: rule.aggregation || '',
-            comparison: rule.comparison || '',
-            threshold: rule.threshold || '',
-            cmdbAppid: ''
+            class: ruleobj.class || '',
+            name: ruleobj.name || '',
+            cluster: ruleobj.cluster || '',
+            app: ruleobj.app || '',
+            severity: ruleobj.severity || '',
+            indicator: ruleobj.indicator || '',
+            pending: ruleobj.pending || '',
+            aggregation: ruleobj.aggregation || '',
+            comparison: ruleobj.comparison || '',
+            threshold: ruleobj.threshold || '',
+            cmdbAppid: '',
+            description: ruleobj.description || ''
+
         };
 
         self.loadClusters = loadClusters;
@@ -91,7 +94,7 @@
 
         // 更新
         function update() {
-            self.form.ID = rule.ID;
+            self.form.ID = ruleobj.ID;
             monitorAlertBackend.rule(self.form.ID).update(self.form, function (data) {
                 Notification.success('更新成功');
                 $state.go('home.monitorAlert', null, {reload: true})
