@@ -1,6 +1,6 @@
 <div class="alarm-strategy-list" layout="column">
     <div class="result-sum">
-        <h2>报警规则</h2>
+        <h2>监控告警规则</h2>
     </div>
     <div class="panel">
         <div layout="row" layout-align="end start">
@@ -19,6 +19,7 @@
                     <th md-column>报警级别</th>
                     <th md-column>监控阀值</th>
                     <th md-column>描述</th>
+                    <th md-column>状态</th>
                     <th md-column>创建时间</th>
                     <th md-column>更新时间</th>
                     <th md-column>操作</th>
@@ -53,6 +54,9 @@
                         {/rule.description/}
                     </td>
                     <td md-cell>
+                      <span>{/rule.status === 'Disabled' ? '已暂停' : '已启用'/}</span>
+                    </td>
+                    <td md-cell>
                         {/rule.CreatedAt | date:" yyyy-MM-dd HH:mm:ss"/}
                     </td>
                     <td md-cell>
@@ -60,20 +64,31 @@
                     </td>
                     <td md-cell>
                         <div class="action" layout="row">
-                            <md-button id="update{/$index/}" aria-label="update" class="md-raised"
-                                       data-ui-sref="home.monitorAlertUpdate({id: rule.ID})">
-                                更新
-                            </md-button>
-                            <md-button id="delete{/$index/}" aria-label="update" class="md-raised"
-                                       data-ng-click="vm.deleteAlert(rule.ID, rule.class)">
-                                删除
-                            </md-button>
-                            <md-button aria-label="update" class="md-raised" ng-if="rule.status === 'Disabled'"
-                                       ng-click="vm.activateAlert(rule)">启用
-                            </md-button>
-                            <md-button aria-label="update" class="md-raised" ng-if="rule.status === 'Enabled'"
-                                       ng-click="vm.activateAlert(rule)">暂停
-                            </md-button>
+                          <md-button aria-label="update" class="md-raised" ng-if="rule.status === 'Disabled'"
+                                     ng-click="vm.activateAlert(rule)" style="height:20px;margin-top:8px;">启用
+                          </md-button>
+                          <md-button aria-label="update" class="md-raised" ng-if="rule.status === 'Enabled'"
+                                     ng-click="vm.activateAlert(rule)" style="height:20px;margin-top:8px;">暂停
+                          </md-button>
+                            <md-menu md-offset="0 -5" >
+                              <md-button aria-label='more' class="md-icon-menu" ng-click="$mdOpenMenu($event)">
+                                  <i class='fa fa-ellipsis-h'></i>
+                              </md-button>
+                              <md-menu-content width="2">
+                                <md-menu-item>
+                                  <md-button id="update{/$index/}" aria-label="update" class="md-raised"
+                                             data-ui-sref="home.monitorAlertUpdate({id: rule.ID})">
+                                      更新
+                                  </md-button>
+                                </md-menu-item>
+                                <md-menu-item>
+                                  <md-button id="delete{/$index/}" aria-label="update" class="md-raised"
+                                             data-ng-click="vm.deleteAlert(rule.ID, rule.class)">
+                                      删除
+                                  </md-button>
+                                </md-menu-item>
+                              </md-menu>
+                            </md-menu>
                         </div>
                     </td>
                 </tr>

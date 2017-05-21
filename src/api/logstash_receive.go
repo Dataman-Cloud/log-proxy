@@ -45,11 +45,10 @@ func (s *Search) ReceiverLog(ctx *gin.Context) {
 		}
 
 		event.Keyword = keyword
+		event.Description = rule.Description
 		if err := s.Store.CreateLogAlertEvent(&event); err != nil {
 			logrus.Errorf("create log alert event got error: %s", err.Error())
 		}
-
-		event.Description = rule.Description
 
 		go s.SendLogAlertEventToCama(&event)
 

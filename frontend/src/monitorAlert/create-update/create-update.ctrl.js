@@ -11,7 +11,6 @@
         var self = this;
 
         var ruleobj = rule.data || {};
-        
 
         self.target = target;
 
