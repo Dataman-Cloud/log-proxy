@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"html"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 	"sync"
@@ -13,6 +14,7 @@ import (
 
 	"github.com/Dataman-Cloud/log-proxy/src/config"
 	"github.com/Dataman-Cloud/log-proxy/src/models"
+	"github.com/Dataman-Cloud/log-proxy/src/utils/esclient"
 
 	log "github.com/Sirupsen/logrus"
 	"gopkg.in/olivere/elastic.v3"
@@ -31,19 +33,11 @@ type SearchResult struct {
 }
 
 // NewEsService new es search client
-func NewEsService(url []string) *SearchService {
-	var ofs []elastic.ClientOptionFunc
-	ofs = append(ofs, elastic.SetURL(url...))
-	ofs = append(ofs, elastic.SetMaxRetries(3))
-	if config.GetConfig().SearchDebug {
-		ofs = append(ofs, elastic.SetTraceLog(log.StandardLogger()))
-	}
-	client, err := elastic.NewClient(ofs...)
+func NewEsService(urls []string) *SearchService {
+	client, err := esclient.New(urls)
 	if err != nil {
 		log.Errorf("new elastic client error: %v", err)
-		return nil
 	}
-
 	return &SearchService{
 		ESClient:  client,
 		AlertFlag: make(map[string]time.Time),
@@ -51,8 +45,24 @@ func NewEsService(url []string) *SearchService {
 	}
 }
 
+func (s *SearchService) resetESClient() error {
+	var err error
+	if s.ESClient == nil {
+		s.ESClient, err = esclient.GetClient(strings.Split(config.GetConfig().EsURL, ","))
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // Applications get all applications
 func (s *SearchService) Applications(page models.Page) (map[string]int64, error) {
+	var err error
+	err = s.resetESClient()
+	if err != nil {
+		return nil, err
+	}
 	appLabel := config.LogAppLabel()
 	bquery := elastic.NewBoolQuery().
 		Filter(elastic.NewRangeQuery("logtime.timestamp").Gte(page.RangeFrom).Lte(page.RangeTo).Format("epoch_millis"))
@@ -66,13 +76,27 @@ func (s *SearchService) Applications(page models.Page) (map[string]int64, error)
 		Pretty(true).
 		Do()
 
-	if err != nil && err.(*elastic.Error).Status == http.StatusNotFound {
-		return nil, nil
+	if err != nil {
+		switch errType := err.(type) {
+		case *url.Error:
+			err = s.resetESClient()
+			if err != nil {
+				return nil, err
+			}
+		case *elastic.Error:
+			if errType.Status == http.StatusNotFound {
+				return nil, nil
+			}
+		}
 	}
 
 	if err != nil {
 		log.Errorf("get applications error: %v", err)
 		return apps, err
+	}
+
+	if result == nil {
+		return nil, fmt.Errorf("Get the null from elasicsearch")
 	}
 
 	agg, found := result.Aggregations.Terms("apps")
@@ -87,6 +111,12 @@ func (s *SearchService) Applications(page models.Page) (map[string]int64, error)
 }
 
 func (s *SearchService) Slots(app string, page models.Page) (map[string]int64, error) {
+	var err error
+	err = s.resetESClient()
+	if err != nil {
+		return nil, err
+	}
+
 	appLabel := config.LogAppLabel()
 	slotLabel := config.LogSlotLabel()
 	bQuery := elastic.NewBoolQuery().
@@ -109,6 +139,10 @@ func (s *SearchService) Slots(app string, page models.Page) (map[string]int64, e
 		return slots, err
 	}
 
+	if result == nil {
+		return nil, fmt.Errorf("Get the null from elasicsearch")
+	}
+
 	agg, found := result.Aggregations.Terms("slots")
 	if !found {
 		return slots, nil
@@ -123,6 +157,12 @@ func (s *SearchService) Slots(app string, page models.Page) (map[string]int64, e
 
 // Tasks get application tasks
 func (s *SearchService) Tasks(opts map[string]interface{}, page models.Page) (map[string]int64, error) {
+	var err error
+	err = s.resetESClient()
+	if err != nil {
+		return nil, err
+	}
+
 	var querys []elastic.Query
 	for k, v := range opts {
 		querys = append(querys, elastic.NewTermQuery(k, v))
@@ -162,6 +202,12 @@ func (s *SearchService) Tasks(opts map[string]interface{}, page models.Page) (ma
 }
 
 func (s *SearchService) Sources(opts map[string]interface{}, page models.Page) (map[string]int64, error) {
+	var err error
+	err = s.resetESClient()
+	if err != nil {
+		return nil, err
+	}
+
 	sources := make(map[string]int64)
 	var querys []elastic.Query
 	for k, v := range opts {
@@ -203,6 +249,12 @@ func (s *SearchService) Sources(opts map[string]interface{}, page models.Page) (
 
 // Search search log by condition
 func (s *SearchService) Search(keyword string, opts map[string]interface{}, page models.Page) (map[string]interface{}, error) {
+	var err error
+	err = s.resetESClient()
+	if err != nil {
+		return nil, err
+	}
+
 	sort := false
 	var querys []elastic.Query
 
@@ -264,6 +316,12 @@ func (s *SearchService) Search(keyword string, opts map[string]interface{}, page
 
 // Context search log context
 func (s *SearchService) Context(opts map[string]interface{}, page models.Page) ([]map[string]interface{}, error) {
+	var err error
+	err = s.resetESClient()
+	if err != nil {
+		return nil, err
+	}
+
 	offsetLabel := config.LogOffsetLabel()
 	offset_, ok := opts[offsetLabel]
 	if !ok {
@@ -342,6 +400,12 @@ func (s *SearchService) Context(opts map[string]interface{}, page models.Page) (
 }
 
 func (s *SearchService) Everything(key string, opts map[string]interface{}, page models.Page) (map[string]int64, error) {
+	var err error
+	err = s.resetESClient()
+	if err != nil {
+		return nil, err
+	}
+
 	var querys []elastic.Query
 	for k, v := range opts {
 		querys = append(querys, elastic.NewTermQuery(k, v))
