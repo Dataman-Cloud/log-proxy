@@ -191,12 +191,13 @@ func TestMain(m *testing.M) {
 	config.GetConfig().EsURL = baseURL
 	ret := m.Run()
 	server.Close()
+
 	os.Exit(ret)
 }
 
 func TestNewEsService(t *testing.T) {
 	config.InitConfig("../../env_file.template")
-	if NewEsService([]string{"localhost"}) == nil {
+	if NewEsService([]string{"localhost"}).ESClient == nil {
 		t.Log("success")
 	} else {
 		t.Error("faild")
@@ -205,6 +206,17 @@ func TestNewEsService(t *testing.T) {
 		t.Log("success")
 	} else {
 		t.Error("faild")
+	}
+}
+
+func TestResetESClient(t *testing.T) {
+	fakeServer := startHTTPServer()
+	fakeURL := fakeServer.URL
+	fakeServer.Close()
+	s := NewEsService([]string{fakeURL})
+	err := s.resetESClient()
+	if err == nil {
+		t.Error("TestResetESClient", err)
 	}
 }
 
