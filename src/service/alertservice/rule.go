@@ -246,7 +246,7 @@ func (alert *Alert) WriteAlertFile(rule *models.Rule) error {
 	return nil
 }
 
-func (alert *Alert) DeleteAlertRule(id uint64, group string) error {
+func (alert *Alert) DeleteAlertRule(id, tenantID uint64, group string) error {
 	var (
 		rowsAffected int64
 		err          error
@@ -259,8 +259,12 @@ func (alert *Alert) DeleteAlertRule(id uint64, group string) error {
 		return fmt.Errorf("DeleteAlertRule: GetAlertRule() %v, ", err)
 	}
 
+	if result.TenantID != tenantID {
+		return fmt.Errorf("DeleteAlertRule: Don't allow to delete the rule %d by tenantID %d", id, tenantID)
+	}
+
 	if result.Group != group {
-		return fmt.Errorf("DeleteAlertRule: Can't delete the rule %d with group %s", id, group)
+		return fmt.Errorf("DeleteAlertRule: Don't allow to delete the rule %d by group %s", id, group)
 	}
 
 	// Delate alert rule
@@ -311,14 +315,14 @@ func (alert *Alert) UpdateAlertFile(rule *models.Rule) error {
 }
 
 // ListAlertRules list the rules by name with pages.
-func (alert *Alert) ListAlertRules(page models.Page, group, app string) (*models.RulesList, error) {
+func (alert *Alert) ListAlertRules(page models.Page, options map[string]interface{}) (*models.RulesList, error) {
 	var (
 		result         *models.RulesList
 		err            error
 		indicatorName  string
 		indicatorAlias string
 	)
-	result, err = alert.Store.ListAlertRules(page, group, app)
+	result, err = alert.Store.ListAlertRules(page, options)
 	if err != nil {
 		return nil, err
 	}
@@ -370,6 +374,7 @@ func (alert *Alert) UpdateAlertRule(rule *models.Rule) (*models.Rule, error) {
 
 	id := rule.ID
 	group := rule.Group
+	tenantID := rule.TenantID
 
 	// Can't Update the app, severity and indicator of one rule, if required, delete and create it.
 	if rule.App != "" || rule.Severity != "" || rule.Indicator != "" {
@@ -382,8 +387,11 @@ func (alert *Alert) UpdateAlertRule(rule *models.Rule) (*models.Rule, error) {
 		return nil, fmt.Errorf("Failed to get the rule %d with error %v", id, err)
 	}
 
+	if result.TenantID != tenantID {
+		return nil, fmt.Errorf("Don't allow to update the rule %d by tenant %d, it is in the tenant %d", id, tenantID, result.TenantID)
+	}
 	if result.Group != group {
-		return nil, fmt.Errorf("Don't Allow to update the rule %d with group %s, it is in the group %s", id, group, result.Group)
+		return nil, fmt.Errorf("Don't allow to update the rule %d with group %s, it is in the group %s", id, group, result.Group)
 	}
 
 	err = alert.Store.UpdateAlertRule(rule)

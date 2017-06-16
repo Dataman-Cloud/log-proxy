@@ -9,9 +9,9 @@ type Alerter interface {
 	GetIndicatorAlias(name string) (alias, unit string, err error)
 	ReloadPrometheusConf() error
 	WriteAlertFile(rule *models.Rule) error
-	DeleteAlertRule(id uint64, group string) error
+	DeleteAlertRule(id uint64, tenantID uint64, group string) error
 	UpdateAlertFile(rule *models.Rule) error
-	ListAlertRules(page models.Page, group, app string) (*models.RulesList, error)
+	ListAlertRules(page models.Page, options map[string]interface{}) (*models.RulesList, error)
 	GetAlertRule(id uint64) (*models.Rule, error)
 	UpdateAlertRule(rule *models.Rule) (*models.Rule, error)
 	ReceiveAlertEvent(message map[string]interface{}) error

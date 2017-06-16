@@ -26,7 +26,8 @@ type Rule struct {
 	CreatedAt   time.Time `json:"CreatedAt"`
 	UpdatedAt   time.Time `json:"UpdatedAt"`
 	Name        string    `json:"name" gorm:"not null;unique"`
-	Group       string    `json:"group" gorm:"not null;column:groupname"`
+	TenantID    uint64    `json:"tenant" gorm:"not null;"`
+	Group       string    `json:"group" gorm:"not null;"`
 	App         string    `json:"app" gorm:"not null;"`
 	Severity    string    `json:"severity" gorm:"not null"`
 	Indicator   string    `json:"indicator" gorm:"not null"`

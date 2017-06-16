@@ -46,9 +46,10 @@ func (m *Monitor) CreateAlertRule(ctx *gin.Context) {
 // DeleteAlertRule delete the rule by id and name from DB and files
 func (m *Monitor) DeleteAlertRule(ctx *gin.Context) {
 	var (
-		err   error
-		id    uint64
-		group string
+		err      error
+		id       uint64
+		tenantID uint64
+		group    string
 	)
 
 	id, err = strconv.ParseUint(ctx.Param("id"), 10, 64)
@@ -56,9 +57,14 @@ func (m *Monitor) DeleteAlertRule(ctx *gin.Context) {
 		utils.ErrorResponse(ctx, fmt.Errorf("Failed to parse the id: %s", err))
 		return
 	}
+	tenantID, err = strconv.ParseUint(ctx.Param("tenant_id"), 10, 64)
+	if err != nil {
+		utils.ErrorResponse(ctx, fmt.Errorf("Failed to parse the tenant_id: %s", err))
+		return
+	}
 	group = ctx.Query("group")
 
-	err = m.Alert.DeleteAlertRule(id, group)
+	err = m.Alert.DeleteAlertRule(id, tenantID, group)
 	if err != nil {
 		utils.ErrorResponse(ctx, err)
 		return
@@ -70,9 +76,23 @@ func (m *Monitor) DeleteAlertRule(ctx *gin.Context) {
 // ListAlertRules list the rules by name with pages.
 func (m *Monitor) ListAlertRules(ctx *gin.Context) {
 	page := ctx.MustGet("page").(models.Page)
-	group := ctx.Query("group")
-	app := ctx.Query("app")
-	data, err := m.Alert.ListAlertRules(page, group, app)
+	tenantID, err = strconv.ParseUint(ctx.Param("tenant_id"), 10, 64)
+	if err != nil {
+		utils.ErrorResponse(ctx, fmt.Errorf("Failed to parse the tenant_id: %s", err))
+		return
+	}
+	options := make(map[string]interface{})
+	if ctx.Query("group") != "" {
+		options["group"] = ctx.Query("group")
+	}
+	if ctx.Query("tenant_id") != "" {
+		options["tenant_id"] = ctx.Query("tenant_id")
+	}
+	if ctx.Query("app") != "" {
+		options["app"] = ctx.Query("app")
+	}
+
+	data, err := m.Alert.ListAlertRules(page, options)
 	if err != nil {
 		utils.ErrorResponse(ctx, err)
 		return
