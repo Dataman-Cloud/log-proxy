@@ -165,9 +165,8 @@ func (m *Monitor) GetAlertEvents(ctx *gin.Context) {
 		}
 	}
 
-	if ctx.Query("group") != "" {
-		options["groupname"] = ctx.Query("group")
-	}
+	groups := ctx.QueryArray("group")
+
 	if ctx.Query("app") != "" {
 		options["app"] = ctx.Query("app")
 	}
@@ -178,7 +177,7 @@ func (m *Monitor) GetAlertEvents(ctx *gin.Context) {
 		options["end"] = ctx.Query("end")
 	}
 
-	result, err := m.Alert.GetAlertEvents(ctx.MustGet("page").(models.Page), options)
+	result, err := m.Alert.GetAlertEvents(ctx.MustGet("page").(models.Page), options, groups)
 	if err != nil {
 		utils.ErrorResponse(ctx, utils.NewError(AckEventError, err))
 		return

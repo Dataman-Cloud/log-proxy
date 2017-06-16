@@ -157,15 +157,15 @@ func (_mr *_MockAlerterRecorder) ReceiveAlertEvent(arg0 interface{}) *gomock.Cal
 	return _mr.mock.ctrl.RecordCall(_mr.mock, "ReceiveAlertEvent", arg0)
 }
 
-func (_m *MockAlerter) GetAlertEvents(page models.Page, options map[string]interface{}) (map[string]interface{}, error) {
-	ret := _m.ctrl.Call(_m, "GetAlertEvents", page, options)
+func (_m *MockAlerter) GetAlertEvents(page models.Page, options map[string]interface{}, groups []string) (map[string]interface{}, error) {
+	ret := _m.ctrl.Call(_m, "GetAlertEvents", page, options, groups)
 	ret0, _ := ret[0].(map[string]interface{})
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-func (_mr *_MockAlerterRecorder) GetAlertEvents(arg0, arg1 interface{}) *gomock.Call {
-	return _mr.mock.ctrl.RecordCall(_mr.mock, "GetAlertEvents", arg0, arg1)
+func (_mr *_MockAlerterRecorder) GetAlertEvents(arg0, arg1, arg2 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCall(_mr.mock, "GetAlertEvents", arg0, arg1, arg2)
 }
 
 func (_m *MockAlerter) AckAlertEvent(id int, options map[string]interface{}) error {

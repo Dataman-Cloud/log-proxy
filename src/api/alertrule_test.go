@@ -506,7 +506,7 @@ func TestGetAlertEvents(t *testing.T) {
 	assert.NotNil(t, testServer)
 	defer testServer.Close()
 
-	mockAlerter.EXPECT().GetAlertEvents(gomock.Any(), gomock.Any()).Return(result, nil).Times(1)
+	mockAlerter.EXPECT().GetAlertEvents(gomock.Any(), gomock.Any(), gomock.Any()).Return(result, nil).Times(1)
 
 	resp, err := http.Get(testServer.URL + "/alert/events?ack=false&group=dev&app=app1")
 	if err != nil {
@@ -536,7 +536,7 @@ func TestGetAlertEventsError(t *testing.T) {
 	assert.NotNil(t, testServer)
 	defer testServer.Close()
 
-	mockAlerter.EXPECT().GetAlertEvents(gomock.Any(), gomock.Any()).Return(result, errors.New("err")).Times(1)
+	mockAlerter.EXPECT().GetAlertEvents(gomock.Any(), gomock.Any(), gomock.Any()).Return(result, errors.New("err")).Times(1)
 
 	resp, err := http.Get(testServer.URL + "/alert/events?group=dev&app=app1&start=1234567&end=1234567")
 	if err != nil {

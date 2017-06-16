@@ -14,7 +14,7 @@ type Store interface {
 	DeleteAlertRuleByID(id uint64) (int64, error)
 	CreateOrIncreaseEvent(event *models.Event) error
 	AckEvent(ID int, group, app string) error
-	ListEvents(page models.Page, options map[string]interface{}) (map[string]interface{}, error)
+	ListEvents(page models.Page, options map[string]interface{}, groups []string) (map[string]interface{}, error)
 	CreateLogAlertRule(rule *models.LogAlertRule) error
 	UpdateLogAlertRule(rule *models.LogAlertRule) error
 	DeleteLogAlertRule(ID string) error

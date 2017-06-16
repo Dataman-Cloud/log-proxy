@@ -124,15 +124,15 @@ func (_mr *_MockStoreRecorder) AckEvent(arg0, arg1, arg2 interface{}) *gomock.Ca
 	return _mr.mock.ctrl.RecordCall(_mr.mock, "AckEvent", arg0, arg1, arg2)
 }
 
-func (_m *MockStore) ListEvents(page models.Page, options map[string]interface{}) (map[string]interface{}, error) {
-	ret := _m.ctrl.Call(_m, "ListEvents", page, options)
+func (_m *MockStore) ListEvents(page models.Page, options map[string]interface{}, groups []string) (map[string]interface{}, error) {
+	ret := _m.ctrl.Call(_m, "ListEvents", page, options, groups)
 	ret0, _ := ret[0].(map[string]interface{})
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-func (_mr *_MockStoreRecorder) ListEvents(arg0, arg1 interface{}) *gomock.Call {
-	return _mr.mock.ctrl.RecordCall(_mr.mock, "ListEvents", arg0, arg1)
+func (_mr *_MockStoreRecorder) ListEvents(arg0, arg1, arg2 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCall(_mr.mock, "ListEvents", arg0, arg1, arg2)
 }
 
 func (_m *MockStore) CreateLogAlertRule(rule *models.LogAlertRule) error {
