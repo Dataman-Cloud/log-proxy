@@ -9,7 +9,7 @@ import (
 func (db *datastore) CreateLogAlertRule(rule *models.LogAlertRule) error {
 	var result models.LogAlertRule
 	notfound := db.Where("log_alert_rules.app = ? AND log_alert_rules.source = ? AND log_alert_rules.keyword = ? "+
-		"AND log_alert_rules.group = ?",
+		"AND log_alert_rules.groupname = ?",
 		rule.App, rule.Source, rule.Keyword, rule.Group).
 		First(&result).
 		RecordNotFound()
@@ -50,14 +50,26 @@ func (db *datastore) GetLogAlertRules(opts map[string]interface{}, page models.P
 		count int
 		rules []*models.LogAlertRule
 	)
+	groups := opts["groups"]
+	delete(opts, "groups")
 
-	if err := db.Table("log_alert_rules").Where(opts).Find(&rules).Count(&count).Error; err != nil {
+	if err := db.Table("log_alert_rules").
+		Where(opts).
+		Where("groupname in (?)", groups).
+		Find(&rules).
+		Count(&count).
+		Error; err != nil {
 		return nil, err
 	}
 
-	if err := db.Table("log_alert_rules").Where(opts).Offset(page.PageFrom).Limit(page.PageSize).
+	if err := db.Table("log_alert_rules").
+		Where(opts).
+		Where("groupname in (?)", groups).
+		Offset(page.PageFrom).
+		Limit(page.PageSize).
 		Scan(&rules).Error; err != nil {
 		return nil, err
+
 	}
 
 	return map[string]interface{}{"count": count, "rules": rules}, nil

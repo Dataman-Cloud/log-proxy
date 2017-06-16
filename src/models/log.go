@@ -28,7 +28,7 @@ type Alert struct {
 type LogAlertRule struct {
 	ID          uint64    `json:"id" gorm:"not null; auto_increment"`
 	User        string    `json:"user" gorm:"not null" binding:"required"`
-	Group       string    `json:"group" gorm:"not null" binding:"required"`
+	Group       string    `json:"group" gorm:"not null;column:groupname;"`
 	Cluster     string    `json:"cluster" gorm:"not null"`
 	App         string    `json:"app" gorm:"not null" binding:"required"`
 	Keyword     string    `json:"keyword" gorm:"not null" binding:"required"`

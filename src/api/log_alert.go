@@ -97,9 +97,7 @@ func (s *Search) GetLogAlertRule(ctx *gin.Context) {
 
 func (s *Search) GetLogAlertRules(ctx *gin.Context) {
 	options := make(map[string]interface{})
-	if ctx.Query("group") != "" {
-		options["group"] = ctx.Query("group")
-	}
+	options["groups"] = ctx.QueryArray("group")
 
 	rules, err := s.Store.GetLogAlertRules(options, ctx.MustGet("page").(models.Page))
 	if err != nil {
