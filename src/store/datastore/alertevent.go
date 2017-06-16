@@ -9,7 +9,6 @@ import (
 )
 
 func (db *datastore) CreateOrIncreaseEvent(event *models.Event) error {
-	fmt.Println("datastore CreateOrIncreaseEvent")
 	var result models.Event
 	notfound := db.Debug().
 		Where("ack = ? AND alertname = ?", false, event.AlertName).
@@ -36,7 +35,7 @@ func (db *datastore) AckEvent(id int, group, app string) error {
 	return db.Save(&result).Error
 }
 
-func (db *datastore) ListEvents(page models.Page, options map[string]interface{}) (map[string]interface{}, error) {
+func (db *datastore) ListEvents(page models.Page, options map[string]interface{}, groups []string) (map[string]interface{}, error) {
 	var (
 		result []*models.Event
 		count  int
@@ -67,23 +66,46 @@ func (db *datastore) ListEvents(page models.Page, options map[string]interface{}
 		delete(options, "end")
 	}
 
-	err := query.
-		Where(options).
-		Find(&result).
-		Count(&count).
-		Error
-	if err != nil {
-		return nil, err
-	}
-
-	err = query.Where(options).
-		Offset(page.PageFrom).
-		Limit(page.PageSize).
-		Order("updated_at desc").
-		Find(&result).
-		Error
-	if err != nil {
-		return nil, err
+	if len(groups) == 0 {
+		err := query.
+			Where(options).
+			Offset(page.PageFrom).
+			Limit(page.PageSize).
+			Order("updated_at desc").
+			Find(&result).
+			Error
+		if err != nil {
+			return nil, err
+		}
+		err = query.
+			Where(options).
+			Find(&result).
+			Count(&count).
+			Error
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		err := query.
+			Where(options).
+			Where("groupname in (?)", groups).
+			Offset(page.PageFrom).
+			Limit(page.PageSize).
+			Order("updated_at desc").
+			Find(&result).
+			Error
+		if err != nil {
+			return nil, err
+		}
+		err = query.
+			Where(options).
+			Where("groupname in (?)", groups).
+			Find(&result).
+			Count(&count).
+			Error
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return map[string]interface{}{"count": count, "events": result}, nil

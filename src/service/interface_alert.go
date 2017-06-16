@@ -15,6 +15,6 @@ type Alerter interface {
 	GetAlertRule(id uint64) (*models.Rule, error)
 	UpdateAlertRule(rule *models.Rule) (*models.Rule, error)
 	ReceiveAlertEvent(message map[string]interface{}) error
-	GetAlertEvents(page models.Page, options map[string]interface{}) (map[string]interface{}, error)
+	GetAlertEvents(page models.Page, options map[string]interface{}, groups []string) (map[string]interface{}, error)
 	AckAlertEvent(id int, options map[string]interface{}) error
 }

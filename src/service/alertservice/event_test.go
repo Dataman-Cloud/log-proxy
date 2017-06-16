@@ -49,8 +49,10 @@ func TestGetAlertEvents(t *testing.T) {
 	data := make(map[string]interface{})
 	data["app"] = "app"
 
-	mockStore.EXPECT().ListEvents(gomock.Any(), gomock.Any()).Return(data, nil).Times(1)
-	result, err := alert.GetAlertEvents(page, options)
+	groups := []string{}
+
+	mockStore.EXPECT().ListEvents(gomock.Any(), gomock.Any(), gomock.Any()).Return(data, nil).Times(1)
+	result, err := alert.GetAlertEvents(page, options, groups)
 	if result == nil {
 		t.Errorf("Expect result is not nil, but got %v", err)
 	}
@@ -70,8 +72,10 @@ func TestGetAlertEventsError(t *testing.T) {
 	page := models.Page{}
 	options := make(map[string]interface{})
 
-	mockStore.EXPECT().ListEvents(gomock.Any(), gomock.Any()).Return(nil, errors.New("err")).Times(1)
-	result, err := alert.GetAlertEvents(page, options)
+	groups := []string{}
+
+	mockStore.EXPECT().ListEvents(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil, errors.New("err")).Times(1)
+	result, err := alert.GetAlertEvents(page, options, groups)
 	if result != nil {
 		t.Errorf("Expect result is  nil, but got %v", err)
 	}

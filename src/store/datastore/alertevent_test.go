@@ -103,8 +103,10 @@ func TestListEvents(t *testing.T) {
 	page.PageFrom = 0
 	page.PageSize = 100
 
+	groups := []string{"dev"}
+	emptyGroups := []string{}
+
 	options := make(map[string]interface{})
-	options["group"] = "dev"
 	options["app"] = "web-zdou-datamanmesos"
 	options["ack"] = false
 	options["start"] = "1494139284"
@@ -121,6 +123,10 @@ func TestListEvents(t *testing.T) {
 
 		return testdb.RowsFromCSVString(columns, rows), nil
 	})
-	data, _ := store.ListEvents(page, options)
+
+	data, _ := store.ListEvents(page, options, groups)
+	assert.Nil(t, data)
+
+	data, _ = store.ListEvents(page, options, emptyGroups)
 	assert.Nil(t, data)
 }

@@ -36,8 +36,8 @@ func (alert *Alert) ReceiveAlertEvent(message map[string]interface{}) error {
 	return nil
 }
 
-func (alert *Alert) GetAlertEvents(page models.Page, options map[string]interface{}) (map[string]interface{}, error) {
-	result, err := alert.Store.ListEvents(page, options)
+func (alert *Alert) GetAlertEvents(page models.Page, options map[string]interface{}, groups []string) (map[string]interface{}, error) {
+	result, err := alert.Store.ListEvents(page, options, groups)
 	if err != nil {
 		return nil, err
 	}
