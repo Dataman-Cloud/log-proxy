@@ -5,7 +5,7 @@ import (
 )
 
 type Store interface {
-	ListAlertRules(page models.Page, group, app string) (*models.RulesList, error)
+	ListAlertRules(page models.Page, groups []string, app string) (*models.RulesList, error)
 	GetAlertRule(id uint64) (models.Rule, error)
 	GetAlertRules() ([]*models.Rule, error)
 	GetAlertRuleByName(name string) (models.Rule, error)

@@ -311,14 +311,14 @@ func (alert *Alert) UpdateAlertFile(rule *models.Rule) error {
 }
 
 // ListAlertRules list the rules by name with pages.
-func (alert *Alert) ListAlertRules(page models.Page, group, app string) (*models.RulesList, error) {
+func (alert *Alert) ListAlertRules(page models.Page, groups []string, app string) (*models.RulesList, error) {
 	var (
 		result         *models.RulesList
 		err            error
 		indicatorName  string
 		indicatorAlias string
 	)
-	result, err = alert.Store.ListAlertRules(page, group, app)
+	result, err = alert.Store.ListAlertRules(page, groups, app)
 	if err != nil {
 		return nil, err
 	}

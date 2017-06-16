@@ -38,24 +38,26 @@ func TestListAlertRules(t *testing.T) {
 	})
 
 	page := models.Page{}
-	result, err := store.ListAlertRules(page, "user1", "")
+	groups := []string{"user1"}
+	result, err := store.ListAlertRules(page, groups, "")
 	assert.Nil(t, err)
 	assert.NotNil(t, result)
 
-	result, err = store.ListAlertRules(page, "", "")
+	emptyGroups := []string{}
+	result, err = store.ListAlertRules(page, emptyGroups, "")
 	assert.Nil(t, err)
 	assert.NotNil(t, result)
 
 	testdb.SetQueryFunc(func(query string) (driver.Rows, error) {
 		return nil, errors.New("db error")
 	})
-	_, err = store.ListAlertRules(page, "user1", "")
+	_, err = store.ListAlertRules(page, groups, "")
 	assert.NotNil(t, err)
 
-	_, err = store.ListAlertRules(page, "", "")
+	_, err = store.ListAlertRules(page, emptyGroups, "")
 	assert.NotNil(t, err)
 
-	_, err = store.ListAlertRules(page, "user1", "app")
+	_, err = store.ListAlertRules(page, groups, "app")
 	assert.NotNil(t, err)
 }
 

@@ -379,6 +379,7 @@ func TestListAlertRules(t *testing.T) {
 	alert.PromServer = testServer.URL
 
 	rule := models.NewRule()
+	rule.Group = "work"
 	rule.App = "work-nginx"
 	rule.Pending = "5s"
 	rule.Severity = "warning"
@@ -395,7 +396,8 @@ func TestListAlertRules(t *testing.T) {
 	mockStore.EXPECT().ListAlertRules(gomock.Any(), gomock.Any(), gomock.Any()).Return(result, nil).Times(1)
 
 	page := &models.Page{}
-	data, err := alert.ListAlertRules(*page, "Undefine", "")
+	groups := []string{}
+	data, err := alert.ListAlertRules(*page, groups, "")
 	if data == nil {
 		t.Errorf("Expect data is not nil, bug got %v", data)
 	}

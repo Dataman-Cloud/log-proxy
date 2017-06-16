@@ -6,34 +6,34 @@ import (
 	"github.com/Dataman-Cloud/log-proxy/src/models"
 )
 
-func (db *datastore) ListAlertRules(page models.Page, group, app string) (*models.RulesList, error) {
+func (db *datastore) ListAlertRules(page models.Page, groups []string, app string) (*models.RulesList, error) {
 	var (
 		rules     []*models.Rule
 		count     int
 		err       error
 		rulesList *models.RulesList
 	)
-	if group == "" {
+	if len(groups) == 0 {
 		db.Table("rules").Find(&rules).Count(&count)
 		err = db.Table("rules").Offset(page.PageFrom).Limit(page.PageSize).Find(&rules).Error
-	} else if group != "" && app == "" {
+	} else if len(groups) != 0 && app == "" {
 		db.Table("rules").
-			Where("groupname = ?", group).
+			Where("groupname in (?)", groups).
 			Scan(&rules).
 			Count(&count)
 		err = db.Debug().Table("rules").
-			Where("groupname = ?", group).
+			Where("groupname in (?)", groups).
 			Offset(page.PageFrom).
 			Limit(page.PageSize).
 			Scan(&rules).
 			Error
-	} else if group != "" && app != "" {
+	} else if len(groups) != 0 && app != "" {
 		db.Table("rules").
-			Where("groupname = ? AND app = ? ", group, app).
+			Where("groupname in (?) AND app = ? ", groups, app).
 			Scan(&rules).
 			Count(&count)
 		err = db.Table("rules").
-			Where("groupname = ? AND app = ? ", group, app).
+			Where("groupname in (?) AND app = ? ", groups, app).
 			Offset(page.PageFrom).
 			Limit(page.PageSize).
 			Scan(&rules).

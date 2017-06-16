@@ -114,7 +114,7 @@ func (_mr *_MockAlerterRecorder) UpdateAlertFile(arg0 interface{}) *gomock.Call 
 	return _mr.mock.ctrl.RecordCall(_mr.mock, "UpdateAlertFile", arg0)
 }
 
-func (_m *MockAlerter) ListAlertRules(page models.Page, group string, app string) (*models.RulesList, error) {
+func (_m *MockAlerter) ListAlertRules(page models.Page, group []string, app string) (*models.RulesList, error) {
 	ret := _m.ctrl.Call(_m, "ListAlertRules", page, group, app)
 	ret0, _ := ret[0].(*models.RulesList)
 	ret1, _ := ret[1].(error)

@@ -70,9 +70,9 @@ func (m *Monitor) DeleteAlertRule(ctx *gin.Context) {
 // ListAlertRules list the rules by name with pages.
 func (m *Monitor) ListAlertRules(ctx *gin.Context) {
 	page := ctx.MustGet("page").(models.Page)
-	group := ctx.Query("group")
+	groups := ctx.QueryArray("group")
 	app := ctx.Query("app")
-	data, err := m.Alert.ListAlertRules(page, group, app)
+	data, err := m.Alert.ListAlertRules(page, groups, app)
 	if err != nil {
 		utils.ErrorResponse(ctx, err)
 		return

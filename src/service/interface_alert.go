@@ -11,7 +11,7 @@ type Alerter interface {
 	WriteAlertFile(rule *models.Rule) error
 	DeleteAlertRule(id uint64, group string) error
 	UpdateAlertFile(rule *models.Rule) error
-	ListAlertRules(page models.Page, group, app string) (*models.RulesList, error)
+	ListAlertRules(page models.Page, group []string, app string) (*models.RulesList, error)
 	GetAlertRule(id uint64) (*models.Rule, error)
 	UpdateAlertRule(rule *models.Rule) (*models.Rule, error)
 	ReceiveAlertEvent(message map[string]interface{}) error
