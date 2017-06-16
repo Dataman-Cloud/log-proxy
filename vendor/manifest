@@ -93,19 +93,10 @@
 			"notests": true
 		},
 		{
-			"importpath": "github.com/gin-gonic/contrib/static",
-			"repository": "https://github.com/gin-gonic/contrib",
-			"vcs": "git",
-			"revision": "cf28f84316e50a05a59d174b37c26ad9a43a1201",
-			"branch": "master",
-			"path": "/static",
-			"notests": true
-		},
-		{
 			"importpath": "github.com/gin-gonic/gin",
 			"repository": "https://github.com/gin-gonic/gin",
 			"vcs": "git",
-			"revision": "bb159f9260a262fccbdbd6f37f8575d1e7e6aaa0",
+			"revision": "d5b353c5d5a560322e6d96121c814115562501f7",
 			"branch": "master",
 			"notests": true
 		},
@@ -222,6 +213,14 @@
 			"repository": "https://github.com/manucorporat/stats",
 			"vcs": "git",
 			"revision": "8f2d6ace262eba462e9beb552382c98be51d807b",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/mattn/go-isatty",
+			"repository": "https://github.com/mattn/go-isatty",
+			"vcs": "git",
+			"revision": "fc9e8d8ef48496124e79ae0df75490096eccf6fe",
 			"branch": "master",
 			"notests": true
 		},
@@ -576,6 +575,14 @@
 			"repository": "https://gopkg.in/gemnasium/logrus-airbrake-hook.v2",
 			"vcs": "git",
 			"revision": "bfee1239d796830ca346767650cce5ba90d58c57",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "gopkg.in/go-playground/validator.v8",
+			"repository": "https://gopkg.in/go-playground/validator.v8",
+			"vcs": "git",
+			"revision": "5f57d2222ad794d0dffb07e664ea05e2ee07d60c",
 			"branch": "master",
 			"notests": true
 		},

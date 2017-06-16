@@ -246,7 +246,7 @@ func (alert *Alert) WriteAlertFile(rule *models.Rule) error {
 	return nil
 }
 
-func (alert *Alert) DeleteAlertRule(id uint64, group string) error {
+func (alert *Alert) DeleteAlertRule(id uint64, groups []string) error {
 	var (
 		rowsAffected int64
 		err          error
@@ -259,8 +259,14 @@ func (alert *Alert) DeleteAlertRule(id uint64, group string) error {
 		return fmt.Errorf("DeleteAlertRule: GetAlertRule() %v, ", err)
 	}
 
-	if result.Group != group {
-		return fmt.Errorf("DeleteAlertRule: Can't delete the rule %d with group %s", id, group)
+	isInGroups := false
+	for _, group := range groups {
+		if result.Group == group {
+			isInGroups = true
+		}
+	}
+	if !isInGroups {
+		return fmt.Errorf("DeleteAlertRule: Can't delete the rule %d, it is in group %s", id, result.Group)
 	}
 
 	// Delate alert rule
@@ -311,14 +317,14 @@ func (alert *Alert) UpdateAlertFile(rule *models.Rule) error {
 }
 
 // ListAlertRules list the rules by name with pages.
-func (alert *Alert) ListAlertRules(page models.Page, group, app string) (*models.RulesList, error) {
+func (alert *Alert) ListAlertRules(page models.Page, groups []string, app string) (*models.RulesList, error) {
 	var (
 		result         *models.RulesList
 		err            error
 		indicatorName  string
 		indicatorAlias string
 	)
-	result, err = alert.Store.ListAlertRules(page, group, app)
+	result, err = alert.Store.ListAlertRules(page, groups, app)
 	if err != nil {
 		return nil, err
 	}
