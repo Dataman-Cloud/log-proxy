@@ -46,9 +46,8 @@ func (m *Monitor) CreateAlertRule(ctx *gin.Context) {
 // DeleteAlertRule delete the rule by id and name from DB and files
 func (m *Monitor) DeleteAlertRule(ctx *gin.Context) {
 	var (
-		err   error
-		id    uint64
-		group string
+		err error
+		id  uint64
 	)
 
 	id, err = strconv.ParseUint(ctx.Param("id"), 10, 64)
@@ -56,9 +55,9 @@ func (m *Monitor) DeleteAlertRule(ctx *gin.Context) {
 		utils.ErrorResponse(ctx, fmt.Errorf("Failed to parse the id: %s", err))
 		return
 	}
-	group = ctx.Query("group")
+	groups := ctx.QueryArray("group")
 
-	err = m.Alert.DeleteAlertRule(id, group)
+	err = m.Alert.DeleteAlertRule(id, groups)
 	if err != nil {
 		utils.ErrorResponse(ctx, err)
 		return

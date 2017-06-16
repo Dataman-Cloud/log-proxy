@@ -94,8 +94,8 @@ func (_mr *_MockAlerterRecorder) WriteAlertFile(arg0 interface{}) *gomock.Call {
 	return _mr.mock.ctrl.RecordCall(_mr.mock, "WriteAlertFile", arg0)
 }
 
-func (_m *MockAlerter) DeleteAlertRule(id uint64, group string) error {
-	ret := _m.ctrl.Call(_m, "DeleteAlertRule", id, group)
+func (_m *MockAlerter) DeleteAlertRule(id uint64, groups []string) error {
+	ret := _m.ctrl.Call(_m, "DeleteAlertRule", id, groups)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
@@ -114,8 +114,8 @@ func (_mr *_MockAlerterRecorder) UpdateAlertFile(arg0 interface{}) *gomock.Call 
 	return _mr.mock.ctrl.RecordCall(_mr.mock, "UpdateAlertFile", arg0)
 }
 
-func (_m *MockAlerter) ListAlertRules(page models.Page, group []string, app string) (*models.RulesList, error) {
-	ret := _m.ctrl.Call(_m, "ListAlertRules", page, group, app)
+func (_m *MockAlerter) ListAlertRules(page models.Page, groups []string, app string) (*models.RulesList, error) {
+	ret := _m.ctrl.Call(_m, "ListAlertRules", page, groups, app)
 	ret0, _ := ret[0].(*models.RulesList)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1

@@ -13,18 +13,19 @@ func (db *datastore) ListAlertRules(page models.Page, groups []string, app strin
 		err       error
 		rulesList *models.RulesList
 	)
+	query := db.Table("rules").Offset(page.PageFrom).Limit(page.PageSize)
 	if len(groups) == 0 {
 		db.Table("rules").Find(&rules).Count(&count)
-		err = db.Table("rules").Offset(page.PageFrom).Limit(page.PageSize).Find(&rules).Error
+		err = query.
+			Find(&rules).
+			Error
 	} else if len(groups) != 0 && app == "" {
 		db.Table("rules").
 			Where("groupname in (?)", groups).
 			Scan(&rules).
 			Count(&count)
-		err = db.Debug().Table("rules").
+		err = query.
 			Where("groupname in (?)", groups).
-			Offset(page.PageFrom).
-			Limit(page.PageSize).
 			Scan(&rules).
 			Error
 	} else if len(groups) != 0 && app != "" {
@@ -32,10 +33,8 @@ func (db *datastore) ListAlertRules(page models.Page, groups []string, app strin
 			Where("groupname in (?) AND app = ? ", groups, app).
 			Scan(&rules).
 			Count(&count)
-		err = db.Table("rules").
+		err = query.
 			Where("groupname in (?) AND app = ? ", groups, app).
-			Offset(page.PageFrom).
-			Limit(page.PageSize).
 			Scan(&rules).
 			Error
 	} else {

@@ -277,6 +277,7 @@ func TestDeleteAlertRule(t *testing.T) {
 	alert.PromServer = testServer.URL
 
 	rule := models.NewRule()
+	rule.Group = "work"
 	rule.App = "work-nginx"
 	rule.Pending = "5s"
 	rule.Severity = "warning"
@@ -291,8 +292,8 @@ func TestDeleteAlertRule(t *testing.T) {
 
 	mockStore.EXPECT().GetAlertRule(gomock.Any()).Return(result, nil).Times(1)
 	mockStore.EXPECT().DeleteAlertRuleByID(gomock.Any()).Return(int64(1), nil).Times(1)
-
-	err := alert.DeleteAlertRule(result.ID, "Undefine")
+	groups := []string{"work"}
+	err := alert.DeleteAlertRule(result.ID, groups)
 	if err != nil {
 		t.Errorf("Expect error is nil, but got %v", err)
 	}
@@ -319,6 +320,7 @@ func TestDeleteAlertRuleError(t *testing.T) {
 	alert.PromServer = testServer.URL
 
 	rule := models.NewRule()
+	rule.Group = "work"
 	rule.App = "work-nginx"
 	rule.Pending = "5s"
 	rule.Severity = "warning"
@@ -331,28 +333,30 @@ func TestDeleteAlertRuleError(t *testing.T) {
 	result = *rule
 	result.ID = 1
 
+	groups := []string{"work"}
 	mockStore.EXPECT().GetAlertRule(gomock.Any()).Return(result, errors.New("error")).Times(1)
-	err := alert.DeleteAlertRule(result.ID, "Undefine")
+	err := alert.DeleteAlertRule(result.ID, groups)
 	if err == nil {
 		t.Errorf("Expect error is not nil, but got %v", err)
 	}
 
+	emptyGroups := []string{}
 	mockStore.EXPECT().GetAlertRule(gomock.Any()).Return(result, nil).Times(1)
-	err = alert.DeleteAlertRule(result.ID, "error_group")
+	err = alert.DeleteAlertRule(result.ID, emptyGroups)
 	if err == nil {
 		t.Errorf("Expect error is nil, but got %v", err)
 	}
 
 	mockStore.EXPECT().GetAlertRule(gomock.Any()).Return(result, nil).Times(1)
 	mockStore.EXPECT().DeleteAlertRuleByID(gomock.Any()).Return(int64(1), errors.New("error")).Times(1)
-	err = alert.DeleteAlertRule(result.ID, "Undefine")
+	err = alert.DeleteAlertRule(result.ID, groups)
 	if err == nil {
 		t.Errorf("Expect error is nil, but got %v", err)
 	}
 
 	mockStore.EXPECT().GetAlertRule(gomock.Any()).Return(result, nil).Times(1)
 	mockStore.EXPECT().DeleteAlertRuleByID(gomock.Any()).Return(int64(0), nil).Times(1)
-	err = alert.DeleteAlertRule(result.ID, "Undefine")
+	err = alert.DeleteAlertRule(result.ID, groups)
 	if err != nil {
 		t.Errorf("Expect error is nil, but got %v", err)
 	}

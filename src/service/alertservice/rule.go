@@ -246,7 +246,7 @@ func (alert *Alert) WriteAlertFile(rule *models.Rule) error {
 	return nil
 }
 
-func (alert *Alert) DeleteAlertRule(id uint64, group string) error {
+func (alert *Alert) DeleteAlertRule(id uint64, groups []string) error {
 	var (
 		rowsAffected int64
 		err          error
@@ -259,8 +259,14 @@ func (alert *Alert) DeleteAlertRule(id uint64, group string) error {
 		return fmt.Errorf("DeleteAlertRule: GetAlertRule() %v, ", err)
 	}
 
-	if result.Group != group {
-		return fmt.Errorf("DeleteAlertRule: Can't delete the rule %d with group %s", id, group)
+	isInGroups := false
+	for _, group := range groups {
+		if result.Group == group {
+			isInGroups = true
+		}
+	}
+	if !isInGroups {
+		return fmt.Errorf("DeleteAlertRule: Can't delete the rule %d, it is in group %s", id, result.Group)
 	}
 
 	// Delate alert rule
