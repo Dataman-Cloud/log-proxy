@@ -9,7 +9,7 @@ import (
 func (db *datastore) CreateLogAlertRule(rule *models.LogAlertRule) error {
 	var result models.LogAlertRule
 	notfound := db.Where("log_alert_rules.app = ? AND log_alert_rules.source = ? AND log_alert_rules.keyword = ? "+
-		"AND log_alert_rules.group = ?",
+		"AND log_alert_rules.groupname = ?",
 		rule.App, rule.Source, rule.Keyword, rule.Group).
 		First(&result).
 		RecordNotFound()
@@ -50,14 +50,40 @@ func (db *datastore) GetLogAlertRules(opts map[string]interface{}, page models.P
 		count int
 		rules []*models.LogAlertRule
 	)
-
-	if err := db.Table("log_alert_rules").Where(opts).Find(&rules).Count(&count).Error; err != nil {
-		return nil, err
-	}
-
-	if err := db.Table("log_alert_rules").Where(opts).Offset(page.PageFrom).Limit(page.PageSize).
-		Scan(&rules).Error; err != nil {
-		return nil, err
+	if _, ok := opts["groups"]; ok {
+		groups := opts["groups"]
+		delete(opts, "groups")
+		if err := db.Table("log_alert_rules").
+			Where(opts).
+			Where("groupname in (?)", groups).
+			Find(&rules).
+			Count(&count).
+			Error; err != nil {
+			return nil, err
+		}
+		if err := db.Table("log_alert_rules").
+			Where(opts).
+			Where("groupname in (?)", groups).
+			Offset(page.PageFrom).
+			Limit(page.PageSize).
+			Scan(&rules).Error; err != nil {
+			return nil, err
+		}
+	} else {
+		if err := db.Table("log_alert_rules").
+			Where(opts).
+			Find(&rules).
+			Count(&count).
+			Error; err != nil {
+			return nil, err
+		}
+		if err := db.Table("log_alert_rules").
+			Where(opts).
+			Offset(page.PageFrom).
+			Limit(page.PageSize).
+			Scan(&rules).Error; err != nil {
+			return nil, err
+		}
 	}
 
 	return map[string]interface{}{"count": count, "rules": rules}, nil
@@ -82,13 +108,29 @@ func (db *datastore) GetLogAlertEvents(opts map[string]interface{}, page models.
 		query = query.Where("log_time <= ?", page.RangeTo)
 	}
 
-	if err := query.Where(opts).Find(&events).Count(&count).Error; err != nil {
-		return nil, err
-	}
+	if _, ok := opts["groups"]; ok {
+		groups := opts["groups"]
+		delete(opts, "groups")
+		if err := query.Where(opts).
+			Where("groupname in (?)", groups).
+			Find(&events).Count(&count).Error; err != nil {
+			return nil, err
+		}
 
-	if err := query.Where(opts).Offset(page.PageFrom).Limit(page.PageSize).Order("log_time desc").
-		Scan(&events).Error; err != nil {
-		return nil, err
+		if err := query.Where(opts).
+			Where("groupname in (?)", groups).
+			Offset(page.PageFrom).Limit(page.PageSize).Order("log_time desc").
+			Scan(&events).Error; err != nil {
+			return nil, err
+		}
+	} else {
+		if err := query.Where(opts).Find(&events).Count(&count).Error; err != nil {
+			return nil, err
+		}
+		if err := query.Where(opts).Offset(page.PageFrom).Limit(page.PageSize).Order("log_time desc").
+			Scan(&events).Error; err != nil {
+			return nil, err
+		}
 	}
 
 	return map[string]interface{}{"count": count, "events": events}, nil
@@ -116,8 +158,19 @@ func (db *datastore) GetLogAlertApps(opts map[string]interface{}, page models.Pa
 		query = query.Where("log_time <= ?", page.RangeTo)
 	}
 
-	if err := query.Where(opts).Scan(&apps).Error; err != nil {
-		return nil, err
+	if _, ok := opts["groups"]; ok {
+		groups := opts["groups"]
+		delete(opts, "groups")
+		if err := query.Where(opts).
+			Where("groupname in (?)", groups).
+			Scan(&apps).Error; err != nil {
+			return nil, err
+		}
+	} else {
+		if err := query.Where(opts).
+			Scan(&apps).Error; err != nil {
+			return nil, err
+		}
 	}
 
 	return apps, nil

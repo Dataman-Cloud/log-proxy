@@ -126,6 +126,10 @@ func TestGetLogAlertRules(t *testing.T) {
 
 	_, err := store.GetLogAlertRules(map[string]interface{}{"test": "test"}, models.Page{})
 	assert.NoError(t, err)
+
+	groups := []string{"work"}
+	_, err = store.GetLogAlertRules(map[string]interface{}{"test": "test", "groups": groups}, models.Page{})
+	assert.NoError(t, err)
 }
 
 func TestCreateLogAlertEvent(t *testing.T) {
@@ -161,6 +165,10 @@ func TestGetLogAlertEvents(t *testing.T) {
 		return testdb.RowsFromCSVString(columns, rows), errors.New("test")
 	})
 	_, err = store.GetLogAlertEvents(map[string]interface{}{"test": "test"}, models.Page{RangeFrom: 0, RangeTo: 10})
+	assert.NotNil(t, err)
+
+	groups := []string{"work"}
+	_, err = store.GetLogAlertEvents(map[string]interface{}{"test": "test", "groups": groups}, models.Page{RangeFrom: 0, RangeTo: 10})
 	assert.NotNil(t, err)
 }
 
@@ -213,4 +221,9 @@ func TestGetLogAlertApps(t *testing.T) {
 	})
 	_, err = store.GetLogAlertApps(map[string]interface{}{"test": "test"}, models.Page{RangeFrom: 0, RangeTo: 10})
 	assert.NotNil(t, err)
+
+	groups := []string{"work"}
+	_, err = store.GetLogAlertApps(map[string]interface{}{"test": "test", "groups": groups}, models.Page{RangeFrom: 0, RangeTo: 10})
+	assert.NotNil(t, err)
+
 }

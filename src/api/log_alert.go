@@ -97,8 +97,9 @@ func (s *Search) GetLogAlertRule(ctx *gin.Context) {
 
 func (s *Search) GetLogAlertRules(ctx *gin.Context) {
 	options := make(map[string]interface{})
-	if ctx.Query("group") != "" {
-		options["group"] = ctx.Query("group")
+	groups := ctx.QueryArray("group")
+	if len(groups) != 0 {
+		options["groups"] = ctx.QueryArray("group")
 	}
 
 	rules, err := s.Store.GetLogAlertRules(options, ctx.MustGet("page").(models.Page))
@@ -144,8 +145,10 @@ func (s *Search) DeleteLogAlertRule(ctx *gin.Context) {
 
 func (s *Search) GetLogAlertEvents(ctx *gin.Context) {
 	options := make(map[string]interface{})
-	if ctx.Query("group") != "" {
-		options["group"] = ctx.Query("group")
+
+	groups := ctx.QueryArray("group")
+	if len(groups) != 0 {
+		options["groups"] = groups
 	}
 
 	if ctx.Query("app") != "" {
@@ -164,8 +167,9 @@ func (s *Search) GetLogAlertEvents(ctx *gin.Context) {
 
 func (s *Search) GetLogAlertApps(ctx *gin.Context) {
 	options := make(map[string]interface{})
-	if ctx.Query("group") != "" {
-		options["group"] = ctx.Query("group")
+	groups := ctx.QueryArray("group")
+	if len(groups) != 0 {
+		options["groups"] = groups
 	}
 
 	apps, err := s.Store.GetLogAlertApps(options, ctx.MustGet("page").(models.Page))
