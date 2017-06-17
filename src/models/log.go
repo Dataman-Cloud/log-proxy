@@ -28,7 +28,7 @@ type Alert struct {
 type LogAlertRule struct {
 	ID          uint64    `json:"id" gorm:"not null; auto_increment"`
 	User        string    `json:"user" gorm:"not null" binding:"required"`
-	Group       string    `json:"group" gorm:"not null;column:groupname;"`
+	Group       string    `json:"group" gorm:"not null;column:groupname;" binding:"required"`
 	Cluster     string    `json:"cluster" gorm:"not null"`
 	App         string    `json:"app" gorm:"not null" binding:"required"`
 	Keyword     string    `json:"keyword" gorm:"not null" binding:"required"`
@@ -50,7 +50,7 @@ type LogAlertEvent struct {
 	App         string    `json:"DM_APP_ID" binding:"required"`
 	User        string    `json:"DM_USER" binding:"required"`
 	Task        string    `json:"DM_TASK_ID" binding:"required"`
-	Group       string    `json:"DM_GROUP_NAME" binding:"required"`
+	Group       string    `json:"DM_GROUP_NAME" binding:"required" gorm:"column:groupname"`
 	Cluster     string    `json:"DM_VCLUSTER" binding:"required"`
 	Keyword     string    `json:"keyword"`
 	Ack         bool      `json:"ack" sql:"DEFAULT: false"`
