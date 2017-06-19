@@ -119,7 +119,8 @@ func (alert *Alert) CreateAlertRule(rule *models.Rule) (*models.Rule, error) {
 	}
 	rule.Indicator = indicatorName
 	rule.Unit = indicatorUnit
-	app = strings.Replace(rule.App, "-", "_", -1)
+	replacer := strings.NewReplacer("-", "_", ".", "_")
+	app = replacer.Replace(rule.App)
 	rule.Name = fmt.Sprintf("%s_%s_%s", app, rule.Indicator, rule.Severity)
 	// Create Alert rule in DB
 	err = alert.Store.CreateAlertRule(rule)
